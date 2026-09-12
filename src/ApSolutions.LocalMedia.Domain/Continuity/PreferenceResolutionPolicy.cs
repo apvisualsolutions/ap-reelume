@@ -38,6 +38,10 @@ public sealed record ResolvedPlaybackPreference
     public required SubtitleStyle SubtitleStyle { get; init; }
 
     public PreferenceScope? SubtitleStyleSource { get; init; }
+
+    public required PictureAdjustment Picture { get; init; }
+
+    public PreferenceScope? PictureSource { get; init; }
 }
 
 /// <summary>
@@ -67,6 +71,7 @@ public static class PreferenceResolutionPolicy
         var (volume, volumeSource) = Pick(file, series, global, preference => preference.VolumePercent);
         var (output, outputSource) = Pick(file, series, global, preference => preference.AudioOutputDeviceId);
         var (style, styleSource) = Pick(file, series, global, preference => preference.SubtitleStyle);
+        var (picture, pictureSource) = Pick(file, series, global, preference => preference.Picture);
 
         return new ResolvedPlaybackPreference
         {
@@ -84,6 +89,8 @@ public static class PreferenceResolutionPolicy
             AudioOutputSource = outputSource,
             SubtitleStyle = style ?? SubtitleStyle.EngineDefault,
             SubtitleStyleSource = styleSource,
+            Picture = picture ?? PictureAdjustment.Neutral,
+            PictureSource = pictureSource,
         };
     }
 

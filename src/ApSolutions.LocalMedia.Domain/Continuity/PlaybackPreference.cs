@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Globalization;
+using ApSolutions.LocalMedia.Domain.Playback;
 
 namespace ApSolutions.LocalMedia.Domain.Continuity;
 
@@ -134,6 +135,12 @@ public sealed record PlaybackPreference
     public string? AudioOutputDeviceId { get; init; }
 
     public SubtitleStyle? SubtitleStyle { get; init; }
+
+    /// <summary>
+    /// Brightness, contrast and gamma for the picture. Null means this scope says nothing, which is
+    /// not the same as neutral: a stored neutral overrides a wider scope on purpose.
+    /// </summary>
+    public PictureAdjustment? Picture { get; init; }
 
     /// <summary>The global scope always uses the same key so it can be stored in one row.</summary>
     public static string GlobalKey => "global";

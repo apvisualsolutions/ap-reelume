@@ -7,7 +7,11 @@
 - Pruebas re-ejecutables / Re-runnable tests:
   `tests/ApSolutions.LocalMedia.Domain.Tests/Playback/PictureAdjustmentTests.cs`,
   `tests/ApSolutions.LocalMedia.MediaTests/Playback/PackedYuvConverterTests.cs`,
-  `tests/ApSolutions.LocalMedia.MediaTests/Playback/PictureAdjustmentOnRealFramesTests.cs`
+  `tests/ApSolutions.LocalMedia.MediaTests/Playback/PictureAdjustmentOnRealFramesTests.cs`,
+  `tests/ApSolutions.LocalMedia.Domain.Tests/Continuity/PreferenceResolutionTests.cs`,
+  `tests/ApSolutions.LocalMedia.Application.Tests/Playback/ApplyPlaybackPreferencesTests.cs`,
+  `tests/ApSolutions.LocalMedia.IntegrationTests/Playback/PlaybackPreferenceRepositoryTests.cs`,
+  `tests/ApSolutions.LocalMedia.IntegrationTests/Data/MigrationHistoryTests.cs`
 
 ## Veredicto / Verdict
 
@@ -126,7 +130,49 @@ punto ciego no es una prueba que falta, es una familia entera de filas que se mu
   hace el `eq` de ffmpeg y lo que el propietario miró y aprobó, así que es el comportamiento; pero
   un comentario que lo niega haría que el siguiente se fiara de un extremo que ningún vídeo alcanza.
 
+## La preferencia que lo recuerda, y las cinco puertas ciegas que traía dentro
+
+El ajuste viaja en `PlaybackPreference.Picture`, al lado de la velocidad, con los tres ámbitos que ya
+existían: `File`, `Series` y `Global`, resueltos **campo a campo** y no objeto a objeto. La migración
+`0023` añade tres columnas `REAL NULL`, y el repositorio las lee **al final** de su lista —índices 20
+a 22— porque su lectura es posicional y meterlas junto a la velocidad habría desplazado en silencio
+los seis campos del estilo de subtítulos.
+
+**La decisión que gobierna todo lo demás: un neutro almacenado NO es un silencio.** `NULL` significa
+«este ámbito no dice nada» y deja contestar al siguiente; un neutro guardado significa «aquí alguien
+lo deshizo» y gana sobre el ámbito más ancho. De ahí que la migración **no rellene** las filas ya
+almacenadas: hacerlo convertiría cada silencio en esa decisión, y un ajuste global no volvería a
+alcanzar ninguna película ya vista.
+
+Y el ajuste se escribe en el motor **al abrir, responda o no un ámbito**, que es justo lo contrario
+de la regla de las pistas de al lado. El motor es un `singleton` y sobrevive al archivo, así que sin
+esa escritura la película siguiente heredaría el ajuste de la anterior.
+
+### Las cinco que `gate-auditor` encontró, cada una probada por mutación
+
+| Mutación que sobrevivía | Por qué nadie la veía | Qué la caza ahora |
+| --- | --- | --- |
+| Quitar las tres columnas de imagen del `ON CONFLICT … DO UPDATE` | el round-trip sólo insertaba sobre una fila que no existía, y **en producción la fila casi siempre existe ya** —un volumen, una pista—, así que la única rama que se usa era la única sin medir | ajustar dos veces el mismo ámbito, con un volumen dentro para forzar el conflicto |
+| Guardar `0/1/1` donde no hay ajuste | la prueba de «un campo sin poner sigue sin poner» afirmaba velocidad, subtítulo y estilo, y no la imagen | afirmar también `Picture`, que es lo que el comentario de esa suite lleva prohibiendo desde que se escribió |
+| Que la migración rellenara las filas viejas | `pragma_table_info` describe la **forma** de la columna sobre una base recién creada, que **no tiene filas**; la promesa de la cabecera no la comprueba nadie | migrar a la 22, escribir una fila, migrar a la 23 y leerla: sigue callada |
+| Que la serie ganara al archivo, sólo para la imagen | ninguna fila ponía valor en archivo **y** en serie a la vez, y sin esa fila los dos órdenes contestan lo mismo | los tres ámbitos con valor, más la vuelta sin el archivo |
+| Dejar la guarda de `NULL` sólo en la primera columna | la fila fuera de rango ejercía el `catch` del dominio, nunca la fila a medias — y ese fallo es un `InvalidOperationException`, que el `catch` de al lado **no** atrapa | una fila con brillo y gamma y el contraste en `NULL` |
+
+**La tercera es la más cara de las cinco si se escapa**, porque no rompe nada: deja cada película ya
+vista llevando un neutro que nadie decidió, y el ajuste global deja de llegarles para siempre sin un
+solo error por ninguna parte.
+
+### Y una sexta, vista por inspección y no por mutación
+
+`if (engine is IPictureAdjustable adjustable)` **no tenía rama de fallo en toda la suite**: el doble
+de la prueba implementa la interfaz por construcción, así que un motor envuelto en un decorador
+dejaría morir el ajuste en silencio y ninguna prueba lo diría. Ahora hay un motor de prueba que
+reenvía todo `IMediaPlayerEngine` y **se deja atrás** esa interfaz, que es exactamente lo que un
+decorador haría sin querer.
+
 ## Lo que queda
 
-- El control en pantalla y la preferencia que lo recuerda.
+- El control en pantalla: el panel de imagen dentro del engranaje del reproductor (`ADR-0012`).
+- El coste por fotograma medido contra un presupuesto, que el criterio de la fila promete y todavía
+  no tiene ni una cifra de tiempo.
 - El juicio final sobre el valor por defecto, que es del propietario y se firma por el ojo.

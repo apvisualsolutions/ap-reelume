@@ -3,6 +3,7 @@
 
 using System.Globalization;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Domain.Playback;
 using Microsoft.Data.Sqlite;
 
 namespace ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
@@ -18,7 +19,8 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
         subtitle_language, subtitle_channels, subtitle_codec, subtitle_prefer_external,
         subtitles_enabled, speed_multiplier, volume_percent, audio_output_device_id,
         subtitle_font_size_percent, subtitle_font_family, subtitle_foreground, subtitle_background,
-        subtitle_background_opacity, subtitle_outline_thickness
+        subtitle_background_opacity, subtitle_outline_thickness,
+        picture_brightness, picture_contrast, picture_gamma
         """;
 
     private readonly SqliteConnectionFactory _connectionFactory;
@@ -58,12 +60,14 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
                 subtitles_enabled, speed_multiplier, volume_percent, audio_output_device_id,
                 subtitle_font_size_percent, subtitle_font_family, subtitle_foreground,
                 subtitle_background, subtitle_background_opacity, subtitle_outline_thickness,
+                picture_brightness, picture_contrast, picture_gamma,
                 updated_at)
             VALUES (
                 $scope, $key, $audioLanguage, $audioChannels, $audioCodec, $audioExternal,
                 $subtitleLanguage, $subtitleChannels, $subtitleCodec, $subtitleExternal,
                 $subtitlesEnabled, $speed, $volume, $device,
                 $fontSize, $fontFamily, $foreground, $background, $backgroundOpacity, $outline,
+                $brightness, $contrast, $gamma,
                 $updatedAt)
             ON CONFLICT(scope, scope_key) DO UPDATE SET
                 audio_language = excluded.audio_language,
@@ -84,6 +88,9 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
                 subtitle_background = excluded.subtitle_background,
                 subtitle_background_opacity = excluded.subtitle_background_opacity,
                 subtitle_outline_thickness = excluded.subtitle_outline_thickness,
+                picture_brightness = excluded.picture_brightness,
+                picture_contrast = excluded.picture_contrast,
+                picture_gamma = excluded.picture_gamma,
                 updated_at = excluded.updated_at;
             """;
         command.Parameters.AddWithValue("$scope", (int)preference.Scope);
@@ -100,6 +107,9 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
         AddNullable(command, "$background", preference.SubtitleStyle?.BackgroundHex);
         AddNullable(command, "$backgroundOpacity", preference.SubtitleStyle?.BackgroundOpacity);
         AddNullable(command, "$outline", preference.SubtitleStyle?.OutlineThickness);
+        AddNullable(command, "$brightness", preference.Picture?.Brightness);
+        AddNullable(command, "$contrast", preference.Picture?.Contrast);
+        AddNullable(command, "$gamma", preference.Picture?.Gamma);
         command.Parameters.AddWithValue(
             "$updatedAt",
             DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture));
@@ -145,6 +155,7 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
         VolumePercent = reader.IsDBNull(12) ? null : reader.GetInt32(12),
         AudioOutputDeviceId = reader.IsDBNull(13) ? null : reader.GetString(13),
         SubtitleStyle = ReadStyle(reader, 14),
+        Picture = ReadPicture(reader, 20),
     };
 
     private static TrackSelection? ReadSelection(SqliteDataReader reader, int offset)
@@ -160,6 +171,32 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
         }
 
         return new TrackSelection(language, channels, codec, reader.GetInt32(offset + 3) == 1);
+    }
+
+    /// <summary>
+    /// Reads the three picture columns, and answers «nobody stored one» for a row that cannot make a
+    /// valid adjustment. <see cref="PictureAdjustment"/> rejects a value outside its range instead of
+    /// clamping it, which is right for a control but would turn a hand-edited database into a film
+    /// that will not open. Falling through to the next scope is what a missing column already means.
+    /// </summary>
+    private static PictureAdjustment? ReadPicture(SqliteDataReader reader, int offset)
+    {
+        if (reader.IsDBNull(offset) || reader.IsDBNull(offset + 1) || reader.IsDBNull(offset + 2))
+        {
+            return null;
+        }
+
+        try
+        {
+            return new PictureAdjustment(
+                reader.GetDouble(offset),
+                reader.GetDouble(offset + 1),
+                reader.GetDouble(offset + 2));
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return null;
+        }
     }
 
     private static SubtitleStyle? ReadStyle(SqliteDataReader reader, int offset)

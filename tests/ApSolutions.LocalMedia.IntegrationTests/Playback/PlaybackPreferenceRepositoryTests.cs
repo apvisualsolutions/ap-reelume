@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Domain.Playback;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
@@ -33,6 +34,7 @@ public sealed class PlaybackPreferenceRepositoryTests
             VolumePercent = 140,
             AudioOutputDeviceId = "stable-endpoint-id",
             SubtitleStyle = SubtitleStyle.Create(150, "Verdana", "#FFFFFF00", "#80101010", 0.6, 2.5),
+            Picture = new PictureAdjustment(0.35, 1.2, 1.6),
         };
 
         await repository.SaveAsync(preference, TestContext.Current.CancellationToken);
@@ -49,6 +51,115 @@ public sealed class PlaybackPreferenceRepositoryTests
         Assert.Equal(140, restored.VolumePercent);
         Assert.Equal("stable-endpoint-id", restored.AudioOutputDeviceId);
         Assert.Equal(preference.SubtitleStyle, restored.SubtitleStyle);
+        Assert.Equal(new PictureAdjustment(0.35, 1.2, 1.6), restored.Picture);
+    }
+
+    /// <summary>
+    /// Adjusting a second time overwrites the first, which is the branch production almost always
+    /// takes: a row usually exists already because a volume or a track was stored in it, so the
+    /// INSERT falls through to the conflict clause and never runs as an insert at all.
+    /// </summary>
+    [Fact]
+    public async Task Adjusting_the_picture_twice_keeps_the_second_setting()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
+        var repository = new PlaybackPreferenceRepository(factory);
+        var key = PlaybackPreference.FileKey(Guid.Empty);
+
+        await repository.SaveAsync(
+            new PlaybackPreference
+            {
+                Scope = PreferenceScope.File,
+                ScopeKey = key,
+                VolumePercent = 80,
+                Picture = new PictureAdjustment(0.1, 1.1, 1.1),
+            },
+            TestContext.Current.CancellationToken);
+        await repository.SaveAsync(
+            new PlaybackPreference
+            {
+                Scope = PreferenceScope.File,
+                ScopeKey = key,
+                VolumePercent = 80,
+                Picture = new PictureAdjustment(0.4, 1.3, 1.6),
+            },
+            TestContext.Current.CancellationToken);
+
+        var stored = await repository.GetAsync(PreferenceScope.File, key, TestContext.Current.CancellationToken);
+
+        Assert.Equal(new PictureAdjustment(0.4, 1.3, 1.6), stored!.Picture);
+    }
+
+    /// <summary>
+    /// A row with only some of the three columns filled reads back as «nobody stored one» too. The
+    /// out-of-range row below exercises the domain's refusal; this one exercises the NULL guard, and
+    /// without it the reader throws <see cref="InvalidOperationException"/> — which the refusal's
+    /// own catch does not cover, so the film simply would not open.
+    /// </summary>
+    [Fact]
+    public async Task A_half_written_picture_row_reads_back_as_no_adjustment()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
+        var key = PlaybackPreference.FileKey(Guid.Empty);
+
+        await using (var connection = await factory.OpenAsync(TestContext.Current.CancellationToken))
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                INSERT INTO playback_preferences (
+                    scope, scope_key, picture_brightness, picture_contrast, picture_gamma, updated_at)
+                VALUES ($scope, $key, 0.4, NULL, 1.6, '2026-09-12T00:00:00.0000000+00:00');
+                """;
+            command.Parameters.AddWithValue("$scope", (int)PreferenceScope.File);
+            command.Parameters.AddWithValue("$key", key);
+            _ = await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        }
+
+        var stored = await new PlaybackPreferenceRepository(factory).GetAsync(
+            PreferenceScope.File,
+            key,
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(stored);
+        Assert.Null(stored!.Picture);
+    }
+
+    /// <summary>
+    /// A row whose picture columns cannot make a valid adjustment reads back as «nobody stored one»
+    /// instead of throwing. <see cref="PictureAdjustment"/> rejects out-of-range values rather than
+    /// clamping them, so without this the only way to reach a hand-edited database would be to open
+    /// a film that refuses to open.
+    /// </summary>
+    [Fact]
+    public async Task A_picture_row_outside_the_allowed_range_reads_back_as_no_adjustment()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
+        var key = PlaybackPreference.FileKey(Guid.Empty);
+
+        await using (var connection = await factory.OpenAsync(TestContext.Current.CancellationToken))
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                INSERT INTO playback_preferences (
+                    scope, scope_key, picture_brightness, picture_contrast, picture_gamma, updated_at)
+                VALUES ($scope, $key, 9.0, 1.0, 1.0, '2026-09-12T00:00:00.0000000+00:00');
+                """;
+            command.Parameters.AddWithValue("$scope", (int)PreferenceScope.File);
+            command.Parameters.AddWithValue("$key", key);
+            _ = await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        }
+
+        var stored = await new PlaybackPreferenceRepository(factory).GetAsync(
+            PreferenceScope.File,
+            key,
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(stored);
+        Assert.Null(stored!.Picture);
+        Assert.Equal(PictureAdjustment.Neutral, PreferenceResolutionPolicy.Resolve(stored, null, null).Picture);
     }
 
     [Fact]
@@ -88,6 +199,9 @@ public sealed class PlaybackPreferenceRepositoryTests
         Assert.Null(file!.SpeedMultiplier);
         Assert.Null(file.Subtitle);
         Assert.Null(file.SubtitleStyle);
+        // Storing the neutral here instead of nothing would look harmless and would mean this file
+        // had been adjusted and set back, so no wider scope could ever reach it again.
+        Assert.Null(file.Picture);
 
         var resolved = PreferenceResolutionPolicy.Resolve(file, null, global);
         Assert.Equal("spa", resolved.Audio.Language);

@@ -270,6 +270,69 @@ public sealed class PreferenceResolutionTests
             PreferenceResolutionPolicy.PrecedenceOrder);
     }
 
+    [Fact]
+    public void The_picture_adjustment_answers_from_the_narrowest_scope_that_stored_one()
+    {
+        var global = Preference(PreferenceScope.Global, "global") with
+        {
+            Picture = new PictureAdjustment(0.1, 1.1, 1.1),
+        };
+        var series = Preference(PreferenceScope.Series, "series:1") with
+        {
+            Picture = new PictureAdjustment(0.4, 1.3, 1.6),
+        };
+        var file = Preference(PreferenceScope.File, "file:1") with
+        {
+            Picture = new PictureAdjustment(-0.2, 0.9, 2.4),
+        };
+
+        // All three carry one, which is the only arrangement that can tell File from Series. With
+        // the file silent the two orders answer the same thing, and a swapped precedence passes.
+        var narrowest = PreferenceResolutionPolicy.Resolve(file, series, global);
+
+        Assert.Equal(new PictureAdjustment(-0.2, 0.9, 2.4), narrowest.Picture);
+        Assert.Equal(PreferenceScope.File, narrowest.PictureSource);
+
+        var withoutTheFile = PreferenceResolutionPolicy.Resolve(
+            Preference(PreferenceScope.File, "file:1"),
+            series,
+            global);
+
+        Assert.Equal(new PictureAdjustment(0.4, 1.3, 1.6), withoutTheFile.Picture);
+        Assert.Equal(PreferenceScope.Series, withoutTheFile.PictureSource);
+    }
+
+    [Fact]
+    public void A_picture_adjustment_nobody_stored_is_neutral_and_names_no_scope()
+    {
+        var resolved = PreferenceResolutionPolicy.Resolve(null, null, null);
+
+        Assert.Equal(PictureAdjustment.Neutral, resolved.Picture);
+        Assert.Null(resolved.PictureSource);
+    }
+
+    /// <summary>
+    /// A stored neutral is a decision and not a silence: someone who undoes the adjustment for one
+    /// film must not get the global one back the next time they open it.
+    /// </summary>
+    [Fact]
+    public void A_stored_neutral_overrides_a_wider_scope_instead_of_falling_through_it()
+    {
+        var global = Preference(PreferenceScope.Global, "global") with
+        {
+            Picture = new PictureAdjustment(0.4, 1.3, 1.6),
+        };
+        var file = Preference(PreferenceScope.File, "file:1") with
+        {
+            Picture = PictureAdjustment.Neutral,
+        };
+
+        var resolved = PreferenceResolutionPolicy.Resolve(file, null, global);
+
+        Assert.Equal(PictureAdjustment.Neutral, resolved.Picture);
+        Assert.Equal(PreferenceScope.File, resolved.PictureSource);
+    }
+
     private static PlaybackPreference Preference(
         PreferenceScope scope,
         string key,

@@ -116,14 +116,79 @@ public sealed class ApplyPlaybackPreferencesTests
         Assert.Equal(["beside.srt", "beside.es.srt"], engine.ExternalSubtitles);
     }
 
+    [Fact]
+    public async Task The_stored_picture_adjustment_reaches_the_engine_as_the_file_opens()
+    {
+        var engine = new RecordingEngine([SpanishAudio], activeAudioTrackId: "1", activeSubtitleTrackId: null);
+        var apply = new ApplyPlaybackPreferences(new StoredPreferences(new PlaybackPreference
+        {
+            Scope = PreferenceScope.Series,
+            ScopeKey = "series",
+            Picture = new PictureAdjustment(0.3, 1.2, 1.6),
+        }));
+
+        var applied = await apply.ApplyAsync(engine, Context(), TestContext.Current.CancellationToken);
+
+        Assert.Equal(new PictureAdjustment(0.3, 1.2, 1.6), engine.PictureAdjustment);
+        Assert.Equal(PreferenceScope.Series, applied.Resolved.PictureSource);
+    }
+
+    /// <summary>
+    /// Here silence <b>is</b> a value, which is the opposite of the subtitle rule above and worth the
+    /// words. The engine outlives the file: it is a singleton, so an adjustment left over from the
+    /// last film would carry into the next one unless opening writes the resolved value either way.
+    /// </summary>
+    [Fact]
+    public async Task A_file_nobody_adjusted_opens_neutral_instead_of_keeping_the_last_ones()
+    {
+        var engine = new RecordingEngine([SpanishAudio], activeAudioTrackId: "1", activeSubtitleTrackId: null)
+        {
+            PictureAdjustment = new PictureAdjustment(0.5, 1.4, 2.0),
+        };
+        var apply = new ApplyPlaybackPreferences(new EmptyPreferences());
+
+        var applied = await apply.ApplyAsync(engine, Context(), TestContext.Current.CancellationToken);
+
+        Assert.Equal(PictureAdjustment.Neutral, engine.PictureAdjustment);
+        Assert.Null(applied.Resolved.PictureSource);
+    }
+
+    /// <summary>
+    /// An engine with no picture to adjust is opened without complaint, and this is the half of the
+    /// test that the double above cannot give: it implements the interface by construction, so the
+    /// filter around the assignment has no failing branch anywhere in the suite. An engine that
+    /// draws into a window of its own has no pixels here, which is why the two interfaces are
+    /// separate at all.
+    /// </summary>
+    [Fact]
+    public async Task An_engine_with_no_picture_to_adjust_opens_without_complaint()
+    {
+        var inner = new RecordingEngine([SpanishAudio], activeAudioTrackId: "1", activeSubtitleTrackId: null);
+        var engine = new EngineWithoutAPicture(inner);
+        var apply = new ApplyPlaybackPreferences(new StoredPreferences(new PlaybackPreference
+        {
+            Scope = PreferenceScope.Series,
+            ScopeKey = "series",
+            Picture = new PictureAdjustment(0.3, 1.2, 1.6),
+        }));
+
+        var applied = await apply.ApplyAsync(engine, Context(), TestContext.Current.CancellationToken);
+
+        Assert.Equal(new PictureAdjustment(0.3, 1.2, 1.6), applied.Resolved.Picture);
+        Assert.Equal(PictureAdjustment.Neutral, inner.PictureAdjustment);
+        Assert.Equal(SpanishAudio, applied.Audio);
+    }
+
     private static PlaybackPreferenceContext Context() => new("file", "series", []);
 
     /// <summary>Records what the engine was told to do, and answers with a fixed announcement.</summary>
     private sealed class RecordingEngine(
         IReadOnlyList<MediaTrack> tracks,
         string? activeAudioTrackId,
-        string? activeSubtitleTrackId) : IMediaPlayerEngine
+        string? activeSubtitleTrackId) : IMediaPlayerEngine, IPictureAdjustable
     {
+        public PictureAdjustment PictureAdjustment { get; set; } = PictureAdjustment.Neutral;
+
         public List<(MediaTrackKind Kind, string? TrackId)> Selections { get; } = [];
 
         public List<string> ExternalSubtitles { get; } = [];
@@ -189,6 +254,63 @@ public sealed class ApplyPlaybackPreferencesTests
             Task.CompletedTask;
 
         public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    }
+
+    /// <summary>
+    /// An engine seen only as one: everything forwarded, and <see cref="IPictureAdjustable"/> left
+    /// behind, which is what a decorator around the real engine would do by accident.
+    /// </summary>
+    private sealed class EngineWithoutAPicture(RecordingEngine inner) : IMediaPlayerEngine
+    {
+        public PlaybackState State => inner.State;
+
+#pragma warning disable CS0067 // The contract declares these events; this double never raises them.
+        public event EventHandler<PlaybackStateChangedEventArgs>? StateChanged;
+
+        public event EventHandler<PlaybackPositionChangedEventArgs>? PositionChanged;
+
+        public event EventHandler<PlaybackFailureEventArgs>? Failure;
+#pragma warning restore CS0067
+
+        public Task InitializeAsync(CancellationToken cancellationToken = default) =>
+            inner.InitializeAsync(cancellationToken);
+
+        public Task OpenAsync(PlaybackRequest request, CancellationToken cancellationToken = default) =>
+            inner.OpenAsync(request, cancellationToken);
+
+        public Task PlayAsync(CancellationToken cancellationToken = default) => inner.PlayAsync(cancellationToken);
+
+        public Task PauseAsync(CancellationToken cancellationToken = default) => inner.PauseAsync(cancellationToken);
+
+        public Task SeekAsync(TimeSpan position, CancellationToken cancellationToken = default) =>
+            inner.SeekAsync(position, cancellationToken);
+
+        public Task StopAsync(CancellationToken cancellationToken = default) => inner.StopAsync(cancellationToken);
+
+        public Task<PlaybackSnapshot> GetSnapshotAsync(CancellationToken cancellationToken = default) =>
+            inner.GetSnapshotAsync(cancellationToken);
+
+        public Task SelectTrackAsync(
+            MediaTrackKind kind,
+            string? trackId,
+            CancellationToken cancellationToken = default) =>
+            inner.SelectTrackAsync(kind, trackId, cancellationToken);
+
+        public Task<MediaTrack> AddExternalSubtitleAsync(
+            string path,
+            CancellationToken cancellationToken = default) =>
+            inner.AddExternalSubtitleAsync(path, cancellationToken);
+
+        public Task SetSpeedAsync(double multiplier, CancellationToken cancellationToken = default) =>
+            inner.SetSpeedAsync(multiplier, cancellationToken);
+
+        public Task SetAudioOutputDeviceAsync(string deviceId, CancellationToken cancellationToken = default) =>
+            inner.SetAudioOutputDeviceAsync(deviceId, cancellationToken);
+
+        public Task ApplyVolumeAsync(VolumeDecision decision, CancellationToken cancellationToken = default) =>
+            inner.ApplyVolumeAsync(decision, cancellationToken);
+
+        public ValueTask DisposeAsync() => inner.DisposeAsync();
     }
 
     /// <summary>A library nobody has expressed a preference in.</summary>

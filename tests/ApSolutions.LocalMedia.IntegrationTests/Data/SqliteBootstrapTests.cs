@@ -43,10 +43,10 @@ public sealed class SqliteBootstrapTests
         Assert.Equal(1L, await ScalarInt64Async(connection, "PRAGMA foreign_keys;"));
         Assert.True(await ScalarInt64Async(connection, "PRAGMA busy_timeout;") >= 5000L);
         Assert.Equal("ok", await ScalarTextAsync(connection, "PRAGMA integrity_check;"));
-        Assert.Equal(22L, await ScalarInt64Async(connection, "SELECT COUNT(*) FROM schema_history;"));
-        Assert.Equal(22L, await ScalarInt64Async(connection, "SELECT MAX(version) FROM schema_history;"));
+        Assert.Equal(23L, await ScalarInt64Async(connection, "SELECT COUNT(*) FROM schema_history;"));
+        Assert.Equal(23L, await ScalarInt64Async(connection, "SELECT MAX(version) FROM schema_history;"));
         Assert.Equal(
-            "initial,library_roots,media_files_scans,catalog_fts,file_identity,scanned_catalog_projection,match_candidates,metadata_cache,rename_log,playback_preferences,watch_state,intro_markers,personal_state,episode_media,catalog_metadata_versions,detected_markers,trailer_key,provider_reference,match_candidate_title,five_star_rating,scanned_title_year,courses",
+            "initial,library_roots,media_files_scans,catalog_fts,file_identity,scanned_catalog_projection,match_candidates,metadata_cache,rename_log,playback_preferences,watch_state,intro_markers,personal_state,episode_media,catalog_metadata_versions,detected_markers,trailer_key,provider_reference,match_candidate_title,five_star_rating,scanned_title_year,courses,picture_adjustment",
             await ScalarTextAsync(connection, "SELECT group_concat(name, ',') FROM schema_history ORDER BY version;"));
 
         var tables = await ReadStringsAsync(
@@ -155,6 +155,38 @@ public sealed class SqliteBootstrapTests
                 """));
     }
 
+    /// <summary>
+    /// Brightness, contrast and gamma, one column each.
+    /// </summary>
+    /// <remarks>
+    /// All three nullable and with no default, because a NULL means this scope says nothing and the
+    /// next one answers, while a stored neutral means someone undid the adjustment here. A default
+    /// would erase that difference for every row the migration touches.
+    /// </remarks>
+    [Theory]
+    [InlineData("picture_brightness")]
+    [InlineData("picture_contrast")]
+    [InlineData("picture_gamma")]
+    public async Task The_picture_adjustment_is_three_nullable_columns_without_a_default(string column)
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = DatabaseTestHarness.CreateFactory(directory.DatabasePath);
+        var runner = DatabaseTestHarness.CreateDefaultRunner(factory);
+
+        await DatabaseTestHarness.MigrateAsync(runner);
+        await using var connection = await DatabaseTestHarness.OpenAsync(factory);
+
+        Assert.Equal(
+            $"{column}|REAL|0|",
+            await ScalarTextAsync(
+                connection,
+                $"""
+                SELECT name || '|' || type || '|' || "notnull" || '|' || COALESCE(dflt_value, '')
+                FROM pragma_table_info('playback_preferences')
+                WHERE name = '{column}';
+                """));
+    }
+
     [Fact]
     public async Task Migration_is_idempotent_and_creates_one_valid_copy_per_new_migration()
     {
@@ -166,14 +198,14 @@ public sealed class SqliteBootstrapTests
         var backupPath = Assert.IsType<string>(runner.GetType().GetProperty("LastBackupPath")?.GetValue(runner));
         Assert.True(File.Exists(backupPath));
         var backups = Directory.EnumerateFiles(directory.Path, "*.pre-migration-*.bak").Order().ToArray();
-        Assert.Equal(22, backups.Length);
+        Assert.Equal(23, backups.Length);
 
         await DatabaseTestHarness.MigrateAsync(runner);
         Assert.Equal(backupPath, runner.GetType().GetProperty("LastBackupPath")?.GetValue(runner));
         Assert.Equal(backups, Directory.EnumerateFiles(directory.Path, "*.pre-migration-*.bak").Order().ToArray());
 
         await using var active = await DatabaseTestHarness.OpenAsync(factory);
-        Assert.Equal(22L, await ScalarInt64Async(active, "SELECT COUNT(*) FROM schema_history;"));
+        Assert.Equal(23L, await ScalarInt64Async(active, "SELECT COUNT(*) FROM schema_history;"));
         Assert.Equal("ok", await ScalarTextAsync(active, "PRAGMA integrity_check;"));
 
         foreach (var path in backups)
