@@ -5,6 +5,18 @@ using System.Globalization;
 
 namespace ApSolutions.LocalMedia.Windows.Playback;
 
+/// <summary>
+/// What the probe draws before it asks a card to enlarge it.
+/// </summary>
+public enum UpscaleProbeContent
+{
+    /// <summary>Hard synthetic edges with flat colour: the original picture, kept as the control.</summary>
+    Bands = 0,
+
+    /// <summary>Gradients, fine texture and moving colour: the shape of a decoded frame.</summary>
+    Detail = 1,
+}
+
 /// <summary>The card behind the video processor, which decides which super resolution to ask for.</summary>
 public enum GpuVendor
 {
@@ -170,8 +182,30 @@ public static class D3d11UpscaleFormats
     /// came out of one that did everything. Colour is left flat for the same reason — what these
     /// models rebuild is detail, and detail lives in the luma.
     /// </remarks>
-    public static byte[] TestPattern(string format, int width, int height, out int pitch)
+    public static byte[] TestPattern(string format, int width, int height, out int pitch) =>
+        TestPattern(format, width, height, UpscaleProbeContent.Bands, out pitch);
+
+    /// <summary>
+    /// The same picture in <paramref name="content"/>'s shape. <see cref="UpscaleProbeContent.Bands"/>
+    /// is the original: hard synthetic edges, flat colour. <see cref="UpscaleProbeContent.Detail"/>
+    /// is what a decoded frame looks like instead — gradients, fine texture, and colour that moves.
+    /// </summary>
+    public static byte[] TestPattern(
+        string format,
+        int width,
+        int height,
+        UpscaleProbeContent content,
+        out int pitch)
     {
+        if (content is not (UpscaleProbeContent.Bands or UpscaleProbeContent.Detail))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(content),
+                content,
+                "There is no such picture, and drawing another one would answer a question nobody asked.");
+        }
+
+        var detail = content == UpscaleProbeContent.Detail;
         switch (format)
         {
             case "YUY2":
@@ -182,8 +216,10 @@ public static class D3d11UpscaleFormats
                     for (var x = 0; x < width; x++)
                     {
                         var at = (y * pitch) + (x * 2);
-                        packed[at] = Luma(x, y);
-                        packed[at + 1] = 128;
+                        packed[at] = detail ? DetailLuma(x, y) : Luma(x, y);
+
+                        // U and V alternate along the row in a packed 4:2:2 picture.
+                        packed[at + 1] = detail ? DetailChroma(x / 2, y, (x & 1) == 0) : (byte)128;
                     }
                 }
 
@@ -196,11 +232,27 @@ public static class D3d11UpscaleFormats
                 {
                     for (var x = 0; x < width; x++)
                     {
-                        planar[(y * width) + x] = Luma(x, y);
+                        planar[(y * width) + x] = detail ? DetailLuma(x, y) : Luma(x, y);
                     }
                 }
 
-                Array.Fill(planar, (byte)128, width * height, planar.Length - (width * height));
+                if (detail)
+                {
+                    for (var y = 0; y < height / 2; y++)
+                    {
+                        for (var x = 0; x < width / 2; x++)
+                        {
+                            var at = (width * height) + (y * width) + (x * 2);
+                            planar[at] = DetailChroma(x, y * 2, true);
+                            planar[at + 1] = DetailChroma(x, y * 2, false);
+                        }
+                    }
+                }
+                else
+                {
+                    Array.Fill(planar, (byte)128, width * height, planar.Length - (width * height));
+                }
+
                 return planar;
 
             case "B8G8R8A8_UNORM":
@@ -212,10 +264,10 @@ public static class D3d11UpscaleFormats
                     for (var x = 0; x < width; x++)
                     {
                         var at = (y * pitch) + (x * 4);
-                        var value = Luma(x, y);
-                        rgba[at] = value;
+                        var value = detail ? DetailLuma(x, y) : Luma(x, y);
+                        rgba[at] = detail ? DetailChroma(x / 2, y, true) : value;
                         rgba[at + 1] = value;
-                        rgba[at + 2] = value;
+                        rgba[at + 2] = detail ? DetailChroma(x / 2, y, false) : value;
                         rgba[at + 3] = 255;
                     }
                 }
@@ -254,6 +306,29 @@ public static class D3d11UpscaleFormats
 
     /// <summary>Broadcast black and white in bands three and five pixels wide, which never line up.</summary>
     private static byte Luma(int x, int y) => ((x / 3) + (y / 5)) % 2 == 0 ? (byte)235 : (byte)16;
+
+    /// <summary>
+    /// Luma for the detail picture: a slow diagonal gradient with fine texture over it and a small
+    /// deterministic dither on top, which is the shape of a decoded frame rather than of a test card.
+    /// Kept inside limited range, because that is what a decoder publishes.
+    /// </summary>
+    private static byte DetailLuma(int x, int y)
+    {
+        var gradient = 40 + (((x * 3) + (y * 5)) % 150);
+        var texture = ((x / 2) + (y / 2)) % 2 == 0 ? 18 : -18;
+        var dither = ((x * 7) + (y * 13) + (x * y / 3)) % 11 - 5;
+        return (byte)Math.Clamp(gradient + texture + dither, 16, 235);
+    }
+
+    /// <summary>
+    /// Chroma for the detail picture, which the band picture leaves flat at 128. Real frames carry
+    /// colour that moves, and whether that matters to a vendor's model is exactly what is unmeasured.
+    /// </summary>
+    private static byte DetailChroma(int x, int y, bool isU)
+    {
+        var wave = isU ? (x * 5) + (y * 2) : (x * 2) - (y * 5);
+        return (byte)Math.Clamp(128 + (wave % 47) - 23, 16, 240);
+    }
 
     /// <summary>
     /// What a card's answer means, decided here rather than in a person's head.

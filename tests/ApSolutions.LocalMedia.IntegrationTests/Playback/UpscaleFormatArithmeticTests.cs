@@ -423,6 +423,64 @@ public sealed class UpscaleFormatArithmeticTests
             pixels,
             null);
 
+    /// <summary>
+    /// The second picture exists because the first one assumes something nobody measured: that a
+    /// vendor's super resolution has anything to do with hard synthetic bands. These are neural
+    /// models trained on compressed video, and the probe's own numbers hint at it — the same bands
+    /// come back off an RTX 5070 with six distinct byte values and off an Intel UHD with forty-four.
+    /// So the detail picture carries what a frame actually carries: gradients, fine texture, and
+    /// colour that is not flat.
+    /// </summary>
+    [Theory]
+    [InlineData("YUY2")]
+    [InlineData("NV12")]
+    [InlineData("B8G8R8A8_UNORM")]
+    public void The_detail_picture_carries_colour_where_the_band_picture_carries_none(string format)
+    {
+        var bands = D3d11UpscaleFormats.TestPattern(
+            format, 64, 32, UpscaleProbeContent.Bands, out _);
+        var detail = D3d11UpscaleFormats.TestPattern(
+            format, 64, 32, UpscaleProbeContent.Detail, out _);
+
+        Assert.Equal(bands.Length, detail.Length);
+        Assert.True(
+            detail.Distinct().Count() > bands.Distinct().Count(),
+            $"{format}: detail has {detail.Distinct().Count()} values, bands {bands.Distinct().Count()}");
+    }
+
+    [Fact]
+    public void The_detail_picture_paints_the_NV12_colour_plane_instead_of_leaving_it_grey()
+    {
+        var detail = D3d11UpscaleFormats.TestPattern(
+            "NV12", 64, 32, UpscaleProbeContent.Detail, out _);
+
+        // The band picture fills this plane with 128 and says so; this one must not.
+        var chroma = detail[(64 * 32)..];
+        Assert.True(chroma.Distinct().Count() > 1, "the colour plane came back flat");
+    }
+
+    [Theory]
+    [InlineData("YUY2")]
+    [InlineData("NV12")]
+    public void Both_pictures_are_the_same_every_run(string format)
+    {
+        foreach (var content in new[] { UpscaleProbeContent.Bands, UpscaleProbeContent.Detail })
+        {
+            var first = D3d11UpscaleFormats.TestPattern(format, 64, 32, content, out var pitch);
+            var second = D3d11UpscaleFormats.TestPattern(format, 64, 32, content, out var again);
+
+            Assert.Equal(pitch, again);
+            Assert.Equal(first, second);
+        }
+    }
+
+    [Fact]
+    public void A_content_kind_that_does_not_exist_is_refused_rather_than_drawn_as_something_else()
+    {
+        _ = Assert.Throws<ArgumentOutOfRangeException>(
+            () => D3d11UpscaleFormats.TestPattern("NV12", 64, 32, (UpscaleProbeContent)9, out _));
+    }
+
     private static Dictionary<string, uint> Accepting(IEnumerable<string> names)
     {
         var support = D3d11UpscaleFormats.Battery.ToDictionary(
