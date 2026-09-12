@@ -116,6 +116,49 @@ was about to record two false findings, and both were mine.**
 **La lección, que es la regla 0 de este repositorio:** un `E_FAIL` de una API no documentada no es un
 hallazgo sobre la máquina hasta haber leído una implementación que funcione.
 
+## El cero de NVIDIA, medido contra cuatro combinaciones en vez de una
+
+**Actualizado el 2026-09-12 por la tarde.** La primera medición varió el interruptor y nada más, así
+que su cero decía «con este formato y esta imagen». Las dos cosas que no varió son las dos que un
+modelo del fabricante miraría, y ninguna de las dos era la explicación:
+
+| Adaptador | Entrada | Imagen | Bytes distintos de 33 177 600 | Valores distintos |
+| --- | --- | --- | --- | --- |
+| NVIDIA GeForce RTX 5070 | `YUY2` | bandas | **0** | 6 |
+| NVIDIA GeForce RTX 5070 | `YUY2` | detalle | **0** | 256 |
+| NVIDIA GeForce RTX 5070 | `NV12` | bandas | **0** | 6 |
+| NVIDIA GeForce RTX 5070 | `NV12` | detalle | **0** | 256 |
+| Intel UHD Graphics 770 | `YUY2` | bandas | 18 109 378 | 44 |
+| Intel UHD Graphics 770 | `YUY2` | detalle | **22 455 544** | 256 |
+| Intel UHD Graphics 770 | `NV12` | bandas | 18 109 378 | 44 |
+| Intel UHD Graphics 770 | `NV12` | detalle | **22 446 365** | 256 |
+
+**Por qué se midieron esas dos cosas.** El formato, porque tanto VLC como Chromium entregan `NV12`
+salido de un decodificador de hardware y esta tubería prefiere el empaquetado; el contenido, porque
+la superresolución del fabricante es una red entrenada sobre vídeo comprimido y unas bandas duras con
+color plano no le dan nada que reconstruir — el propio comentario del patrón lo daba por supuesto sin
+medirlo. La imagen de detalle lleva degradado, textura fina y croma que se mueve.
+
+**Y el cero vale más ahora, porque Intel mueve MÁS con detalle**: 22,4 millones frente a 18,1. El
+instrumento **sí** responde al contenido, así que el cero de NVIDIA con la misma imagen no es que la
+imagen no le diera trabajo.
+
+**Lo que la documentación decía por adelantado, y se midió igual**: Chromium no comprueba el formato
+—admite `NV12`, `YUY2` y `P010`— ni la resolución ni el factor de escala. Sólo el fabricante y **si el
+equipo va con batería**. Así que la hipótesis del formato era la débil de las dos, y «con ninguno de
+estos» es una frase distinta de «con el único que probamos».
+
+**Lo que queda vivo, y no es de código**: el interruptor de la aplicación de NVIDIA, y la hipótesis de
+que la superresolución sólo actúe cuando la imagen se **presenta** en una cadena de intercambio y no
+en un dibujo fuera de pantalla que se lee a memoria. Lo segundo sólo se puede comprobar dentro de la
+cadena que `PLY-016` tiene que construir.
+
+**Y dos descartes más, medidos el mismo día**: el controlador de esta máquina **pasa** la comprobación
+de versión que VLC exige antes de llamar —32.0.16.1656 da 161 656 contra un mínimo de 153 000—, y el
+registro de VLC 3.0.23 reproduciendo un vídeo de 480p en esta misma tarjeta dice **«Using Super
+Resolution scaler with B8G8R8A8 output»** y **«turning VSR ON»**, sin un solo error. Es decir: la
+llamada se acepta igual que la nuestra. Lo que VLC no ha dicho todavía es si mueve un píxel.
+
 ## Por qué el cero de NVIDIA es NO CONCLUYENTE y no «no funciona»
 
 La llamada es **idéntica** a la de Chromium (`ToggleNvidiaVpSuperResolution`): mismo GUID, misma

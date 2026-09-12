@@ -195,6 +195,87 @@ public sealed class WindowsVideoUpscaleProbeTests
     /// decides how large the picture is enlarged, so the measurement and the feature cannot drift
     /// apart.
     /// </summary>
+    /// <summary>
+    /// <b>A zero measured with one picture and one format is not «this card does nothing».</b>
+    /// NVIDIA answered <c>S_OK</c> and moved no byte with hard synthetic bands in YUY2, and the two
+    /// things that measurement never varied are the two a vendor's model would care about: the
+    /// content, because these are networks trained on compressed video and bands with flat colour
+    /// give them nothing to rebuild; and the format, because both VLC and Chromium hand the
+    /// processor NV12 off a hardware decoder rather than the packed format this pipeline prefers.
+    /// </summary>
+    /// <remarks>
+    /// Chromium checks neither — measured in its source on 2026-09-12, <c>ToggleNvidiaVpSuperResolution</c>
+    /// gates on the vendor and on battery power and nothing else, and its input may be NV12, YUY2 or
+    /// P010 — so the format is the weaker of the two. It is measured anyway, because «not with any of
+    /// these» is a different sentence from «not with the one we tried», and the whole point of the
+    /// probe is to be able to say the first one.
+    /// </remarks>
+    [Fact]
+    public void The_zero_is_measured_against_every_picture_and_format_the_card_takes()
+    {
+        var decision = UpscalePolicy.Decide(SourceWidth, SourceHeight, 3840, 2160);
+        var baseline = WindowsVideoUpscaleProbe.ProbeAll(
+            SourceWidth, SourceHeight, decision.TargetWidth, decision.TargetHeight);
+        var withProcessor = baseline.Where(probe => probe.Pixels is not null).ToList();
+        Assert.SkipWhen(withProcessor.Count == 0, "no adapter here exposes a video processor.");
+
+        var rows = new List<string>();
+        foreach (var probe in withProcessor)
+        {
+            foreach (var format in new[] { "YUY2", "NV12" })
+            {
+                if (!probe.FormatSupport.TryGetValue(format, out var flags)
+                    || !D3d11UpscaleFormats.AcceptsAsInput(flags))
+                {
+                    continue;
+                }
+
+                foreach (var content in new[] { UpscaleProbeContent.Bands, UpscaleProbeContent.Detail })
+                {
+                    var measured = WindowsVideoUpscaleProbe.ProbeAll(
+                        SourceWidth,
+                        SourceHeight,
+                        decision.TargetWidth,
+                        decision.TargetHeight,
+                        content,
+                        format);
+                    var match = measured.Single(other => other.Description == probe.Description);
+
+                    // That the format asked for is the format sent. Without this the loop can run
+                    // four times over the same preferred input and report a matrix that varied
+                    // nothing — which reads exactly like a matrix that varied everything.
+                    Assert.Equal(format, match.PreferredInput);
+
+                    // Every combination has to have actually drawn something, or a zero below is a
+                    // blt that never ran rather than a super resolution that did nothing.
+                    Assert.NotNull(match.Pixels);
+                    Assert.Equal(0, match.Pixels!.WorstBltResult);
+                    Assert.True(
+                        match.Pixels.DistinctValues > 2,
+                        $"{probe.Description} {format} {content}: the readback carries "
+                        + $"{match.Pixels.DistinctValues} distinct values, so nothing was drawn.");
+                    Assert.Equal(0, match.Pixels.ControlDifferingBytes);
+
+                    rows.Add(string.Join(
+                        ',',
+                        probe.Description.Replace(",", " ", StringComparison.Ordinal),
+                        format,
+                        content.ToString(),
+                        match.Pixels.DifferingBytes.ToString(CultureInfo.InvariantCulture),
+                        match.Pixels.TotalBytes.ToString(CultureInfo.InvariantCulture),
+                        match.Pixels.DistinctValues.ToString(CultureInfo.InvariantCulture)));
+                }
+            }
+        }
+
+        Assert.NotEmpty(rows);
+        var directory = RepositoryLayout.PathFromRoot("artifacts", "test-results", "PLY-016");
+        Directory.CreateDirectory(directory);
+        File.WriteAllLines(
+            Path.Combine(directory, "d3d11-upscale-matrix.csv"),
+            rows.Prepend("adapter,format,content,differing_bytes,total_bytes,distinct_values"));
+    }
+
     private static IReadOnlyList<AdapterUpscaleProbe> Probe()
     {
         var decision = UpscalePolicy.Decide(SourceWidth, SourceHeight, 3840, 2160);

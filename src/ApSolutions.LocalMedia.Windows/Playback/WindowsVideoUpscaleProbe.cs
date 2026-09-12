@@ -82,7 +82,9 @@ public static class WindowsVideoUpscaleProbe
         int sourceWidth,
         int sourceHeight,
         int targetWidth,
-        int targetHeight)
+        int targetHeight,
+        UpscaleProbeContent content = UpscaleProbeContent.Bands,
+        string? forcedInput = null)
     {
         var results = new List<AdapterUpscaleProbe>();
         var factoryId = IidDxgiFactory1;
@@ -103,7 +105,8 @@ public static class WindowsVideoUpscaleProbe
 
                 try
                 {
-                    results.Add(ProbeAdapter(adapter, sourceWidth, sourceHeight, targetWidth, targetHeight));
+                    results.Add(ProbeAdapter(
+                        adapter, sourceWidth, sourceHeight, targetWidth, targetHeight, content, forcedInput));
                 }
                 finally
                 {
@@ -124,7 +127,9 @@ public static class WindowsVideoUpscaleProbe
         int sourceWidth,
         int sourceHeight,
         int targetWidth,
-        int targetHeight)
+        int targetHeight,
+        UpscaleProbeContent content,
+        string? forcedInput)
     {
         var desc = new AdapterDesc1 { Description = string.Empty };
         _ = Com.Method<GetDesc1Fn>(adapter, 10)(adapter, ref desc);
@@ -164,7 +169,9 @@ public static class WindowsVideoUpscaleProbe
                     sourceWidth,
                     sourceHeight,
                     targetWidth,
-                    targetHeight);
+                    targetHeight,
+                    content,
+                    forcedInput);
             }
             finally
             {
@@ -188,7 +195,9 @@ public static class WindowsVideoUpscaleProbe
         int sourceWidth,
         int sourceHeight,
         int targetWidth,
-        int targetHeight)
+        int targetHeight,
+        UpscaleProbeContent content,
+        string? forcedInput)
     {
         var contentDesc = new VideoProcessorContentDesc
         {
@@ -221,7 +230,7 @@ public static class WindowsVideoUpscaleProbe
                 support[format.Name] = check(enumerator, format.DxgiFormat, out var flags) < 0 ? 0u : flags;
             }
 
-            var preferred = D3d11UpscaleFormats.PreferredInput(support);
+            var preferred = forcedInput ?? D3d11UpscaleFormats.PreferredInput(support);
             if (preferred is null)
             {
                 return new AdapterUpscaleProbe(
@@ -231,7 +240,7 @@ public static class WindowsVideoUpscaleProbe
 
             return Blt(
                 devices, enumerator, description, vendorId, vendor, support, preferred,
-                sourceWidth, sourceHeight, targetWidth, targetHeight);
+                sourceWidth, sourceHeight, targetWidth, targetHeight, content);
         }
         finally
         {
@@ -250,10 +259,12 @@ public static class WindowsVideoUpscaleProbe
         int sourceWidth,
         int sourceHeight,
         int targetWidth,
-        int targetHeight)
+        int targetHeight,
+        UpscaleProbeContent content)
     {
         var inputFormat = D3d11UpscaleFormats.Battery.First(format => format.Name == preferred);
-        var pattern = D3d11UpscaleFormats.TestPattern(preferred, sourceWidth, sourceHeight, out var pitch);
+        var pattern = D3d11UpscaleFormats.TestPattern(
+            preferred, sourceWidth, sourceHeight, content, out var pitch);
         var handle = GCHandle.Alloc(pattern, GCHandleType.Pinned);
         var processor = nint.Zero;
         var input = nint.Zero;
