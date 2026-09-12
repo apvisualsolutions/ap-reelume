@@ -174,6 +174,77 @@ public sealed class PictureAdjustmentViewModelTests
         Assert.Equal(expected, model.Brightness);
     }
 
+    /// <summary>
+    /// Asking for the value a control already has stores nothing. Every setter goes through one
+    /// place and that place stores, so without the equality guard a panel that reloads its own
+    /// values would write them straight back — and moving a slider one way and back would leave a
+    /// stored decision where there had been a silence.
+    /// </summary>
+    [Fact]
+    public void Setting_a_control_to_the_value_it_already_carries_stores_nothing()
+    {
+        var repository = new InMemoryPreferences();
+        var model = new PictureAdjustmentViewModel(repository, new RecordingTarget());
+
+        model.Brightness = 0d;
+        model.Contrast = 1d;
+        model.Gamma = 1d;
+
+        Assert.Equal(0, repository.Saves);
+    }
+
+    /// <summary>
+    /// Moving one control announces all five, which is what keeps the number beside each slider and
+    /// the reset button itself in step with the value. Nothing here subscribed until this test, so
+    /// the announcement was reaching nobody and the branch that makes it was never taken.
+    /// </summary>
+    [Fact]
+    public void Moving_a_control_announces_the_value_and_the_neutral_it_is_no_longer_at()
+    {
+        var model = new PictureAdjustmentViewModel(new InMemoryPreferences(), new RecordingTarget());
+        var announced = new List<string?>();
+        model.PropertyChanged += (_, args) => announced.Add(args.PropertyName);
+
+        model.Gamma = 1.6;
+
+        Assert.Contains(nameof(PictureAdjustmentViewModel.Gamma), announced);
+        Assert.Contains(nameof(PictureAdjustmentViewModel.IsNeutral), announced);
+        Assert.Contains(nameof(PictureAdjustmentViewModel.Adjustment), announced);
+    }
+
+    /// <summary>
+    /// A scope with a row in it but no picture in that row opens neutral, which is not the same
+    /// path as a scope with no row at all: the first is somebody who set a volume here and never
+    /// touched the picture, and it is the ordinary case for a library already in use.
+    /// </summary>
+    [Fact]
+    public async Task A_scope_that_stored_something_else_opens_at_neutral()
+    {
+        var repository = new InMemoryPreferences();
+        await repository.SaveAsync(
+            new PlaybackPreference
+            {
+                Scope = PreferenceScope.Global,
+                ScopeKey = PlaybackPreference.GlobalKey,
+                VolumePercent = 80,
+            },
+            TestContext.Current.CancellationToken);
+        var model = new PictureAdjustmentViewModel(repository, new RecordingTarget());
+
+        await model.LoadAsync(TestContext.Current.CancellationToken);
+
+        Assert.True(model.IsNeutral);
+    }
+
+    [Fact]
+    public void A_panel_with_nothing_to_store_in_or_nothing_to_adjust_is_refused()
+    {
+        Assert.Throws<ArgumentNullException>(
+            () => new PictureAdjustmentViewModel(null!, new RecordingTarget()));
+        Assert.Throws<ArgumentNullException>(
+            () => new PictureAdjustmentViewModel(new InMemoryPreferences(), null!));
+    }
+
     /// <summary>What the engine was last told, which is the only thing a person can see.</summary>
     private sealed class RecordingTarget : IPictureAdjustable
     {
@@ -184,6 +255,9 @@ public sealed class PictureAdjustmentViewModelTests
     {
         private readonly Dictionary<(PreferenceScope, string), PlaybackPreference> _stored = [];
 
+        /// <summary>How many times anything asked for a row to be written.</summary>
+        public int Saves { get; private set; }
+
         public Task<PlaybackPreference?> GetAsync(
             PreferenceScope scope,
             string scopeKey,
@@ -193,6 +267,7 @@ public sealed class PictureAdjustmentViewModelTests
         public Task SaveAsync(PlaybackPreference preference, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(preference);
+            Saves++;
             _stored[(preference.Scope, preference.ScopeKey)] = preference;
             return Task.CompletedTask;
         }

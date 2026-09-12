@@ -436,7 +436,7 @@ try {
     # y AudioOutputViewModel.cs pasó de 99/88 a 100/91 en CI, que la previsualización local no vio
     # porque esta máquina tiene salidas de audio de verdad y el runner no. En vez de copiar el suelo
     # nuevo se cubrieron las cinco ramas que faltaban, cada una con sus dos mitades en la misma prueba.
-    $debtRatchet = 185
+    $debtRatchet = 187
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.
