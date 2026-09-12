@@ -65,6 +65,26 @@
 >   Force `(Get-Item $f).LastWriteTime = Get-Date` and check the binary changed.
 > · **The «Microsoft Basic Render Driver» exposes no `ID3D11VideoDevice`.** It is all a hosted runner
 >   has, so the pixel test skips there — and says so.
+> · **AN AUDITOR IN AN ISOLATED WORKTREE CAN BE MEASURING OLD CODE AND ANSWER THAT ALL IS WELL.**
+>   `isolation: "worktree"` mounts the copy on **`main`**'s commit, not on your `HEAD`. The first pass
+>   got it right **by accident**: the changes were uncommitted and the harness copied them in. The
+>   second, with everything committed, mounted `9fc31e2` and **held not one file from this batch** —
+>   `ls` of the new file said it did not exist. An auditor that cannot see your code does not go red:
+>   it goes green, which is the worst outcome available. **Check before believing it**: `git worktree
+>   list`, then `ls` the newest file inside the copy. The way out is to mount it by hand —
+>   `git worktree add --detach .claude/worktrees/audit-<sha> <sha>` — and tell the agent to work
+>   there.
+>
+> ### Waiting on the owner, with the recommendation in front
+>
+> · **Which goes first: the colour or the chain.** On 2026-09-12 he said «I see no improvement, it
+>   still looks bad», and the two causes are measured and different. **Recommended: the colour first**
+>   — it is a short batch, he sees it the same day with his `.bat`, and nothing but the whole chain
+>   removes the softness. The other way round he waits longer to notice anything. No answer by the
+>   time the batch closed.
+> · **The AMD machine in the cloud**, which he already declined on 2026-09-12. It goes back to him
+>   once AMD's chain is written and not before, and the recommendation is still yes: it is a few
+>   loose hours.
 >
 > ### What comes next
 >

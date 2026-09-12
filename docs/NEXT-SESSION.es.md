@@ -65,6 +65,24 @@
 >   `(Get-Item $f).LastWriteTime = Get-Date` y se comprueba que el binario cambió.
 > · **El «Microsoft Basic Render Driver» no expone `ID3D11VideoDevice`.** Es lo único que hay en un
 >   runner hospedado, así que la prueba de píxel se salta allí — y lo dice.
+> · **UN AUDITOR EN WORKTREE AISLADO PUEDE ESTAR MIDIENDO CÓDIGO VIEJO Y CONTESTAR QUE TODO BIEN.**
+>   `isolation: "worktree"` monta la copia sobre el commit de **`main`**, no sobre tu `HEAD`. La
+>   primera pasada acertó **por accidente**: los cambios estaban sin commitear y el arnés los copió
+>   encima. La segunda, con todo ya commiteado, montó `9fc31e2` y **no contenía ni un fichero de la
+>   tanda** — `ls` del fichero nuevo daba «no existe». Un auditor que no ve tu código no da rojo: da
+>   verde, que es el peor desenlace posible. **Se comprueba antes de creerle**: `git worktree list` y
+>   un `ls` del fichero más nuevo dentro de la copia. La salida es montarlo a mano —
+>   `git worktree add --detach .claude/worktrees/audit-<sha> <sha>`— y decirle al agente que trabaje
+>   ahí.
+>
+> ### Pendiente del propietario, con recomendación delante
+>
+> · **Qué va primero: el color o la cadena.** El 2026-09-12 dijo «no noto mejoría, se sigue viendo
+>   mal» y las dos causas están medidas y son distintas. **Recomendado: el color primero** — es una
+>   tanda corta, lo ve el mismo día con su `.bat`, y la blandura no la quita nada que no sea la
+>   cadena entera. Al revés tarda más en notar nada. Sin respuesta al cerrar la tanda.
+> · **La máquina AMD en la nube**, que ya dijo que no el 2026-09-12. Se le vuelve a plantear cuando la
+>   cadena de AMD esté escrita, no antes, y la recomendación sigue siendo sí: son horas sueltas.
 >
 > ### Lo siguiente
 >

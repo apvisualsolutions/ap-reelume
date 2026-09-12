@@ -10,6 +10,36 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La mejora de imagen para vídeo de poca resolución ya está medida, y una de sus tres partes
+  funciona.** La tarjeta integrada Intel de este equipo **reescala con su propia superresolución**:
+  cambia el 54,6 % de la imagen al encenderla, con su control en cero. Y el formato que la aplicación
+  ya produce entra tal cual en las dos tarjetas, así que la conversión de color que hoy hace el
+  procesador desaparece de esa ruta.
+
+  **NVIDIA acepta la petición y no mueve un píxel, y eso queda escrito como «no concluyente», nunca
+  como «no funciona»**: su controlador acepta e ignora mientras la Súper resolución RTX esté apagada
+  en su propia aplicación, que es como viene de fábrica.
+
+  **Y hay mejora automática sin que nadie encienda nada**, que era la condición del propietario: los
+  filtros estándar de Direct3D —reducción de ruido y realce de bordes— los declaran **las dos
+  tarjetas**, y el realce cambia 8,08 millones de bytes en ambas, NVIDIA incluida. Una aplicación
+  **no puede** encender la superresolución de NVIDIA por su cuenta: no existe ese ajuste en la
+  cabecera pública del fabricante, ni aparece por su nombre en el registro ni en su configuración.
+
+### Corregido
+
+- **La blandura al ampliar no era un ajuste olvidado, y se midió antes de tocar nada.** La sospecha
+  barata era que el escalado usaba el filtro por defecto y que pedir «alta calidad» era una línea.
+  Rasterizado sobre un borde duro ampliado cuatro veces, los dos filtros dan **la misma rampa de
+  cuatro píxeles** y el de «alta» sale una pizca más blando. No se cambió nada, y la medición queda
+  archivada con su control positivo.
+
+### Conocido y sin corregir
+
+- **El color está mal en todo vídeo HD.** Se decodifica con la matriz de definición estándar cuando
+  de 720p para arriba se usa otra, y nada mira el espacio de color del origen. Medido: el rojo puro
+  sale 234 en vez de 255, el verde se lleva 20 de rojo, y un tono de piel se desvía hasta 5.
+
 - **Las diecinueve pantallas comparadas con el diseño ya tienen veredicto, una por una.** Mirarlas
   dejaba «unos cuarenta» apuntes sueltos; desglosados y cruzados con lo que el programa ya tiene
   decidido por escrito son **108**, y cada uno sale con una respuesta: **43 diferencias que sí hay

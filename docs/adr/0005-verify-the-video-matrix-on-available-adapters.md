@@ -1,6 +1,6 @@
 # ADR-0005 — Verificar la matriz de vídeo sobre los adaptadores disponibles / Verify the Video Matrix on the Available Adapters
 
-- Estado / Status: `ACCEPTED`
+- Estado / Status: `ACCEPTED`, con enmienda del 2026-09-12 / `ACCEPTED`, amended on 2026-09-12
 - Fecha / Date: 2026-08-04
 - Decisor / Decision owner: Product Owner, a propuesta de Engineering / on Engineering's proposal
 - Relacionado / Related: [`FEATURES.md`](../FEATURES.md), [T22](../evidence/mvp/T22-hdr-acceleration.md),
@@ -13,6 +13,33 @@ This ADR contains the Spanish decision first and its English translation second.
 ---
 
 ## Español
+
+### Enmienda del 2026-09-12 — el equipo ya tiene dos clases de adaptador
+
+**La decisión sigue en pie; su premisa de hecho no.** Este ADR se apoya en que el equipo de
+referencia tenía **un solo adaptador** y en que «su procesador no incorpora gráficos». El 2026-09-12,
+midiendo para `PLY-016`, se enumeraron **tres adaptadores**: la NVIDIA GeForce RTX 5070, una **Intel
+UHD Graphics 770** que sí existe y mueve 3840×2160, y el «Microsoft Basic Render Driver». La gráfica
+integrada estaba desactivada en la BIOS cuando se escribió este documento y el propietario la activó
+después.
+
+**Lo que eso cambia del límite escrito, con precisión y sin ensanchar:**
+
+- El adaptador de Intel **ya no falta**: su procesador de vídeo se ha ejercido con una batería de
+  ocho formatos y una prueba de píxel, y su superresolución cambia el 54,6 % de la imagen. La
+  evidencia es [PLY16-d3d11-probe.md](../evidence/stable/PLY16-d3d11-probe.md).
+- **Lo que sigue sin ejercerse es la DECODIFICACIÓN de Quick Sync**, que es otra cosa: lo medido es
+  el procesador de vídeo, no el decodificador. Y hay un motivo que este ADR no podía conocer: el
+  motor **apaga la aceleración por hardware de forma incondicional** porque con D3D11VA se pierde el
+  subtítulo compuesto. Así que la ruta de decodificación de cualquier fabricante está sin ejercer, no
+  sólo la de Intel.
+- **La matriz física de `PLY-003` no se ha vuelto a ejecutar** sobre la segunda clase de adaptador.
+  Este ADR dice que la publicación estable es su momento natural, y ese momento ahora es posible sin
+  comprar nada.
+
+No se toca la decisión: `PLY-003` sigue `VERIFIED` por lo que se demostró en su día. Lo que se
+corrige es un hecho del contexto que, sin esta nota, seguiría diciendo que aquí no hay gráficos
+integrados.
 
 ### Contexto
 
@@ -89,6 +116,31 @@ política está probada de forma exhaustiva sin hardware.
 ---
 
 ## English
+
+### Amendment of 2026-09-12 — the machine now has two classes of adapter
+
+**The decision stands; its factual premise does not.** This ADR rests on the reference machine having
+**a single adapter** and on its processor having no integrated graphics. On 2026-09-12, measuring for
+`PLY-016`, **three adapters** were enumerated: the NVIDIA GeForce RTX 5070, an **Intel UHD Graphics
+770** that does exist and drives 3840×2160, and the "Microsoft Basic Render Driver". The integrated
+graphics were disabled in the BIOS when this document was written and the owner enabled them
+afterwards.
+
+**What that changes about the recorded limit, precisely and without widening it:**
+
+- The Intel adapter **is no longer missing**: its video processor has been exercised with a battery
+  of eight formats and a pixel test, and its super resolution changes 54.6 % of the picture. The
+  evidence is [PLY16-d3d11-probe.md](../evidence/stable/PLY16-d3d11-probe.md).
+- **What remains unexercised is Quick Sync's DECODE path**, which is a different thing: what was
+  measured is the video processor, not the decoder. And there is a reason this ADR could not have
+  known: the engine **switches hardware decoding off unconditionally** because D3D11VA loses the
+  composed subtitle. So no vendor's decode path is exercised, not only Intel's.
+- **`PLY-003`'s physical matrix has not been re-run** on the second class of adapter. This ADR names
+  the stable release as its natural moment, and that moment is now possible without buying anything.
+
+The decision is untouched: `PLY-003` stays `VERIFIED` on what was demonstrated at the time. What is
+corrected is a fact in the context that would otherwise keep saying there are no integrated graphics
+here.
 
 ### Context
 

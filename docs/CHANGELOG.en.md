@@ -10,6 +10,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Picture enhancement for low-resolution video is now measured, and one of its three parts works.**
+  This machine's integrated Intel card **enlarges with its own super resolution**: it changes 54.6 %
+  of the picture when switched on, with its control at zero. And the format the application already
+  produces is accepted as-is by both cards, so the colour conversion the processor does today drops
+  out of that path.
+
+  **NVIDIA accepts the request and moves no pixel, and that is written down as «inconclusive», never
+  as «it does not work»**: its driver accepts and ignores while RTX Video Super Resolution is off in
+  its own application, which is how it ships.
+
+  **And there is automatic improvement with nobody switching anything on**, which was the owner's
+  condition: the standard Direct3D filters — noise reduction and edge enhancement — are declared by
+  **both cards**, and the enhancement changes 8.08 million bytes on each, NVIDIA included. An
+  application **cannot** switch NVIDIA's super resolution on by itself: no such setting exists in the
+  vendor's public header, and it appears by name neither in the registry nor in its configuration.
+
+### Fixed
+
+- **The softness when enlarging was not a forgotten setting, and it was measured before touching
+  anything.** The cheap guess was that scaling used the default filter and that asking for «high
+  quality» was a one-liner. Rasterised over a hard edge enlarged four times, both filters give **the
+  same four-pixel ramp** and the «high» one comes out a shade softer. Nothing was changed, and the
+  measurement is archived with its positive control.
+
+### Known and not fixed
+
+- **The colour is wrong on every HD video.** It is decoded with the standard-definition matrix when
+  720p and up use a different one, and nothing looks at the source's colour space. Measured: pure red
+  comes out 234 instead of 255, green picks up 20 of red, and a skin tone drifts by up to 5.
+
 - **The nineteen screens compared against the design now each have a verdict, one by one.** Looking
   at them left «some forty» loose notes; broken down and crossed against what the program already has
   decided in writing they are **108**, and each one comes out with an answer: **43 differences that
