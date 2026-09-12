@@ -396,21 +396,39 @@ public static class WindowsVideoUpscaleProbe
         _ = Com.Method<GetVideoProcessorCapsFn>(enumerator, 9)(enumerator, ref caps);
         var offered = D3d11UpscaleFormats.OfferedFilters(caps.FilterCaps);
         var edge = D3d11UpscaleFormats.StandardFilters.First(filter => filter.Name == "EDGE_ENHANCEMENT");
-        if (!offered.Contains("EDGE_ENHANCEMENT"))
+        var range = new VideoProcessorFilterRange();
+        if (offered.Contains("EDGE_ENHANCEMENT"))
         {
-            return new StandardFilterOutcome(caps.FilterCaps, offered, -1);
+            _ = Com.Method<GetFilterRangeFn>(enumerator, 12)(enumerator, edge.Index, ref range);
         }
 
-        var range = new VideoProcessorFilterRange();
-        _ = Com.Method<GetFilterRangeFn>(enumerator, 12)(enumerator, edge.Index, ref range);
+        // Which level, and whether to ask at all, is decided in D3d11UpscaleFormats and measured
+        // there on any machine. It used to be decided right here — «range.Maximum», with no test
+        // able to reach it — which is the one thing rule 10 says must never sit inside an excluded
+        // file. What is left in here is the call.
+        if (D3d11UpscaleFormats.EdgeEnhancementLevel(
+                caps.FilterCaps,
+                new D3d11UpscaleFormats.FilterRange(
+                    range.Minimum, range.Maximum, range.Default, range.Multiplier)) is not { } level)
+        {
+            return new StandardFilterOutcome(caps.FilterCaps, offered, -1, null, 0f);
+        }
+
         var setFilter = Com.Method<SetStreamFilterFn>(devices.VideoContext, 38);
 
-        setFilter(devices.VideoContext, processor, 0, edge.Index, enabled: 1, range.Maximum);
+        // The level on the «off» call is not a second choice: the documentation says Level «is
+        // ignored» when Enable is FALSE, so passing the same number keeps this call from reading
+        // like it configures anything.
+        setFilter(devices.VideoContext, processor, 0, edge.Index, enabled: 1, level);
         var enhanced = Draw(devices, processor, inputView, outputView, output, staging, targetWidth, targetHeight);
-        setFilter(devices.VideoContext, processor, 0, edge.Index, enabled: 0, range.Default);
+        setFilter(devices.VideoContext, processor, 0, edge.Index, enabled: 0, level);
 
         return new StandardFilterOutcome(
-            caps.FilterCaps, offered, D3d11UpscaleFormats.CountDifferences(enhanced.Pixels, plain));
+            caps.FilterCaps,
+            offered,
+            D3d11UpscaleFormats.CountDifferences(enhanced.Pixels, plain),
+            level,
+            D3d11UpscaleFormats.FilterStrength(level, range.Multiplier));
     }
 
     private static string? CreateOutputs(
