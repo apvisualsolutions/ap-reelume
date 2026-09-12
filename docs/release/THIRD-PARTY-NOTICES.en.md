@@ -93,6 +93,21 @@ them byte for byte against the package the build consumed; the canonical ones we
 that already distributed them and contrasted with a second, independent copy. The detail is in
 [licenses/README.en.md](licenses/README.en.md).
 
+### Ported code, which no automatic gate sees
+
+**This is written by hand, and that is why it stands apart.** Every other row in this document comes
+from `packages.lock.json` and `ThirdPartyNoticeTests` demands it; a **ported** source file is not a
+packaged dependency, so it appears in no lock file and no test would miss it. The licence obligation
+is the same.
+
+| Origin | Source file | Declared licence | What was taken |
+| --- | --- | --- | --- |
+| VideoLAN / VLC | `modules/video_output/win32/d3d11_scaler.cpp` | `LGPL-2.1-or-later` | The identifiers of NVIDIA's and Intel's super-resolution extensions, their payloads, and the Direct3D 11 video processor call sequence, in `src/ApSolutions.LocalMedia.Windows/Playback/`. |
+| The Chromium Authors | `ui/gl/swap_chain_presenter.cc` | `BSD-3-Clause` | Which door each Intel call goes through — the first two are output extensions and only the third is a stream one — and that NVIDIA's driver accepts the request and ignores it while the feature is switched off. |
+
+`GPL-3.0-or-later` admits incorporating both. The full texts of `LGPL-2.1` and `BSD-3-Clause`
+already travel in `licenses/` for other dependencies, so neither needs adding.
+
 ## Components used only during development and testing
 
 These never enter an artifact. They build it, test it, or measure it.

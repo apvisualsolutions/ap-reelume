@@ -1,5 +1,111 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-12, tarde: `PLY-016` tiene un tercio MEDIDO, y el instrumento está probado
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit.
+>
+> ### Lo que se cerró
+>
+> · **La superresolución de Intel funciona, y está probada por píxeles.** En la UHD 770 de este mismo
+>   equipo cambia **18 109 378 bytes de 33 177 600 — el 54,6 %** de la imagen al encenderla, con el
+>   control negativo en cero. Es el primer resultado verificado de `PLY-016`.
+> · **El riesgo n.º 1 está contestado y a favor**: **`YUY2` entra** en el procesador de vídeo de las
+>   dos tarjetas, como entrada y como salida. LibVLC ya entrega `UYVY`, que es lo mismo con cada
+>   pareja de bytes intercambiada, así que el fotograma llega al reescalador **sin conversión de
+>   color en CPU** — la que hoy corre escalar dentro del hilo del decodificador.
+> · **NVIDIA acepta la petición y no mueve un píxel: NO CONCLUYENTE, no «no funciona».** La llamada es
+>   idéntica a la de Chromium, que documenta que el controlador la acepta y la ignora mientras la
+>   Súper resolución RTX esté apagada en NVIDIA App, que es como viene de fábrica. **Lo que falta es
+>   encenderla y volver a correr la prueba**; no es trabajo de código.
+> · **Y ese cero significa algo porque el instrumento está probado tres veces**: control negativo
+>   (dos pasadas apagadas dan idéntico), control positivo (se cuenta cuántos valores distintos trae la
+>   imagen, porque un `blt` que no dibujara dejaría tres negros idénticos y también daría cero), y un
+>   tercer control de sistema que llegó solo — Intel mueve el 54,6 % con **esta misma sonda**.
+> · **La política vive en `Domain` y la decide `UpscalePolicy`**: reescala a la **caja que la imagen
+>   ocupa en pantalla**, nunca a la pantalla. Un 4:3 en un 16:9 se estiraría, y un 720p en una ventana
+>   de 1280 gastaría la tarjeta para tirar el resultado.
+> · **La condición del propietario —«sin que el usuario cambie nada»— se cumple, y ordena el diseño.**
+>   Los filtros estándar del procesador de vídeo son de Direct3D y no de un fabricante: las dos
+>   tarjetas declaran reducción de ruido y realce de bordes, y **el realce cambia 8 084 664 bytes en
+>   la propia RTX 5070**. Ni aplicación del fabricante, ni ajuste, ni licencia. **Una aplicación NO
+>   puede encender la Súper resolución RTX**: no está en `NvApiDriverSettings.h`, no aparece por su
+>   nombre en el registro (45 claves de NVIDIA, control positivo) ni en la configuración de NVIDIA
+>   App, y el SDK que la expondría está descartado por licencia. **Corolario: lo del fabricante es un
+>   extra oportunista y nunca la promesa.**
+> · **La auditoría de puertas encontró SIETE huecos y el peor invalidaba la medición entera**: se
+>   podía borrar toda la extensión del fabricante y las pruebas seguían verdes, porque `differing` no
+>   se afirmaba en ninguna parte. También: `Count == 0 ||` aprobaba «la batería nunca se preguntó»,
+>   `ProbeAll` podía devolver vacío y las dos pruebas se omitían, la tolerancia de forma era doce
+>   veces el error que decía admitir, el redondeo no lo ejecutaba nadie, la escala del patrón no la
+>   medía nadie, y el informe escribía `0x00000000` tanto para `S_OK` como para «no se intentó». Los
+>   siete cerrados, y **las cinco mutaciones del auditor vuelven a ponerlo rojo**, comprobadas una a
+>   una.
+>
+> ### Lo que costó no documentarse, y es la lección de la tanda
+>
+> **Esta tanda estuvo a punto de escribir dos hallazgos falsos sobre Intel, y los dos eran míos.**
+> Primero `E_INVALIDARG`: su estructura lleva un **puntero** al parámetro, no el parámetro. Después
+> `E_FAIL` en la llamada de versión, que se iba a registrar como «la UHD 770 no tiene la interfaz
+> VPE». Es falso: **sus dos primeras llamadas van por `VideoProcessorSetOutputExtension` y sólo la
+> tercera por `VideoProcessorSetStreamExtension`** (Chromium, `ui/gl/swap_chain_presenter.cc`).
+> Mandar la primera por la puerta equivocada **se lee exactamente igual que una tarjeta que no
+> puede**. Lo paró el propietario con una palabra: «documéntate».
+>
+> ### Trampas medidas hoy
+>
+> · **El orden de métodos de la documentación publicada NO es el de la tabla de funciones.**
+>   `CreateVideoProcessor` está en la ranura 4 y `CreateVideoProcessorEnumerator` —que se llama
+>   antes— en la 10. Las ranuras se leen de la cabecera del SDK, nunca de la web.
+> · **Un `grep` con lista de tipos de retorno se saltó un método** cuyo tipo era
+>   `APP_DEPRECATED_HRESULT`, y **desplazó todas las ranuras posteriores**. `VideoProcessorBlt` es la
+>   53, no la 48. Un patrón que no casa no es una ausencia.
+> · **Copiar un mutante con `Copy-Item` conserva su fecha y MSBuild no recompila**: tres mutaciones
+>   distintas dieron el mismo veredicto porque las tres midieron el binario de la primera. Se fuerza
+>   `(Get-Item $f).LastWriteTime = Get-Date` y se comprueba que el binario cambió.
+> · **El «Microsoft Basic Render Driver» no expone `ID3D11VideoDevice`.** Es lo único que hay en un
+>   runner hospedado, así que la prueba de píxel se salta allí — y lo dice.
+>
+> ### Lo siguiente
+>
+> 1. **Encender la Súper resolución RTX en NVIDIA App y volver a correr la sonda.** Un comando, y
+>    cierra el tercio de NVIDIA.
+> 2. **La cadena**: textura `YUY2` en el adaptador de Avalonia → procesador de vídeo → textura
+>    compartida importada en la composición. Avalonia 12.1.1 lo admite, medido en el ensamblado:
+>    `TryGetCompositionGpuInterop` → `ImportImage` con `D3D11TextureNtHandle`,
+>    `UpdateWithKeyedMutexAsync`, formatos `B8G8R8A8UNorm`/`R8G8B8A8UNorm`, y `DeviceLuid` para casar
+>    el adaptador. El backend Win32 por defecto es ANGLE sobre D3D11.
+> 3. **FSR 1 en SkSL** para las demás tarjetas: SkiaSharp 3.119.4 trae `SKRuntimeEffect`.
+> 4. **AMD**: escribible y **no verificable** sin máquina. Se le vuelve a plantear al propietario
+>    cuando su cadena esté escrita.
+> 5. **Los subtítulos**, que el propietario decidió el 2026-09-12 que entran en el alcance: dibujarlos
+>    nosotros en vez de dejar que VLC los queme en el fotograma. **Con un agujero que hay que
+>    respetar**: en VLC 3 no hay forma de recibir subtítulos **de imagen** (PGS, VobSub, DVB), así que
+>    la salida es híbrida — pista de texto al camino limpio, pista de imagen al de hoy.
+>
+> ### Registrado y sin hacer
+>
+> · **`LibVLC 3.0.23.1 no exporta `libvlc_video_set_output_callbacks`** (medido en el binario, con dos
+>   controles positivos y uno negativo). No hay forma de recibir de VLC 3 una textura de la tarjeta:
+>   el fotograma **siempre** pasa por memoria del sistema. Lo que gana dibujar los subtítulos nosotros
+>   es el chroma libre, la geometría exacta, que la superresolución deje de procesar texto, y que el
+>   **estilo de subtítulo vuelva a la vida** — hoy se guarda y `SubtitleStyleReachTests` prueba que no
+>   llega a la imagen.
+> · **Cuatro copias de fotograma completo y cero SIMD** en la ruta de hoy, y un `ToArray()` por
+>   fotograma en `VideoFrameView.cs` (≈8,3 MB a 1080p, en el hilo del decodificador).
+> · **Un cuarto fabricante que nadie había nombrado**: Mthreads, GUID `{28D65B12-…}`. Ninguna máquina
+>   del propietario lo lleva.
+> · **El hook `post-push.sh` sigue diciendo «un run tarda 49-57 min»**, y `CLAUDE.md` decidió el
+>   2026-09-04 que esa cifra no se guarda porque siempre está desfasada. Quien corrigió el documento
+>   no miró quién más la escribe.
+> · **Un worktree de agente bajo `.claude/` pone roja una puerta de documentos.** `EvidenceLinkTests`
+>   barre `docs`, `design` y **`.claude` entero y recursivo**, así que la copia del repositorio que
+>   vive en `.claude/worktrees/<agente>/` se lee como documentos nuevos: su lista de excepciones va
+>   por ruta relativa y la copia no casa. Medido hoy — la misma suite dio 99/99 antes de lanzar el
+>   auditor y 98/99 con él corriendo—, y lo peor es el mensaje: **nombra un fichero que no existe en
+>   el árbol real**, así que manda a buscar una falta inventada. El barrido tiene que saltarse
+>   `.claude/worktrees/`.
+
 > ## AVISO AL FRENTE — 2026-09-12: la tarjeta de la Biblioteca, con su ritmo y sus cuatro marcas
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

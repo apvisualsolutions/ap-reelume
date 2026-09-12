@@ -94,6 +94,21 @@ los compara byte a byte contra el paquete que la compilación consumió; los can
 una fuente que ya los distribuía y se contrastaron con una segunda copia independiente. El detalle
 está en [licenses/README.es.md](licenses/README.es.md).
 
+### Código portado, que ninguna puerta automática ve
+
+**Esto se escribe a mano y por eso está separado.** Las demás filas de este documento salen de
+`packages.lock.json` y `ThirdPartyNoticeTests` las exige; un fichero fuente **portado** no es una
+dependencia empaquetada, así que no aparece en ningún fichero de bloqueo y ninguna prueba lo echaría
+de menos. La obligación de la licencia es la misma.
+
+| Origen | Fichero de origen | Licencia declarada | Qué se trajo |
+| --- | --- | --- | --- |
+| VideoLAN / VLC | `modules/video_output/win32/d3d11_scaler.cpp` | `LGPL-2.1-or-later` | Los identificadores de las extensiones de superresolución de NVIDIA e Intel, sus cargas útiles y la secuencia de llamadas del procesador de vídeo de Direct3D 11, en `src/ApSolutions.LocalMedia.Windows/Playback/`. |
+| The Chromium Authors | `ui/gl/swap_chain_presenter.cc` | `BSD-3-Clause` | Por qué puerta va cada llamada de Intel —las dos primeras son extensiones de salida y sólo la tercera de flujo— y que el controlador de NVIDIA acepta la petición y la ignora mientras la función esté apagada. |
+
+`GPL-3.0-or-later` admite incorporar las dos. Los textos íntegros de `LGPL-2.1` y `BSD-3-Clause` ya
+viajan en `licenses/` por otras dependencias, así que no hace falta añadir ninguno.
+
 ## Componentes usados solo durante el desarrollo y las pruebas
 
 Estos no entran nunca en un artefacto. Lo construyen, lo prueban o lo miden.

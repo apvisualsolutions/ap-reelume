@@ -1,5 +1,111 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-12, afternoon: a third of `PLY-016` is MEASURED, and the instrument is proven
+>
+> **Look at the tree first; it outranks this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here.
+>
+> ### What was closed
+>
+> · **Intel's super resolution works, and it is proven in pixels.** On this machine's own UHD 770 it
+>   changes **18,109,378 bytes of 33,177,600 — 54.6 %** of the picture when switched on, with the
+>   negative control at zero. It is `PLY-016`'s first verified result.
+> · **Risk #1 is answered, and favourably**: **`YUY2` is accepted** by both cards' video processors,
+>   as input and as output. LibVLC already hands out `UYVY`, which is the same bytes with each pair
+>   swapped, so the frame reaches the scaler **with no CPU colour conversion** — the one that runs
+>   scalar today inside the decoder thread.
+> · **NVIDIA accepts the request and moves no pixel: INCONCLUSIVE, not «it does not work».** The call
+>   is identical to Chromium's, which documents that the driver accepts it and ignores it while RTX
+>   Video Super Resolution is off in the NVIDIA app, which is how it ships. **What is left is
+>   switching it on and running the test again**; it is not code.
+> · **And that zero means something because the instrument is proven three times over**: the negative
+>   control (two runs with it off come out identical), the positive control (how many distinct byte
+>   values the picture carries, because a `blt` that drew nothing would leave three identical blacks
+>   and also count zero), and a third, system-wide control that arrived on its own — Intel moves
+>   54.6 % through **this very probe**.
+> · **The policy lives in `Domain` and `UpscalePolicy` decides it**: it enlarges to the **box the
+>   picture occupies on screen**, never to the screen. A 4:3 on a 16:9 would stretch, and a 720p in a
+>   1280-wide window would spend the card to throw the result away.
+> · **The owner's condition — «without the user changing anything» — holds, and it orders the
+>   design.** The standard video processor filters belong to Direct3D and not to a vendor: both cards
+>   declare noise reduction and edge enhancement, and **the enhancement changes 8,084,664 bytes on the
+>   RTX 5070 itself**. No vendor application, no setting, no licence. **An application CANNOT switch
+>   RTX Video Super Resolution on**: it is not in `NvApiDriverSettings.h`, it appears by name neither
+>   in the registry (45 NVIDIA keys, positive control) nor in the NVIDIA app's configuration, and the
+>   SDK that would expose it is rejected on licence. **Corollary: the vendor's is an opportunistic
+>   bonus and never the promise.**
+> · **The gate audit found SEVEN holes and the worst invalidated the whole measurement**: the entire
+>   vendor extension could be deleted and the tests stayed green, because `differing` was asserted
+>   nowhere. Also: `Count == 0 ||` approved «the battery was never asked», `ProbeAll` could return
+>   empty and both tests skipped, the shape tolerance was twelve times the error it claimed to allow,
+>   the rounding was exercised by nobody, the pattern's scale was measured by nobody, and the report
+>   wrote `0x00000000` for both `S_OK` and «not attempted». All seven closed, and **the auditor's five
+>   mutations turn it red again**, checked one by one.
+>
+> ### What not reading the documentation cost, and it is this batch's lesson
+>
+> **This batch was about to write two false findings about Intel, and both were mine.** First
+> `E_INVALIDARG`: its structure carries a **pointer** to the parameter, not the parameter. Then
+> `E_FAIL` on the version call, which was about to be recorded as «the UHD 770 has no VPE
+> interface». That is false: **its first two calls go through `VideoProcessorSetOutputExtension` and
+> only the third through `VideoProcessorSetStreamExtension`** (Chromium,
+> `ui/gl/swap_chain_presenter.cc`). Sending the first down the wrong door **reads exactly like a card
+> that cannot do it**. The owner stopped it with one word: «documéntate».
+>
+> ### Traps measured today
+>
+> · **The published method order is NOT the vtable order.** `CreateVideoProcessor` sits at slot 4 and
+>   `CreateVideoProcessorEnumerator` — called first — at 10. Slots are read from the SDK header,
+>   never from the web.
+> · **A grep listing return types skipped a method** whose type was `APP_DEPRECATED_HRESULT`, and
+>   **shifted every slot after it**. `VideoProcessorBlt` is 53, not 48. A pattern that did not match
+>   is not an absence.
+> · **Copying a mutant with `Copy-Item` keeps its timestamp and MSBuild does not rebuild**: three
+>   different mutations returned the same verdict because all three measured the first one's binary.
+>   Force `(Get-Item $f).LastWriteTime = Get-Date` and check the binary changed.
+> · **The «Microsoft Basic Render Driver» exposes no `ID3D11VideoDevice`.** It is all a hosted runner
+>   has, so the pixel test skips there — and says so.
+>
+> ### What comes next
+>
+> 1. **Switch RTX Video Super Resolution on in the NVIDIA app and run the probe again.** One command,
+>    and NVIDIA's third is closed.
+> 2. **The chain**: a `YUY2` texture on Avalonia's adapter → video processor → shared texture imported
+>    into the composition. Avalonia 12.1.1 supports it, measured in the assembly:
+>    `TryGetCompositionGpuInterop` → `ImportImage` with `D3D11TextureNtHandle`,
+>    `UpdateWithKeyedMutexAsync`, formats `B8G8R8A8UNorm`/`R8G8B8A8UNorm`, and `DeviceLuid` to match
+>    the adapter. The default Win32 backend is ANGLE over D3D11.
+> 3. **FSR 1 in SkSL** for every other card: SkiaSharp 3.119.4 carries `SKRuntimeEffect`.
+> 4. **AMD**: writable and **not verifiable** without a machine. It goes back to the owner once its
+>    chain is written.
+> 5. **Subtitles**, which the owner brought into scope on 2026-09-12: drawing them ourselves instead
+>    of letting VLC burn them into the frame. **With a hole that has to be respected**: VLC 3 offers
+>    no way to receive **image** subtitles (PGS, VobSub, DVB), so the answer is hybrid — a text track
+>    takes the clean path, an image track today's.
+>
+> ### Registered and not done
+>
+> · **LibVLC 3.0.23.1 does not export `libvlc_video_set_output_callbacks`** (measured in the binary,
+>   with two positive controls and one negative). There is no way to receive a card texture from
+>   VLC 3: the frame **always** goes through system memory. What drawing subtitles ourselves buys is
+>   a free choice of chroma, the exact geometry, a super resolution that stops processing text, and
+>   **the subtitle style coming back to life** — it is stored today and `SubtitleStyleReachTests`
+>   proves it never reaches the picture.
+> · **Four whole-frame copies and zero SIMD** on today's path, plus a `ToArray()` per frame in
+>   `VideoFrameView.cs` (≈8.3 MB at 1080p, on the decoder thread).
+> · **A fourth vendor nobody had named**: Mthreads, GUID `{28D65B12-…}`. No machine of the owner's
+>   carries one.
+> · **The `post-push.sh` hook still says «a run takes 49-57 min»**, and `CLAUDE.md` decided on
+>   2026-09-04 that this number is not stored because it is always stale. Whoever fixed the document
+>   did not look at who else writes it.
+> · **An agent worktree under `.claude/` turns a documentation gate red.** `EvidenceLinkTests` sweeps
+>   `docs`, `design` and **all of `.claude`, recursively**, so the copy of the repository living in
+>   `.claude/worktrees/<agent>/` reads as new documents: its exception list is keyed by relative path
+>   and the copy does not match. Measured today — the same suite gave 99/99 before the auditor was
+>   launched and 98/99 while it ran — and the worst part is the message: **it names a file that does
+>   not exist in the real tree**, sending a reader after an invented offence. The sweep has to skip
+>   `.claude/worktrees/`.
+
 > ## READ THIS FIRST — 2026-09-12: the library card, with its rhythm and its four marks
 >
 > **First look at the tree, which overrules this document**: `git log --oneline -1 main`,

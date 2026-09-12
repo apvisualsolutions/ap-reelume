@@ -52,6 +52,29 @@ que esa fila prohíbe. Así que `PLY-016` sólo llegará a `VERIFIED` en dos ter
 decisión de gasto se tome: es del propietario, se le vuelve a plantear cuando la cadena de AMD esté
 escrita, y la recomendación sigue siendo sí — son horas sueltas de una máquina, no una compra.
 
+**Y el 2026-09-12 `PLY-016` dejó de ser una intención: tiene un tercio verificado.** La sonda del
+procesador de vídeo mide que la superresolución de **Intel funciona en la UHD 770 del propio equipo**
+—cambia el 54,6 % de la imagen, con su control negativo en cero y un control positivo que prueba que
+el procesador dibujó—, y que el formato que esta aplicación ya produce entra en las dos tarjetas sin
+conversión de color. **NVIDIA acepta la petición y no mueve un píxel, y eso queda como NO
+CONCLUYENTE**: la llamada es idéntica a la de Chromium, que documenta que el controlador la acepta y
+la ignora mientras la Súper resolución RTX esté apagada en NVIDIA App, que es como viene de fábrica.
+Falta encenderla y volver a medir; no es trabajo de código. La evidencia, con lo que costó
+equivocarse dos veces en la llamada de Intel, está en
+[PLY16-d3d11-probe.md](../evidence/stable/PLY16-d3d11-probe.md).
+
+**Y el propietario puso la condición que ordena el diseño: la mejora tiene que funcionar sin que
+quien usa la aplicación cambie nada.** Se investigó y **se cumple**, por una vía que no depende de
+ningún fabricante: los filtros estándar del procesador de vídeo de Direct3D —reducción de ruido y
+realce de bordes— los declaran **las dos tarjetas**, y el realce cambia 8,08 millones de bytes en
+ambas, **NVIDIA incluida**. A eso se suman la superresolución de Intel, que ya funciona sola, y el
+reescalador portátil para el resto. **Lo que no se puede es encender la Súper resolución RTX desde la
+aplicación**: no existe ese ajuste en la cabecera pública de NVIDIA, ni aparece por su nombre en el
+registro ni en la configuración de NVIDIA App de esta máquina, y el SDK que sí lo expondría está
+descartado por licencia. **Así que la superresolución del fabricante es un extra oportunista y nunca
+la promesa**: lo prometido corre siempre, y lo del fabricante se enciende solo si al compararlo
+cambia píxeles.
+
 **Y `PRD-003` dejó de ser lo que esta línea decía, el 2026-09-04.** Decía que dependía de «una
 máquina Windows 11 ARM64 que no hay». La hay y es gratis: GitHub ofrece runners hospedados de
 Windows 11 ARM64 —`windows-11-arm`—, **gratis e ilimitados en repositorios públicos**, y éste lo es

@@ -51,6 +51,29 @@ exactly what that row forbids. So `PLY-016` will only reach `VERIFIED` in two th
 spending decision is made: it is the owner's, it goes back to him once AMD's chain is written, and
 the recommendation is still yes — these are a few hours of a machine, not a purchase.
 
+**And on 2026-09-12 `PLY-016` stopped being an intention: a third of it is verified.** The video
+processor probe measures that **Intel's super resolution works on this machine's own UHD 770** — it
+changes 54.6 % of the picture, with its negative control at zero and a positive control proving the
+processor drew at all — and that the format this application already produces is accepted by both
+cards with no colour conversion. **NVIDIA accepts the request and moves no pixel, and that is
+recorded as INCONCLUSIVE**: the call is identical to Chromium's, which documents that the driver
+accepts it and ignores it while RTX Video Super Resolution is off in the NVIDIA app, which is how it
+ships. Switching it on and measuring again is what is left, and it is not code. The evidence, with
+what getting Intel's call wrong twice cost, is in
+[PLY16-d3d11-probe.md](../evidence/stable/PLY16-d3d11-probe.md).
+
+**And the owner set the condition that orders the design: the improvement has to work without the
+person using the application changing anything.** It was investigated and **it holds**, by a route
+that depends on no vendor: the standard Direct3D video processor filters — noise reduction and edge
+enhancement — are declared by **both cards**, and the enhancement changes 8.08 million bytes on each,
+**NVIDIA included**. Intel's super resolution, which already works on its own, and the portable
+upscaler for everything else sit on top of that. **What cannot be done is switching RTX Video Super
+Resolution on from the application**: no such setting exists in NVIDIA's public settings header, it
+appears by name neither in this machine's registry nor in the NVIDIA app's configuration, and the SDK
+that would expose it is rejected on licence. **So the vendor's super resolution is an opportunistic
+bonus and never the promise**: what is promised always runs, and the vendor's switches itself on only
+if comparing it changes pixels.
+
 **And `PRD-003` stopped being what this line said, on 2026-09-04.** It said it depended on «a
 Windows 11 ARM64 machine that does not exist here». There is one and it is free: GitHub offers
 hosted Windows 11 ARM64 runners — `windows-11-arm` — **free and unlimited on public repositories**,
