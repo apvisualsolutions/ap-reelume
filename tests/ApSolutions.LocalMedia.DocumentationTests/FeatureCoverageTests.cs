@@ -44,7 +44,7 @@ public sealed class FeatureCoverageTests
         // agreeing is the point. They disagreed all day precisely because five rows were invisible to
         // one of them. This number and verify-docs.ps1's are measured after the change, never written
         // ahead of it.
-        Assert.Equal(71, FeatureMatrix.Rows.Count);
+        Assert.Equal(72, FeatureMatrix.Rows.Count);
         Assert.Equal(MvpCommitments, FeatureMatrix.Mvp.Count);
         Assert.Equal(
             FeatureMatrix.Rows.Count,

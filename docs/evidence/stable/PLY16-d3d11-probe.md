@@ -175,6 +175,41 @@ registro de VLC 3.0.23 reproduciendo un vídeo de 480p en esta misma tarjeta dic
 Resolution scaler with B8G8R8A8 output»** y **«turning VSR ON»**, sin un solo error. Es decir: la
 llamada se acepta igual que la nuestra. Lo que VLC no ha dicho todavía es si mueve un píxel.
 
+## VLC tampoco mueve un píxel con la VSR, y eso CONFIRMA el interruptor
+
+**Medido el 2026-09-12 por la noche con VLC 3.0.23 en la RTX 5070 de esta máquina**, reproduciendo un
+fotograma congelado de un vídeo real de 480p a pantalla completa y comparando la pantalla por bytes.
+
+**La clave fue encontrar el cuarto modo.** `--d3d11-upscale-mode` acepta `linear`, `point`,
+`processor` y `super`, leídos del binario del plugin. `processor` usa el procesador de vídeo **sin**
+la superresolución del fabricante y `super` **con** ella — lo dicen los propios registros de VLC,
+«Using Video Processor scaler» frente a «Using Super Resolution scaler» más «turning VSR ON». Ese par
+es lo único que aísla la VSR.
+
+| Comparación | Bytes distintos de 33 177 600 | Qué mide |
+| --- | --- | --- |
+| escritorio → cualquier pasada | 70,6 % | control positivo: VLC dibujó |
+| `processor` contra `processor` | **0** | control negativo: dos pasadas idénticas |
+| **`processor` contra `super`** | **0** | **la VSR, aislada: no mueve nada** |
+| `linear` contra `super` | 50,0 % | el procesador de vídeo entero, no la VSR |
+
+**El cero de VLC vale más que el nuestro**, y por eso cierra la pregunta: es la implementación de un
+tercero que funciona, sobre **vídeo real**, con entrada `NV12` salida de un decodificador de hardware,
+y **presentándose en una cadena de intercambio** en vez de dibujando fuera de pantalla. Con eso cae
+también la hipótesis que quedaba viva — que la superresolución sólo actuara al presentar.
+
+**La primera versión de esta medición dio 50 % y estuvo a punto de escribirse como «VLC sí mejora».**
+Comparaba `linear` contra `super`, y `linear` **no crea escalador**: va por un sampler del shader. Ese
+50 % es el procesador de vídeo frente a no usarlo, que es una pregunta distinta y ya contestada. Lo
+destapó el registro de VLC, no el número.
+
+**Y ese 50 % es la buena noticia para `PLY-016`, leída bien**: el procesador de vídeo **sí** mejora la
+imagen en la RTX 5070 — la mitad de los bytes de la pantalla, con un desvío medio de 15 niveles y
+máximo de 61 —, y eso es lo que la cadena va a usar. Coincide con lo que la sonda ya medía por otra
+vía: el realce de bordes estándar mueve 8 084 664 bytes en esa misma tarjeta. /
+**VLC's VSR moves nothing either, with a perfect negative control; the video processor itself moves
+half the screen.**
+
 ## Por qué el cero de NVIDIA es NO CONCLUYENTE y no «no funciona»
 
 La llamada es **idéntica** a la de Chromium (`ToggleNvidiaVpSuperResolution`): mismo GUID, misma

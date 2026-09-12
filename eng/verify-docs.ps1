@@ -55,6 +55,11 @@ $featureMatrixPath = Join-Path $docsRoot 'FEATURES.md'
 $featureMatrix = Get-Content -LiteralPath $featureMatrixPath -Raw
 $featureIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|')
 $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*\| MVP \|')
+# 72 since 2026-09-12, when PLY-017 was opened against STABLE and not MVP: the MVP manifest is a
+# closed record of 46 commitments with the tasks that built them, and a row born today has no task to
+# name — inventing one would falsify the record. The colour defect showed that NO row promised a
+# video would be decoded with the colour space it belongs to, which is why nothing caught it for as
+# long as it lasted. A defect that no row covers is a defect no register is watching.
 # 71 since 2026-09-03, and it took three sessions in one day to get there. 65 came from 2026-08-30,
 # when ADR-0006 was accepted and CRS-001..005 arrived. Then CRS-006 (a course card's picture, taken
 # from the video) and LIB-018 (setting your own cover) made it 67. Then the rail menu was measured
@@ -63,8 +68,8 @@ $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*
 # CRS-007 (filtering the courses grid). The count is asserted rather than left open so that a row
 # added to the matrix has to be added here too, which is where somebody notices that the manifest and
 # the localised documents need it as well.
-if ($featureIds.Count -ne 71) {
-    $errors.Add("Expected 71 feature IDs, found $($featureIds.Count).")
+if ($featureIds.Count -ne 72) {
+    $errors.Add("Expected 72 feature IDs, found $($featureIds.Count).")
 }
 if ($mvpIds.Count -ne 46) {
     $errors.Add("Expected 46 MVP feature IDs, found $($mvpIds.Count).")
