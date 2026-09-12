@@ -65,6 +65,16 @@
 >   `(Get-Item $f).LastWriteTime = Get-Date` y se comprueba que el binario cambió.
 > · **El «Microsoft Basic Render Driver» no expone `ID3D11VideoDevice`.** Es lo único que hay en un
 >   runner hospedado, así que la prueba de píxel se salta allí — y lo dice.
+> · **QUITAR UNA GUARDA POR DEDUCCIÓN CUANDO LA MEDICIÓN YA DECÍA QUE PASABA.** La sonda lleva
+>   `[ExcludeFromCodeCoverage]` sobre toda su clase. Se quitó por dos razones que sonaban buenas y
+>   ninguna era una medición: que sería **el primer** fichero del árbol excluido entero, y que
+>   `preview-coverage-floors.ps1` lo lista como «not measured». Mientras tanto **CI ya lo había dado
+>   verde** con la exclusión puesta — la queja del previsualizador es un límite suyo, que no sabe
+>   juzgar un fichero sin líneas medibles, y no la puerta negándose. Sin la exclusión el fichero lee
+>   **15/10** en un runner hospedado contra **92/63** en esta máquina con dos tarjetas, así que habría
+>   entrado como **octavo** de la lista de deuda y habría subido el trinquete para siempre, comprado
+>   con un razonamiento contra un dato. **La regla de la casa otra vez: un verde leído manda sobre un
+>   argumento bien construido.**
 > · **UN AUDITOR EN WORKTREE AISLADO PUEDE ESTAR MIDIENDO CÓDIGO VIEJO Y CONTESTAR QUE TODO BIEN.**
 >   `isolation: "worktree"` monta la copia sobre el commit de **`main`**, no sobre tu `HEAD`. La
 >   primera pasada acertó **por accidente**: los cambios estaban sin commitear y el arnés los copió

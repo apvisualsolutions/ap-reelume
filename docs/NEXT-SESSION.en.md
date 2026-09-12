@@ -65,6 +65,16 @@
 >   Force `(Get-Item $f).LastWriteTime = Get-Date` and check the binary changed.
 > · **The «Microsoft Basic Render Driver» exposes no `ID3D11VideoDevice`.** It is all a hosted runner
 >   has, so the pixel test skips there — and says so.
+> · **REMOVING A GUARD BY DEDUCTION WHEN THE MEASUREMENT ALREADY SAID IT PASSED.** The probe carries
+>   `[ExcludeFromCodeCoverage]` over its whole class. It was taken off for two reasons that sounded
+>   good and neither of which was a measurement: that it would be **the first** file in the tree
+>   excluded whole, and that `preview-coverage-floors.ps1` lists it as «not measured». Meanwhile **CI
+>   had already gone green** with the exclusion in place — the preview's complaint is a limit of the
+>   preview, which cannot judge a file with no measurable lines, not the gate refusing. Without the
+>   exclusion the file reads **15/10** on a hosted runner against **92/63** on this machine with two cards,
+>   so it would have become an **eighth** entry in the debt list and raised the ratchet for good,
+>   bought with an argument against a fact. **The house rule again: a green that was read outranks a
+>   well-built argument.**
 > · **AN AUDITOR IN AN ISOLATED WORKTREE CAN BE MEASURING OLD CODE AND ANSWER THAT ALL IS WELL.**
 >   `isolation: "worktree"` mounts the copy on **`main`**'s commit, not on your `HEAD`. The first pass
 >   got it right **by accident**: the changes were uncommitted and the harness copied them in. The

@@ -27,16 +27,24 @@ namespace ApSolutions.LocalMedia.Windows.Playback;
 /// <c>CreateVideoProcessorEnumerator</c> — which is called first — sits at 10.
 /// </para>
 /// <para>
-/// <b>Not excluded from coverage, and that was tried first.</b> Everything that decides anything
-/// lives in <see cref="D3d11UpscaleFormats"/> and is measured there on any machine, so marking this
-/// class <c>[ExcludeFromCodeCoverage]</c> looked like rule 10's seam. It would have made this the
-/// first file in the tree excluded whole, the coverage preview refused it as «not measured», and an
-/// earlier attempt had already been rejected by CI at 45/100 because the data records then living
-/// beside it were not excluded and the gate measures per file. What is left is what rule 10 names as
-/// its other half: a file that depends on hardware a hosted runner does not have, which belongs in
-/// <c>eng/coverage-debt.txt</c> with its reason — the eighth of its kind.
+/// Excluded from coverage as a whole, which is rule 10's seam and not an exception to it: everything
+/// that decides anything lives in <see cref="D3d11UpscaleFormats"/> and is measured there on any
+/// machine. What is left can only fail if Windows or a display driver fails.
+/// </para>
+/// <para>
+/// <b>And the exclusion is measured, not assumed — twice, in both directions.</b> CI first rejected
+/// this file at 45/100 because the data records then living beside it were <i>not</i> excluded and
+/// the gate measures per file; moving them out turned the run green. Then the exclusion was taken off
+/// anyway, on the reasoning that no other file in the tree is excluded whole and that the coverage
+/// preview reports this one as «not measured» — and the green run had already proved the gate
+/// accepts it. The preview's complaint is a limit of the preview, which cannot judge a file with no
+/// measurable lines; it is not the gate refusing. Taking it off turned the next run red and put a
+/// number on how hardware-bound this file is: <b>15/10 on a hosted runner against 92/63 on a machine
+/// with two graphics cards</b>. It would have become an eighth entry in <c>eng/coverage-debt.txt</c>
+/// and a permanently higher ratchet, bought with a deduction against a measurement.
 /// </para>
 /// </remarks>
+[ExcludeFromCodeCoverage]
 public static class WindowsVideoUpscaleProbe
 {
     private const int DxgiErrorNotFound = unchecked((int)0x887A0002);
