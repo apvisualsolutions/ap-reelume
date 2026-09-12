@@ -184,9 +184,24 @@ public sealed class WindowsVideoUpscaleProbeTests
             // a filter that reports itself and does nothing, which is the defect this house is
             // named after.
             Assert.Contains("EDGE_ENHANCEMENT", probe.Filters.Offered);
+
+            // Declared and asked for stopped being the same thing when the level became a policy: a
+            // processor that offers the filter and then declares a range with no room above its own
+            // default is never asked. Saying that one «changed not one byte at maximum» would be a
+            // sentence about a call that never happened, so the two are separated before the count
+            // is read at all.
+            Assert.True(
+                probe.Filters.EdgeEnhancementLevel is not null,
+                $"'{probe.Description}' declares edge enhancement and the range it declared was "
+                + "refused, so nothing was asked for and the count beside it measures no call.");
+
             Assert.True(
                 probe.Filters.EdgeEnhancementDifferingBytes > 0,
-                $"'{probe.Description}' offers edge enhancement and changed not one byte with it at maximum.");
+                FormattableString.Invariant(
+                    $"'{probe.Description}' was asked for edge enhancement at level ")
+                + FormattableString.Invariant(
+                    $"{probe.Filters.EdgeEnhancementLevel} ({probe.Filters.EdgeEnhancementStrength} ")
+                + "in the filter's own units) and changed not one byte.");
         }
     }
 

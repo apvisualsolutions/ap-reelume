@@ -113,6 +113,18 @@ evidencia bilingüe → changelogs ES/EN → un commit → push con `main` en fa
   2. **La textura y el procesador de vídeo**, con el realce de bordes estándar que las dos tarjetas
      declaran y que mueve el 24,4 % de la imagen en ambas. Se mide leyendo la textura de vuelta con
      una textura de staging, que es lo que `WindowsVideoUpscaleProbe` ya hace.
+
+     **Empezado el 2026-09-12 por donde la regla 10 obliga**: el nivel del realce —el «máximo» que
+     produjo esos dos 24,4 %— se decidía **dentro** del archivo excluido de la cobertura, así que
+     nada podía medirlo. Vive ahora en `D3d11UpscaleFormats.EdgeEnhancementLevel` con siete casos, y
+     la sonda lo consume. Comprobado contra las dos tarjetas: **las cifras no se movieron ni un
+     byte**. Detalle y la puerta ciega que la propia política trajo, en
+     [PLY16-d3d11-probe.md](../../evidence/stable/PLY16-d3d11-probe.md).
+
+     **Lo que queda del eslabón** es la ruta de producción: la textura de entrada alimentada con lo
+     que produce `UyvyToYuy2` en vez del patrón sintético de la sonda, su procesador, y el veredicto
+     leído de vuelta. La maquinaria COM existe entera en la sonda; lo que no existe es quién la posee
+     durante una reproducción.
   3. **La importación en la composición**, por `TryGetCompositionGpuInterop` →
      `ImportImage(D3D11TextureNtHandle)` → `UpdateWithKeyedMutexAsync(image, acquire, release)`. La
      documentación de Avalonia nombra otras tres llamadas y **ninguna existe**; la ruta buena está

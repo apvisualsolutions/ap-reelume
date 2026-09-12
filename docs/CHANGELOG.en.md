@@ -10,6 +10,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **How strong the picture enhancement is asked to be is now decided by code somebody can check.**
+  It was written inside the one file in the project that is not measured, so no test could reach it.
+  It is a separate rule now, with seven cases: the maximum is asked for — the only value with a
+  measurement behind it — and nothing is asked for when the card does not offer the enhancement, when
+  there is no room above what its own driver treats as neutral, or when the numbers it declares
+  contradict each other. Checked where it counts: both of this machine's cards return exactly the
+  same figures as before the change.
+
 - **The format the graphics card needs is now produced, and it costs less than what happens today.**
   The picture the decoder hands over carries its bytes in an order Direct3D does not recognise — it
   is not in its list of formats, checked against Microsoft's documentation before a line was written

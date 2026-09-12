@@ -261,6 +261,65 @@ public sealed class UpscaleFormatArithmeticTests
             expected.Split(',', StringSplitOptions.RemoveEmptyEntries),
             D3d11UpscaleFormats.OfferedFilters(filterCaps));
 
+    /// <summary>
+    /// Which level of edge enhancement is asked for, which until 2026-09-12 was decided inside the
+    /// file that is excluded from coverage — rule 10's exact prohibition, and the reason nothing
+    /// measured it.
+    /// </summary>
+    [Theory]
+    // Offered, with room above the driver's own default: the maximum, because it is the only level
+    // with a measurement behind it — 24.4 % of the picture moved, on both cards, on 2026-09-12.
+    [InlineData(0x20u, 0, 100, 50, 100)]
+    [InlineData(0x30u, -10, 64, 0, 64)]
+    // The commonest range there is, and the one that was missing: a filter that ships switched off
+    // reports its default AT its minimum. Without this row the check below can be loosened from
+    // «below the minimum» to «at or below it» with everything green — and that mutation turns the
+    // ordinary card into one that is never asked for anything.
+    [InlineData(0x20u, 0, 100, 0, 100)]
+    // Offered but with nothing above the default, so switching it on cannot change a pixel.
+    [InlineData(0x20u, 0, 50, 50, null)]
+    // Offered and contradicting itself: a default below the floor the driver just declared, with
+    // room above it on purpose — that room is what leaves the check as the only possible reason for
+    // the refusal. A row without it is refused by the comparison instead, which is how the first
+    // attempt at this row measured nothing at all.
+    [InlineData(0x20u, 50, 100, 10, null)]
+    // A range that came back all zeroes, which is what a failed GetVideoProcessorFilterRange leaves
+    // in the struct. A control and not a gate — no mutation survives its absence — but it is the
+    // only place the answer is written down.
+    [InlineData(0x20u, 0, 0, 0, null)]
+    // Not offered at all — noise reduction only, and every colour filter.
+    [InlineData(0x10u, 0, 100, 50, null)]
+    [InlineData(0xCFu, 0, 100, 50, null)]
+    public void The_edge_enhancement_level_is_the_only_one_with_a_measurement_behind_it(
+        uint filterCaps,
+        int minimum,
+        int maximum,
+        int @default,
+        int? expected) =>
+        Assert.Equal(
+            expected,
+            D3d11UpscaleFormats.EdgeEnhancementLevel(
+                filterCaps,
+                new D3d11UpscaleFormats.FilterRange(minimum, maximum, @default, 1f)));
+
+    /// <summary>
+    /// What a level means in the filter's own units. Two cards that both answered «100» have not
+    /// been asked for the same thing unless their multipliers agree, which is why the strength and
+    /// not only the level travels into the report.
+    /// </summary>
+    [Theory]
+    [InlineData(100, 1f, 100f)]
+    // The documentation's own worked example: «a filter value of 2 would be interpreted by the
+    // device as 0.50 (or 2 × 0.25)».
+    [InlineData(2, 0.25f, 0.5f)]
+    [InlineData(64, 0.5f, 32f)]
+    [InlineData(-8, 0.25f, -2f)]
+    public void A_level_means_whatever_its_multiplier_says_it_means(
+        int level,
+        float multiplier,
+        float expected) =>
+        Assert.Equal(expected, D3d11UpscaleFormats.FilterStrength(level, multiplier));
+
     /// <summary>A format this pipeline never sends is refused rather than silently drawn as noise.</summary>
     [Fact]
     public void A_format_the_pipeline_never_sends_is_refused() =>
@@ -387,6 +446,33 @@ public sealed class UpscaleFormatArithmeticTests
         // extension did.
         Assert.Contains("EDGE_ENHANCEMENT", nvidia, StringComparison.Ordinal);
         Assert.Contains("edge=8084664", nvidia, StringComparison.Ordinal);
+
+        // And the level it was asked for, without which «edge=0» a month later cannot be told apart
+        // from a filter that was never asked for anything.
+        Assert.Contains("edge_level=100@100", nvidia, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The line for a processor that declares the filter and then declares a range with no room in
+    /// it. The count is the same <c>-1</c> as a card with no filter at all, so the line has to say
+    /// which of the two happened — and it is the level, not the count, that says it.
+    /// </summary>
+    [Fact]
+    public void A_filter_that_was_declared_but_never_asked_for_says_so_rather_than_reading_as_a_zero()
+    {
+        var line = UpscaleProbeReport.Describe(new AdapterUpscaleProbe(
+            "Intel(R) UHD Graphics 770",
+            0x8086u,
+            GpuVendor.Intel,
+            new Dictionary<string, uint>(StringComparer.Ordinal) { ["YUY2"] = 3u },
+            "YUY2",
+            new VendorExtensionOutcome(0, 0, 0, true, false),
+            new StandardFilterOutcome(0x20u, ["EDGE_ENHANCEMENT"], -1L, null, 0f),
+            new UpscalePixelComparison(0L, 0L, 33177600L, 44, 0, true),
+            null));
+
+        Assert.Contains("EDGE_ENHANCEMENT", line, StringComparison.Ordinal);
+        Assert.Contains("edge_level=not asked", line, StringComparison.Ordinal);
     }
 
     /// <summary>An adapter that never got that far says so, rather than reading as a refusal.</summary>
@@ -419,7 +505,7 @@ public sealed class UpscaleFormatArithmeticTests
             new Dictionary<string, uint>(StringComparer.Ordinal) { ["YUY2"] = 3u },
             "YUY2",
             extension,
-            new StandardFilterOutcome(0x30u, ["NOISE_REDUCTION", "EDGE_ENHANCEMENT"], 8084664L),
+            new StandardFilterOutcome(0x30u, ["NOISE_REDUCTION", "EDGE_ENHANCEMENT"], 8084664L, 100, 100f),
             pixels,
             null);
 

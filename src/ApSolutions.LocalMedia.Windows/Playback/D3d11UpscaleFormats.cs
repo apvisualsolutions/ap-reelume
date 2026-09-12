@@ -173,6 +173,87 @@ public static class D3d11UpscaleFormats
         [.. StandardFilters.Where(filter => (filterCaps & filter.CapBit) != 0).Select(filter => filter.Name)];
 
     /// <summary>
+    /// What a processor says it accepts for one filter, as <c>GetVideoProcessorFilterRange</c>
+    /// reports it. <see cref="Multiplier"/> is not decoration: the documentation's formula is
+    /// <i>actual value = set value × multiplier</i>, so the numbers here are steps and not degrees.
+    /// </summary>
+    public sealed record FilterRange(int Minimum, int Maximum, int Default, float Multiplier);
+
+    /// <summary>
+    /// The edge-enhancement level to ask this processor for, or <see langword="null"/> when there is
+    /// nothing worth asking.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>This decision used to live inside <see cref="WindowsVideoUpscaleProbe"/></b>, which is
+    /// excluded from coverage whole — so the one thing rule 10 says must never be excluded was. It
+    /// moved out on 2026-09-12 without changing what it answers for the cards measured that day.
+    /// </para>
+    /// <para>
+    /// <b>The maximum, and the reason is that it is the only level with a measurement behind it</b>:
+    /// 24.4 % of the picture moved on both of this machine's cards at that level. Any other number
+    /// would be a guess wearing a policy's clothes. Whether the maximum is also the level a person
+    /// wants to watch is a different question — edge enhancement buys sharpness with haloes — and
+    /// that one is signed off by eye, on real material, by the owner.
+    /// </para>
+    /// <para>
+    /// Three answers of <see langword="null"/>, and they are not the same «no»: a processor that
+    /// never offered the filter, a range with nothing above the driver's own default — where
+    /// switching it on cannot move a pixel, so the call would only cost one — and a range that
+    /// contradicts itself, which is not obeyed at all. A driver reporting a maximum under its
+    /// minimum is reporting a bug, and following it would push an arbitrary number into a filter.
+    /// </para>
+    /// </remarks>
+    public static int? EdgeEnhancementLevel(uint filterCaps, FilterRange range)
+    {
+        ArgumentNullException.ThrowIfNull(range);
+
+        if (!OfferedFilters(filterCaps).Contains("EDGE_ENHANCEMENT"))
+        {
+            return null;
+        }
+
+        // A default below the floor the driver just declared is a driver contradicting itself, and
+        // it is not obeyed: following it would push a number the same driver called out of bounds
+        // into a filter.
+        //
+        // TWO other contradictions were written here and BOTH were taken out for the same measured
+        // reason — nothing can tell them apart from their own absence:
+        //
+        //  · «Default above Maximum»: whenever it holds, the comparison below already answers null.
+        //  · «Maximum at or below Minimum»: to reach a non-null answer a range needs Default at or
+        //    above Minimum (this check) and Maximum above Default (the comparison), and those two
+        //    together already say Maximum is above Minimum. Enumerated over the whole domain on
+        //    2026-09-12: zero inputs separate the two versions.
+        //
+        // Both were found the same way and not by reading: they survived being deleted with every
+        // row green. A guard that cannot fail is not protection, it is a sentence that reads like
+        // protection — so it says so here instead of standing there.
+        if (range.Default < range.Minimum)
+        {
+            return null;
+        }
+
+        return range.Maximum > range.Default ? range.Maximum : null;
+    }
+
+    /// <summary>
+    /// What a filter level means in the filter's own units: <i>actual value = set value ×
+    /// multiplier</i>, straight out of the documentation of
+    /// <c>D3D11_VIDEO_PROCESSOR_FILTER_RANGE</c>, whose own example reads «a filter value of 2 would
+    /// be interpreted by the device as 0.50».
+    /// </summary>
+    /// <remarks>
+    /// One multiplication, and it is here rather than beside the call for two reasons. It is
+    /// arithmetic, so rule 10 keeps it out of the excluded file; and without it the multiplier was a
+    /// field nobody read — measured by deleting it from the record and watching everything compile
+    /// and stay green, which is this repository's own characteristic defect in a new file.
+    /// <b>Two cards that both answered «100» were not asked the same thing unless their multipliers
+    /// agree</b>, so this is what makes the two measurements comparable at all.
+    /// </remarks>
+    public static float FilterStrength(int level, float multiplier) => level * multiplier;
+
+    /// <summary>
     /// The picture the probe sends through the scaler, laid out as <paramref name="format"/> wants
     /// it and identical every run.
     /// </summary>
@@ -405,9 +486,16 @@ public static class UpscaleProbeReport
             ? "not run"
             : probe.Filters.EdgeEnhancementDifferingBytes.ToString(CultureInfo.InvariantCulture);
 
+        // The level and what it means, because «edge=0» reads identically whether the filter was
+        // asked for and did nothing or was never asked at all — and those are opposite findings.
+        var level = probe.Filters?.EdgeEnhancementLevel is { } asked
+            ? FormattableString.Invariant($"{asked}@{probe.Filters.EdgeEnhancementStrength}")
+            : "not asked";
+
         return FormattableString.Invariant(
             $"{probe.Description} [{probe.Vendor}] {verdict} input={probe.PreferredInput ?? "none"} ")
             + FormattableString.Invariant($"differing={differing} filters=[{filters}] edge={edge}")
+            + FormattableString.Invariant($" edge_level={level}")
             + (probe.Note is null ? string.Empty : $" note={probe.Note}");
     }
 }
@@ -496,10 +584,22 @@ public sealed record VendorExtensionOutcome(
 /// What a processor offers without anybody switching anything on: the standard Direct3D filters it
 /// declares, and whether asking for edge enhancement changes the picture.
 /// </summary>
+/// <param name="EdgeEnhancementLevel">
+/// The level that was asked for, or <see langword="null"/> when nothing was. <b>It is here because
+/// its absence made a test lie</b>: while only the differing-bytes count travelled, a processor that
+/// offers the filter but declares a range with no room read as «offers edge enhancement and changed
+/// not one byte with it at maximum» — a sentence about a call that never happened.
+/// </param>
+/// <param name="EdgeEnhancementStrength">
+/// That level in the filter's own units, which is what makes two cards comparable: the same number
+/// under different multipliers is a different request.
+/// </param>
 public sealed record StandardFilterOutcome(
     uint FilterCaps,
     IReadOnlyList<string> Offered,
-    long EdgeEnhancementDifferingBytes);
+    long EdgeEnhancementDifferingBytes,
+    int? EdgeEnhancementLevel,
+    float EdgeEnhancementStrength);
 
 /// <summary>Everything one adapter answered about enlarging pictures.</summary>
 public sealed record AdapterUpscaleProbe(

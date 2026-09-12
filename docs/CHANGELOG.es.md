@@ -10,6 +10,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **La fuerza del realce de imagen ya la decide código que alguien puede comprobar.** Estaba escrita
+  dentro del único archivo del proyecto que no se mide, así que ninguna prueba podía llegar a ella.
+  Ahora es una regla aparte con siete casos: se pide el máximo —el único valor con una medición
+  detrás— y no se pide nada cuando la tarjeta no ofrece el realce, cuando no hay margen por encima
+  de lo que su propio controlador considera neutro, o cuando los números que declara se contradicen.
+  Comprobado donde importa: las dos tarjetas de este equipo devuelven exactamente las mismas cifras
+  que antes del cambio.
+
 - **El formato que la tarjeta gráfica necesita ya se produce, y cuesta menos que lo de ahora.** La
   imagen que entrega el decodificador viene con sus bytes en un orden que Direct3D no reconoce —no
   está en su lista de formatos, comprobado en la documentación de Microsoft antes de escribir nada—,

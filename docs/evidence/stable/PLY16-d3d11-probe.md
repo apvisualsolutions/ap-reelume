@@ -235,6 +235,71 @@ el propietario eligió medir antes de confirmarlo.
 - **Intel es la mitad verificada de `PLY-016`.** NVIDIA está escrita y pendiente de un interruptor;
   AMD sigue escrita-y-no-verificable por falta de máquina, que es decisión de gasto del propietario.
 
+## El nivel del realce salió del archivo excluido — 2026-09-12
+
+**El «máximo» que produjo los dos 24,4 % de arriba se decidía dentro de
+`WindowsVideoUpscaleProbe`**, que está `[ExcludeFromCodeCoverage]` de arriba abajo. Era
+`range.Maximum` escrito en la llamada, y **ninguna prueba podía llegar a él**: la regla 10 dice que
+lo que decide no se excluye nunca, y esto era exactamente eso. Ahora vive en
+`D3d11UpscaleFormats.EdgeEnhancementLevel`, con siete casos que lo miden en cualquier máquina.
+
+**Lo que la política dice, y por qué**: el máximo, porque es el único nivel con una medición detrás.
+Cualquier otro número sería una suposición con aspecto de política. Si ese nivel es además el que
+una persona quiere ver es otra pregunta —el realce compra nitidez con halos— y ésa la firma el
+propietario por el ojo, sobre material real.
+
+Y tres formas de no pedir nada, que no son el mismo «no»: un procesador que no ofrece el filtro, un
+rango sin margen por encima del defecto del propio controlador —donde encender no puede mover un
+píxel—, y un rango que se contradice, que no se obedece.
+
+**La comprobación de que no cambió nada es la única que vale aquí**: la sonda volvió a correr contra
+las dos tarjetas de esta máquina y el realce midió **8 084 664** en la NVIDIA y **8 086 614** en la
+Intel — **los mismos números, byte por byte, que la tabla de arriba**.
+
+### Y al escribir el nivel en el informe salió algo que nadie sabía
+
+El informe no decía **qué** se había pedido, sólo cuánto se movió. Ahora lo dice, y la primera
+ejecución contestó esto:
+
+| Tarjeta | Nivel pedido | Multiplicador | Bytes movidos |
+| --- | --- | --- | --- |
+| NVIDIA GeForce RTX 5070 | **100** | 1 | 8 084 664 |
+| Intel UHD Graphics 770 | **64** | 1 | 8 086 614 |
+
+**A las dos tarjetas NO se les pidió lo mismo** —el máximo de cada una es un número distinto— y aun
+así las dos movieron el mismo 24,4 %, con 1 950 bytes de diferencia entre ellas sobre 33 millones.
+Eso no es una coincidencia bonita: es un aviso de que **ese 24,4 % probablemente describe el patrón
+de prueba —cuántos píxeles tienen un borde al lado— y no la fuerza del realce**. Dos fuerzas que se
+diferencian en un 56 % no pueden dar el mismo número si el número midiera la fuerza.
+
+No cambia ninguna conclusión de este documento —el filtro corre, está encendido y mueve píxeles—,
+pero sí cambia qué se puede decir del 24,4 %: es «cuántos píxeles toca», no «cuánto los toca». Lo
+segundo sigue sin medir, y es lo que una persona ve.
+
+### Y la política nació con una puerta ciega propia, medida en el acto
+
+La comprobación de coherencia del rango **sobrevivió a ser borrada entera con las siete filas en
+verde**. Las dos filas escritas para medirla —un máximo por debajo del mínimo, y un defecto por
+encima del máximo— eran rechazadas por la comparación siguiente, no por ella.
+
+**Y el arreglo de eso quedó a medias, que lo encontró `gate-auditor` con el dominio enumerado
+entero.** De las tres condiciones escritas, **dos no pueden distinguirse de su propia ausencia**:
+
+| Condición | Por qué no mide nada | Cómo se supo |
+| --- | --- | --- |
+| «defecto por encima del máximo» | siempre que se cumple, la comparación final ya contesta que no | borrada, todo verde |
+| «máximo por debajo o igual al mínimo» | para contestar un nivel hacen falta defecto ≥ mínimo y máximo > defecto, y las dos juntas **ya dicen** que el máximo está por encima del mínimo | borrada, todo verde, y **cero entradas** en todo el dominio la separan de su ausencia |
+
+Las dos se quitaron. Queda una sola, «defecto por debajo del mínimo», y su comentario dice por qué
+las otras no están: una guarda que no puede fallar no es una protección, es una frase que se lee
+como una protección.
+
+**Y faltaba el caso más corriente que existe**: un filtro que viene apagado de fábrica declara su
+defecto **en** su mínimo —`min 0, max 100, default 0`—, y ninguna fila lo tenía. Aflojar esa
+comparación de «por debajo del mínimo» a «por debajo o igual» dejaba las ocho filas en verde y
+**convertía a la tarjeta corriente en una a la que no se le pide nada**: el realce desaparecería sin
+un solo rojo. Con la fila puesta, esa mutación cae.
+
 ## Reproducir / Reproduce
 
 ```powershell
