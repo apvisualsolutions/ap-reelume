@@ -28,6 +28,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **El color de todo vídeo HD, que se decodificaba con la matriz de definición estándar.** De 720
+  líneas para arriba se usa otra desde que existe la alta definición, y decodificar con la que no es
+  no es un matiz: **el rojo puro llegaba a la pantalla como 231 en vez de 253**, veintidós niveles
+  por debajo. Ahora la matriz se elige por la altura de la imagen, y ese mismo rojo llega donde le
+  toca. El vídeo de definición estándar no cambia, que es el resultado que se buscaba para él.
+
+  **Y la primera versión de la medición dio por cierto lo contrario.** Pedirle al codificador un
+  fichero «en BT.709» sólo le pone la etiqueta: por dentro seguía llevando el otro, y las dos muestras
+  llegaron al reproductor con los mismos bytes. Con el fichero convertido de verdad, la diferencia
+  aparece. Una etiqueta no es una muestra, y hay una prueba que se pone roja el día que alguien vuelva
+  a confundirlas.
+
 - **La blandura al ampliar no era un ajuste olvidado, y se midió antes de tocar nada.** La sospecha
   barata era que el escalado usaba el filtro por defecto y que pedir «alta calidad» era una línea.
   Rasterizado sobre un borde duro ampliado cuatro veces, los dos filtros dan **la misma rampa de
@@ -35,10 +47,6 @@ evidencia, es [FEATURES.md](FEATURES.md).
   archivada con su control positivo.
 
 ### Conocido y sin corregir
-
-- **El color está mal en todo vídeo HD.** Se decodifica con la matriz de definición estándar cuando
-  de 720p para arriba se usa otra, y nada mira el espacio de color del origen. Medido: el rojo puro
-  sale 234 en vez de 255, el verde se lleva 20 de rojo, y un tono de piel se desvía hasta 5.
 
 - **Las diecinueve pantallas comparadas con el diseño ya tienen veredicto, una por una.** Mirarlas
   dejaba «unos cuarenta» apuntes sueltos; desglosados y cruzados con lo que el programa ya tiene

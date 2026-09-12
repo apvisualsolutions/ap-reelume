@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.Domain.Playback;
 using ApSolutions.LocalMedia.Infrastructure.Playback;
 using Xunit;
 
@@ -12,6 +13,8 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 /// </summary>
 public sealed class PackedYuvConverterTests
 {
+    private static readonly YuvColourMatrix Bt601 = YuvMatrixPolicy.MatrixFor(YuvColourSpace.Bt601);
+
     [Theory]
     // Black, white, and the three primaries, in limited-range BT.601 as a decoder emits them.
     [InlineData(16, 128, 128, 0, 0, 0)]
@@ -19,7 +22,71 @@ public sealed class PackedYuvConverterTests
     [InlineData(82, 90, 240, 255, 0, 0)]
     [InlineData(145, 54, 34, 0, 255, 0)]
     [InlineData(41, 240, 110, 0, 0, 255)]
+    // And two colours that saturate no channel, which is what actually measures the coefficients.
+    // A saturated primary clamps two of its three channels to 0 or 255, so a coefficient can be
+    // doubled and the row still passes — measured: doubling the blue coefficient left all ten rows
+    // above green and the whole suite with it. These two land every channel in mid-range, and each
+    // of the four chroma coefficients doubled moves one of them by more than the tolerance.
+    [InlineData(135, 91, 81, 63, 191, 64)]
+    [InlineData(96, 161, 149, 127, 63, 160)]
     public void The_colours_a_person_would_notice_survive_the_conversion(
+        byte luma,
+        byte u,
+        byte v,
+        byte red,
+        byte green,
+        byte blue) =>
+        AssertPrimarySurvives(YuvColourSpace.Bt601, luma, u, v, red, green, blue);
+
+    [Theory]
+    // The same colours in limited-range BT.709, which is what anything 720 lines or taller is
+    // encoded in. Every sample was read on 2026-09-12 out of ffmpeg converting the same pictures
+    // with each matrix in turn.
+    //
+    // Black and white are here for completeness and measure nothing about the matrix: their chroma
+    // is 128, so every chroma coefficient multiplies zero and the two matrices produce identical
+    // bytes. The rows that tell the two apart are the five below them.
+    [InlineData(16, 128, 128, 0, 0, 0)]
+    [InlineData(235, 128, 128, 255, 255, 255)]
+    [InlineData(63, 102, 240, 255, 0, 0)]
+    [InlineData(173, 42, 26, 0, 255, 0)]
+    [InlineData(32, 240, 118, 0, 0, 255)]
+    [InlineData(149, 85, 77, 63, 191, 64)]
+    [InlineData(88, 164, 152, 127, 63, 160)]
+    public void The_same_colours_survive_the_high_definition_matrix_the_pictures_really_use(
+        byte luma,
+        byte u,
+        byte v,
+        byte red,
+        byte green,
+        byte blue) =>
+        AssertPrimarySurvives(YuvColourSpace.Bt709, luma, u, v, red, green, blue);
+
+    [Fact]
+    public void Decoding_a_high_definition_sample_with_the_standard_definition_matrix_is_the_defect_being_fixed()
+    {
+        // The control that gives the two theories above their meaning. Pure red in BT.709 run
+        // through the BT.601 matrix is what the player did until now, and it is not a rounding
+        // difference: 22 levels of red. Without this, a converter that quietly ignored its matrix
+        // would pass both theories on the rows where the two happen to agree.
+        var packed = new byte[] { 102, 63, 240, 63 };
+        var wrong = new byte[8];
+        var right = new byte[8];
+
+        PackedYuvConverter.UyvyToBgra(
+            packed, wrong, width: 2, height: 1, sourceStride: 4, destinationStride: 8,
+            YuvMatrixPolicy.MatrixFor(YuvColourSpace.Bt601));
+        PackedYuvConverter.UyvyToBgra(
+            packed, right, width: 2, height: 1, sourceStride: 4, destinationStride: 8,
+            YuvMatrixPolicy.MatrixFor(YuvColourSpace.Bt709));
+
+        Assert.InRange(wrong[2], 228, 238);
+        Assert.InRange(right[2], 252, 255);
+        Assert.True(right[2] - wrong[2] >= 15, $"red only moved {right[2] - wrong[2]} levels");
+    }
+
+    private static void AssertPrimarySurvives(
+        YuvColourSpace space,
         byte luma,
         byte u,
         byte v,
@@ -31,7 +98,14 @@ public sealed class PackedYuvConverterTests
         var packed = new byte[] { u, luma, v, luma };
         var bgra = new byte[8];
 
-        PackedYuvConverter.UyvyToBgra(packed, bgra, width: 2, height: 1, sourceStride: 4, destinationStride: 8);
+        PackedYuvConverter.UyvyToBgra(
+            packed,
+            bgra,
+            width: 2,
+            height: 1,
+            sourceStride: 4,
+            destinationStride: 8,
+            YuvMatrixPolicy.MatrixFor(space));
 
         for (var pixel = 0; pixel < 2; pixel++)
         {
@@ -63,7 +137,8 @@ public sealed class PackedYuvConverterTests
             }
         }
 
-        PackedYuvConverter.UyvyToBgra(packed, bgra, Width, Height, SourceStride, DestinationStride);
+        PackedYuvConverter.UyvyToBgra(
+            packed, bgra, Width, Height, SourceStride, DestinationStride, Bt601);
 
         for (var row = 0; row < Height; row++)
         {
@@ -111,7 +186,8 @@ public sealed class PackedYuvConverterTests
             width,
             height,
             sourceStride,
-            destinationStride));
+            destinationStride,
+            Bt601));
 
     [Fact]
     public void Fewer_rows_than_the_conversion_was_told_to_read_is_refused()
@@ -122,7 +198,8 @@ public sealed class PackedYuvConverterTests
             width: 2,
             height: 4,
             sourceStride: 4,
-            destinationStride: 8));
+            destinationStride: 8,
+            Bt601));
 
         Assert.Equal("source", thrown.ParamName);
     }

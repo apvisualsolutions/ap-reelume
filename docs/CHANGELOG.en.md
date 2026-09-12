@@ -28,6 +28,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The colour of every HD video, which was decoded with the standard-definition matrix.** From 720
+  lines up a different one has been used for as long as high definition has existed, and decoding
+  with the wrong one is not a nuance: **pure red reached the screen as 231 instead of 253**, twenty-two
+  levels short. The matrix is now chosen by the picture's height, and that same red arrives where it
+  belongs. Standard-definition video is unchanged, which is the result that was wanted for it.
+
+  **And the first version of the measurement concluded the opposite.** Asking the encoder for a file
+  «in BT.709» only puts the label on it: inside it still carried the other one, and both samples
+  reached the player with the same bytes. With the file really converted, the difference appears. A
+  label is not a sample, and there is a test that goes red the day somebody confuses the two again.
+
 - **The softness when enlarging was not a forgotten setting, and it was measured before touching
   anything.** The cheap guess was that scaling used the default filter and that asking for «high
   quality» was a one-liner. Rasterised over a hard edge enlarged four times, both filters give **the
@@ -35,10 +46,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   measurement is archived with its positive control.
 
 ### Known and not fixed
-
-- **The colour is wrong on every HD video.** It is decoded with the standard-definition matrix when
-  720p and up use a different one, and nothing looks at the source's colour space. Measured: pure red
-  comes out 234 instead of 255, green picks up 20 of red, and a skin tone drifts by up to 5.
 
 - **The nineteen screens compared against the design now each have a verdict, one by one.** Looking
   at them left «some forty» loose notes; broken down and crossed against what the program already has
