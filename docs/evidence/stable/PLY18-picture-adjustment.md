@@ -98,6 +98,34 @@ informe, donde cada línea se queda con la mejor lectura. Reproducido con la fus
 —`UpscalePolicy` y `YuvMatrixPolicy`, que llevan tiempo pasando la puerta— miden lo mismo. Sin esos
 dos controles, el 78 % se habría creído.
 
+## Y con todo eso medido, `gate-auditor` encontró seis puertas ciegas
+
+Veinte mutantes aplicados, **seis vivos**. Los seis se volvieron a medir aquí antes de creérselos.
+
+| Mutación que sobrevivía | Por qué nadie la veía | Qué la caza ahora |
+| --- | --- | --- |
+| El brillo entrando **antes** del contraste | con un solo mando en movimiento las dos fórmulas coinciden en todas partes, y las cinco filas movían uno cada una | una fila con los dos: brillo −0,5 y contraste 2 dan **129** bien y **1** mal |
+| El motor olvidando `_pictureAdjustment = value` | ninguna prueba leía la propiedad después de escribirla | leerla, y comprobar que devuelve lo que se le dio |
+| Construir la tabla siempre, también en neutro | **una tabla identidad da los mismos bytes que no tener tabla**, así que los dos lados de la comparación recorrían el mismo camino | `CarriesPictureLookup`, que hace visible un estado que desde fuera no se distingue |
+| El motor aplicando **su** gamma fija de 1,6 | era el único valor que algo le pedía en todo el árbol | el control negativo: con la gamma bajo uno la media tiene que **bajar** |
+| Ajustar sólo el primer luma de cada par | el muestreador avanzaba 16 píxeles, y **16 es par**: caía siempre en el primer luma. Daba 149,2, el mismo número que sin mutar | paso de 17, que alterna las dos mitades: ahora da 137,4 |
+| Aflojar la guarda de la tabla a «más corta que 256» | sólo se probaba una longitud corta, así que una tabla de 512 quedaba **ignorada en silencio** | cinco longitudes, 1 a 512, y el nombre del parámetro |
+
+**La primera es la peor de la tanda**, y no por su efecto —que es grande: el blanco a media luz— sino
+por cuántas pruebas la dejaban pasar. **795 de 795 en `Domain.Tests`**, más las tres del motor. Un
+punto ciego no es una prueba que falta, es una familia entera de filas que se mueven por el mismo eje.
+
+### Y dos cosas que no eran mutantes
+
+- **El presupuesto de recorte del diagnóstico dividía bytes entre 100 y contaba píxeles**: el listón
+  real era el **4 %** de la imagen mientras el mensaje decía «una centésima». Un diagnóstico que
+  nadie corre es justo donde sobrevive un número cuatro veces más flojo de lo que declara.
+- **«El negro sigue negro» era falso**, y es lo que hay que saber antes de juzgar la función: una
+  imagen de rango limitado **no contiene el nivel 0**. Su negro es 16, esta curva lo manda a 45 y la
+  conversión lo deja en **34** en pantalla. **Las barras del letterbox SÍ se agrisan.** Es lo que
+  hace el `eq` de ffmpeg y lo que el propietario miró y aprobó, así que es el comportamiento; pero
+  un comentario que lo niega haría que el siguiente se fiara de un extremo que ningún vídeo alcanza.
+
 ## Lo que queda
 
 - El control en pantalla y la preferencia que lo recuerda.
