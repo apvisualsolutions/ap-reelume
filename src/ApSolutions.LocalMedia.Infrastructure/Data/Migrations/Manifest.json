@@ -132,6 +132,12 @@
       "name": "courses",
       "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0022_courses.sql",
       "sha256": "FDE85749AA088CD373CCB5DBE81A20F5683CDFC2EA6D63B1601FC36A1C3FF6FC"
+    },
+    {
+      "version": 23,
+      "name": "picture_adjustment",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0023_picture_adjustment.sql",
+      "sha256": "C1B9951BFDF9F6C4500C7996966FEA10700B200A153DF59A4B5DD0EDA8AB9CCF"
     }
   ]
 }

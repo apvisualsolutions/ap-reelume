@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Infrastructure.Data;
+using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.IntegrationTests.Data;
@@ -91,6 +93,56 @@ public sealed class MigrationHistoryTests
 
         Assert.Equal(0L, await CountCachedAsync(factory, "tmdb"));
         Assert.Equal(1L, await CountCachedAsync(factory, "other-provider"));
+    }
+
+    /// <summary>
+    /// A library somebody has already been watching keeps its silence about the picture, which is
+    /// what migration 23 writes in its own header and what <c>pragma_table_info</c> cannot check: the
+    /// column's shape is read on a database that was just created and therefore has no rows in it.
+    /// </summary>
+    /// <remarks>
+    /// A backfill here would be invisible and expensive. Every row already stored would come out
+    /// carrying a neutral adjustment, which does not read as «nobody said anything» but as «somebody
+    /// undid it here» — so a global adjustment would never again reach a film anyone had opened.
+    /// </remarks>
+    [Fact]
+    public async Task Upgrading_leaves_an_already_watched_file_saying_nothing_about_the_picture()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = new SqliteConnectionFactory(directory.DatabasePath);
+        var migrations = DatabaseTestHarness.EmbeddedMigrations;
+        var key = PlaybackPreference.FileKey(Guid.Empty);
+        using (var before = new MigrationRunner(factory, migrations.Where(entry => entry.Version < 23)))
+        {
+            await before.MigrateAsync(TestContext.Current.CancellationToken);
+        }
+
+        await using (var connection = await factory.OpenAsync(TestContext.Current.CancellationToken))
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                INSERT INTO playback_preferences (scope, scope_key, volume_percent, updated_at)
+                VALUES ($scope, $key, 80, '2026-09-12T00:00:00.0000000+00:00');
+                """;
+            _ = command.Parameters.AddWithValue("$scope", (int)PreferenceScope.File);
+            _ = command.Parameters.AddWithValue("$key", key);
+            _ = await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        }
+
+        using (var upgrade = new MigrationRunner(factory, migrations))
+        {
+            await upgrade.MigrateAsync(TestContext.Current.CancellationToken);
+        }
+
+        var stored = await new PlaybackPreferenceRepository(factory).GetAsync(
+            PreferenceScope.File,
+            key,
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(stored);
+        Assert.Equal(80, stored!.VolumePercent);
+        Assert.Null(stored.Picture);
+        Assert.Null(PreferenceResolutionPolicy.Resolve(stored, null, null).PictureSource);
     }
 
     private static async Task StoreCachedPayloadAsync(SqliteConnectionFactory factory, string provider)

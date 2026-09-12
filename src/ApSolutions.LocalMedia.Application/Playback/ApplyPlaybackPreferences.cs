@@ -67,6 +67,14 @@ public sealed class ApplyPlaybackPreferences
             _ = await engine.AddExternalSubtitleAsync(path, cancellationToken).ConfigureAwait(false);
         }
 
+        // The picture is written either way, and that is the opposite of the track rule below. The
+        // engine outlives the file — it is a singleton — so an adjustment left over from the last
+        // film would carry into a film nobody adjusted unless opening puts the resolved value in.
+        if (engine is IPictureAdjustable adjustable)
+        {
+            adjustable.PictureAdjustment = resolved.Picture;
+        }
+
         var snapshot = await engine.GetSnapshotAsync(cancellationToken).ConfigureAwait(false);
 
         // A scope that answered is a decision somebody took; a scope that did not is silence, and
