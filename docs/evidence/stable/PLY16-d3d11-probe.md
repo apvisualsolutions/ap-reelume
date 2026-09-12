@@ -37,6 +37,22 @@ on no switch.**
 2. **La superresolución de Intel**, que ya funciona sin que nadie la encienda.
 3. **El reescalador portátil (FSR 1, MIT) en SkSL**, que corre en cualquier tarjeta.
 
+### La licencia del SDK, releída en su fuente el 2026-09-12
+
+El descarte se confirma, y el motivo concreto importa más que el veredicto. El acuerdo de licencia de
+software de NVIDIA —el que rige sus SDK— dice que el cliente «no puede copiar, vender, revender,
+alquilar, sublicenciar, transferir, ceder, distribuir, modificar ni crear obras derivadas», y concede
+una licencia expresamente **no sublicenciable**. `GPL-3.0` exige poder hacer justo eso: modificar,
+redistribuir con fuente y sublicenciar aguas abajo. Las dos obligaciones no se pueden cumplir a la
+vez, así que **el SDK no puede viajar dentro de esta aplicación**.
+
+**Pero lo que prohíbe es distribuir el SDK, y eso no es lo que esta cadena hace.** La extensión del
+procesador de vídeo que la sonda usa vive en el **controlador que la persona ya tiene instalado**, y
+se invoca por una interfaz de Direct3D. No se empaqueta nada de NVIDIA ni se enlaza contra nada suyo.
+La licencia cierra la puerta de empaquetar el SDK y deja abierta la que este proyecto usa. /
+**The licence forbids shipping the SDK; it does not touch calling a driver interface the user already
+has.**
+
 **Y lo que NO se puede hacer, comprobado el 2026-09-12:** una aplicación **no puede encender la Súper
 resolución RTX por su cuenta**. No hay ajuste para ella en `NvApiDriverSettings.h` —la cabecera
 pública de ajustes de NVIDIA, que sí cubre DLSS, antialiasing, G-SYNC y Optimus—, los usuarios de
