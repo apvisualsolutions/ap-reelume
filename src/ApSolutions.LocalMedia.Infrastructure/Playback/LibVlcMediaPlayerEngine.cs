@@ -22,7 +22,8 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 /// to flush on request, because teardown here must release the media before the player that
 /// referenced them.
 /// </remarks>
-public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSource, IActiveTrackSource
+public sealed class LibVlcMediaPlayerEngine
+    : IMediaPlayerEngine, IVideoFrameSource, IActiveTrackSource, IPictureAdjustable
 {
     private const int ParseTimeoutMilliseconds = 10_000;
     private const uint MaximumFrameWidth = 3840;
@@ -65,6 +66,8 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
     private int _packedStride;
     private int _frameStride;
     private YuvColourMatrix _frameMatrix;
+    private PictureAdjustment _pictureAdjustment = PictureAdjustment.Neutral;
+    private byte[]? _lumaLookup;
     private object? _formatCallback;
     private object? _cleanupCallback;
     private object? _lockCallback;
@@ -106,6 +109,34 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
     public event EventHandler? ActiveTracksChanged;
 
     public PlaybackState State => _state;
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// <para>
+    /// The table is built here and not per frame, because it is 256 entries of <c>Math.Pow</c> and a
+    /// frame arrives every forty milliseconds. <b>Neutral stores no table at all</b> rather than the
+    /// identity: the default then costs nothing per pixel instead of costing a lookup that changes
+    /// nothing, which is what «leaving it alone changes nothing» has to mean once it reaches a loop
+    /// that runs two million times a second.
+    /// </para>
+    /// <para>
+    /// Assigned from whichever thread turns the control and read from LibVLC's decode thread. That
+    /// is safe here and not by luck: the array is filled completely before the field is assigned,
+    /// and a reference assignment is atomic, so the callback sees the old table or the new one and
+    /// never one half-written. The callback takes its own copy of the reference before using it, so
+    /// a change arriving mid-frame cannot swap the table between two pixels of the same picture.
+    /// </para>
+    /// </remarks>
+    public PictureAdjustment PictureAdjustment
+    {
+        get => _pictureAdjustment;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _pictureAdjustment = value;
+            _lumaLookup = value.IsNeutral ? null : value.BuildLookup();
+        }
+    }
 
     /// <summary>Number of native media objects currently attached to the player: zero or one.</summary>
     public int LiveMediaCount => _media is null ? 0 : 1;
@@ -518,6 +549,11 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
             // The picture arrives packed and leaves as BGRA, which is the price of asking LibVLC for
             // the one format that hands this callback a frame with the subtitles already in it.
             Marshal.Copy(_frameBuffer, packed, 0, packed.Length);
+
+            // Read once into a local, so a control turned mid-frame cannot change the table between
+            // two pixels of the same picture. Null is «nothing to apply», which is what the neutral
+            // setting stores.
+            var lookup = _lumaLookup;
             PackedYuvConverter.UyvyToBgra(
                 packed,
                 managed,
@@ -525,7 +561,8 @@ public sealed class LibVlcMediaPlayerEngine : IMediaPlayerEngine, IVideoFrameSou
                 _visibleHeight,
                 _packedStride,
                 _frameStride,
-                _frameMatrix);
+                _frameMatrix,
+                lookup ?? ReadOnlySpan<byte>.Empty);
             handler(this, new VideoFrameEventArgs(managed, _visibleWidth, _visibleHeight, _frameStride));
         });
 

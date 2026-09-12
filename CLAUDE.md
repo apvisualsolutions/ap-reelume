@@ -548,6 +548,32 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
     una a una con su línea y su offset. Ese día nombró la creación de objetos y nada más, que es lo
     que hizo evidente dónde estaba la costura.
 
+## Y una undécima, para cualquier opción que alguien pueda tocar
+
+11. **Una opción que se decide mirando el vídeo vive en el engranaje del reproductor, no en
+    Ajustes; y cualquier grupo de opciones lleva dentro su «Restaurar valores por defecto».** Lo
+    pidió el propietario el 2026-09-12 y las dos mitades salen de la misma medición.
+
+    **La primera mitad, con su criterio**: si para elegir el valor hay que estar viendo algo —el
+    brillo, la velocidad, la pista de audio, cuántos segundos espera el siguiente episodio—, el
+    sitio es el reproductor. Si se configura una vez y no mirando una película —el tema, las
+    raíces, las copias, las actualizaciones—, el sitio es Ajustes. **El criterio no lo puede juzgar
+    una prueba, así que lo que la puerta exige es la decisión escrita**: una lista cerrada clasifica
+    cada grupo de opciones en uno de los dos sitios, y un grupo que no esté en ella falla. Quien
+    añada un panel tiene que decidir dónde va y dejarlo escrito, que es lo único automatizable de
+    una regla de criterio.
+
+    **La segunda mitad es `UX-010`** y su puerta es simétrica: un grupo que no esté en la lista
+    falla **y** un grupo listado sin su botón falla. Los catorce dicen «Restaurar valores por
+    defecto» **por la misma clave de traducción**, y la prueba afirma la clave y no el texto —
+    comparar el literal dejaría pasar dos claves con el mismo contenido, que es exactamente cómo
+    llegaron a convivir «Volver a 1×» y «Restaurar campos del proveedor» para la misma idea.
+
+    **Por qué hizo falta escribirlo**: el 2026-09-12 se contaron los controles de restablecer de
+    toda la aplicación y salieron **dos**, ninguno en una sección de ajustes. No fue una decisión de
+    nadie: fue que cada panel se escribió sin que existiera la regla, y el siguiente habría hecho lo
+    mismo.
+
 ## El defecto característico de este proyecto
 
 **Registrado y nunca alimentado**: un servicio que se registra en el contenedor y que nada resuelve,
