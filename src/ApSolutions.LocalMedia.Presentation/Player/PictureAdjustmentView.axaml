@@ -1,0 +1,118 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.PictureAdjustmentView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:PictureAdjustmentViewModel"
+    automation:AutomationProperties.Name="{DynamicResource PlayerSettingsGroupPicture}">
+  <StackPanel x:Name="PictureAdjustmentSurface" Spacing="{DynamicResource Space12}">
+    <!--
+      The sentence under the heading says what the gamma is for, because the number a person wants is
+      the one they can see and nothing on this panel says which control to reach for. It also says
+      the default changes nothing, which is the measured fact: the neutral table is the identity.
+    -->
+    <!--
+      The reset shares this row with the sentence instead of standing under the three controls, and
+      that is the walk rather than taste: it is offered only while there is something to come back
+      from, so under them its appearing and going would change the panel's height and move every
+      control the mouse was about to press. Beside a sentence two lines tall it changes nothing.
+    -->
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+      <TextBlock
+          Classes="setting-description"
+          VerticalAlignment="Center"
+          TextWrapping="Wrap"
+          Text="{DynamicResource PictureAdjustmentDescription}" />
+      <!--
+        UX-010: the button that puts this group back sits inside the group and never in a menu of its
+        own, and it says what it says through the one key every group shares.
+      -->
+      <Button
+          x:Name="PictureResetButton"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          IsVisible="{Binding !IsNeutral}"
+          automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+          Command="{Binding ResetCommand}"
+          Content="{DynamicResource RestoreDefaultsAction}" />
+    </Grid>
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+      <TextBlock
+          Classes="setting-name"
+          VerticalAlignment="Center"
+          Text="{DynamicResource PictureBrightnessLabel}" />
+      <StackPanel
+          Grid.Column="1"
+          Orientation="Horizontal"
+          Spacing="{DynamicResource Space12}"
+          VerticalAlignment="Center">
+        <Slider
+            x:Name="PictureBrightnessSlider"
+            Width="170"
+            Minimum="{x:Static player:PictureAdjustmentViewModel.MinimumBrightness}"
+            Maximum="{x:Static player:PictureAdjustmentViewModel.MaximumBrightness}"
+            TickFrequency="0.05"
+            IsSnapToTickEnabled="True"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource PictureBrightnessLabel}"
+            Value="{Binding Brightness, Mode=TwoWay}" />
+        <!--
+          The number beside the slider is a StringFormat and not a ToString: the specifier is what
+          decides the digits, and this one keeps two so a step of 0,05 is visible as it moves.
+        -->
+        <TextBlock Classes="setting-state" Text="{Binding Brightness, StringFormat={}{0:0.00}}" />
+      </StackPanel>
+    </Grid>
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+      <TextBlock
+          Classes="setting-name"
+          VerticalAlignment="Center"
+          Text="{DynamicResource PictureContrastLabel}" />
+      <StackPanel
+          Grid.Column="1"
+          Orientation="Horizontal"
+          Spacing="{DynamicResource Space12}"
+          VerticalAlignment="Center">
+        <Slider
+            x:Name="PictureContrastSlider"
+            Width="170"
+            Minimum="{x:Static player:PictureAdjustmentViewModel.MinimumContrast}"
+            Maximum="{x:Static player:PictureAdjustmentViewModel.MaximumContrast}"
+            TickFrequency="0.05"
+            IsSnapToTickEnabled="True"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource PictureContrastLabel}"
+            Value="{Binding Contrast, Mode=TwoWay}" />
+        <TextBlock Classes="setting-state" Text="{Binding Contrast, StringFormat={}{0:0.00}}" />
+      </StackPanel>
+    </Grid>
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space16}">
+      <TextBlock
+          Classes="setting-name"
+          VerticalAlignment="Center"
+          Text="{DynamicResource PictureGammaLabel}" />
+      <StackPanel
+          Grid.Column="1"
+          Orientation="Horizontal"
+          Spacing="{DynamicResource Space12}"
+          VerticalAlignment="Center">
+        <Slider
+            x:Name="PictureGammaSlider"
+            Width="170"
+            Minimum="{x:Static player:PictureAdjustmentViewModel.MinimumGamma}"
+            Maximum="{x:Static player:PictureAdjustmentViewModel.MaximumGamma}"
+            TickFrequency="0.05"
+            IsSnapToTickEnabled="True"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource PictureGammaLabel}"
+            Value="{Binding Gamma, Mode=TwoWay}" />
+        <TextBlock Classes="setting-state" Text="{Binding Gamma, StringFormat={}{0:0.00}}" />
+      </StackPanel>
+    </Grid>
+  </StackPanel>
+</UserControl>

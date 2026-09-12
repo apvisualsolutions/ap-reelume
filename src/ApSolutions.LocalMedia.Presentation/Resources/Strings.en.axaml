@@ -215,6 +215,20 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PrivacyNoHostsDescription">Nothing leaves this machine.</x:String>
   <x:String x:Key="DiagnosticsEmptyFieldsNotice">Paths, file names, titles and history are listed empty so you can see they are not collected, not that they are omitted.</x:String>
   <x:String x:Key="TransportSpeedResetAction">Back to 1×</x:String>
+  <!-- The gear over the picture and the one group inside it so far (PLY-018, ADR-0012). The button
+       that puts a group back is ONE key for all of them by decision, so that fourteen groups cannot
+       drift apart even in translation — comparing the text would let two keys with the same words
+       through, which is exactly how «Volver a 1×» and «Restaurar campos del proveedor» came to live
+       side by side for the same idea. -->
+  <x:String x:Key="RestoreDefaultsAction">Restore default values</x:String>
+  <x:String x:Key="PlayerSettingsAction">Player settings</x:String>
+  <x:String x:Key="PlayerSettingsBackAction">Back to the settings</x:String>
+  <x:String x:Key="PlayerSettingsCloseAction">Close the settings</x:String>
+  <x:String x:Key="PlayerSettingsGroupPicture">Picture</x:String>
+  <x:String x:Key="PictureAdjustmentDescription">Raise the gamma to see the shadows of a dark film. At its default values the picture comes out exactly as it arrived.</x:String>
+  <x:String x:Key="PictureBrightnessLabel">Brightness</x:String>
+  <x:String x:Key="PictureContrastLabel">Contrast</x:String>
+  <x:String x:Key="PictureGammaLabel">Gamma</x:String>
   <x:String x:Key="ScanSettingsAccessibleName">Scan settings</x:String>
   <x:String x:Key="ScanSettingsTitle">Scanning and watching</x:String>
   <!-- The page had a title and two controls and nothing between them: a page of switches with no

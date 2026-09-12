@@ -1,0 +1,79 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Player.PlayerSettingsMenuView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    x:DataType="player:PlayerSettingsMenuViewModel"
+    automation:AutomationProperties.Name="{DynamicResource PlayerSettingsAction}">
+  <!--
+    Drawn over the picture and never floated. Nothing inside a Flyout can be pressed by the
+    autonomous walk — a flyout's content lands in a popup root of its own, which is why every entry
+    of eng/walk-pending.txt is a flyout child — so putting the player's options in one would take all
+    of them out of that coverage at a stroke (ADR-0012).
+
+    A width and not a star, because this sits on top of the picture rather than beside it: a panel as
+    wide as the window would be a page, and the thing underneath is what somebody is looking at.
+  -->
+  <StackPanel x:Name="PlayerSettingsSurface" Spacing="{DynamicResource Space12}">
+      <!--
+        The first level: one row per group. It is a list of buttons and not a ListBox, because what a
+        row does is open a panel rather than select a value, and a selection that never comes back is
+        a state with nothing to show.
+      -->
+      <StackPanel
+          x:Name="PlayerSettingsList"
+          IsVisible="{Binding IsListVisible}"
+          Spacing="{DynamicResource Space8}">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock
+              FontWeight="SemiBold"
+              VerticalAlignment="Center"
+              Text="{DynamicResource PlayerSettingsAction}"
+              automation:AutomationProperties.HeadingLevel="2" />
+          <Button
+              x:Name="PlayerSettingsCloseButton"
+              Grid.Column="1"
+              automation:AutomationProperties.Name="{DynamicResource PlayerSettingsCloseAction}"
+              Command="{Binding CloseCommand}"
+              Content="{DynamicResource PlayerSettingsCloseAction}" />
+        </Grid>
+        <Button
+            x:Name="PlayerSettingsPictureEntry"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Left"
+            automation:AutomationProperties.Name="{DynamicResource PlayerSettingsGroupPicture}"
+            Command="{Binding OpenGroupCommand}"
+            CommandParameter="{x:Static player:PlayerSettingsGroup.Picture}"
+            Content="{DynamicResource PlayerSettingsGroupPicture}" />
+      </StackPanel>
+      <!--
+        The second level, which REPLACES the first rather than sitting under it: a list plus an open
+        group is twice the height, over a picture somebody is trying to watch.
+      -->
+      <StackPanel
+          x:Name="PlayerSettingsPictureGroup"
+          IsVisible="{Binding IsPictureVisible}"
+          Spacing="{DynamicResource Space12}">
+        <Grid ColumnDefinitions="Auto,*">
+          <Button
+              x:Name="PlayerSettingsBackButton"
+              automation:AutomationProperties.Name="{DynamicResource PlayerSettingsBackAction}"
+              Command="{Binding BackCommand}"
+              Content="{DynamicResource PlayerSettingsBackAction}" />
+          <TextBlock
+              Grid.Column="1"
+              Margin="12,0,0,0"
+              FontWeight="SemiBold"
+              VerticalAlignment="Center"
+              Text="{DynamicResource PlayerSettingsGroupPicture}"
+              automation:AutomationProperties.HeadingLevel="2" />
+        </Grid>
+        <player:PictureAdjustmentView DataContext="{Binding Picture}" />
+      </StackPanel>
+  </StackPanel>
+</UserControl>

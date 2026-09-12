@@ -47,9 +47,11 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
         IPlaybackSessionCoordinator coordinator,
         IVideoFrameSource? frameSource = null,
         IExternalPlaybackLauncher? externalLauncher = null,
-        Func<bool>? alternativesExist = null)
+        Func<bool>? alternativesExist = null,
+        PlayerSettingsMenuViewModel? settings = null)
     {
         _coordinator = coordinator ?? throw new ArgumentNullException(nameof(coordinator));
+        Settings = settings;
         _externalLauncher = externalLauncher;
         _alternativesExist = alternativesExist;
         FrameSource = frameSource;
@@ -81,6 +83,15 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// The gear over the picture and the groups inside it (ADR-0012); absent in a session that has
+    /// no options to offer, which is what keeps the button off the bar rather than dimming it.
+    /// </summary>
+    public PlayerSettingsMenuViewModel? Settings { get; }
+
+    /// <summary>Whether the gear has anything behind it, and therefore whether the bar draws one.</summary>
+    public bool HasSettings => Settings is not null;
 
     public ICommand PauseCommand { get; }
 
@@ -150,6 +161,13 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
         {
             SetField(ref _isCompact, value);
             OnPropertyChanged(nameof(HasFullTransport));
+
+            // The gear's button stands down with the bar, so a panel left open in the small window
+            // would be 380 px of options over 480 px of picture with nothing to close it.
+            if (value)
+            {
+                Settings?.Close();
+            }
         }
     }
 

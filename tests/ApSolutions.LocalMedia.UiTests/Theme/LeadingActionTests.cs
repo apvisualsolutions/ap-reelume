@@ -128,6 +128,12 @@ public sealed class LeadingActionTests
         ["AudioOutputView"] = null,
         ["SubtitleStyleView"] = null,
         ["ShortcutSettingsView"] = null,
+        // The gear and its one group so far (ADR-0012). Neither leads with anything, and for the
+        // two reasons already in the list above: the menu is a row of mutually exclusive choices,
+        // and the picture group is a block of controls on a panel whose heading is the accent.
+        // Accenting «Restaurar valores por defecto» would paint the undo as the thing to do.
+        ["PlayerSettingsMenuView"] = null,
+        ["PictureAdjustmentView"] = null,
         ["PlayerVersionsView"] = null,
         // A list that repeats, like the version rows above it: forty lessons with one of them
         // accented is not a hierarchy, it is a list with an arbitrary row painted. The player's one

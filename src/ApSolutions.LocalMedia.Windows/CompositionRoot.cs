@@ -1035,7 +1035,11 @@ public static partial class CompositionRoot
         var player = new PlayerViewModel(
             provider.GetRequiredService<IPlaybackSessionCoordinator>(),
             provider.GetRequiredService<IVideoFrameSource>(),
-            provider.GetRequiredService<IExternalPlaybackLauncher>())
+            provider.GetRequiredService<IExternalPlaybackLauncher>(),
+            settings: BuildPlayerSettings(
+                provider,
+                PreferenceScope.File,
+                session.MediaFileId.Value.ToString("D", CultureInfo.InvariantCulture)))
         {
             Transport = provider.GetRequiredService<TransportControlsViewModel>(),
         };
@@ -1059,6 +1063,29 @@ public static partial class CompositionRoot
             LooseFile = banner,
         };
     }
+
+    /// <summary>
+    /// The gear over the picture, with the groups that are decided while watching inside it
+    /// (ADR-0012). Absent when the engine has no pixels of its own to adjust, which is what keeps
+    /// the button off the bar instead of dimming it.
+    /// </summary>
+    /// <remarks>
+    /// The scope is the series for an episode and the file for anything else, and that is the same
+    /// pair <c>ApplyPlaybackPreferences</c> reads on the way in — the two sides have to agree or the
+    /// panel would store into a row nothing ever looks at. It also matches what a person means: ten
+    /// dark episodes of one show are one decision, and a film is its own.
+    /// </remarks>
+    private static PlayerSettingsMenuViewModel? BuildPlayerSettings(
+        IServiceProvider provider,
+        PreferenceScope scope,
+        string scopeKey) =>
+        provider.GetRequiredService<IMediaPlayerEngine>() is IPictureAdjustable adjustable
+            ? new PlayerSettingsMenuViewModel(new PictureAdjustmentViewModel(
+                provider.GetRequiredService<IPlaybackPreferenceRepository>(),
+                adjustable,
+                scope,
+                scopeKey))
+            : null;
 
     /// <summary>
     /// Opens one media file and builds everything that session puts on screen. The tracks, the output
@@ -1089,23 +1116,33 @@ public static partial class CompositionRoot
         // has been read and it needs to be able to ask. A value passed at this point would always be
         // the answer from before anybody looked.
         PlayerVersionsViewModel? versions = null;
-        var player = new PlayerViewModel(
-            provider.GetRequiredService<IPlaybackSessionCoordinator>(),
-            provider.GetRequiredService<IVideoFrameSource>(),
-            provider.GetRequiredService<IExternalPlaybackLauncher>(),
-            () => versions?.HasAlternatives == true)
-        {
-            Transport = transport,
-        };
 
         // An episode belongs to its show, and the T29 model stores markers per series; a file that
         // is not an episode keeps its own identifier as its series, which is what movies already do.
+        // It is read before the player is built because the gear's picture group has to be told
+        // which scope it stores in, and that scope is this one.
         var episodeEntry = await provider.GetRequiredService<IEpisodeSequenceRepository>()
             .FindByFileAsync(mediaFileId, cancellationToken)
             .ConfigureAwait(true);
         var seriesId = episodeEntry is not null
             ? new SeriesId(episodeEntry.ShowId.Value)
             : new SeriesId(mediaFileId.Value);
+
+        var player = new PlayerViewModel(
+            provider.GetRequiredService<IPlaybackSessionCoordinator>(),
+            provider.GetRequiredService<IVideoFrameSource>(),
+            provider.GetRequiredService<IExternalPlaybackLauncher>(),
+            () => versions?.HasAlternatives == true,
+            BuildPlayerSettings(
+                provider,
+                episodeEntry is not null ? PreferenceScope.Series : PreferenceScope.File,
+                episodeEntry is not null
+                    ? seriesId.Value.ToString("D", CultureInfo.InvariantCulture)
+                    : mediaFileId.Value.ToString("D", CultureInfo.InvariantCulture)))
+        {
+            Transport = transport,
+        };
+
         var manualMarkers = await provider.GetRequiredService<IIntroMarkerRepository>()
             .GetForSeriesAsync(seriesId, cancellationToken)
             .ConfigureAwait(true);

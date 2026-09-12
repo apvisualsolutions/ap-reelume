@@ -242,6 +242,21 @@ SPDX-License-Identifier: GPL-3.0-or-later
         They reach the player's own model rather than the shell's, and that is not a preference: this
         very control is handed to the mini window, where there is no shell above it to bind up to.
       -->
+      <!--
+        The gear, and what is behind it is drawn over the picture rather than floated out of it: a
+        Flyout's content lands in a popup root of its own, where the autonomous walk reaches nothing,
+        so a popup here would take every option in the player out of that coverage at once
+        (ADR-0012). Absent and not dimmed when the session has no options to offer, which is the
+        grammar the player's own pills already follow.
+      -->
+      <Button
+          x:Name="PlayerSettingsButton"
+          Classes="player-chrome"
+          IsVisible="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).HasSettings}"
+          automation:AutomationProperties.Name="{DynamicResource PlayerSettingsAction}"
+          Command="{Binding $parent[player:PlayerView].((player:PlayerViewModel)DataContext).Settings.ToggleCommand}">
+        <Path Classes="icon size-18" Data="{DynamicResource IconSettings}" />
+      </Button>
       <Button
           x:Name="PictureInPictureButton"
           Classes="player-chrome"

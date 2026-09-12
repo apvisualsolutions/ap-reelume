@@ -43,6 +43,12 @@ public sealed class CommandNotificationTests
                 ["public bool CanExecute(object? parameter) => true;"],
             ["src/ApSolutions.LocalMedia.Presentation/Player/ShortcutSettingsViewModel.cs"] =
                 ["public bool CanExecute(object? parameter) => true;"],
+            // The gear's four commands — open, close, back, and open a group. None of them asks a
+            // question at all: the gear is always openable, the list is always there to come back
+            // to, and a group entry is on screen exactly when its group exists. What CHANGES is
+            // which of the two levels is drawn, and that is an IsVisible binding, which notifies.
+            ["src/ApSolutions.LocalMedia.Presentation/Player/PlayerSettingsMenuViewModel.cs"] =
+                ["public bool CanExecute(object? parameter) => true;"],
             ["src/ApSolutions.LocalMedia.Presentation/Recovery/DatabaseRecoveryViewModel.cs"] =
                 [
                     "public bool CanExecute(object? parameter) => parameter is DatabaseRecoveryAction "
