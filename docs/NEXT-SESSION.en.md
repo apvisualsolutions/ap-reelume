@@ -1,5 +1,82 @@
 # Where to pick up
 
+> ## READ THIS FIRST — 2026-09-12, evening: the wrong feature was being built, and the owner's own file said so
+>
+> **Read the tree first; it outranks this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. No commit number is written here.
+>
+> ### The turn this batch took, and where it came from
+>
+> The owner asked why his video still looked bad. **Measuring his file answered that `PLY-016`
+> attacks a defect he does not have.** The copy is 720 × 404 in MPEG-4 Simple Profile — a 2003 codec
+> — at 1.5 Mbit/s, all ten episodes alike; but that is not what gets in the way: across five scenes
+> of the same file the **mean luma runs from 28 to 69 out of 235**, and in one of them the brightest
+> pixel anywhere on screen is **97**. The picture is not soft, it is crushed into black, and
+> `PLY-016` promises sharpness when enlarging.
+>
+> **The file's range is limited and correct** — luma lives between 10 and 232 — so the application
+> was darkening nothing. And it had **no picture control at all**: searching all of `src/` for
+> brightness, contrast, gamma and saturation turns up only the interface theme and the subtitle
+> style. No row promised a person could do anything about a dark film. That row is now `PLY-018`.
+>
+> ### What closed
+>
+> · **`PLY-016`'s first link**: `UyvyToYuy2`, the pair swap that takes the picture to the format
+>   Direct3D accepts — DXGI has no `UYVY`, checked across the whole enumeration — and that **removes**
+>   work rather than adding it. Ten cases, four mutants killed.
+> · **The enhancement's strength moved out of the file excluded from coverage**, which is what rule 10
+>   forbids. It lives in `D3d11UpscaleFormats.EdgeEnhancementLevel` with seven cases, and **both cards
+>   return the same figures as before, byte for byte**.
+> · **`PLY-018` half built and measured where it counts**: the policy, the conversion and the engine.
+>   A real frame decoded through the production route gains more than ten per cent of brightness at
+>   gamma 1.6, and at neutral matches the old one to three decimals.
+> · **Rule 11 and `UX-010`**, both asked for by the owner. Counting the whole application's reset
+>   controls found **two**, and not one in a settings section.
+>
+> ### Traps measured, and two of them are about measuring wrong
+>
+> · **Adding up the branches of two unmerged reports gives a false figure.** It read 78 % where the
+>   gate sees 100 %. The gate **merges with `reportgenerator` first** and reads one report. The
+>   control caught it: two files that have been passing the gate for ages read 50 % under that same
+>   arithmetic.
+> · **The coverage preview does NOT see a new file that is not committed**, because it asks
+>   `git diff --diff-filter=A`. Its silence says nothing about what you just wrote.
+> · **A negative `double` cast to `byte` is not zero, it is 255.** Removing a guard that looked merely
+>   defensive put 255 at level 127 and 1 at 128: the shadows came out **white**. At any gamma other
+>   than 1 it yields `NaN`, which does cast to zero and hides the same hole on this runtime and not
+>   necessarily another.
+> · **Two guards were indistinguishable from their own absence**, enumerated over the whole domain,
+>   and were removed. A guard that cannot fail does not protect; it reads as though it does.
+> · **A copied test theory inherits its blind spot.** The new geometry theory was copied from the old
+>   one, and both measured «at least one macropixel» where they claimed to measure «at least one row»:
+>   every row named a width of two. Both fixed.
+>
+> ### Decided and NOT executed
+>
+> · **The player's settings gear, mockup approved**: one button opens a two-level list — the second
+>   replaces the first — drawn over the video and **not in a popup**, because nothing inside a popup
+>   is reachable by the automated walk. Today's five panels move inside it and the bar keeps play,
+>   volume, gear, mini player and fullscreen.
+> · **The button reads «Restore default values»** across all fourteen groups, and the gate asserts
+>   **the resource key** rather than the literal: comparing text would let two keys with the same
+>   content through, which is exactly how «back to 1x» and «restore the provider's fields» came to
+>   coexist.
+> · **«Remember for this series» needs no inventing**: `PreferenceScope` already has `Global`,
+>   `Series` and `File` with its repository, and the picture adjustment belongs in
+>   `PlaybackPreference` beside the speed. What is missing is three columns and their migration.
+> · **The adjustment's default is neutral**, and the number a person wants comes out of using it.
+>
+> ### Still blocked by something that is not code
+>
+> · **RTX Video Super Resolution cannot be switched on by an application**, checked on 2026-09-12 in
+>   four places: not in NVIDIA's public settings header, not in the driver's profile database, not in
+>   this machine's registry — 45 keys, with a positive control — and not in NVIDIA App's own files.
+>   And the SDK that would expose it cannot ship inside this application by licence. **It is not
+>   `PLY-016`'s promise**: Direct3D's own video processor moves half the screen on that same card
+>   with nobody switching anything on.
+> · `PRD-002` needs the commercial signing certificate; `REL-004` the trademark check. AMD's super
+>   resolution remains written and unverified for want of a card.
+
 > ## READ THIS FIRST — 2026-09-12, close: `PLY-016`'s blocker is answered, and the CI margin was never negative
 >
 > **Look at the tree first; it outranks this document**: `git log --oneline -1 main`,

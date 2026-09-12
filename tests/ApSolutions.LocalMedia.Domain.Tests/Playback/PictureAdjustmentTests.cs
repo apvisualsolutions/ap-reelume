@@ -35,10 +35,18 @@ public sealed class PictureAdjustmentTests
         // the curtains and the armour come back, and the picture does not wash out.
         var table = new PictureAdjustment(Brightness: 0d, Contrast: 1d, Gamma: 1.6d).BuildLookup();
 
-        // Black stays black and white stays white — a gamma curve pins both ends by construction,
-        // and if it did not, every letterboxed bar would turn grey.
+        // Level 0 stays 0 and level 255 stays 255, which a gamma curve pins by construction.
+        //
+        // <b>And that is NOT «black stays black», which is what this comment claimed until an audit
+        // measured it.</b> A limited-range picture never contains level 0: its black is 16, and this
+        // curve sends it to 45 — which the conversion then turns into 34 on screen, because it takes
+        // the 16 back off and applies the range gain. So the letterbox bars DO lift towards grey.
+        // It is what FFmpeg's eq does and what the owner looked at and approved, so it is the
+        // behaviour and not a defect; but a comment denying it would have the next reader trust a
+        // curve that pins an end no video ever reaches.
         Assert.Equal(0, table[0]);
         Assert.Equal(255, table[255]);
+        Assert.InRange(table[16], 42, 48);
 
         // And everything in between goes up, which is the whole point.
         Assert.True(table[32] > 32 + 20, $"deep shadow only reached {table[32]}");
@@ -74,6 +82,13 @@ public sealed class PictureAdjustmentTests
     [InlineData(0d, 1.5d, 1d, 128, 128)]
     [InlineData(0d, 1.5d, 1d, 64, 32)]
     [InlineData(0d, 1.5d, 1d, 192, 223)]
+    // Both dials at once, and this row is the only thing in the tree that pins the ORDER of the two.
+    // Every row above moves one dial, and with one dial moving, «contrast times (level minus half)
+    // plus brightness» and «contrast times (level minus half plus brightness)» agree everywhere.
+    // They do not agree here: this lands 129 the right way round and 1 the wrong way, and the wrong
+    // way sends white to half light and greys the letterbox bars. It is FFmpeg's order, which is the
+    // whole reason the arithmetic was copied rather than invented.
+    [InlineData(-0.5d, 2d, 1d, 192, 129)]
     public void Brightness_shifts_and_contrast_pivots_around_the_middle(
         double brightness,
         double contrast,

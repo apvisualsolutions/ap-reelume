@@ -141,6 +141,18 @@ public sealed class LibVlcMediaPlayerEngine
     /// <summary>Number of native media objects currently attached to the player: zero or one.</summary>
     public int LiveMediaCount => _media is null ? 0 : 1;
 
+    /// <summary>
+    /// Whether a lookup table is being carried at all, which is the difference between the neutral
+    /// setting costing nothing and costing an identity read per pixel.
+    /// </summary>
+    /// <remarks>
+    /// It exists for the same reason <see cref="LiveMediaCount"/> does: the saving is invisible from
+    /// outside, because a table of the identity produces the very same bytes as no table. An audit
+    /// on 2026-09-12 proved it — building the table unconditionally left every test green, including
+    /// the one written to measure exactly that, because both of its sides ran the same code.
+    /// </remarks>
+    public bool CarriesPictureLookup => _lumaLookup is not null;
+
     /// <summary>Frames the decoder actually produced for the active media.</summary>
     public int DecodedFrameCount => Volatile.Read(ref _decodedFrameCount);
 

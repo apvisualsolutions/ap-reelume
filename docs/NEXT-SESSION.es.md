@@ -1,5 +1,81 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-12, noche: se estaba construyendo la pieza equivocada, y lo dijo el archivo del propietario
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit.
+>
+> ### El giro de la tanda, y de dónde salió
+>
+> El propietario preguntó por qué su vídeo seguía viéndose mal. **Medir su archivo contestó que
+> `PLY-016` ataca un defecto que él no tiene.** La copia es 720 × 404 en MPEG-4 Simple Profile —un
+> códec de 2003— a 1,5 Mbit/s, los diez episodios iguales; pero lo que molesta no es eso: en cinco
+> escenas del mismo archivo el **luma medio va de 28 a 69 sobre 235**, y en una de ellas el píxel más
+> claro de toda la pantalla es **97**. La imagen no está borrosa, está aplastada en negro, y
+> `PLY-016` promete nitidez al ampliar.
+>
+> **El rango del archivo es limitado y correcto** —el luma vive entre 10 y 232—, así que la
+> aplicación no oscurecía nada. Y **no tenía ningún control de imagen**: buscando brillo, contraste,
+> gamma y saturación por todo `src/` sólo aparecen el tema de la interfaz y el estilo de los
+> subtítulos. Ninguna fila prometía que una persona pudiera hacer algo con una película oscura. Ahora
+> es `PLY-018`.
+>
+> ### Lo que se cerró
+>
+> · **El primer eslabón de `PLY-016`**: `UyvyToYuy2`, el intercambio de pares que lleva la imagen al
+>   formato que Direct3D acepta —DXGI no tiene `UYVY`, comprobado recorriendo la enumeración— y que
+>   **quita trabajo** en vez de añadirlo. Diez casos, cuatro mutantes muertos.
+> · **La fuerza del realce salió del archivo excluido de la cobertura**, que es lo que la regla 10
+>   prohíbe. Vive en `D3d11UpscaleFormats.EdgeEnhancementLevel` con siete casos, y **las dos tarjetas
+>   devuelven las mismas cifras que antes, byte por byte**.
+> · **`PLY-018` a medio construir y medida donde importa**: la política, el convertidor y el motor.
+>   Un fotograma real decodificado por la ruta de producción sube más de un diez por ciento de brillo
+>   con la gamma a 1,6, y en neutro coincide con el de antes hasta el tercer decimal.
+> · **La regla 11 y `UX-010`**, las dos pedidas por el propietario. Contar los controles de
+>   restablecer de toda la aplicación dio **dos**, y ninguno en una sección de ajustes.
+>
+> ### Trampas medidas, y dos son de medir mal
+>
+> · **Sumar las ramas de dos informes sin fusionar da una cifra falsa.** Dio 78 % donde la puerta ve
+>   100 %. La puerta **fusiona primero con `reportgenerator`** y lee uno solo. Lo destapó el control:
+>   dos archivos que llevan tiempo pasando la puerta daban 50 % con esa misma aritmética.
+> · **La previsualización de cobertura NO ve un archivo nuevo sin commitear**, porque pregunta por
+>   `git diff --diff-filter=A`. Su silencio no dice nada sobre lo que acabas de escribir.
+> · **Un `double` negativo convertido a `byte` no da cero, da 255.** Quitar una guarda que parecía
+>   defensiva puso 255 en el nivel 127 y 1 en el 128: las sombras salían **blancas**. Con una gamma
+>   distinta de 1 da `NaN`, que sí convierte a cero y esconde el mismo agujero en este runtime y no en
+>   otro.
+> · **Dos guardas eran indistinguibles de su propia ausencia**, enumerado sobre todo el dominio, y se
+>   quitaron. Una guarda que no puede fallar no protege: se lee como si protegiera.
+> · **Una teoría de pruebas copiada hereda su punto ciego.** La teoría nueva de geometrías se copió de
+>   la vieja, y las dos medían «al menos un macropíxel» donde decían medir «al menos una fila»:
+>   todas sus filas nombraban un ancho de dos. Las dos corregidas.
+>
+> ### Decidido y NO ejecutado
+>
+> · **El engranaje del reproductor, con maqueta aprobada**: un botón abre una lista de dos niveles
+>   —el segundo sustituye al primero— dibujada sobre el vídeo y **no en un menú emergente**, porque
+>   dentro de un emergente el recorrido automático no alcanza nada. Los cinco paneles de hoy pasan
+>   dentro y la barra queda con reproducir, volumen, engranaje, miniatura y pantalla completa.
+> · **El botón dice «Restaurar valores por defecto»** en los catorce grupos, y la puerta afirma **la
+>   clave de traducción** y no el literal: comparar el texto dejaría pasar dos claves con el mismo
+>   contenido, que es exactamente cómo conviven «Volver a 1×» y «Restaurar campos del proveedor».
+> · **«Recordar para esta serie» no hay que inventarlo**: `PreferenceScope` ya tiene `Global`,
+>   `Series` y `File` con su repositorio, y el ajuste de imagen va en `PlaybackPreference` al lado de
+>   la velocidad. Lo que falta son tres columnas y su migración.
+> · **El valor por defecto del ajuste es neutro**, y el número que una persona quiere sale de usarlo.
+>
+> ### Sigue bloqueado por algo que no es código
+>
+> · **La Súper Resolución RTX no la puede encender una aplicación**, comprobado el 2026-09-12 en
+>   cuatro sitios: no está en la cabecera pública de ajustes de NVIDIA, ni en la base de perfiles del
+>   controlador, ni en el registro de esta máquina —45 claves, con control positivo—, ni en los
+>   ficheros de NVIDIA App. Y el SDK que la expondría no puede viajar dentro por licencia. **No es la
+>   promesa de `PLY-016`**: el procesador de vídeo de Direct3D mueve la mitad de la pantalla en esa
+>   misma tarjeta sin que nadie encienda nada.
+> · `PRD-002` pide el certificado comercial de firma; `REL-004` la comprobación de marca. La
+>   superresolución de AMD sigue escrita y sin verificar por falta de tarjeta.
+
 > ## AVISO AL FRENTE — 2026-09-12, cierre: el bloqueo de `PLY-016` contestado, y el margen de CI nunca estuvo en negativo
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
