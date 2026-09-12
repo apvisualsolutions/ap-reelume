@@ -6,7 +6,8 @@ using ApSolutions.LocalMedia.Domain.Playback;
 namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 
 /// <summary>
-/// Turns the packed 4:2:2 picture LibVLC publishes into the 32-bit BGRA the shell draws.
+/// Takes the packed 4:2:2 picture LibVLC publishes wherever it has to go: the 32-bit BGRA the shell
+/// draws, and the YUY2 a Direct3D 11 video processor takes in.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -90,6 +91,92 @@ public static class PackedYuvConverter
                 var secondLuma = read[at + 3] - 16;
                 WritePixel(write[(pair * 8)..], firstLuma, u, v, matrix);
                 WritePixel(write[((pair * 8) + 4)..], secondLuma, u, v, matrix);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Writes <paramref name="height"/> rows of UYVY into <paramref name="destination"/> as YUY2,
+    /// which is the same picture with every neighbouring pair of bytes swapped.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The two formats carry identical samples in a different order: UYVY is U, Y0, V, Y1 and YUY2
+    /// is Y0, U, Y1, V — «the same as the YUY2 format except the byte order is reversed», in the
+    /// words of Microsoft's own <i>Recommended 8-Bit YUV Formats for Video Rendering</i>. So there is
+    /// no colour conversion here at all, no matrix, and nothing to clamp.
+    /// </para>
+    /// <para>
+    /// It exists because <b>DXGI has no UYVY</b>. A Direct3D 11 video processor takes
+    /// <c>DXGI_FORMAT_YUY2</c> (107, «width must be even», mapped Y0→R8, U0→G8, Y1→B8, V0→A8), and
+    /// there is no format in the enumeration for the bytes LibVLC publishes. Asking LibVLC for YUY2
+    /// instead is not the way round it: measured on 2026-08-25, that takes the whole subtitle out of
+    /// the frame.
+    /// </para>
+    /// <para>
+    /// And this <b>removes</b> work rather than adding it. Every frame already walks these same
+    /// bytes to make BGRA — a multiply, three clamps and twice the bytes written per pixel — so the
+    /// baseline this is measured against is not zero: it is what stops being paid.
+    /// </para>
+    /// </remarks>
+    public static void UyvyToYuy2(
+        ReadOnlySpan<byte> source,
+        Span<byte> destination,
+        int width,
+        int height,
+        int sourceStride,
+        int destinationStride)
+    {
+        // The same guards as the BGRA conversion, and for the same reason: without them a short
+        // stride or an odd width walks off the end of a row and the slice below reports it as an
+        // index, which reads like a bug in here rather than a caller handing over a geometry the
+        // buffers never held. Both strides are measured against the same two bytes a pixel —
+        // source and destination are the identical packed 4:2:2 picture, only reordered.
+        ArgumentOutOfRangeException.ThrowIfNotEqual(width, AlignWidth(width));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
+        ArgumentOutOfRangeException.ThrowIfLessThan(sourceStride, width * SourceBytesPerPixel);
+        ArgumentOutOfRangeException.ThrowIfLessThan(destinationStride, width * SourceBytesPerPixel);
+
+        // Two throws and not one «or», because the name is the whole message: while both halves
+        // raised the same exception naming the source, a caller with a short destination was told
+        // to look at the wrong buffer and the second half could be deleted without a test noticing.
+        if (source.Length < sourceStride * height)
+        {
+            throw new ArgumentException(
+                "The swap was given fewer rows than it was told to read.",
+                nameof(source));
+        }
+
+        if (destination.Length < destinationStride * height)
+        {
+            throw new ArgumentException(
+                "The swap was given fewer rows than it was told to write.",
+                nameof(destination));
+        }
+
+        // This one has no counterpart in the BGRA conversion and needs none: that one writes twice
+        // the bytes it reads, so nobody is tempted to run it in place. This one writes exactly as
+        // many, and in place it destroys the picture quietly — the first byte written is the second
+        // byte still to be read.
+        if (source.Overlaps(destination))
+        {
+            throw new ArgumentException(
+                "The swap cannot run in place: it would read bytes it has already overwritten.",
+                nameof(destination));
+        }
+
+        var pairs = width / 2;
+        for (var row = 0; row < height; row++)
+        {
+            var read = source.Slice(row * sourceStride, pairs * 4);
+            var write = destination.Slice(row * destinationStride, pairs * 4);
+            for (var pair = 0; pair < pairs; pair++)
+            {
+                var at = pair * 4;
+                write[at] = read[at + 1];
+                write[at + 1] = read[at];
+                write[at + 2] = read[at + 3];
+                write[at + 3] = read[at + 2];
             }
         }
     }

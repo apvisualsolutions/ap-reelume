@@ -175,6 +175,11 @@ public sealed class PackedYuvConverterTests
     [InlineData(2, 0, 4, 8)]
     [InlineData(2, 1, 3, 8)]
     [InlineData(2, 1, 4, 7)]
+    // The same blind spot the YUY2 theory below was copied from, found on 2026-09-12 and fixed in
+    // both: every row named a width of two, where a guard that dropped the width entirely still
+    // refuses everything these rows ask about. These two rows fail the moment it does.
+    [InlineData(4, 1, 4, 16)]
+    [InlineData(4, 1, 8, 8)]
     public void A_geometry_the_buffers_cannot_hold_is_refused_rather_than_written_past(
         int width,
         int height,
@@ -188,6 +193,173 @@ public sealed class PackedYuvConverterTests
             sourceStride,
             destinationStride,
             Bt601));
+
+    [Fact]
+    public void The_pairs_are_swapped_into_the_order_Direct3D_names_for_YUY2()
+    {
+        // UYVY as LibVLC publishes it is U, Y0, V, Y1; YUY2 as dxgiformat.h names it is Y0, U, Y1,
+        // V — «the same as the YUY2 format except the byte order is reversed», in Microsoft's own
+        // words, and DXGI spells the destination out as Y0→R8, U0→G8, Y1→B8, V0→A8.
+        //
+        // Four values that differ from each other, because the swap has five wrong answers that a
+        // repeated value hides: a straight copy, a reversal, a rotation either way, and swapping
+        // the halves of the macropixel rather than its pairs.
+        var packed = new byte[] { 200, 30, 100, 60 };
+        var yuy2 = new byte[4];
+
+        PackedYuvConverter.UyvyToYuy2(
+            packed, yuy2, width: 2, height: 1, sourceStride: 4, destinationStride: 4);
+
+        Assert.Equal(new byte[] { 30, 200, 60, 100 }, yuy2);
+    }
+
+    [Fact]
+    public void Every_row_is_swapped_and_what_sits_past_the_picture_never_travels()
+    {
+        // Three strides that all differ, which is the shape this really runs in: the decoder's
+        // buffer is wider than the picture, and a mapped texture's row pitch is wider again and by
+        // a different amount.
+        const int Width = 4;
+        const int Height = 3;
+        const int SourceStride = 12;
+        const int DestinationStride = 10;
+        var packed = new byte[SourceStride * Height];
+        var yuy2 = new byte[DestinationStride * Height];
+        for (var row = 0; row < Height; row++)
+        {
+            // A different value in every byte of the picture, so a loop that reads or writes the
+            // wrong row lands on a number that belongs to another one.
+            for (var at = 0; at < Width * PackedYuvConverter.SourceBytesPerPixel; at++)
+            {
+                packed[(row * SourceStride) + at] = (byte)(1 + (row * 20) + at);
+            }
+
+            for (var spare = Width * PackedYuvConverter.SourceBytesPerPixel; spare < SourceStride; spare++)
+            {
+                packed[(row * SourceStride) + spare] = 0xEE;
+            }
+        }
+
+        PackedYuvConverter.UyvyToYuy2(packed, yuy2, Width, Height, SourceStride, DestinationStride);
+
+        for (var row = 0; row < Height; row++)
+        {
+            for (var pair = 0; pair < Width / 2; pair++)
+            {
+                var read = (row * SourceStride) + (pair * 4);
+                var write = (row * DestinationStride) + (pair * 4);
+                Assert.Equal(packed[read + 1], yuy2[write]);
+                Assert.Equal(packed[read], yuy2[write + 1]);
+                Assert.Equal(packed[read + 3], yuy2[write + 2]);
+                Assert.Equal(packed[read + 2], yuy2[write + 3]);
+            }
+
+            // The padding the decoder left behind is not picture, and a texture that received it
+            // would show a stripe down its side.
+            for (var spare = Width * PackedYuvConverter.SourceBytesPerPixel; spare < DestinationStride; spare++)
+            {
+                Assert.Equal(0, yuy2[(row * DestinationStride) + spare]);
+            }
+        }
+    }
+
+    [Fact]
+    public void Swapping_twice_gives_the_original_back_because_the_swap_is_its_own_inverse()
+    {
+        var packed = new byte[] { 200, 30, 100, 60, 12, 240, 90, 7 };
+        var once = new byte[8];
+        var twice = new byte[8];
+
+        PackedYuvConverter.UyvyToYuy2(
+            packed, once, width: 4, height: 1, sourceStride: 8, destinationStride: 8);
+        PackedYuvConverter.UyvyToYuy2(
+            once, twice, width: 4, height: 1, sourceStride: 8, destinationStride: 8);
+
+        Assert.Equal(packed, twice);
+
+        // The control without which the line above is passed by a conversion that copies and does
+        // nothing else: «twice gives the original back» is true of doing nothing too. And «not a
+        // copy» is still not enough on its own — swapping the halves, reversing the four bytes, or
+        // swapping only one of the two pairs are all their own inverse as well — so the single pass
+        // is named byte by byte rather than merely declared different.
+        Assert.NotEqual(packed, once);
+        Assert.Equal(new byte[] { 30, 200, 60, 100, 240, 12, 7, 90 }, once);
+    }
+
+    [Theory]
+    [InlineData(0, 1, 4, 4)]
+    [InlineData(3, 1, 8, 8)]
+    [InlineData(2, 0, 4, 4)]
+    [InlineData(2, 1, 3, 4)]
+    [InlineData(2, 1, 4, 3)]
+    // And the same two strides at a width of four, which is what actually measures the guards. At a
+    // width of two the bar is four bytes either way, so «at least one macropixel» and «at least one
+    // row» are the same number and a guard that ignored the width would pass every row above. With
+    // the width dropped, a stride of 4 for a 4-pixel row stops being refused and the loop writes
+    // row 1's bytes on top of row 0's.
+    [InlineData(4, 1, 4, 8)]
+    [InlineData(4, 1, 8, 4)]
+    public void A_geometry_the_swap_cannot_hold_is_refused_rather_than_written_past(
+        int width,
+        int height,
+        int sourceStride,
+        int destinationStride) =>
+        Assert.ThrowsAny<ArgumentException>(() => PackedYuvConverter.UyvyToYuy2(
+            new byte[16],
+            new byte[16],
+            width,
+            height,
+            sourceStride,
+            destinationStride));
+
+    [Fact]
+    public void Fewer_rows_than_the_swap_was_told_to_read_is_refused()
+    {
+        // The two strides differ on purpose: with both at 4 this passes just as happily when the
+        // guard measures the source against the destination's stride, which is a different
+        // question with the same answer only while they happen to agree.
+        var thrown = Assert.Throws<ArgumentException>(() => PackedYuvConverter.UyvyToYuy2(
+            new byte[16],
+            new byte[32],
+            width: 2,
+            height: 4,
+            sourceStride: 8,
+            destinationStride: 4));
+
+        Assert.Equal("source", thrown.ParamName);
+    }
+
+    [Fact]
+    public void Fewer_rows_than_the_swap_was_told_to_write_is_refused()
+    {
+        // And this one names «destination», which is the whole of its point: while both halves
+        // threw the same exception with the same name, a reader could not tell which buffer was
+        // short and the guard on this one could be deleted without a test noticing.
+        var thrown = Assert.Throws<ArgumentException>(() => PackedYuvConverter.UyvyToYuy2(
+            new byte[32],
+            new byte[4],
+            width: 2,
+            height: 4,
+            sourceStride: 4,
+            destinationStride: 4));
+
+        Assert.Equal("destination", thrown.ParamName);
+    }
+
+    [Fact]
+    public void Converting_a_buffer_on_top_of_itself_is_refused_rather_than_half_done()
+    {
+        // Unlike the BGRA conversion, this one produces exactly as many bytes as it reads, which is
+        // what tempts somebody into saving the copy. It cannot survive it: the first byte written
+        // is the second byte still to be read. Measured before this guard existed — {200, 30, 100,
+        // 60} came back {30, 30, 60, 60}, luma duplicated over chroma, silently.
+        var buffer = new byte[] { 200, 30, 100, 60 };
+
+        var thrown = Assert.Throws<ArgumentException>(() => PackedYuvConverter.UyvyToYuy2(
+            buffer, buffer, width: 2, height: 1, sourceStride: 4, destinationStride: 4));
+
+        Assert.Equal("destination", thrown.ParamName);
+    }
 
     [Fact]
     public void Fewer_rows_than_the_conversion_was_told_to_read_is_refused()

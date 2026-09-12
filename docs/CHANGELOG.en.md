@@ -10,6 +10,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The format the graphics card needs is now produced, and it costs less than what happens today.**
+  The picture the decoder hands over carries its bytes in an order Direct3D does not recognise — it
+  is not in its list of formats, checked against Microsoft's documentation before a line was written
+  — so the enhancement chain could not receive it. Translating one into the other turned out to be
+  swapping neighbouring bytes, without touching a single colour, and that pass **replaces** the one
+  that multiplies and writes twice as much for every point of the picture: it removes work rather
+  than adding it. Ten test cases, and checked the other way round — the code was broken in four
+  different ways and every one of them made a test fail, with the compiled program's fingerprint
+  measured on each turn so that "it failed" could not mean "the previous version was measured".
+
 - **Before building the enhancement chain, the question of whether anybody could see it working was
   settled — and the answer changes where the checks go.** The harness this repository uses to count
   pixels **can** see the layer where the chain ends: a mark drawn through the composition arrives at

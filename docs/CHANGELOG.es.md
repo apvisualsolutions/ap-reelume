@@ -10,6 +10,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El formato que la tarjeta gráfica necesita ya se produce, y cuesta menos que lo de ahora.** La
+  imagen que entrega el decodificador viene con sus bytes en un orden que Direct3D no reconoce —no
+  está en su lista de formatos, comprobado en la documentación de Microsoft antes de escribir nada—,
+  así que la cadena de mejora no podía recibirla. Traducir de uno al otro resultó ser intercambiar
+  bytes vecinos, sin tocar un solo color, y ese recorrido **sustituye** al que hoy multiplica y
+  escribe el doble por cada punto de la imagen: quita trabajo en vez de añadirlo. Diez casos de
+  prueba, y comprobado al revés — se estropeó el código de cuatro maneras distintas y cada una lo
+  hizo fallar, con la huella del programa compilado medida en cada vuelta para que «falló» no pudiera
+  significar «se midió la versión anterior».
+
 - **Antes de construir la cadena de mejora se resolvió si alguien podría ver que funciona, y la
   respuesta cambia dónde van las comprobaciones.** El arnés con el que este repositorio cuenta
   píxeles **sí** ve la capa donde la cadena termina: una marca dibujada por la composición llega a la

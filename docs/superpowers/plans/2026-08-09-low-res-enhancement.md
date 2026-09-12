@@ -95,12 +95,21 @@ evidencia bilingüe → changelogs ES/EN → un commit → push con `main` en fa
      con su control negativo. Sabe que `YUY2` es el preferido y por qué. Lo que **no** existe en el
      árbol es la conversión de bytes ni la subida — comprobado buscando `UyvyToYuy2`, `ToYuy2` y
      `SwapPairs` en `src/` y `tests/`, cero coincidencias.
-  1. **`UYVY` → `YUY2` al subir.** No es un cambio de lo que se le pide al decodificador: pedir
-     `YUY2` **es una regresión ya medida** —el 2026-08-25 perdía el subtítulo entero, cero bytes de
-     diferencia contra 61 687 con `UYVY`— y DXGI no tiene formato `UYVY`. Es aritmética pura, va
-     junto a `PackedYuvConverter` y se prueba sin tarjeta. **Y quita trabajo**: hoy ese mismo bucle
-     ya convierte cada píxel a `BGRA`, así que la línea base del coste no es cero, es lo que
-     desaparece.
+  1. **`UYVY` → `YUY2` al subir. Hecho el 2026-09-12** —
+     [PLY16-uyvy-to-yuy2.md](../../evidence/stable/PLY16-uyvy-to-yuy2.md)—. No fue un cambio de lo
+     que se le pide al decodificador: pedir `YUY2` **es una regresión ya medida** —el 2026-08-25
+     perdía el subtítulo entero, cero bytes de diferencia contra 61 687 con `UYVY`— y DXGI no tiene
+     formato `UYVY`, comprobado recorriendo la enumeración entera. `PackedYuvConverter.UyvyToYuy2`
+     intercambia cada par de bytes vecinos y no toca el color: los dos formatos llevan las mismas
+     muestras en otro orden, en las palabras de Microsoft «the same as the YUY2 format except the
+     byte order is reversed». Diez casos de prueba y **cuatro mutantes muertos**, con la huella del
+     ensamblado medida en cada vuelta y volviendo byte a byte a la del verde al restaurar.
+     **Y quita trabajo**: ese mismo bucle hoy convierte cada píxel a `BGRA`, así que la línea base
+     del coste no es cero, es lo que desaparece.
+
+     **Lo que este eslabón deja sin consumidor es el eslabón siguiente**, y queda escrito porque es
+     el defecto característico de esta casa: nada de producción llama a esa conversión hasta que la
+     textura exista.
   2. **La textura y el procesador de vídeo**, con el realce de bordes estándar que las dos tarjetas
      declaran y que mueve el 24,4 % de la imagen en ambas. Se mide leyendo la textura de vuelta con
      una textura de staging, que es lo que `WindowsVideoUpscaleProbe` ya hace.
