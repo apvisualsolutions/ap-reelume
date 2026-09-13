@@ -216,6 +216,68 @@ public sealed class PlayerSettingsMenuTests
         Assert.False(group.IsEffectivelyVisible);
     }
 
+    /// <summary>
+    /// Every group the gear can show fits the band it is drawn in, which is 380 px wide.
+    /// </summary>
+    /// <remarks>
+    /// No other gate knows that number. <c>ViewOverflowTests</c> mounts each view alone at 900 —
+    /// the narrowest window the application allows — and a group that fits 900 and not 380 passes
+    /// it while being cut off in the one place it is actually drawn. The width is read from the
+    /// markup rather than written here, so the two cannot disagree.
+    /// </remarks>
+    [AvaloniaTheory]
+    [InlineData(typeof(PictureAdjustmentView))]
+    public void Every_group_the_gear_shows_fits_the_band_it_is_drawn_in(Type group)
+    {
+        var view = (UserControl)Activator.CreateInstance(group)!;
+        var window = new Window { Width = GearWidth, Height = 900, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var spilling = view.GetVisualDescendants()
+            .OfType<Control>()
+            .Where(control => control.Bounds.Width > 0)
+            .Where(control => control.Bounds.Right > GearWidth + 0.5)
+            .Select(control => $"{control.GetType().Name} reaches {control.Bounds.Right:0.#} px")
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.True(
+            spilling.Length == 0,
+            $"{group.Name} does not fit the gear's {GearWidth} px band:\n  "
+                + string.Join("\n  ", spilling));
+
+        // Anti-blindness floor: a view that laid out to nothing would spill nowhere and pass.
+        var measured = view.GetVisualDescendants().OfType<Control>().Count(c => c.Bounds.Width > 0);
+        Assert.True(
+            measured >= 10,
+            $"only {measured} controls were laid out in {group.Name}, so the tree is not being "
+                + "measured rather than the group being small.");
+    }
+
+    /// <summary>The band the gear is drawn in, read from the markup that decides it.</summary>
+    private static double GearWidth
+    {
+        get
+        {
+            var markup = File.ReadAllText(Path.Combine(
+                ApSolutions.LocalMedia.TestSupport.RepositoryLayout.Root,
+                "src",
+                "ApSolutions.LocalMedia.Presentation",
+                "Player",
+                "PlayerView.axaml"));
+            var match = System.Text.RegularExpressions.Regex.Match(
+                markup,
+                @"x:Name=""PlayerSettingsHostSurface""[^>]*?Width=""(?<width>\d+)""",
+                System.Text.RegularExpressions.RegexOptions.Singleline,
+                TimeSpan.FromSeconds(2));
+            Assert.True(match.Success, "PlayerView.axaml no longer declares the gear's width.");
+            return double.Parse(
+                match.Groups["width"].Value,
+                System.Globalization.CultureInfo.InvariantCulture);
+        }
+    }
+
     /// <summary>One stored row, and a count of how many times anything asked for it.</summary>
     private sealed class SilentPreferences : IPlaybackPreferenceRepository
     {

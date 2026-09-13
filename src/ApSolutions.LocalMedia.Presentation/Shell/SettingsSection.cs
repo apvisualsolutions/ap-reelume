@@ -23,12 +23,11 @@ public enum SettingsSection
     /// <summary>The library's folders and the scanning that watches them: «Biblioteca y escaneo».</summary>
     Library,
 
-    /// <summary>What happens when an episode or a lesson ends: «Reproducción».</summary>
-    Playback,
-
+    // «Reproducción» and «Detección de segmentos» were here until 2026-09-13. They went down to the
+    // player's gear (ADR-0012) and are reached through PlayerSettingsGroup now: their value is
+    // decided while watching something, which is not a question a settings page can be asked.
     Recommendations,
     Subtitles,
-    SegmentDetection,
     Shortcuts,
     Lifecycle,
     Privacy,

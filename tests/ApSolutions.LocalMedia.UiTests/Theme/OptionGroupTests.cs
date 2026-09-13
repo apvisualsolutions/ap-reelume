@@ -104,13 +104,13 @@ public sealed class OptionGroupTests
                 + "not a question anybody can answer without something playing behind the text."),
         ["NextEpisodeCountdown"] = new(
             OptionPlace.Player,
-            "SettingsSection.Playback",
+            "PlayerSettingsGroup.NextEpisode",
             "PlaybackSettingsView",
             "PlaybackResetButton",
             "How long to wait before the next episode is decided by having just sat through one."),
         ["SegmentDetection"] = new(
             OptionPlace.Player,
-            "SettingsSection.SegmentDetection",
+            "PlayerSettingsGroup.Segments",
             "SegmentDetectionSettingsView",
             "SegmentDetectionResetButton",
             "Whether intros are skipped is judged the moment one is, or is not, skipped."),
@@ -225,15 +225,16 @@ public sealed class OptionGroupTests
     /// </remarks>
     private static readonly Dictionary<string, string> Pending = new(StringComparer.Ordinal)
     {
-        ["SubtitleStyle"] = "It has its button, and is still reached through Settings: it moves into the gear.",
-        ["NextEpisodeCountdown"] = "It has its button, and is still reached through Settings: it "
-            + "moves into the gear.",
-        ["SegmentDetection"] = "It has its button, and is still reached through Settings: it moves "
-            + "into the gear.",
+        // The last one, and it is not forgetfulness: measured on 2026-09-13, SubtitleStyleView does
+        // not fit the gear's 380 px band — a Viewbox in its colour pickers reaches 2010 px there.
+        // Making it fit is a redesign of that view for a third of its width, with its own mock-up,
+        // and it is a separate row rather than something to improvise inside this one.
+        ["SubtitleStyle"] = "It has its button, and is still reached through Settings: it belongs in "
+            + "the gear and does not fit its 380 px band yet.",
     };
 
     /// <summary>The ratchet over <see cref="Pending"/>, which only ever comes down.</summary>
-    private const int MaximumPending = 3;
+    private const int MaximumPending = 1;
 
     /// <summary>
     /// Every button in the tree that puts something back, and what each one is allowed to say.
@@ -517,7 +518,10 @@ public sealed class OptionGroupTests
         // groups be fixed without the number moving and leave three silent slots behind. This is
         // what eng/check-coverage.ps1 means by failing at a floor that is short AND at one that is
         // long.
-        Assert.Equal(MaximumPending, Pending.Count);
+        Assert.True(
+            Pending.Count == MaximumPending,
+            $"{Pending.Count} groups are pending and the ratchet says {MaximumPending}. It only "
+                + "comes down, and it comes down in the same change that fixes one.");
     }
 
     /// <summary>

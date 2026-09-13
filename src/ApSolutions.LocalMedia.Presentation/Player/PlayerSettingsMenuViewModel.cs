@@ -34,9 +34,14 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
     private bool _loaded;
     private PlayerSettingsGroup _group = PlayerSettingsGroup.None;
 
-    public PlayerSettingsMenuViewModel(PictureAdjustmentViewModel? picture = null)
+    public PlayerSettingsMenuViewModel(
+        PictureAdjustmentViewModel? picture = null,
+        Settings.PlaybackSettingsViewModel? nextEpisode = null,
+        Settings.SegmentDetectionSettingsViewModel? segments = null)
     {
         Picture = picture;
+        NextEpisode = nextEpisode;
+        Segments = segments;
         ToggleCommand = new MenuCommand(_ => IsOpen = !_isOpen);
         CloseCommand = new MenuCommand(_ => IsOpen = false);
         BackCommand = new MenuCommand(_ => Group = PlayerSettingsGroup.None);
@@ -53,6 +58,16 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
 
     /// <summary>The picture group's own model; absent in a session that has no picture to adjust.</summary>
     public PictureAdjustmentViewModel? Picture { get; }
+
+    /// <summary>
+    /// The next-episode countdown, down from Settings on 2026-09-13 (ADR-0012). It keeps writing the
+    /// global row rather than this session's: ten seconds is an answer for the whole library, and
+    /// making it per-series would be a change to the stored model that nobody asked for.
+    /// </summary>
+    public Settings.PlaybackSettingsViewModel? NextEpisode { get; }
+
+    /// <summary>Automatic segment detection, down from Settings the same day and also global.</summary>
+    public Settings.SegmentDetectionSettingsViewModel? Segments { get; }
 
     public ICommand ToggleCommand { get; }
 
@@ -125,6 +140,18 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
     /// <summary>The picture group, which stands in place of the list.</summary>
     public bool IsPictureVisible => _isOpen && _group is PlayerSettingsGroup.Picture;
 
+    /// <inheritdoc cref="IsPictureVisible"/>
+    public bool IsNextEpisodeVisible => _isOpen && _group is PlayerSettingsGroup.NextEpisode;
+
+    /// <inheritdoc cref="IsPictureVisible"/>
+    public bool IsSegmentsVisible => _isOpen && _group is PlayerSettingsGroup.Segments;
+
+    /// <summary>Whether the gear has the countdown group to offer at all.</summary>
+    public bool HasNextEpisode => NextEpisode is not null;
+
+    /// <inheritdoc cref="HasNextEpisode"/>
+    public bool HasSegments => Segments is not null;
+
     private void RaiseEverything()
     {
         foreach (var name in new[]
@@ -133,6 +160,8 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
             nameof(Group),
             nameof(IsListVisible),
             nameof(IsPictureVisible),
+            nameof(IsNextEpisodeVisible),
+            nameof(IsSegmentsVisible),
         })
         {
             OnPropertyChanged(name);

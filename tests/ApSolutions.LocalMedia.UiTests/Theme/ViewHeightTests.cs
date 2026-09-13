@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 using System.Globalization;
+using System.Xml.Linq;
 using ApSolutions.LocalMedia.Presentation;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
@@ -142,6 +144,37 @@ public sealed class ViewHeightTests
 
         window.Close();
         Dispatcher.UIThread.RunJobs();
-        return found;
+        return found || IsScrolledInTheMarkup(viewName);
+    }
+
+    /// <summary>
+    /// The half the mounted shell cannot answer: a view that lives inside the player is reached
+    /// through a <c>ContentControl</c> whose <c>Content</c> is a binding, so with no session there is
+    /// no content, the template never applies, and the view is in no tree to be found under anything.
+    /// </summary>
+    /// <remarks>
+    /// Measured on 2026-09-13, when the gear was capped and put in a scroller and this gate went on
+    /// reporting it as unscrolled. Reading the markup is what can see it, and it is read for
+    /// containment — the view's own element, or the template that stands in for it, below a
+    /// <c>ScrollViewer</c> — rather than for the two words appearing in one file.
+    /// </remarks>
+    private static bool IsScrolledInTheMarkup(string viewName)
+    {
+        foreach (var path in Directory.EnumerateFiles(
+            Path.Combine(RepositoryLayout.Root, "src"), "*.axaml", SearchOption.AllDirectories))
+        {
+            var document = XDocument.Load(path);
+            var scrolled = document.Descendants()
+                .Where(element => element.Name.LocalName == "ScrollViewer")
+                .SelectMany(scroller => scroller.Descendants())
+                .Any(descendant => descendant.Name.LocalName == viewName);
+
+            if (scrolled)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

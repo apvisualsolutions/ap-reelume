@@ -58,6 +58,25 @@ public sealed class WatchedThresholdSettingsTests
         Assert.True(recommendations.IsEnabled);
     }
 
+    /// <summary>
+    /// The half of the reset that runs when the assembled application never handed this surface a
+    /// threshold to configure: the switch still goes back, and nothing else is touched. Without this
+    /// branch covered the file fell from 95/83 to 94/78 in CI, and coverage does not go backwards.
+    /// </summary>
+    [Fact]
+    public void Restoring_the_defaults_without_a_threshold_still_puts_the_switch_back()
+    {
+        var recommendations = new StubRecommendationSettings();
+        recommendations.SetEnabled(false);
+        var viewModel = new RecommendationSettingsViewModel(recommendations);
+        Assert.False(viewModel.HasWatchedThreshold);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+
+        Assert.Equal(IRecommendationSettings.EnabledByDefault, recommendations.IsEnabled);
+        Assert.False(viewModel.HasThresholdResult);
+    }
+
     [Fact]
     public void The_slider_arrives_showing_the_threshold_in_force()
     {

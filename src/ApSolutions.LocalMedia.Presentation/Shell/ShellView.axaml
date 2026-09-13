@@ -451,11 +451,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Tag="{x:Static shell:SettingsSection.Library}"
               automation:AutomationProperties.Name="{DynamicResource SettingsSectionLibrary}" />
           <ListBoxItem
-              Content="{DynamicResource PlaybackSettingsTitle}"
-              IsVisible="{Binding HasPlaybackSettings}"
-              Tag="{x:Static shell:SettingsSection.Playback}"
-              automation:AutomationProperties.Name="{DynamicResource PlaybackSettingsTitle}" />
-          <ListBoxItem
               Content="{DynamicResource RecommendationSettingsTitle}"
               IsVisible="{Binding HasRecommendationSettings}"
               Tag="{x:Static shell:SettingsSection.Recommendations}"
@@ -465,11 +460,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
               IsVisible="{Binding HasSubtitleStyle}"
               Tag="{x:Static shell:SettingsSection.Subtitles}"
               automation:AutomationProperties.Name="{DynamicResource SubtitleStyleAccessibleName}" />
-          <ListBoxItem
-              Content="{DynamicResource SegmentDetectionSettingsTitle}"
-              IsVisible="{Binding HasSegmentDetection}"
-              Tag="{x:Static shell:SettingsSection.SegmentDetection}"
-              automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsTitle}" />
           <ListBoxItem
               Content="{DynamicResource ShortcutSettingsAccessibleName}"
               IsVisible="{Binding HasShortcuts}"
@@ -527,11 +517,11 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 </ContentControl>
               </StackPanel>
             </ContentControl>
-            <ContentControl Margin="48,0" IsVisible="{Binding IsPlaybackSection}">
-              <ContentControl IsVisible="{Binding HasPlaybackSettings}">
-                <settings:PlaybackSettingsView DataContext="{Binding PlaybackSettings}" />
-              </ContentControl>
-            </ContentControl>
+            <!--
+              Reproducción y Detección de segmentos vivían aquí hasta el 2026-09-13. Bajaron al
+              engranaje del reproductor (ADR-0012): su valor se decide mirando algo, no en una
+              página de ajustes. Se alcanzan por PlayerSettingsGroup.
+            -->
             <ContentControl Margin="48,0" IsVisible="{Binding IsRecommendationsSection}">
               <ContentControl IsVisible="{Binding HasRecommendationSettings}">
                 <settings:RecommendationSettingsView DataContext="{Binding RecommendationSettings}" />
@@ -540,11 +530,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <ContentControl Margin="48,0" IsVisible="{Binding IsSubtitlesSection}">
               <ContentControl IsVisible="{Binding HasSubtitleStyle}">
                 <player:SubtitleStyleView DataContext="{Binding SubtitleStyle}" />
-              </ContentControl>
-            </ContentControl>
-            <ContentControl Margin="48,0" IsVisible="{Binding IsSegmentDetectionSection}">
-              <ContentControl IsVisible="{Binding HasSegmentDetection}">
-                <settings:SegmentDetectionSettingsView DataContext="{Binding SegmentDetection}" />
               </ContentControl>
             </ContentControl>
             <ContentControl Margin="48,0" IsVisible="{Binding IsShortcutsSection}">

@@ -1080,11 +1080,24 @@ public static partial class CompositionRoot
         PreferenceScope scope,
         string scopeKey) =>
         provider.GetRequiredService<IMediaPlayerEngine>() is IPictureAdjustable adjustable
-            ? new PlayerSettingsMenuViewModel(new PictureAdjustmentViewModel(
-                provider.GetRequiredService<IPlaybackPreferenceRepository>(),
-                adjustable,
-                scope,
-                scopeKey))
+            ? new PlayerSettingsMenuViewModel(
+                new PictureAdjustmentViewModel(
+                    provider.GetRequiredService<IPlaybackPreferenceRepository>(),
+                    adjustable,
+                    scope,
+                    scopeKey),
+
+                // The two that came down from Settings on 2026-09-13. They read and write the same
+                // facades the Settings page used, which is what makes the move a move rather than a
+                // second copy of two switches: the value the chaining code obeys is the one these
+                // write, whichever surface somebody reached them through.
+                new PlaybackSettingsViewModel(
+                    () => provider.GetRequiredService<StartNextEpisodeCountdown>().CountdownSeconds,
+                    seconds => provider.GetRequiredService<StartNextEpisodeCountdown>()
+                        .ConfigureCountdown(seconds)),
+                new SegmentDetectionSettingsViewModel(
+                    () => provider.GetRequiredService<DetectSeriesSegments>().IsEnabled,
+                    enabled => provider.GetRequiredService<DetectSeriesSegments>().SetEnabled(enabled)))
             : null;
 
     /// <summary>

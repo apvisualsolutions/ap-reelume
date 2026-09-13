@@ -18,4 +18,17 @@ public enum PlayerSettingsGroup
 
     /// <summary>Brightness, contrast and gamma (PLY-018).</summary>
     Picture,
+
+    /// <summary>
+    /// How long the next episode waits before it starts on its own. It came down from Settings on
+    /// 2026-09-13 (ADR-0012): the number somebody wants is the one they arrive at having just sat
+    /// through an episode, which is not a question anybody answers on a settings page.
+    /// </summary>
+    NextEpisode,
+
+    /// <summary>
+    /// Whether intros are detected and offered for skipping, down from Settings on the same day and
+    /// for the same reason: it is judged the moment one is, or is not, skipped.
+    /// </summary>
+    Segments,
 }
