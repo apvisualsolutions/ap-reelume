@@ -368,3 +368,79 @@ esta sonda ya hace — y decírselo a quien la usa, en vez de encenderla por su 
 `NV_VPP_RTX_VIDEO_SUPER_RESOLUTION_ENB` y sus dos hermanos, que aparecen en el issue 396 de
 `nvidiaProfileInspector`, **se los inventó un modelo de lenguaje** — lo dice quien los publicó, que
 además no los encuentra ni añadiéndolos a mano. No se usaron aquí.
+
+---
+
+## Enmienda del 2026-09-13 — «el registro no cambió» era cierto y engañoso, y el interruptor sigue sin poder encenderse
+
+El propietario insistió en que tenía que existir una forma de encender la superresolución desde la
+aplicación, porque **una función que depende de que el usuario vaya a otro programa es una función
+que la mayoría de la gente no va a tener**. Se agotaron las cuatro vías. Ninguna funciona, y la
+primera además corrige lo escrito arriba.
+
+### 1. El registro SÍ cambia, y la medición anterior no era falsa: era estrecha
+
+Arriba dice «el registro no cambió: cero diferencias de 272». Ese 272 es el número de valores bajo
+`HK*\SOFTWARE\NVIDIA Corporation`, y **el ajuste no vive ahí**. Vive en la clave de clase del
+adaptador de pantalla:
+
+```
+HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000
+```
+
+Barriendo ese árbol —1 164 valores— y comparando encendido contra apagado, **cambia exactamente
+uno**: `_User_Global_VAL_SuperResolution`, **5 encendido, 0 apagado**. Sus vecinos
+(`_Auto` = 2, `_RTXVideoFlags` = 0x100, los `_XEN_` = 0x80000001, un blob `_DAT_`) no se mueven.
+
+**La lección no es el dato, es el método**: un barrido vacío no prueba una ausencia, prueba que se
+miró donde no era. La consulta anterior buscó por el nombre del fabricante; la clave la escribe el
+fabricante pero **cuelga del dispositivo**.
+
+### 2. Escribirlo no enciende nada, con permisos de administrador y todo
+
+- `_User_Global_VAL_SuperResolution` puesto a 5 desde fuera de NVIDIA App, con elevación
+  (sin elevación Windows contesta «Requested registry access is not allowed»).
+- Sonda: **0 bytes distintos de 33 177 600** en la RTX 5070.
+- **Control positivo en la misma pasada**: la Intel UHD 770 movió **18 109 378 bytes**. El
+  instrumento estaba vivo.
+
+### 3. Reiniciar el servicio del controlador tampoco
+
+`NVDisplay.ContainerLocalSystem` reiniciado con el valor ya en 5, y la sonda repetida: **otra vez 0
+bytes**, con la Intel moviendo los mismos 18,1 millones.
+
+### 4. La base de perfiles del controlador no participa — ahora con control positivo
+
+La medición de arriba decía que `nvdrsdb0.bin` no cambia, pero **sin una prueba de que el interruptor
+se hubiera movido de verdad**. Repetida el 2026-09-13 con esa prueba al lado: el fichero es
+**byte a byte idéntico** (1 924 512 bytes, misma huella, `cmp -l` da 0 diferencias) mientras el valor
+del registro pasaba de 0 a 5. El clic ocurrió y el fichero no se enteró.
+
+### 5. Y la propia NVIDIA App tampoco lee ese valor
+
+Con el registro en 5 escrito por nosotros, **su interfaz seguía mostrando la función desactivada**
+—observado por el propietario—. Ese valor es el **recuerdo** de la decisión, no la decisión: nadie lo
+lee, ni el controlador ni la aplicación que lo escribe.
+
+**Conclusión**: NVIDIA App se lo comunica al controlador **en caliente**, por un canal que no deja
+rastro en ningún fichero ni clave que una aplicación pueda escribir. El interruptor global no se
+enciende desde fuera. Punto final para esa vía.
+
+### Lo que sí existe, y no lo habíamos mirado: el kit de vídeo RTX
+
+Lo encontró el propietario. NVIDIA publica un **RTX Video SDK** cuya superresolución vive en
+`nvngx_vsr.dll` y **se ejecuta dentro del proceso que la llama**: sin interruptor global, sin NVIDIA
+App, sin permisos de administrador y sin que el usuario toque nada. Es exactamente la autonomía que
+se buscaba, y su contrato **permite repartir el binario dentro de una aplicación** —la guía de NGX lo
+dice, y pide la marca de NVIDIA en la pantalla «Acerca de»—.
+
+**Lo que lo bloquea no es técnico.** La cláusula 2.5 del contrato de NVIDIA prohíbe usar el kit «de
+manera que quede sujeto a una licencia de código abierto», y nombra las que exigen entregar el código
+fuente, permitir obras derivadas o redistribuir sin coste. Con la licencia propia del 2026-09-13 esa
+cláusula deja de chocar con la licencia de este programa; **lo que sigue bloqueando es el
+decodificador de VideoLAN**, compilado con `--enable-gpl` (ver los avisos de terceros). Mientras ese
+complemento viaje en el paquete, el kit de NVIDIA no puede entrar.
+
+**Y la superresolución sigue siendo un extra, no la base**: el kit solo corre en tarjetas RTX. El
+escalador propio hace falta igual para AMD, Intel y las NVIDIA anteriores, y es el que da imagen
+mejorada al 100 % de quien use el programa sin que nadie mueva un dedo.

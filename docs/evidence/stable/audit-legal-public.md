@@ -119,3 +119,92 @@ remain the owner's.
 No es un dictamen jurídico. Lo hizo quien programa, leyendo los términos aplicables y el código, y su
 valor es haber medido en vez de suponer. Los seis puntos de `docs/legal/LEGAL.es.md` siguen abiertos y
 `REL-004` sigue sin verificar. / It is not a legal opinion.
+
+---
+
+## Enmienda del 2026-09-13 — el repositorio deja de ser libre, y las cifras de arriba caducaron
+
+El propietario cambió la licencia de `GPL-3.0-or-later` a una licencia propia,
+`LicenseRef-AP-Reelume`: gratuita para quien la use, sin derecho a modificar, redistribuir ni vender.
+El motivo es de negocio y lo dejó dicho él: **la licencia anterior concedía por escrito las tres
+cosas que quiere reservarse**. / The owner moved the licence to one of its own; the previous licence
+granted in writing the three things he wants to keep.
+
+**Lo que lo hizo posible, medido**: `git log --format='%an' | sort | uniq -c` devuelve **646 commits
+y un solo autor**. Sin copyright ajeno, la licencia la decide él solo. Lo publicado antes de esta
+fecha conserva sus derechos para siempre: relicenciar mira adelante, nunca atrás.
+
+### Las cifras de esta evidencia estaban desfasadas, y nada lo avisaba
+
+| Recuento | Esta evidencia (2026-08-10) | Medido el 2026-09-13 |
+| --- | --- | --- |
+| `.cs` con cabecera | 556 | **925** |
+| `.axaml` con cabecera | 51 | **71** |
+| `.ps1` con cabecera | 17 | **29** |
+| Total de archivos tocados por el cambio | — | **1 033** |
+
+`docs/legal/LEGAL.{es,en}.md` repetía los tres números viejos. **Ninguna puerta los comprueba**, ni
+antes ni ahora: `eng/verify-docs.ps1` no mira licencia ni cabeceras. Queda dicho en el propio
+documento legal en vez de arreglado en silencio, porque el hueco sigue abierto.
+
+### La lección que deja el cambio: el identificador apuntaba a una licencia en vez de a un documento
+
+Cada archivo declaraba `GPL-3.0-or-later`, así que cambiar de licencia obligó a reescribir **1 033
+archivos**. La corrección la propuso el propietario en mitad del barrido y se aplicó antes de
+terminarlo: el identificador es ahora `LicenseRef-AP-Reelume`, **sin versión**. Nombra «la licencia
+propia de este proyecto» y apunta a `LICENSE`, que es donde viven la versión y la fecha y adonde hay
+que ir de todos modos para conocer las condiciones. **Reescribir las condiciones ya no toca ningún
+archivo de código.** El porqué está escrito en `.editorconfig`, junto a la regla, con la factura al
+lado para que nadie vuelva a meter la versión ahí.
+
+### Tres razonamientos legales que se invirtieron sin que nadie tocara código
+
+Es el hallazgo que más vale conservar: **una conclusión correcta deja de serlo cuando cambia su
+premisa**, y ninguna prueba automática puede avisarlo.
+
+1. **Los complementos de VideoLAN.** Estaban cerrados desde el 2026-08-10 con este argumento: un
+   complemento `GPL-2.0-or-later` sube a GPL-3.0 y encaja dentro de un programa GPL-3.0. Sigue siendo
+   válido; el programa ya no es GPL, así que no hay versión a la que subir. **Reabierto, y bloquea la
+   publicación del artefacto.** Medido el mismo día: el complemento que importa no es el codificador
+   x264 —un reproductor no codifica— sino **`libavcodec_plugin.dll`, el decodificador**, cuya línea de
+   compilación empieza por `--enable-gpl`, leída dentro del binario con tres complementos de control
+   que no la llevan. La salida no pierde formatos: la biblioteca que descodifica es permisiva por
+   defecto y lo contagioso son piezas opcionales de compilación.
+2. **El §6(a) de la LGPL-2.1.** Se cumplía publicando nuestro fuente bajo licencia libre. Esa vía se
+   cierra y pasa a la de al lado, que aquí ya se cumplía de hecho: las bibliotecas viajan como
+   ficheros separados que cualquiera puede sustituir.
+3. **Los términos de GitHub.** El documento decía que nuestra licencia concedía **más** que ellos.
+   Ahora concede **menos**: sus términos dan a cualquier usuario el derecho a ver y **bifurcar** un
+   repositorio público, AP Solutions no lo concede ni lo puede retirar, y el repositorio sigue público
+   a propósito porque de ello dependen los runners gratuitos, los ARM64 incluidos. La sección 5 de
+   `LICENSE` lo reconoce y reserva todo lo demás, en vez de prohibir lo que la plataforma ya permite.
+
+### Dos puertas que se habrían quedado ciegas
+
+- **`LicenceTextTests.LicenceShaped`** reconoce identificadores con forma de licencia publicada, y un
+  `LicenseRef-` no lo es. Tras el cambio habría seguido **en verde viendo un identificador menos**:
+  el defecto característico de esta casa, una prueba que se vuelve ciega en vez de roja. La expresión
+  ahora lo reconoce, con el motivo escrito al lado.
+- **`AssembledJourneyTests`** afirmaba `"GPL-3.0"` sobre la pantalla de créditos montada. Coincidía
+  en los dos idiomas **por casualidad**, por ser un identificador; con «Licencia» y «Licence» se
+  rompía. Ahora afirma el nombre del fichero, que sí es idéntico en ambos.
+
+### Verde medido tras el cambio
+
+| Puerta | Resultado |
+| --- | --- |
+| `dotnet format --verify-no-changes --severity warn` | limpio |
+| `dotnet build -c Release -warnaserror` | 0 avisos, 0 errores |
+| `eng/verify-docs.ps1` | 303 ficheros, 36 localizados, 74 identificadores |
+| `DocumentationTests` | 99 / 99 |
+| `UiTests` | 1 399 / 1 399 |
+| `AccessibilityTests` | 150 / 150 |
+
+### Lo que queda abierto
+
+- **El artefacto no se puede publicar** hasta que el decodificador deje de ser contagioso. El código
+  fuente sí lleva ya la licencia nueva: el árbol solo contiene código de AP Solutions.
+- **La integridad del texto de `LICENSE` dentro del paquete no la comprueba nadie**: los textos de
+  terceros se comparan byte a byte y el nuestro solo se comprueba que exista. Un fichero truncado
+  pasaría verde.
+- **El borrador de la licencia lleva siete puntos para un abogado** y no ha sido revisado por uno.
