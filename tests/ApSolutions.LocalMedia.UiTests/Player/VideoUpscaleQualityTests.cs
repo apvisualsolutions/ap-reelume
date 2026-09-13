@@ -35,6 +35,15 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// like, and removing it is `PLY-016`'s job and nothing else's. The day one of Avalonia's modes
 /// becomes genuinely sharper than another, the first test here goes red and somebody revisits.
 /// </para>
+/// <para>
+/// <b>What the ramp width here cannot say, and where the other half lives.</b> Less is better, so its
+/// perfect score is zero — and zero is what nearest-neighbour gives, as the second test below states
+/// outright. A yardstick whose best score belongs to the worst filter cannot be optimised against:
+/// on 2026-09-13 a candidate that scored well on it looked worse, and the owner had already said so.
+/// <see cref="VideoUpscaleFidelityTests"/> measures the other question — how far the enlarged picture
+/// landed from the picture it should have been — and the two together are what pin the chain's
+/// numbers. Neither alone is a criterion.
+/// </para>
 /// </remarks>
 public sealed class VideoUpscaleQualityTests
 {
@@ -185,10 +194,11 @@ public sealed class VideoUpscaleQualityTests
         Assert.True(
             enhanced < composition,
             $"The enhancement ramps over {enhanced} pixels against the composition's {composition}, "
-                + "so it is not sharpening anything a person would see. Measured 2026-09-13 at a "
-                + "strength of 0.6: 2 against 4, profile 31,95,159,223 becoming 3,86,169,252. At 0.3 "
-                + "the ramp stays at 4, so the strength is what carries this and not the shader "
-                + "merely running.");
+                + "so it is not sharpening anything a person would see. Measured 2026-09-13 with the "
+                + "shipped chain — a sharpened cubic feeding a bounded 0.45 mask: 2 against 4. "
+                + "**This gate is what stops the other one from being optimised alone**: a 0.3 mask "
+                + "lands closer to the truth in VideoUpscaleFidelityTests and brings this ramp back "
+                + "to 4, and so does a cubic of C=1.0. The pair is the criterion, not either half.");
     }
 
     /// <summary>

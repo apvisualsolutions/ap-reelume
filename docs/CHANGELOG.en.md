@@ -40,6 +40,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **A small video's picture looks considerably sharper, and the yardstick that said otherwise was the
+  culprit.** The owner said twice in one day that it was still soft, and he was right: the only
+  measurement in place rewarded exactly what the eye rejects. It counted how abrupt an edge was, so
+  its perfect score belongs to nearest-neighbour — the worst enlargement there is, the one with the
+  staircased edges — and improving against it pushed towards that. Sharpness is now judged against a
+  truth drawn on purpose: shrink it, enlarge it back, and measure how far the result landed from what
+  it should have been, which is the field's own procedure and punishes blur, staircasing and haloing
+  in one number. With it, the picture went from landing **30.4 %** closer to the truth to **35.7 %**,
+  with the edge just as fine and **less** haloing than before: **no check was loosened to get there**.
+  The sharpening came down rather than up, because overdoing it moves the picture **away** from the
+  truth as well as drawing outlines; and the upscaler can no longer lighten or darken a point beyond
+  what already surrounded it, which is how the graphics vendor describes its own sharpening. A version
+  that reached 41.9 % was measured and rejected: it drew the outline.
+
+- **And why the picture fills with blocks when gamma is raised is now pinned down**, which is a
+  separate defect and not the upscaler's: the tone adjustment is applied through a 256-level table, so a
+  steep curve sends distinct tones to the same value and a smooth gradient turns into flat patches. It
+  shows most around light lettering on a dark background. It is registered with its known fix and with
+  the automatic check it lacks — there was none, which is why a person watching a film found it.
+
 - **The legal reasoning about VideoLAN's plugins was closed and has reopened, without anybody
   touching a line of code.** It said a copyleft plugin "fits" inside the program because both meet at
   the same version of the free licence. The reasoning was correct and still is; what changed is the

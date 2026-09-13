@@ -100,11 +100,53 @@ public static class UpscaleDrawPlan
     /// How the picture is sampled <i>before</i> the sharpening pass, which is a different question.
     /// </summary>
     /// <remarks>
-    /// Linear and not cubic: the shader's own arithmetic is what narrows the edge, and two sharpenings
-    /// stacked overshoot into a visible outline. Measured — a nearest-neighbour sample here is what
-    /// the ramp gate already kills.
+    /// <para>
+    /// <b>A sharpened cubic, and the coefficients are measured rather than named.</b> This read
+    /// <c>SKFilterMode.Linear</c> until 2026-09-13, on the argument that the shader's own arithmetic
+    /// narrows the edge and two sharpenings stacked overshoot into an outline. The argument was
+    /// sound and the conclusion was wrong: measured against a synthesised truth in
+    /// <c>VideoUpscaleFidelityTests</c>, feeding the mask a linear sample lands <b>30,4 %</b> closer
+    /// to the truth than the composition, and feeding it this cubic lands <b>35,7 %</b> closer — with
+    /// the sharpening cut from 0.6 to 0.45, and a <i>smaller</i> overshoot than before, 16 levels
+    /// against 17.
+    /// </para>
+    /// <para>
+    /// <b>Why the coefficients and not the named preset.</b> The family is Mitchell-Netravali's, where
+    /// <c>B = 0, C = 0.5</c> is Catmull-Rom and a larger <c>C</c> deepens the negative lobes that
+    /// steepen an edge; the constructor takes the two coefficients, so the whole family is reachable
+    /// and not just the two fields — measured by reflection, because a preset-only API would have made
+    /// this paragraph fiction.
+    /// </para>
+    /// <para>
+    /// <b>The lobes ring, and the shader's bound cannot remove it</b>, because the ring is created by
+    /// the resample and is therefore already inside the neighbourhood the bound clamps to. Measured
+    /// across a grey edge — flat levels 64 and 192 — the step beside the edge scales straight with
+    /// <c>C</c>: 9 levels at 0.5, 13 at 0.7, <b>16 here</b>; and so does the fidelity it buys, 28,1 % /
+    /// 33,2 % / 35,7 %. The ceiling in <c>SkiaUpscaleDrawOperationTests</c> is what holds it.
+    /// </para>
+    /// <para>
+    /// <b>This was 0.7 for half an hour, on a diagnosis that turned out to be wrong, and the story is
+    /// worth more than the number.</b> The owner reported «alrededor de las letras se ven cuadraditos o
+    /// de distintos tonos», this ring was the obvious suspect, and the coefficient came down twice
+    /// chasing it — with a gate loosened on the way. Then he ran the control nobody here had thought
+    /// to run: <b>his gamma was at 1.5, and at 1.0 the squares stop</b>. The artefact was banding from
+    /// an 8-bit tone curve (`ENG-021`), not this. So the coefficient is back at the value that measures
+    /// best, and the lesson is that <b>a report of something seen is a symptom and not a diagnosis</b>:
+    /// the suspect gets switched off before anything is tuned.
+    /// </para>
+    /// <para>
+    /// <b>Two other designs were measured while chasing that ghost, and both are worse — which is the
+    /// useful part of the detour.</b> Nothing that cannot leave the local range gets past about 13 %
+    /// closer to the truth: linear sampling with any strength reaches 13,7 %, and a monotone remap of
+    /// the local range — steepening where the centre sits between its neighbours, which cannot overshoot
+    /// by construction — reaches 13,4 % with a step of exactly <b>0</b>. Binding the sharpening to a
+    /// second linear copy of the frame with a margin buys 25,7 % at a step of 10, against this 35,7 %.
+    /// <b>All the sharpness above 13 % comes from the negative lobes, and so does the step.</b> Getting
+    /// both needs a different algorithm — interpolating along an edge rather than across it — and that
+    /// is `ENG-022`, not a coefficient.
+    /// </para>
     /// </remarks>
-    public static SKSamplingOptions SharpeningSource => new(SKFilterMode.Linear);
+    public static SKSamplingOptions SharpeningSource => new(new SKCubicResampler(0f, 0.85f));
 
     /// <summary>
     /// One source pixel measured in the destination units the shader reads its coordinates in.

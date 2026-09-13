@@ -249,9 +249,20 @@ public sealed class SkiaUpscaleDrawOperationTests
     /// <para>
     /// So the edge is grey against grey, 64 against 192, where there is room on both sides for the
     /// overshoot to be seen. Measured: at a strength of 0.6 the profile reaches 47 and 209, which is
-    /// 17 past each flat level; at 1.0 it reaches 36 and 220, which is 28. The bound sits between
-    /// them, so a strength that would draw an outline around everything fails here instead of waiting
-    /// for somebody to notice it on screen.
+    /// 17 past each flat level; at 1.0 it reaches 36 and 220, which is 28.
+    /// </para>
+    /// <para>
+    /// <b>The ceiling was cut to 14 for half an hour and then put back, and why is worth keeping.</b>
+    /// The owner reported tonal squares around lettering, this step measured 16, and the obvious move
+    /// was to make the bound tighter than what he had objected to. It was the wrong move because the
+    /// diagnosis was wrong: he then found that <b>his gamma was at 1.5 and at 1.0 the squares stop</b>,
+    /// so the artefact was banding from an 8-bit tone curve (`ENG-021`) and this step was never in it.
+    /// A ceiling set to exclude somebody else's defect excludes good settings for nothing.
+    /// </para>
+    /// <para>
+    /// <b>And this is what pins the resampling coefficient</b>, which no other gate can see: the step
+    /// scales straight with it — 9 levels at <c>C = 0.5</c>, 13 at 0.7, 16 at 0.85 — while the fidelity
+    /// gate next door pulls the other way, rewarding the largest. Neither alone would hold a middle.
     /// </para>
     /// </remarks>
     [AvaloniaFact]

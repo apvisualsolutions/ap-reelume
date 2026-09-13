@@ -152,16 +152,41 @@ public sealed class UpscaleDrawPlanTests
     }
 
     /// <summary>
-    /// What feeds the sharpening pass is sampled linearly, not cubically and not by nearest.
+    /// What feeds the sharpening pass is sampled through a cubic sharper than either preset.
     /// </summary>
     /// <remarks>
-    /// Two sharpenings stacked overshoot into a visible outline, and nearest hands the shader a
-    /// staircase to sharpen. The ramp gate already kills the nearest case; this names the choice.
+    /// <para>
+    /// This asserted <c>SKFilterMode.Linear</c> until 2026-09-13, on the argument that two sharpenings
+    /// stacked overshoot into a visible outline. The argument was right about the mechanism and wrong
+    /// about the answer: linear cannot ring, and measured against a synthesised truth it also cannot
+    /// sharpen — <b>13,7 %</b> closer to the truth at this strength, against this cubic's 35,7 %.
+    /// </para>
+    /// <para>
+    /// <b>The coefficient is held between two gates that pull opposite ways</b>, and that is why this
+    /// asserts the number and not the family. Fidelity rises with <c>C</c> — 28,1 % at 0.5, 33,2 % at
+    /// 0.7, <b>35,7 % here</b> — and so does the step the resample leaves beside an edge: 9 levels, 13,
+    /// 16, against a ceiling of 22 in <c>SkiaUpscaleDrawOperationTests</c>. It spent half an hour at 0.7
+    /// chasing an artefact that turned out to be an 8-bit tone curve (`ENG-021`) and not this.
+    /// </para>
+    /// <para>
+    /// <b>Catmull-Rom is named as what it is not</b>, measured at the strength that ships: it lands
+    /// 28,1 % closer, well under the fidelity floor. Linear is named too, for the reason in the first
+    /// paragraph. Asserting only «it is cubic» would pass for both ends of a family whose ends both
+    /// fail, one each way.
+    /// </para>
     /// </remarks>
     [Fact]
-    public void What_feeds_the_sharpening_pass_is_sampled_linearly()
+    public void What_feeds_the_sharpening_pass_is_sampled_through_the_measured_cubic()
     {
-        Assert.Equal(new SKSamplingOptions(SKFilterMode.Linear), UpscaleDrawPlan.SharpeningSource);
+        Assert.Equal(
+            new SKSamplingOptions(new SKCubicResampler(0f, 0.85f)),
+            UpscaleDrawPlan.SharpeningSource);
+        Assert.NotEqual(
+            new SKSamplingOptions(SKCubicResampler.CatmullRom),
+            UpscaleDrawPlan.SharpeningSource);
+        Assert.NotEqual(
+            new SKSamplingOptions(SKFilterMode.Linear),
+            UpscaleDrawPlan.SharpeningSource);
     }
 
     /// <summary>

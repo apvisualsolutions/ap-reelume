@@ -29,9 +29,20 @@ namespace ApSolutions.LocalMedia.Presentation.Player;
 /// nothing.
 /// </para>
 /// <para>
+/// <b>The result is bounded by its own neighbourhood, and that is the halo made impossible rather
+/// than merely small.</b> An unsharp mask on its own can push a pixel past every value around it,
+/// which is what an outline drawn around everything is. AMD says the same thing about its own
+/// adaptive sharpening in its own words — «areas of the input image that are already sharp are
+/// sharpened less … higher overall natural visual sharpness with fewer artifacts» — so the arithmetic
+/// here clamps the sharpened pixel between the lightest and darkest of the five it read. Measured: at
+/// the shipped settings the edge overshoots <b>16</b> levels with this bound and <b>29</b> without,
+/// against a ceiling of 22 that the gate auditor set on 2026-09-13. Deleting the two lines turns that
+/// gate red, so this is guarded and not merely intended.
+/// </para>
+/// <para>
 /// The alpha of the centre is returned untouched. A runtime shader returns premultiplied colour, so
 /// letting a sharpened channel climb past its own alpha would hand Skia a colour that cannot exist;
-/// the clamp is what keeps it valid rather than tidy.
+/// the second clamp is what keeps it valid rather than tidy.
 /// </para>
 /// </remarks>
 public static class UpscaleShaderSource
@@ -50,20 +61,29 @@ public static class UpscaleShaderSource
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Measured rather than chosen by eye.</b> Across a hard edge enlarged four times, 0.3 leaves
-    /// the ramp at <b>4</b> pixels — profile <c>18,91,164,237</c>, which is the composition's own
-    /// width and therefore no improvement anybody would see — while 0.6 brings it to <b>2</b>, profile
-    /// <c>3,86,169,252</c>. So this number is the difference between clearing the gate and not
-    /// clearing it, not a taste.
+    /// <b>Measured rather than chosen by eye, and measured twice.</b> The first reading only had the
+    /// ramp width to go on: across a hard edge enlarged four times, 0.3 left the ramp at <b>4</b>
+    /// pixels — the composition's own width — while 0.6 brought it to <b>2</b>, profile
+    /// <c>3,86,169,252</c>. So 0.6 shipped on 2026-09-13, and the owner said it was still soft.
     /// </para>
     /// <para>
-    /// <b>What that measurement cannot see is a halo</b>, and it is worth saying so rather than
-    /// implying otherwise: the scene is black against white, so an overshoot past either end clamps
-    /// invisibly. Whether a stronger value would draw an outline around everything is the owner's
-    /// visual judgement on real material, which the acceptance criterion asks for by name.
+    /// <b>He was right, and the ramp width is why.</b> Its perfect score is zero, which is what
+    /// nearest-neighbour gives, so it rewards a hard threshold and cannot say whether the picture
+    /// came back <i>faithful</i>. Against a synthesised truth — <c>VideoUpscaleFidelityTests</c> —
+    /// this number wants the opposite of what the ramp wanted. Measured in that harness with the
+    /// chain as it ships: <b>0.45</b> lands <b>35,7 %</b> closer to the truth than the composition,
+    /// 0.6 lands 34,0 %, and 1.0 lands 30,3 %. Over-sharpening does not merely risk a halo; it
+    /// measurably moves the picture away from what it should have been.
+    /// </para>
+    /// <para>
+    /// <b>And the ramp is why it is not lower still</b>, which is what keeps this honest rather than
+    /// convenient. <b>0.3 scores better</b> — 36,8 % — and it fails: the ramp goes back to the
+    /// composition's four and three of the tests next door turn red, measured by putting 0.3 in here
+    /// and running them. 0.45 is the highest-scoring value tried that clears <b>every</b> yardstick,
+    /// and it leaves the ramp at <b>2</b>. Nothing was loosened to land it.
     /// </para>
     /// </remarks>
-    public const float Strength = 0.6f;
+    public const float Strength = 0.45f;
 
     /// <summary>The shader itself.</summary>
     public const string Sksl = """
@@ -73,12 +93,19 @@ public static class UpscaleShaderSource
 
         half4 main(float2 coord) {
             half4 centre = source.eval(coord);
-            half4 blur = (source.eval(coord + float2(-sourceStep.x, 0.0))
-                        + source.eval(coord + float2( sourceStep.x, 0.0))
-                        + source.eval(coord + float2(0.0, -sourceStep.y))
-                        + source.eval(coord + float2(0.0,  sourceStep.y))) * 0.25;
+            half4 west  = source.eval(coord + float2(-sourceStep.x, 0.0));
+            half4 east  = source.eval(coord + float2( sourceStep.x, 0.0));
+            half4 north = source.eval(coord + float2(0.0, -sourceStep.y));
+            half4 south = source.eval(coord + float2(0.0,  sourceStep.y));
+
+            half4 blur = (west + east + north + south) * 0.25;
             half4 sharpened = centre + (centre - blur) * half(strength);
-            return half4(clamp(sharpened.rgb, 0.0, centre.a), centre.a);
+
+            half3 lowest  = min(min(min(west.rgb, east.rgb), min(north.rgb, south.rgb)), centre.rgb);
+            half3 highest = max(max(max(west.rgb, east.rgb), max(north.rgb, south.rgb)), centre.rgb);
+            half3 bounded = clamp(sharpened.rgb, lowest, highest);
+
+            return half4(clamp(bounded, 0.0, centre.a), centre.a);
         }
         """;
 

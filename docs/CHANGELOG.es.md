@@ -40,6 +40,27 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La imagen de un vídeo pequeño se ve bastante más nítida, y la medida que decía lo contrario era
+  la culpable.** El propietario dijo dos veces el mismo día que seguía medio borrosa, y tenía razón:
+  la única medida que había premiaba justo lo que el ojo rechaza. Contaba lo abrupto de un canto, así
+  que su nota perfecta es la del vecino más cercano —el peor reescalado que existe, el de los bordes
+  escalonados—, y mejorar contra ella empujaba hacia eso. La nitidez se juzga ahora contra una verdad
+  que se dibuja a propósito: se reduce, se vuelve a ampliar y se mide cuánto se alejó de lo que tenía
+  que ser, que es el procedimiento del sector y castiga de una vez el borrón, el dentado y el halo.
+  Con él, la imagen pasó de quedar un **30,4 %** más cerca de la verdad a quedar un **35,7 %**, con el
+  canto igual de fino y **menos** halo que antes: **ninguna comprobación se aflojó para conseguirlo**.
+  El afilado bajó, no subió, porque pasarse **aleja** de la verdad además de dibujar contornos; y el
+  reescalador ahora no puede aclarar ni oscurecer un punto más allá de lo que ya había a su alrededor,
+  que es como el fabricante de tarjetas describe su propio afilado. Se probó una versión que llegaba al
+  41,9 % y se descartó: dibujaba el contorno.
+
+- **Y quedó localizado por qué la imagen se llena de cuadros al subir la gamma**, que es un defecto
+  distinto y no del reescalado: el ajuste de tono se aplica con una tabla de 256 niveles, así que una
+  curva pronunciada manda tonos distintos al mismo valor y un degradado suave se convierte en parches
+  planos. Se nota sobre todo alrededor de letras claras en fondo oscuro. Está registrado con su
+  arreglo conocido y con la comprobación automática que le falta — ninguna había, y por eso lo
+  encontró una persona mirando una película.
+
 - **El razonamiento legal sobre los complementos de VideoLAN estaba cerrado y se ha reabierto, sin
   que nadie tocara una línea de código.** Decía que un complemento contagioso «encaja» dentro del
   programa porque ambos se encuentran en la misma versión de la licencia libre. El razonamiento era
