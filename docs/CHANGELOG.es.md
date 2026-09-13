@@ -10,6 +10,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Cada grupo de opciones está donde se decide y se puede devolver a sus valores de fábrica desde
+  dentro.** Los doce llevan su botón «Restaurar valores por defecto» dentro del propio grupo, en la
+  fila del título — nunca bajo los mandos, porque un botón que aparece y desaparece ahí mueve el
+  control que el ratón iba a pulsar.
+
+  **Tres bajaron de Ajustes al reproductor**, que es donde se deciden mirando algo: el estilo de los
+  subtítulos, los segundos que espera el siguiente episodio y la detección de intros. Se abren desde
+  el engranaje, sobre el vídeo, sin salir de la película. **Y el idioma salió de Apariencia a una
+  entrada propia**: es una elección que gobierna todas las pantallas, y así restaurar la apariencia
+  ya no puede cambiar el idioma de la interfaz de golpe.
+
+  **Ni las carpetas de la biblioteca ni las copias llevan botón, y es deliberado**: no guardan
+  ninguna preferencia, así que «devolverlas a sus valores de fábrica» habría sido vaciar la
+  biblioteca detrás de la palabra más inocente de la pantalla.
+
 - **El vídeo oscuro se puede aclarar, y era el defecto que de verdad molestaba.** Se midió un
   episodio real de la biblioteca del propietario y la respuesta no era la que se estaba
   construyendo: la imagen no está borrosa, está aplastada en negro. En cinco escenas del mismo

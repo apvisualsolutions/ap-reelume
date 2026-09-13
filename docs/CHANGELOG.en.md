@@ -10,6 +10,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Every group of options sits where it is decided and can be returned to its factory values from
+  within.** All twelve carry their «Restore default values» inside the group itself, in the heading
+  row — never under the controls, because a button that appears and disappears there moves the very
+  control the mouse was about to press.
+
+  **Three moved down from Settings into the player**, which is where they are decided while watching
+  something: the subtitle style, the seconds the next episode waits, and intro detection. They open
+  from the gear, over the video, without leaving the film. **And the language moved out of Appearance
+  into a destination of its own**: it is one choice that governs every screen, so restoring the
+  appearance can no longer switch the interface's language out from under somebody.
+
+  **Neither the library's folders nor the backups carry a button, and that is deliberate**: they
+  store no preference at all, so «returning them to their factory values» would have meant emptying
+  the library behind the most innocent word on the screen.
+
 - **Dark video can be lifted, and that was the defect actually getting in the way.** A real episode
   from the owner's own library was measured and the answer was not the one being built: the picture
   is not soft, it is crushed into black. Across five scenes of the same file the mean brightness ran

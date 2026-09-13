@@ -1,5 +1,69 @@
 # Where to pick up
 
+> ## FRONT NOTICE — 2026-09-13, afternoon: `UX-010` closed, and two of my own measurements were false
+>
+> **Read the tree first; it outranks this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here. At
+> closing time `main` and the branch were level, and every fast-forward was made on a green CI that
+> had been read.
+>
+> ### What was closed
+>
+> · **All of `UX-010`.** All twelve groups of options carry their «Restore default values» inside
+>   them, through one resource key, each asserted on the **stored** value and pressed by the walk.
+>   Three moved into the gear — subtitle style, next-episode countdown and segment detection — and
+>   the language moved out of Appearance into a destination of its own.
+> · **The gate, `OptionGroupTests`**, with the closed list that classifies every group and fails from
+>   both sides. Its pending ratchet **was deleted when it emptied**, which is what it said it would
+>   do.
+> · **The eleven places that said «fourteen»**, corrected to twelve by reading the list rather than
+>   the other way round.
+>
+> ### What turned out false when measured, with nobody else to say so
+>
+> · **«Two reset controls, none in a settings section»** was false in both halves: there were
+>   **four**, and the missing one is in Settings. It is the most deceiving of them because its button
+>   was already called `RestoreDefaultsButton` while saying a different key — which is why the gate
+>   asserts the key.
+> · **«The player's surface» cannot move down**: it is a read-only row with no control at all.
+> · **Neither the roots nor the backups are groups**, so `UX-010` **did not need** the destructive
+>   confirmation its criterion promised.
+> · **«The subtitle style does not fit 380 px» was MY OWN badly made measurement**, and it stood for
+>   a few hours with a redesign task behind it. The gate read `Bounds.Right`, relative to the parent
+>   and **blind to render transforms**: an icon inside a `Viewbox` measured 2,010 px in its own space
+>   and **twelve drawn**. With `TranslatePoint` against the band — which `ViewOverflowTests` already
+>   did — it fits with room to spare.
+>
+> ### Measured traps, three of them about instruments
+>
+> · **A double that cannot hold what it is given witnesses nothing.** «Restoring puts the theme back»
+>   passed with the theme line **deleted**, because that suite's double returns a constant and its
+>   `Apply` does nothing.
+> · **The floor preview does not warn about DROPS**, only about short floors and new files. Two CI
+>   reds got through that way, both on the branch that decides not to write when a group is already
+>   at its factory value. It does predict the new floor: it said 96/85 and the artefact said 96/85.
+> · **`ArchitectureTests` reads ALL of `src/`**, so it runs whenever `src/` changes: it caught three
+>   `RelayCommand`s that followed the tree's convention and were not declared in its list.
+> · **The height gate could not see the gear**: a view inside the player is reached through a
+>   `ContentControl` whose `Content` is a binding, so with no session it is in no tree at all. And
+>   widening it made it existential — one appearance under a `ScrollViewer` vouching for every
+>   mounting, including one with `IsVisible="False"`. It now asks about **all** of them and resolves
+>   containment upwards.
+> · **The `gate-auditor` found eleven blind spots across two passes**, eight with a surviving mutant,
+>   and one of them was propping up a task that was not needed. Running it **twice** — once per block
+>   of new gates — is what exposed them.
+>
+> ### Decided and NOT executed
+>
+> · **Exclude `.claude/worktrees/` from the documentation sweep**: running the auditor in a worktree
+>   turns `EvidenceLinkTests` red, because it treats those copies as project documents. Using the
+>   tool the repository recommends should not break a gate. It has a background task.
+> · **The scanning group governs nothing**: its two controls are fields with no store and no reader
+>   anywhere in `src/`. It was classified anyway — off the list, the day somebody wires them up a
+>   group is born the gate cannot see — but the defect stands.
+> · **`PLY-016` and `PLY-018` are still in progress**, and `PLY-018` still owes the per-frame cost
+>   figure its criterion promises.
+
 > ## READ THIS FIRST — 2026-09-13: `PLY-018` can be reached now, and the whole of `UX-010` is the next batch
 >
 > **Read the tree first; it outranks this document**: `git log --oneline -1 main`,
@@ -2114,7 +2178,6 @@
 > · **Instrumenting the walk and writing to a temp file costs 2m40 a pass** and answers things no
 >   isolated probe does, because the state that matters is built by 37 scenes.
 
-
 > ## HANDOVER — 2026-09-01, sixteenth session: the fidelity sweep, and a preference that drew every corner
 >
 > **It began as batch 1 of the previous handover** — pairing the ten button classes `ADR-0007` left
@@ -3432,7 +3495,6 @@ prototype draws 15: raising it moved the library entry **44 px** down in 6 of th
 because it wraps a line. The gain was **0.55 px** of ink. Eighty to one against. It is written into
 `ELEMENTS` with its number, so next time it is a decision and not a discovery.
 
-
 ### What the second pass added, and the two gates that came out of it
 
 **A gate born of my own slip.** Aligning the play moved its class in **three** views; with the cost
@@ -4124,7 +4186,6 @@ And a note for the next time a floor has to move: **the report CI measures merge
 local run of one of them.** `MovieDetailsViewModel` read 82.54 % measuring `UiTests` alone here and
 83 there, because the accessibility suite walks that file too. Measuring locally is worth it for the
 **direction** and for not spending a CI round blind; the number written into the file is CI's.
-
 
 `CompositionRoot.Library.cs` fell from the bar to 97/50 with the hooks this batch added, and **came
 back to the bar** as soon as the walk pressed its five arms: with no shell, with a card for a title

@@ -1,5 +1,65 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-13, tarde: `UX-010` cerrada, y dos mediciones mías eran falsas
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit. Al
+> cerrar, `main` y la rama quedaron al día, y cada fast-forward se hizo con CI en verde leído.
+>
+> ### Lo que se cerró
+>
+> · **`UX-010` entera.** Los doce grupos de opciones llevan su «Restaurar valores por defecto»
+>   dentro, todos por la misma clave de traducción, cada uno probado sobre el valor **guardado** y
+>   pulsado por el paseo. Tres bajaron al engranaje —estilo de subtítulos, cuenta atrás y detección
+>   de segmentos— y el idioma salió de Apariencia a un destino propio.
+> · **La puerta, `OptionGroupTests`**, con la lista cerrada que clasifica cada grupo y falla por los
+>   dos lados. Su trinquete de pendientes **se borró al vaciarse**, que es lo que decía que haría.
+> · **Los once sitios que decían «catorce»**, corregidos a doce leyendo la lista y no al revés.
+>
+> ### Lo que resultó falso al medirlo, y no lo dijo nadie más
+>
+> · **«Dos controles de restablecer, ninguno en una sección de ajustes»** era falso por sus dos
+>   mitades: eran **cuatro**, y el que faltaba está en Ajustes. Es el más engañoso porque su botón ya
+>   se llamaba `RestoreDefaultsButton` mientras decía otra clave — por eso la puerta afirma la clave.
+> · **«La superficie del reproductor» no puede bajar**: es una fila de sólo lectura sin un mando.
+> · **Ni las raíces ni las copias son grupos**, así que `UX-010` **no necesitaba** la confirmación
+>   destructiva que su criterio prometía.
+> · **«El estilo de subtítulos no cabe en 380 px» era una medición MÍA mal hecha**, y estuvo escrita
+>   unas horas con una tarea de rediseño detrás. La prueba leía `Bounds.Right`, relativo al padre y
+>   **ciego a las transformaciones de render**: un icono dentro de un `Viewbox` medía 2.010 px en su
+>   espacio y **doce dibujados**. Con `TranslatePoint` contra la banda —lo que `ViewOverflowTests` ya
+>   hacía— cabe de sobra.
+>
+> ### Trampas medidas, y tres son de instrumento
+>
+> · **Un doble que no guarda no atestigua nada.** «Restaurar devuelve el tema» pasaba con la línea
+>   del tema **borrada**, porque el doble de esa suite devuelve una constante y su `Apply` no hace
+>   nada.
+> · **La previsualización de suelos no avisa de BAJADAS**, sólo de suelos cortos y archivos nuevos.
+>   Por ahí se colaron dos rojos de CI seguidos, los dos por la rama que decide no escribir cuando el
+>   grupo ya está en su valor de fábrica. Sí predice el suelo nuevo: dijo 96/85 y el artefacto dijo
+>   96/85.
+> · **`ArchitectureTests` lee TODO `src/`**, así que se corre siempre que `src/` cambie: cazó tres
+>   `RelayCommand` que seguían la convención del árbol y no estaban declarados en su lista.
+> · **La puerta de altura no veía el engranaje**: una vista dentro del reproductor se alcanza por un
+>   `ContentControl` con `Content` enlazado, así que sin sesión no está en ningún árbol. Y al
+>   ampliarla nació existencial — una aparición bajo un `ScrollViewer` valía por todos los montajes,
+>   incluida una con `IsVisible="False"`—. Ahora pregunta por **todos** y resuelve hacia arriba.
+> · **El `gate-auditor` encontró once puntos ciegos en dos pasadas**, ocho con mutante que
+>   sobrevivía, y uno de ellos sostenía una tarea que no hacía falta. Lanzarlo **dos veces** —una por
+>   bloque de puertas nuevas— fue lo que lo destapó.
+>
+> ### Decidido y NO ejecutado
+>
+> · **Excluir `.claude/worktrees/` del barrido de documentos**: correr el auditor en un worktree pone
+>   roja `EvidenceLinkTests`, que trata sus copias como documentos del proyecto. Usar la herramienta
+>   que el repositorio recomienda no debería romper una puerta. Tiene tarea de fondo.
+> · **El grupo de escaneo no gobierna nada**: sus dos mandos son campos sin almacén y sin ningún
+>   lector en `src/`. Se clasificó igualmente —fuera de la lista, el día que alguien los cablee nace
+>   un grupo que la puerta no ve— pero el defecto sigue abierto.
+> · **`PLY-016` y `PLY-018` siguen en curso**, y `PLY-018` debe todavía la cifra de coste por
+>   fotograma que su criterio promete.
+
 > ## AVISO AL FRENTE — 2026-09-13: `PLY-018` ya se puede tocar, y `UX-010` entera es la tanda siguiente
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
@@ -2119,7 +2179,6 @@ callarlo. Informar sin adivinar.
 > · **Instrumentar el paseo y escribir a un archivo temporal cuesta 2m40 por pasada** y contesta cosas
 >   que ninguna sonda aislada contesta, porque el estado que importa lo construyen 37 escenas.
 
-
 > ## RELEVO — 2026-09-01, decimosexta sesión: el barrido de fidelidad, y una preferencia que dibujaba todas las esquinas
 >
 > **Empezó como la tanda 1 del relevo anterior** —emparejar las diez clases de botón que `ADR-0007`
@@ -3455,7 +3514,6 @@ aplicación admite— porque hace envolver una línea. La ganancia eran **0,55 p
 uno en contra. Está escrito en `ELEMENTS` con su número, para que la próxima vez sea una decisión y
 no un descubrimiento.
 
-
 ### Lo que la segunda ronda añadió, y las dos puertas que salieron de ella
 
 **Una puerta que nació de mi propio descuido.** Alinear el play movió su clase en **tres** vistas;
@@ -4154,7 +4212,6 @@ suites que una ejecución local de una sola.** `MovieDetailsViewModel` dio 82,54
 `UiTests` aquí y 83 allí, porque la suite de accesibilidad también recorre ese archivo. Medir en
 local sirve para saber la **dirección** y para no gastar una vuelta de CI a ciegas; el número que se
 escribe en el archivo es el de CI.
-
 
 `CompositionRoot.Library.cs` cayó de estar en el listón a 97/50 con los enganches que añadió esta
 tanda, y **volvió al listón** en cuanto el paseo presionó sus cinco arcos: sin shell, con una tarjeta
