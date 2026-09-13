@@ -412,7 +412,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ShortcutSettingsDescription">Every essential action has a shortcut. You can change them; a shortcut already in use is refused and names the action holding it.</x:String>
   <x:String x:Key="ShortcutSettingsListName">Shortcut list</x:String>
   <x:String x:Key="ShortcutSettingsCustomised">customised</x:String>
-  <x:String x:Key="ShortcutSettingsRestore">Restore initial values</x:String>
   <x:String x:Key="ResumePromptAccessibleName">Resume playback</x:String>
   <x:String x:Key="ResumePromptTitle">You left this part-way through. Continue where you stopped?</x:String>
   <x:String x:Key="ResumePromptResume">Continue</x:String>

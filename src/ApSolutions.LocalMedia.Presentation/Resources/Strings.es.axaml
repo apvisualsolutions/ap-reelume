@@ -412,7 +412,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="ShortcutSettingsDescription">Cada acción esencial tiene un atajo. Puedes cambiarlos; un atajo ya usado se rechaza indicando qué acción lo ocupa.</x:String>
   <x:String x:Key="ShortcutSettingsListName">Lista de atajos</x:String>
   <x:String x:Key="ShortcutSettingsCustomised">personalizado</x:String>
-  <x:String x:Key="ShortcutSettingsRestore">Restaurar valores iniciales</x:String>
   <x:String x:Key="ResumePromptAccessibleName">Reanudar reproducción</x:String>
   <x:String x:Key="ResumePromptTitle">Dejaste esto empezado. ¿Continuar donde lo dejaste?</x:String>
   <x:String x:Key="ResumePromptResume">Continuar</x:String>
