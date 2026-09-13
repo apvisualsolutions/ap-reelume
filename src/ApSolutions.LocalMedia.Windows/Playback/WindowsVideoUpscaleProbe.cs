@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -333,6 +334,15 @@ public static class WindowsVideoUpscaleProbe
             var without = Draw(devices, processor, inputView, outputView, output, staging, targetWidth, targetHeight);
             var controlRun = Draw(devices, processor, inputView, outputView, output, staging, targetWidth, targetHeight);
 
+            // The clock, and it runs here rather than around the three draws above: those copy 33 MB
+            // out to be compared pixel by pixel, which is the one thing in this probe that a playing
+            // film never does. Plain first — the extension is off at this point — and then with it on
+            // again, so what the vendor's enlargement COSTS can be read beside what it CHANGES.
+            var plainTiming = Time(devices, processor, inputView, outputView, output, staging);
+            _ = SetExtension(devices.VideoContext, processor, vendor, enable: true, out _, out _);
+            var enhancedTiming = Time(devices, processor, inputView, outputView, output, staging);
+            _ = SetExtension(devices.VideoContext, processor, vendor, enable: false, out _, out _);
+
             var pixels = new UpscalePixelComparison(
                 D3d11UpscaleFormats.CountDifferences(withExtension.Pixels, without.Pixels),
                 D3d11UpscaleFormats.CountDifferences(without.Pixels, controlRun.Pixels),
@@ -361,7 +371,11 @@ public static class WindowsVideoUpscaleProbe
                     : null,
                 filters,
                 pixels,
-                note);
+                note)
+            {
+                Plain = plainTiming,
+                Enhanced = enhancedTiming,
+            };
         }
         finally
         {
@@ -544,6 +558,74 @@ public static class WindowsVideoUpscaleProbe
                 // this probe. Reported as "not attempted" rather than as a failure.
                 return 1;
         }
+    }
+
+    /// <summary>
+    /// How many passes separate the two timings. Thirty rather than one, because one measurement
+    /// carries the read-back — 33 MB for a 4K surface — and the difference between two carries only
+    /// the passes that differ.
+    /// </summary>
+    private const int TimingExtraPasses = 30;
+
+    /// <summary>
+    /// Times the enlargement as it stands right now, twice, so the fixed cost can be subtracted.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A warm-up pass is thrown away first, and that is not ceremony: the first blt of a session
+    /// carries whatever the driver compiles or allocates on the way, and charging that to the
+    /// enlargement would report a cost no later frame pays.
+    /// </para>
+    /// <para>
+    /// Each timing ends in a read-back with <c>Map</c>, which is what makes the clock mean anything:
+    /// Direct3D hands work to the card and returns, so timing the blt alone times the handing over.
+    /// The pixels are not copied out — only the wait is needed — because copying them is the one part
+    /// of this that has nothing to do with playing a film.
+    /// </para>
+    /// </remarks>
+    private static UpscaleTiming Time(
+        Devices devices,
+        nint processor,
+        nint inputView,
+        nint outputView,
+        nint output,
+        nint staging)
+    {
+        _ = Sweep(devices, processor, inputView, outputView, output, staging, passes: 1);
+
+        return new UpscaleTiming(
+            Sweep(devices, processor, inputView, outputView, output, staging, passes: 1),
+            Sweep(devices, processor, inputView, outputView, output, staging, passes: 1 + TimingExtraPasses),
+            TimingExtraPasses);
+    }
+
+    private static TimeSpan Sweep(
+        Devices devices,
+        nint processor,
+        nint inputView,
+        nint outputView,
+        nint output,
+        nint staging,
+        int passes)
+    {
+        var stream = new VideoProcessorStream { Enable = 1, InputSurface = inputView };
+        var blt = Com.Method<VideoProcessorBltFn>(devices.VideoContext, 53);
+        var clock = Stopwatch.StartNew();
+
+        for (var pass = 0; pass < passes; pass++)
+        {
+            _ = blt(devices.VideoContext, processor, outputView, 0, 1, ref stream);
+        }
+
+        Com.Method<CopyResourceFn>(devices.Context, 47)(devices.Context, staging, output);
+        var mapped = new MappedSubresource();
+        if (Com.Method<MapFn>(devices.Context, 14)(devices.Context, staging, 0, MapRead, 0, ref mapped) >= 0)
+        {
+            Com.Method<UnmapFn>(devices.Context, 15)(devices.Context, staging, 0);
+        }
+
+        clock.Stop();
+        return clock.Elapsed;
     }
 
     private static (byte[] Pixels, int Result) Draw(

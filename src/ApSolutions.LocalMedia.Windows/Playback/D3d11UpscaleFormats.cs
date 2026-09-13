@@ -602,6 +602,21 @@ public sealed record StandardFilterOutcome(
     float EdgeEnhancementStrength);
 
 /// <summary>Everything one adapter answered about enlarging pictures.</summary>
+/// <summary>
+/// Two timings of the same enlargement that differ by <paramref name="ExtraPasses"/> passes, so the
+/// fixed cost around the work can be subtracted from it rather than charged to it.
+/// </summary>
+/// <param name="One">One pass, plus the read-back and the flush around it.</param>
+/// <param name="Many">One pass plus <paramref name="ExtraPasses"/> more, plus the same fixed cost.</param>
+/// <param name="ExtraPasses">How many passes separate the two timings.</param>
+/// <remarks>
+/// The raw timings travel rather than a verdict, and that is deliberate: what a cost means depends on
+/// the cadence of the film being played, which this probe does not know. <c>UpscaleCostPolicy</c> is
+/// what turns these into an answer, and it lives in the domain where it can be tested — measuring
+/// needs a graphics card, dividing does not.
+/// </remarks>
+public sealed record UpscaleTiming(TimeSpan One, TimeSpan Many, int ExtraPasses);
+
 public sealed record AdapterUpscaleProbe(
     string Description,
     uint VendorId,
@@ -611,5 +626,12 @@ public sealed record AdapterUpscaleProbe(
     VendorExtensionOutcome? Extension,
     StandardFilterOutcome? Filters,
     UpscalePixelComparison? Pixels,
-    string? Note);
+    string? Note)
+{
+    /// <summary>What one enlargement costs on this adapter with the vendor extension off.</summary>
+    public UpscaleTiming? Plain { get; init; }
+
+    /// <summary>The same, with the vendor extension on, so the price of turning it on can be read.</summary>
+    public UpscaleTiming? Enhanced { get; init; }
+}
 
