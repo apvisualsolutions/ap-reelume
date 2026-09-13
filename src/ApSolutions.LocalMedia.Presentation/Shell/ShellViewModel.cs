@@ -611,7 +611,16 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public PlaybackMode PlaybackMode
     {
         get => _playbackMode;
-        private set => SetField(ref _playbackMode, value);
+        private set
+        {
+            if (SetField(ref _playbackMode, value))
+            {
+                // The chrome stands beside the picture or it does not, and the mode is half of that
+                // answer. Without this the rail would keep its 64 px until something else happened
+                // to notify — which is the shape of a defect that looks intermittent.
+                OnPropertyChanged(nameof(IsShellChromeVisible));
+            }
+        }
     }
 
     public bool HasRestore => Restore is not null;
@@ -872,12 +881,37 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             if (SetField(ref _isChromeRevealed, value))
             {
                 OnPropertyChanged(nameof(IsPlayerColumnVisible));
+                OnPropertyChanged(nameof(IsShellChromeVisible));
             }
         }
     }
 
     /// <summary>The column is a panel somebody opened <b>and</b> chrome, so it answers to both.</summary>
     public bool IsPlayerColumnVisible => IsPlayerPanelOpen && _isChromeRevealed;
+
+    /// <summary>
+    /// Whether the rail, the title bar and the player's header stand <b>beside</b> the picture.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>In fullscreen they never do</b>, and that is the whole of what the owner reported twice.
+    /// The second time, on 2026-09-13: «la app entera se pone en pantalla completa, pero el vídeo
+    /// sigue en su marco, se ve el menú todo». Measured from the assembled shell: the picture came
+    /// back <b>1856 wide inside a 1920 window</b> and <b>1171 tall inside 1280</b> — the rail taking
+    /// 64 and the two headers 109.
+    /// </para>
+    /// <para>
+    /// It is not a new rule, it is <c>ADR-0010</c> applied where nobody had: <b>a state takes space
+    /// and an event floats</b>. Embedded, the chrome is a state and standing beside the picture is
+    /// right. In fullscreen it is an event, so it may appear over the picture but never take a pixel
+    /// from it — which is what every other player does and what «como cualquier reproductor» meant.
+    /// </para>
+    /// <para>
+    /// Revealing still happens on a pointer move, and still never un-does itself. That stays: the
+    /// alternative is a clock, and the reason against a clock is written above.
+    /// </para>
+    /// </remarks>
+    public bool IsShellChromeVisible => _isChromeRevealed && _playbackMode != PlaybackMode.Fullscreen;
 
     /// <summary>Brings everything back, and does nothing at all when it is already there.</summary>
     public void RevealChrome()

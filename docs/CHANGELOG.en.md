@@ -56,6 +56,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   this repository's characteristic defect — a test that goes blind instead of red — and the
   expression now recognises it, with the reason written beside it.
 
+- **In fullscreen the video really does fill the screen.** Until now the window did take the whole
+  display, but the side menu, the title bar and the player's header stayed there taking space from the
+  picture, so the video remained framed. Measured on the assembled application: the picture came back
+  **1856 wide inside a 1920 window** and **1171 tall inside 1280**. Those three now step aside for as
+  long as fullscreen lasts and come back on the way out; the playback controls stay visible because
+  they float **over** the picture, as in any other player.
+
+  **The owner reported it twice in the same words and the cause was different each time.** The first,
+  in August, was that nothing moved the window. This is the second, and **nothing saw it** because
+  every fullscreen check asked about the window's state or about the mode — the model, every time —
+  and **none asked how wide the picture ended up**. Now one does, with its floor: outside fullscreen it
+  checks that the menu **does** take space, so it cannot pass on an application that simply has no menu.
+
 - **The test that reads the credits screen asserted a string that matched in both languages by
   accident.** It checked "GPL-3.0", which reads the same in Spanish and English because it is an
   identifier; with «Licencia» and «Licence» that broke. It now checks the file name, which really is

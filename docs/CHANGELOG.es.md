@@ -57,6 +57,20 @@ evidencia, es [FEATURES.md](FEATURES.md).
   Es el defecto característico de esta casa —una prueba que se vuelve ciega en vez de roja—, y ahora
   la expresión lo reconoce, con el motivo escrito al lado.
 
+- **En pantalla completa el vídeo llena la pantalla de verdad.** Hasta ahora la ventana sí ocupaba
+  todo, pero el menú lateral, la barra de título y la cabecera del reproductor seguían ahí quitándole
+  sitio a la imagen, así que el vídeo se quedaba enmarcado. Medido sobre la aplicación montada: la
+  imagen salía **1856 de ancho en una ventana de 1920** y **1171 de alto en 1280**. Ahora esos tres se
+  apartan mientras dura la pantalla completa y vuelven al salir; los mandos de reproducción siguen
+  visibles porque flotan **sobre** la imagen, como en cualquier reproductor.
+
+  **El propietario lo reportó dos veces con la misma frase y la causa fue distinta cada vez.** La
+  primera, en agosto, era que nada movía la ventana. Ésta es la segunda, y **nada la vio** porque
+  todas las comprobaciones de pantalla completa preguntaban por el estado de la ventana o por el modo
+  —el modelo, siempre— y **ninguna preguntaba cuán ancha acababa la imagen**. Ahora hay una que sí, y
+  con su suelo: fuera de pantalla completa comprueba que el menú **sí** ocupa sitio, para que no pueda
+  pasar sobre una aplicación que simplemente no tuviera menú.
+
 - **La prueba que lee la pantalla de créditos comprobaba una cadena que coincidía en los dos idiomas
   por casualidad.** Afirmaba «GPL-3.0», que se escribe igual en español y en inglés por ser un
   identificador; con «Licencia» y «Licence» eso se rompía. Ahora comprueba el nombre del fichero,
