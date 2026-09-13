@@ -208,3 +208,41 @@ premisa**, y ninguna prueba automática puede avisarlo.
   terceros se comparan byte a byte y el nuestro solo se comprueba que exista. Un fichero truncado
   pasaría verde.
 - **El borrador de la licencia lleva siete puntos para un abogado** y no ha sido revisado por uno.
+
+### Y por qué el identificador nombra a la empresa y no al producto
+
+No fue una preferencia de estilo: lo impuso una regla que ya existía, y la descubrió CI en rojo.
+
+El primer intento fue `LicenseRef-AP-Reelume`, que mete la cadena «Reelume» dentro de **los 1.033
+archivos fuente**. `SqliteIsolationTests` prohíbe esa cadena —sin distinguir mayúsculas— en los cinco
+archivos que fijan la identidad interna: los cuatro contratos de datos de `Application/Data` y
+`Windows/AppDataPaths.cs`. **La razón de esa regla es del usuario, no del código**: la carpeta donde
+vive su biblioteca se deriva de `APSolutions\LocalMedia`, y si dependiera del nombre comercial,
+renombrar el producto movería la base de datos de todo el mundo.
+
+La regla era correcta y el identificador el equivocado. `LicenseRef-APSolutions` la respeta **y
+hereda la propiedad que se buscaba al quitarle la versión**: ahora ni cambiar las condiciones ni
+renombrar el producto tocan una sola cabecera. El nombre comercial vive en el título de `LICENSE`,
+que es donde puede cambiar sin arrastrar nada.
+
+**La lección, que es de las que vuelven**: al elegir una cadena que se va a escribir en cada archivo
+del árbol, hay que preguntar **qué guardas leen el árbol entero**. Aquí eran dos —`IDE0073` por la
+cabecera y esta por la identidad— y solo se había mirado la primera.
+
+### Un rojo de CI que no tenía nada que ver con la licencia, y viajó en el mismo commit
+
+`The_cost_of_one_enlarged_frame_is_measured_on_every_adapter` exigía que **al menos una** tarjeta
+fuera cronometrada. Su propio mensaje decía distinguir «no se midió nada» de «una máquina sin
+procesador de vídeo», y no lo hacía: un runner hospedado no tiene ninguno, así que la prueba solo
+podía pasar sobre un escritorio con gráfica. Verde aquí, roja allí, siempre.
+
+Ahora exige el cronómetro **solo a las tarjetas que alcanzaron su procesador de vídeo**, y cuando no
+hay ninguna exige que **cada adaptador declare por qué** — un «nada que medir» silencioso es
+indistinguible de una sonda que dejó de funcionar. Control por mutación: fingiendo que ninguna tarjeta
+tiene procesador, el suelo se dispara y nombra las dos de esta máquina.
+
+**Y el defecto de proceso que lo trajo**: el commit de la licencia se preparó con `git add -A` sobre
+un árbol que llevaba trabajo de PLY-016 a medias —siete archivos, entre ellos esa prueba—. La
+revisión del diff se hizo filtrando por número de líneas y **no los enseñó**, así que se anunciaron
+«25 archivos con cambios reales» cuando eran 32. Un `add -A` no es una revisión; la revisión es mirar
+la lista entera de lo que se va a commitear.
