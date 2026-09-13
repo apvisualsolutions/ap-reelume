@@ -22,6 +22,13 @@ huecos de la lista de abiertas son las que ya se cerraron y siguen abajo con su 
 apareciera con un número menor que la de encima sería una tarea colada en la cabecera para que se
 hiciera antes, y eso es lo que la guarda impide.
 
+**La antigüedad es el valor por defecto, no una cárcel.** El propietario puede poner una tarea delante
+de su turno, y entonces **la fila no se mueve de sitio** —la posición es la fecha de nacimiento, que es
+lo que se puede comprobar— sino que cambia de estado a `ADELANTADA` y dice **desde cuándo y por qué**.
+Decidido el 2026-09-13: sin eso, el orden le quitaría el volante a quien decide, y una prioridad que
+vive fuera del registro es una que nadie cuenta — que es el agujero que este fichero vino a tapar. La
+guarda exige el motivo, así que un adelanto silencioso no existe.
+
 Lo hace cumplir `TareasRegisterTests`, y comprueba lo que una persona olvida: que las fechas y los
 números van en orden ascendente hacia abajo, que cada fila lleva identificador, fecha y estado, que
 ningún identificador se repite entre las dos listas, y que una fila `PARADA` nombra qué la para.
@@ -31,6 +38,7 @@ ningún identificador se repite entre las dos listas, y que una fila `PARADA` no
 | Estado | Significado |
 | --- | --- |
 | `ABIERTA` | Nadie la ha empezado. |
+| `ADELANTADA` | El propietario la puso delante de su turno. **Va antes que cualquier `ABIERTA`**, y la fila dice desde cuándo y por qué. |
 | `EN CURSO` | Alguien está en ella ahora. |
 | `PARADA` | Hay un bloqueo nombrado. Se salta y se sigue leyendo. |
 | `DEL PROPIETARIO` | No se resuelve programando: dinero, una credencial, un aparato o una decisión suya. |
@@ -47,7 +55,7 @@ ningún identificador se repite entre las dos listas, y que una fila `PARADA` no
 | `ENG-009` | 2026-09-13 | `ABIERTA` | Usar la herramienta que el repositorio recomienda rompe una puerta. | Correr `gate-auditor` en un worktree pone roja `EvidenceLinkTests`, que trata sus copias como documentos del proyecto. Hay que excluir `.claude/worktrees/` del barrido. Costó una decisión de método el 2026-09-13: la auditoría se corrió sin worktree por esto. |
 | `ENG-010` | 2026-09-13 | `ABIERTA` | Dos mandos de Ajustes no gobiernan nada: quien los mueva no cambia nada y nada se lo dice. | El grupo de escaneo tiene dos mandos que son campos sin almacén y sin ningún lector en `src/`. Se clasificaron fuera de la lista de grupos de opciones, así que el día que alguien los cablee nace un grupo que la puerta no ve. |
 | `ENG-011` | 2026-09-13 | `ABIERTA` | La velocidad de reproducción se olvida al cerrar, y quien la cambie tiene que volver a ponerla cada vez. | `ControlPlayback` la guarda en memoria y no en la preferencia. Encontrado de paso al construir el engranaje. |
-| `ENG-013` | 2026-09-13 | `ABIERTA` | **Es lo que desbloquea publicar.** El paquete lleva un componente contagioso dentro de un programa propietario, y eso es un incumplimiento. | Compilar LibVLC y sus dependencias sin `--enable-gpl`, en las dos arquitecturas, y mantener esa compilación. Es infraestructura permanente, no una renuncia de formatos: la biblioteca que descodifica es permisiva por defecto y ningún decodificador está entre las piezas contagiosas. `ADR-0013` §5. Habilita además el kit de vídeo RTX de NVIDIA, que corre dentro del proceso. |
+| `ENG-013` | 2026-09-13 | `ADELANTADA` | **Es lo que desbloquea publicar.** Adelantada el 2026-09-13 por el propietario: eligió construir primero el escalador y dejar esto para la tanda siguiente, así que va antes que las `ABIERTA` que tiene encima. El paquete lleva un componente contagioso dentro de un programa propietario, y eso es un incumplimiento. | Compilar LibVLC y sus dependencias sin `--enable-gpl`, en las dos arquitecturas, y mantener esa compilación. Es infraestructura permanente, no una renuncia de formatos: la biblioteca que descodifica es permisiva por defecto y ningún decodificador está entre las piezas contagiosas. `ADR-0013` §5. Habilita además el kit de vídeo RTX de NVIDIA, que corre dentro del proceso. |
 | `ENG-014` | 2026-09-13 | `ABIERTA` | Tres afirmaciones de los documentos sobre esos complementos son falsas o incompletas, así que quien empiece `ENG-013` empieza con datos malos. | Medido en los binarios: `libswscale_plugin.dll` **también** lleva `--enable-gpl`, en x64 y en ARM64, y no lo nombra ningún documento — son dos y no uno. `libx26410b_plugin.dll` tiene **cero** ocurrencias de esa cadena, mientras cuatro documentos lo presentan como «el ejemplo más claro». Y la medición del 2026-09-13 **no dejó evidencia archivada**: ni comando, ni salida, ni los nombres de los «tres complementos de control» que la frase cita. |
 | `ENG-015` | 2026-09-13 | `ABIERTA` | La cabecera de un trinquete se contradice con el trinquete, así que engaña a quien la lea. | `eng/walk-pending.txt` dice «the ratchet is 20» y «the twenty below» mientras `eng/check-walk-coverage.ps1` dice 23. El texto se quedó en la subida del 2026-09-02. Cuidado: hay un hook que rechaza escribir ese fichero, y `CLAUDE.md` escribe el número también. |
 | `ENG-016` | 2026-09-13 | `ABIERTA` | La previsualización de suelos de cobertura da un falso silencio, y por ahí se cuela un rojo de CI. | `eng/preview-coverage-floors.ps1:204` busca archivos nuevos con `git diff --diff-filter=A`, que sólo nombra los que están **en un commit**. Medido el 2026-09-13: con tres ficheros nuevos sin commitear dijo «nada se queda corto» y dos de los tres estaban por debajo de 96/96. Hay que ensanchar la búsqueda, no estrecharla. |

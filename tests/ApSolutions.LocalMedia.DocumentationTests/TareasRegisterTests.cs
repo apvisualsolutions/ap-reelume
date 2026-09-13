@@ -53,7 +53,19 @@ public sealed class TareasRegisterTests
         RegexOptions.Compiled);
 
     private static readonly string[] Statuses =
-        ["`ABIERTA`", "`EN CURSO`", "`PARADA`", "`DEL PROPIETARIO`", "`POR COMPROBAR`"];
+    [
+        "`ABIERTA`",
+        "`ADELANTADA`",
+        "`EN CURSO`",
+        "`PARADA`",
+        "`DEL PROPIETARIO`",
+        "`POR COMPROBAR`",
+    ];
+
+    /// <summary>What an <c>ADELANTADA</c> row has to say about being moved ahead of its turn.</summary>
+    private static readonly Regex Overtaking = new(
+        @"Adelantada el \d{4}-\d{2}-\d{2} por el propietario",
+        RegexOptions.Compiled);
 
     /// <summary>
     /// The register exists and carries rows, which is the floor every assertion below needs.
@@ -144,6 +156,41 @@ public sealed class TareasRegisterTests
             duplicates.Length == 0,
             $"These identifiers appear more than once: {string.Join(", ", duplicates)}. A closed task "
                 + "keeps its number and a new one takes the next.");
+    }
+
+    /// <summary>
+    /// A task moved ahead of its turn says when, and by whom, and therefore why.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The owner decided on 2026-09-13 that his own priority beats the age order — the age order is the
+    /// default, not a cage — and that the overtake has to be <b>written</b>. Both halves matter: without
+    /// the first he loses the wheel on his own work, and without the second a priority lives outside the
+    /// register, which is exactly the hole this file was created to close.
+    /// </para>
+    /// <para>
+    /// The row does not move up the list. Position is birth order, which is checkable; the status is
+    /// what says «do this first». So an overtake can never be confused with a row queued ahead of its
+    /// turn, and the test above keeps working unchanged.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_task_moved_ahead_of_its_turn_says_when_and_by_whom()
+    {
+        var (open, _) = ReadRows();
+
+        var silent = open
+            .Where(row => row.Status == "`ADELANTADA`")
+            .Where(row => !Overtaking.IsMatch(row.Line))
+            .Select(row => row.Id)
+            .ToArray();
+
+        Assert.True(
+            silent.Length == 0,
+            $"These rows were moved ahead of their turn without saying when or by whom: "
+                + $"{string.Join(", ", silent)}. The row has to carry «Adelantada el AAAA-MM-DD por el "
+                + "propietario», or three batches from now nobody knows whether it was a decision or a "
+                + "slip.");
     }
 
     /// <summary>A task that is stopped says what stops it.</summary>
