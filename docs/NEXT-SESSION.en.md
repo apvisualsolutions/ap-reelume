@@ -1,5 +1,21 @@
 # Where to pick up
 
+> **WHAT IS STILL OPEN DOES NOT LIVE HERE, as of 2026-09-13.** This document records **what happened**
+> in each batch of work, most recent first. What remains to be done lives in two places and only two:
+>
+> · **[FEATURES.md](FEATURES.md)** — the scope, what the program does for whoever uses it. Read it with
+>   `pwsh -NoProfile -File eng/list-pending.ps1`, which counts two ways and refuses to print if the two
+>   disagree.
+> · **[TAREAS.md](TAREAS.md)** — the chores, the gates, the debt, the defects and the unmeasured
+>   questions. **Oldest at the top**, and you take the first one that is not `PARADA`.
+>
+> **The «decisions taken and NOT executed» blocks further down are history**, not a list of open work.
+> They were reconciled on 2026-09-13: thirty bullets across ten blocks, with the done and the open
+> mixed together and nobody counting them — `UX-010` lived there, was built in full, and its bullet was
+> still written as pending. The ones still open are numbered rows in `TAREAS.md` today. They were not
+> deleted from here, because this document is the record of what happened, and rewriting what happened
+> is a different kind of mistake.
+
 > ## FRONT NOTICE — 2026-09-13, evening: the program stopped being free software, and CI was left running
 >
 > **Read the tree first; it outranks this document**: `git log --oneline -1 main`,

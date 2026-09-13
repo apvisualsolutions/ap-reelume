@@ -236,7 +236,21 @@ El relevo (`NEXT-SESSION`) tiene que llevar, además del trabajo hecho:
   **dos veces en una tarde**, la segunda al «corregirlo» poniendo el SHA de entonces. Lo que se pone
   es cómo leerlo —`git log --oneline -1 main`— y lo que sí aguanta: que quedaron al día, y que cada
   fast-forward se hizo con CI en verde;
-- **las decisiones tomadas y NO ejecutadas**, que es lo que nadie puede deducir del diff;
+- **dónde quedó cada decisión tomada y NO ejecutada, no la decisión misma.** Hasta el 2026-09-13 el
+  relevo las llevaba dentro, y eso lo convirtió en un segundo backlog: diez bloques, treinta viñetas,
+  con lo hecho y lo abierto mezclados y **nadie contándolo** — `UX-010` vivió ahí, se construyó
+  entera, y la viñeta seguía escrita como pendiente. Ahora una decisión que no se ejecuta se registra
+  en el sitio que la puede contar, **en la misma tanda en que se decide**:
+  - **si es alcance** —algo que el programa hará para quien lo usa— una fila de `docs/FEATURES.md`
+    con su estado, su criterio y su evidencia;
+  - **si es una faena, una puerta, deuda, un defecto o una pregunta sin medir** — una fila de
+    `docs/TAREAS.md`, al final de la lista, con el número siguiente. **La más vieja arriba y lo nuevo
+    por abajo**: es la regla del propietario, porque quien lee un backlog lee de arriba abajo y no
+    llega al final, así que con lo nuevo arriba lo viejo no se hace nunca. Lo vigila
+    `TareasRegisterTests`.
+
+  El relevo la nombra con su identificador y sigue. Escribirla otra vez entera es tener la misma
+  tarea en dos sitios, y las dos copias se separan a la primera;
 - **lo que está bloqueado por algo que no es código** —hardware, una firma, una respuesta de un
   tercero—, porque eso no se resuelve programando y conviene que se vea pronto;
 - **las trampas medidas** que costaron tiempo esta vez.

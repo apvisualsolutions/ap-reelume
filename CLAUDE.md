@@ -81,9 +81,23 @@ sobre dos píxeles de desalineación visible por medir el modelo en vez de la ti
    leyendas del propio documento, cuenta las filas por dos caminos distintos y exige que cuadren, y
    ante cualquier fila que no entienda **se niega a imprimir** en vez de imprimir una lista más
    corta. Acepta `-Target MVP` y `-Json`.
-2. [docs/NEXT-SESSION.es.md](docs/NEXT-SESSION.es.md) — dónde se retomó por última vez.
-3. [CONTRIBUTING.md](CONTRIBUTING.md) — el ciclo de trabajo, que no es opcional.
-4. [docs/legal/LEGAL.es.md](docs/legal/LEGAL.es.md) — lo que está resuelto y lo que sigue abierto.
+2. [docs/TAREAS.md](docs/TAREAS.md) — **lo que la matriz no puede llevar**: faenas, puertas, deuda,
+   defectos y preguntas sin medir. **La más vieja arriba**, y se toma la primera que no esté `PARADA`.
+
+   La regla del orden es del propietario y tiene guarda —`TareasRegisterTests` exige que las fechas y
+   los números suban hacia abajo—, porque quien lee un backlog **lee de arriba abajo y no llega al
+   final**: con lo nuevo arriba, lo viejo no se hace nunca y entran tareas sin acabar las de antes.
+
+   Existe desde el 2026-09-13 y nació de un defecto: el relevo llevaba las decisiones no ejecutadas
+   dentro, un bloque por tanda, y eso era un segundo backlog — **treinta viñetas en diez bloques, con
+   lo hecho y lo abierto mezclados y nadie contándolo**. `UX-010` vivió ahí, se construyó entera, y la
+   viñeta seguía escrita como pendiente. Lo que es alcance sigue en la matriz y **aquí sólo se nombra**,
+   o vuelve el mismo problema con otro nombre.
+3. [docs/NEXT-SESSION.es.md](docs/NEXT-SESSION.es.md) — dónde se retomó por última vez. **Cuenta qué
+   pasó, no qué queda**: sus bloques de «decisiones tomadas y NO ejecutadas» son historia desde el
+   2026-09-13.
+4. [CONTRIBUTING.md](CONTRIBUTING.md) — el ciclo de trabajo, que no es opcional.
+5. [docs/legal/LEGAL.es.md](docs/legal/LEGAL.es.md) — lo que está resuelto y lo que sigue abierto.
 
 ## Arranque
 

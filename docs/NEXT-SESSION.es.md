@@ -1,5 +1,21 @@
 # Dónde retomar
 
+> **LO PENDIENTE NO VIVE AQUÍ, desde el 2026-09-13.** Este documento cuenta **qué pasó** en cada
+> tanda, la más reciente arriba. Lo que queda por hacer está en dos sitios y sólo en dos:
+>
+> · **[FEATURES.md](FEATURES.md)** — el alcance, lo que el programa hace para quien lo usa. Se lee con
+>   `pwsh -NoProfile -File eng/list-pending.ps1`, que cuenta por dos caminos y se niega a imprimir si
+>   no cuadran.
+> · **[TAREAS.md](TAREAS.md)** — las faenas, las puertas, la deuda, los defectos y las preguntas sin
+>   medir. **La más vieja arriba**, y se toma la primera que no esté `PARADA`.
+>
+> **Los bloques de «decisiones tomadas y NO ejecutadas» que hay más abajo son historia**, no una lista
+> de pendientes. Se reconciliaron el 2026-09-13: eran treinta viñetas en diez bloques, con lo hecho y
+> lo abierto mezclados y nadie contándolo — `UX-010` vivió ahí, se construyó entera, y la viñeta
+> seguía escrita como pendiente. Las que seguían abiertas son hoy filas con número en `TAREAS.md`. No
+> se borraron de aquí porque este documento es el registro de lo que pasó, y reescribir lo que pasó es
+> otra clase de error.
+
 > ## AVISO AL FRENTE — 2026-09-13, noche: el programa dejó de ser libre, y CI quedó corriendo
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
