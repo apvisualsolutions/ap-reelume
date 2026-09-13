@@ -204,6 +204,43 @@ una cuenta de líneas.
 empujar, y el suelo se copia del artefacto `coverage-debt` del run que lo mida — nunca de una
 ejecución local.
 
+## Medido en la aplicación real el 2026-09-13, que cierra el hueco que este documento declaraba
+
+Esta evidencia decía que el shader se había probado sobre un lienzo **por software** mientras la
+aplicación usa la tarjeta, y que esa diferencia **no estaba medida**. Ya lo está, y por el camino que
+el propietario pidió: mirándola.
+
+**El shader corre también en la ruta de la tarjeta.** Se capturó la ventana a 3840×2160 con unos
+créditos en pantalla —cantos duros, que es lo único que puede contestar esta pregunta— y se leyó el
+perfil de los bordes más fuertes. Dos, de doce mil hallados:
+
+```
+55, 30,  5, 17,  66, 114, 163, 211, 250, 242, 233, 224, 215
+52, 23,  0, 29,  77, 125, 173, 221, 241, 235, 229, 223, 216
+```
+
+**El lado oscuro baja a 5 y a 0 cuando sus mesetas son 30 y 23; el claro sube a 250 y 241 cuando las
+suyas son 224 y 216.** Eso es rebase por los dos lados pegado al canto, que es la firma de una máscara
+de desenfoque y algo que un remuestreo bilineal o cúbico **no puede producir**: ninguno se pasa de los
+extremos que tiene delante. Descartada, por tanto, la hipótesis de que el shader no compilara en la
+ruta de la tarjeta y la operación cayera al cúbico sin decirlo.
+
+**Y la misma medición dice dónde está el techo de la técnica.** Con el realce puesto, el canto de una
+letra sigue repartiéndose sobre **cinco píxeles** (`17, 66, 114, 163, 211`): la máscara empina los
+extremos y **no estrecha el centro de la transición**. Sube el contraste donde ya hay un borde y no
+reconstruye nada. El juicio del propietario —«se nota poco, sigue medio borroso»— es exactamente eso,
+y la salida es un escalador adaptativo a la dirección del borde, no subir la fuerza de éste.
+
+**Un aviso sobre el instrumento, que costó dos intentos.** Sobre un fotograma de película normal la
+pregunta **no se puede contestar**: se barrieron 1.300 filas de una escena nocturna y el borde más
+fuerte de todas saltaba **44 niveles repartidos sobre 6 o 7 píxeles**, con un rebase de 2. Sobre una
+rampa así una máscara de desenfoque no tiene nada que amplificar, de modo que «corre y no se nota» y
+«no corre» dan **la misma lectura**. Es la lección del primario saturado con otra cara: una medición
+necesita un caso capaz de **mostrar** la diferencia, y aquí ese caso son los créditos.
+
+**Y de paso queda medido cuánto de lo borroso está en el archivo**: 44 niveles sobre 6 píxeles es un
+fotograma casi sin contenido de alta frecuencia. Ningún escalador recupera lo que no está.
+
 ## Lo que NO se puede afirmar todavía
 
 - **La mitad del fabricante no puede llegar a un fotograma en esta arquitectura.** Lo medido es que
@@ -221,7 +258,11 @@ ejecución local.
   propiedad de layout durante el pase de dibujado invalida la medida desde dentro del commit del
   compositor y lanza—, así que tiene que avisar de forma diferida y sólo cuando el eslabón cambie.
 - **El juicio visual final lo firma el propietario**, que es parte del criterio y ninguna prueba lo
-  sustituye.
+  sustituye. **Firmado el 2026-09-13, y es un «todavía no»**: «se nota poco, algo mejoró pero sigue
+  medio borroso». La medición de arriba le da la razón y explica por qué — la máscara empina los
+  extremos del canto y no estrecha su centro—, así que `PLY-016` sigue `IN_PROGRESS` y lo que falta es
+  un escalador adaptativo a la dirección del borde. **Subir la fuerza de éste no es la salida**: su
+  puerta del halo ya la acota, y sobre material real el rebase medido es de 25 niveles.
 
 ---
 
@@ -316,6 +357,35 @@ The three new files at **100/100**, merged with the gate's arithmetic. Reaching 
 seam: `UpscaleDrawPlan` is pure and fully asserted, and `[ExcludeFromCodeCoverage]` covers only
 `DrawThroughCanvas`. **`VideoFrameView.cs` rises from 100/89 to 100/94** and the gate will ask for its
 new floor, which is copied from a CI `coverage-debt` artefact and never from a local run.
+
+### Measured in the real application on 2026-09-13, closing this document's own gap
+
+This evidence said the shader had been proven on a **software** canvas while the application uses the
+card, and that the difference was **not measured**. It is now, by the route the owner asked for:
+looking at it. The window was captured at 3840×2160 with credits on screen — hard edges, the only
+thing that can answer this — and the strongest edge profiles read:
+
+```
+55, 30,  5, 17,  66, 114, 163, 211, 250, 242, 233, 224, 215
+52, 23,  0, 29,  77, 125, 173, 221, 241, 235, 229, 223, 216
+```
+
+The dark side drops to 5 and to 0 against plateaus of 30 and 23; the light side climbs to 250 and 241
+against 224 and 216. **That is overshoot on both sides of the edge — an unsharp mask's signature, and
+something bilinear or cubic resampling cannot produce**, because neither overshoots the extremes it is
+given. So the shader runs on the card's path too, and the hypothesis that it silently fell to cubic
+there is dead.
+
+The same reading shows the technique's ceiling: with the sharpening applied, a letter's edge still
+spreads over **five pixels**. The mask steepens the ends and does not narrow the middle of the
+transition. «It barely shows, still soft» is exactly that, and the way out is an edge-adaptive
+upscaler rather than a stronger mask.
+
+**And a warning about the instrument, which cost two attempts**: on an ordinary film frame the
+question **cannot be answered**. Sweeping 1,300 rows of a night scene, the strongest edge anywhere
+jumped **44 levels spread over 6 or 7 pixels** with an overshoot of 2. On a ramp that gentle a mask has
+nothing to amplify, so «running and not showing» and «not running» read identically. A measurement
+needs a case that can *show* the difference — here, the credits.
 
 ### What cannot be claimed yet
 
