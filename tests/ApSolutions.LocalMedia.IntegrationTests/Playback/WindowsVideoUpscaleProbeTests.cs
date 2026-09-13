@@ -359,8 +359,93 @@ public sealed class WindowsVideoUpscaleProbeTests
             + FormattableString.Invariant($" control={Number(probe.Pixels?.ControlDifferingBytes)}")
             + FormattableString.Invariant($" total={Number(probe.Pixels?.TotalBytes)}")
             + FormattableString.Invariant($" distinct={Number(probe.Pixels?.DistinctValues)}")
-            + $" worst_blt={Hresult(probe.Pixels?.WorstBltResult)}"));
+            + $" worst_blt={Hresult(probe.Pixels?.WorstBltResult)}"
+            + Timing(probe)));
         File.WriteAllLines(Path.Combine(directory, "d3d11-upscale-probe.txt"), summary);
+    }
+
+    /// <summary>
+    /// What one enlarged frame costs on each adapter, and whether it leaves room for the rest of the
+    /// frame (PLY-016, and the figure PLY-018's criterion owes).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Two timings and a subtraction, which is what separates the enlargement from the 33 MB
+    /// read-back around it — the arithmetic lives in <c>UpscaleCostPolicy</c>, where it is tested on
+    /// any machine, and only the clock is here.
+    /// </para>
+    /// <para>
+    /// <b>What this asserts is that a measurement happened at all</b>, not a ceiling: a cost is a
+    /// property of the card in front of it, and failing a machine for being slow would fail the
+    /// machines this feature is for. The ceiling is reported so a person can read it.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_cost_of_one_enlarged_frame_is_measured_on_every_adapter()
+    {
+        var decision = UpscalePolicy.Decide(SourceWidth, SourceHeight, 3840, 2160);
+        var probes = WindowsVideoUpscaleProbe.ProbeAll(
+            SourceWidth, SourceHeight, decision.TargetWidth, decision.TargetHeight);
+
+        var timed = probes.Where(probe => probe.Plain is not null).ToArray();
+        Assert.True(
+            timed.Length > 0,
+            $"none of the {probes.Count} adapters was timed, so this measured nothing rather than "
+                + "finding a machine without a video processor.");
+
+        foreach (var probe in timed)
+        {
+            var plain = probe.Plain!;
+
+            // The clock ran: a zero here is a Stopwatch that never started, which reads exactly like
+            // an enlargement that costs nothing and is a different answer entirely.
+            Assert.True(
+                plain.One > TimeSpan.Zero,
+                $"{probe.Description} reported a single pass taking no time at all, so the clock is "
+                    + "not being read rather than the card being instant.");
+
+            // And the extra passes cost something: many passes measuring the same as one is the
+            // shape of a loop that was optimised away or a blt that never reached the card.
+            Assert.True(
+                plain.Many > plain.One,
+                $"{probe.Description} took {plain.Many.TotalMilliseconds:0.###} ms for "
+                    + $"{1 + plain.ExtraPasses} passes and {plain.One.TotalMilliseconds:0.###} ms for one, "
+                    + "so the extra passes did nothing measurable.");
+
+            var cost = UpscaleCostPolicy.MeasureDifference(
+                plain.Many, plain.One, plain.ExtraPasses, CinemaFramesPerSecond);
+            Assert.True(
+                cost.PerFrame > TimeSpan.Zero,
+                $"{probe.Description} produced two timings that subtract to nothing.");
+        }
+    }
+
+    /// <summary>
+    /// The cadence this cost is judged against: 24, which is what a film carries and the tightest of
+    /// the cadences a library of series and films actually holds.
+    /// </summary>
+    private const double CinemaFramesPerSecond = 24;
+
+    private static string Timing(AdapterUpscaleProbe probe)
+    {
+        if (probe.Plain is not { } plain)
+        {
+            return " cost=not timed";
+        }
+
+        var plainCost = UpscaleCostPolicy.MeasureDifference(
+            plain.Many, plain.One, plain.ExtraPasses, CinemaFramesPerSecond);
+        var enhanced = probe.Enhanced is { } on
+            ? UpscaleCostPolicy.MeasureDifference(on.Many, on.One, on.ExtraPasses, CinemaFramesPerSecond)
+            : default;
+
+        return FormattableString.Invariant(
+            $" cost_plain_ms={plainCost.PerFrame.TotalMilliseconds:0.###}")
+            + FormattableString.Invariant($" share_plain={plainCost.FrameBudgetShare:0.###}")
+            + FormattableString.Invariant($" fits_plain={plainCost.FitsBudget}")
+            + FormattableString.Invariant($" cost_enhanced_ms={enhanced.PerFrame.TotalMilliseconds:0.###}")
+            + FormattableString.Invariant($" share_enhanced={enhanced.FrameBudgetShare:0.###}")
+            + FormattableString.Invariant($" fits_enhanced={enhanced.FitsBudget}");
     }
 
     private static string Number(long? value) =>
