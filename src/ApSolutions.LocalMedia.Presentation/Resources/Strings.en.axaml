@@ -215,11 +215,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="PrivacyNoHostsDescription">Nothing leaves this machine.</x:String>
   <x:String x:Key="DiagnosticsEmptyFieldsNotice">Paths, file names, titles and history are listed empty so you can see they are not collected, not that they are omitted.</x:String>
   <x:String x:Key="TransportSpeedResetAction">Back to 1×</x:String>
-  <!-- The gear over the picture and the one group inside it so far (PLY-018, ADR-0012). The button
-       that puts a group back is ONE key for all of them by decision, so that fourteen groups cannot
-       drift apart even in translation — comparing the text would let two keys with the same words
-       through, which is exactly how «Volver a 1×» and «Restaurar campos del proveedor» came to live
-       side by side for the same idea. -->
+  <!-- The button that puts a group back is ONE key for all of them by decision (UX-010, ADR-0012),
+       so that the groups cannot drift apart even in translation — comparing the text would let two
+       keys with the same words through, which is exactly how «Volver a 1×» and «Restaurar campos
+       del proveedor» came to live side by side for the same idea.
+       How many groups there are is NOT written here: it is read off `Groups` in OptionGroupTests,
+       which is the gate that counts them. This comment said «fourteen» until 2026-09-13, when
+       measuring gave twelve — a number copied into a comment is a number nobody measures again. -->
   <x:String x:Key="RestoreDefaultsAction">Restore default values</x:String>
   <x:String x:Key="PlayerSettingsAction">Player settings</x:String>
   <x:String x:Key="PlayerSettingsBackAction">Back to the settings</x:String>
