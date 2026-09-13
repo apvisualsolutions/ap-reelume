@@ -14,12 +14,33 @@ SPDX-License-Identifier: GPL-3.0-or-later
        section on this page shares. Without it this one started 158 px to the left of the others. -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
   <StackPanel x:Name="ShortcutSettingsSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
-    <TextBlock
-        FontSize="{DynamicResource FontSizeSubtitle}"
-        FontWeight="SemiBold"
-        Foreground="{DynamicResource TextPrimaryBrush}"
-        Text="{DynamicResource ShortcutSettingsAccessibleName}"
-        automation:AutomationProperties.HeadingLevel="2" />
+    <!--
+      UX-010: the button that puts this group back sits inside the group, and in its heading row for
+      the reason PictureAdjustmentView already carries — under a list that grows, it would be pushed
+      past the first viewport, and the walk's hit testing does not follow a scrolled panel.
+    -->
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeSubtitle}"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource ShortcutSettingsAccessibleName}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <!--
+        Always offered, where the picture group offers its own only while something is away from
+        neutral. The difference is not a preference: nothing in this application rebinds a shortcut
+        yet — the model's TryRebind reaches no view — so a button that appeared only once something
+        was customised could never be pressed at all, and an unpressable control raises the walk's
+        ratchet, which only comes down.
+      -->
+      <Button
+          x:Name="RestoreDefaultsButton"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+          Command="{Binding RestoreDefaultsCommand}"
+          Content="{DynamicResource RestoreDefaultsAction}" />
+    </Grid>
     <TextBlock
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{DynamicResource ShortcutSettingsDescription}"
@@ -87,12 +108,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
         Foreground="{DynamicResource TextPrimaryBrush}"
         Text="{Binding ConflictMessage}"
         TextWrapping="Wrap" />
-
-    <Button
-        x:Name="RestoreDefaultsButton"
-        automation:AutomationProperties.Name="{DynamicResource ShortcutSettingsRestore}"
-        Command="{Binding RestoreDefaultsCommand}"
-        Content="{DynamicResource ShortcutSettingsRestore}" />
   </StackPanel>
   </Border>
 </UserControl>

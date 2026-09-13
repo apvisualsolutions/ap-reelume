@@ -150,7 +150,7 @@ public sealed class OptionGroupTests
             OptionPlace.Settings,
             "SettingsSection.Shortcuts",
             "ShortcutSettingsView",
-            null,
+            "RestoreDefaultsButton",
             "A key map is learned once and used everywhere."),
         ["Lifecycle"] = new(
             OptionPlace.Settings,
@@ -233,15 +233,13 @@ public sealed class OptionGroupTests
             + "Appearance today and needs a rail entry of its own.",
         ["Scanning"] = "No button yet.",
         ["Recommendations"] = "No button yet.",
-        ["Shortcuts"] = "It has a button, and it says ShortcutSettingsRestore rather than the one "
-            + "key every group shares — which is the very drift this rule exists to stop.",
         ["Lifecycle"] = "No button yet.",
         ["Privacy"] = "No button yet.",
         ["Updates"] = "No button yet.",
     };
 
     /// <summary>The ratchet over <see cref="Pending"/>, which only ever comes down.</summary>
-    private const int MaximumPending = 11;
+    private const int MaximumPending = 10;
 
     /// <summary>
     /// Every resource key in the tree shaped like a reset, and what kind of thing each one undoes.
@@ -259,9 +257,6 @@ public sealed class OptionGroupTests
             + "a group — see TransportControlsView in the rejections.",
         ["MetadataRestoreAction"] = "«Restaurar campos del proveedor» puts one title's record back "
             + "to what TMDB says, which is refetching data rather than restoring a preference.",
-        ["ShortcutSettingsRestore"] = "«Restaurar valores iniciales» on the shortcuts, and it is "
-            + "the drift itself: a fifth name for this idea, on the one group in Settings that did "
-            + "have a button. It is folded into the shared key and this entry goes with it.",
     };
 
     /// <summary>The one key every group's button says it with.</summary>

@@ -1087,9 +1087,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Atajos de teclado in the settings index never opened its section");
         Assert.Equal(SettingsSection.Shortcuts, host.ViewModel.CurrentSettingsSection);
 
+        // UX-010: the one key every group's reset says it with, folded in here on 2026-09-13. The
+        // identity the ledger records changes from ShortcutSettingsRestore to RestoreDefaultsAction
+        // and the count does not, because the button is the same button in the same view.
         await PressAsync(
             host,
-            "ShortcutSettingsRestore",
+            "RestoreDefaultsAction",
             () => shortcuts.Resolve(new KeyGesture(Key.F9)),
             "clicking Restore defaults never gave the rebound key back");
         Assert.Null(shortcuts.Resolve(new KeyGesture(Key.F9)));
