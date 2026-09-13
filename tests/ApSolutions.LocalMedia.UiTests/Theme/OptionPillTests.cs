@@ -107,7 +107,11 @@ public sealed class OptionPillTests
         var page = new AppearanceSettingsViewModel(theme, language, appearance);
         using var scope = new Scope(new AppearanceSettingsView { DataContext = page });
 
-        object[] inForce = [ThemePreference.System, InterfaceDensity.Comfortable, CornerRounding.Soft, "es"];
+        // Three rows since 2026-09-13, where there were four: the language left this page for a
+        // destination of its own (UX-010) and is measured below, on the view it moved to. Measured
+        // where it went rather than dropped, because a list that only got shorter would read the
+        // same whether the pills moved or stopped painting.
+        object[] inForce = [ThemePreference.System, InterfaceDensity.Comfortable, CornerRounding.Soft];
         Assert.Equal(Ordered(inForce), scope.Chosen());
 
         foreach (var value in Enum.GetValues<ThemePreference>())
@@ -134,10 +138,29 @@ public sealed class OptionPillTests
             Assert.Equal(Ordered(inForce), scope.Chosen());
         }
 
+    }
+
+    /// <summary>
+    /// The language pills, on the view they moved to, and the same grammar: the one in force wears
+    /// the chosen edge and the other does not.
+    /// </summary>
+    [AvaloniaFact]
+    public void The_language_row_paints_the_one_in_force_and_only_that_one()
+    {
+        var language = new HeldLanguage("es");
+        var page = new AppearanceSettingsViewModel(
+            new HeldTheme(ThemePreference.System),
+            language,
+            new HeldAppearance(new AppearanceOptions()));
+        using var scope = new Scope(new LanguageSettingsView { DataContext = page });
+
+        object[] inForce = ["es"];
+        Assert.Equal(Ordered(inForce), scope.Chosen());
+
         foreach (var value in new[] { "en", "es" })
         {
             page.ApplyLanguageCommand.Execute(value);
-            inForce[3] = value;
+            inForce[0] = value;
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(Ordered(inForce), scope.Chosen());
         }

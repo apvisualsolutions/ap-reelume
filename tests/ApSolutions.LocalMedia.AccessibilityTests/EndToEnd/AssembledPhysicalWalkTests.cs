@@ -683,9 +683,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotNull(appearance);
         Assert.Equal(ThemePreference.System, appearance!.CurrentPreference);
 
-        // The language buttons reload every string in the application, including the ones the walk
-        // finds its controls by. That is fine — the anchor is resolved against whatever is loaded
-        // now — but the pair is pressed together so the rest of the scene runs in one language.
+        // The language, in its own destination since 2026-09-13 (UX-010), so the walk goes there
+        // through the rail like a person does. The buttons reload every string in the application,
+        // including the ones the walk finds its controls by. That is fine — the anchor is resolved
+        // against whatever is loaded now — but the pair is pressed together so the rest of the scene
+        // runs in one language.
+        await PressAsync(
+            host,
+            "LanguageTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Idioma in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Language, host.ViewModel.CurrentSettingsSection);
+
         await PressAsync(
             host,
             "LanguageEnglish",
@@ -693,12 +702,35 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking English never changed the language");
         Assert.Equal("en", appearance.CurrentLanguage);
 
+        // Its «Restaurar valores por defecto», pressed while English is in force so it has something
+        // to come back from — and it is what puts Spanish back, which is why Spanish is not pressed
+        // by hand here any more.
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => appearance.CurrentLanguage,
+            "clicking «restore default values» never put the interface language back to Spanish");
+        Assert.Equal("es", appearance.CurrentLanguage);
+
+        await PressAsync(
+            host,
+            "LanguageEnglish",
+            () => appearance.CurrentLanguage,
+            "clicking English a second time never took");
+
         await PressAsync(
             host,
             "LanguageSpanish",
             () => appearance.CurrentLanguage,
             "clicking Spanish never changed the language back");
         Assert.Equal("es", appearance.CurrentLanguage);
+
+        await PressAsync(
+            host,
+            "AppearanceTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking Apariencia after Idioma never came back to the appearance section");
+        Assert.Equal(SettingsSection.Appearance, host.ViewModel.CurrentSettingsSection);
 
         // Each theme is asked for from a state that is not already it, which is what makes the
         // answer mean something: light from system, dark from light, and system back from dark.

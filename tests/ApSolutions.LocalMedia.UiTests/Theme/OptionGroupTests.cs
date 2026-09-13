@@ -127,7 +127,7 @@ public sealed class OptionGroupTests
             OptionPlace.Settings,
             "SettingsSection.Language",
             "LanguageSettingsView",
-            null,
+            "LanguageResetButton",
             "The interface's language is chosen once and governs every screen, so it belongs "
                 + "nowhere near a film — and it needs a destination of its own rather than a card "
                 + "inside Appearance, because two buttons saying the same thing on one screen is a "
@@ -230,12 +230,10 @@ public sealed class OptionGroupTests
             + "moves into the gear.",
         ["SegmentDetection"] = "It has its button, and is still reached through Settings: it moves "
             + "into the gear.",
-        ["Language"] = "No button yet, and its destination does not exist: it is a card inside "
-            + "Appearance today and needs a rail entry of its own.",
     };
 
     /// <summary>The ratchet over <see cref="Pending"/>, which only ever comes down.</summary>
-    private const int MaximumPending = 4;
+    private const int MaximumPending = 3;
 
     /// <summary>
     /// Every button in the tree that puts something back, and what each one is allowed to say.
@@ -267,6 +265,7 @@ public sealed class OptionGroupTests
         ["UpdateView#UpdateResetButton"] = GroupResetKey,
         ["RecommendationSettingsView#RecommendationResetButton"] = GroupResetKey,
         ["AppearanceSettingsView#AppearanceResetButton"] = GroupResetKey,
+        ["LanguageSettingsView#LanguageResetButton"] = GroupResetKey,
 
         // And the four that are NOT a group's reset, each with the reason it keeps a key of its own.
         // Three of these were invisible to the sweep by prose that this replaced, which is the

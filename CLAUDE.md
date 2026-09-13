@@ -180,7 +180,7 @@ elección se equivoca hacia abajo con facilidad —tocar el shell rompió una ob
 | `Application.Tests` | casos de uso y puertos | ~ 1 s |
 | `ArchitectureTests` | las cinco reglas, red declarada, servicios huérfanos | ~ 2 s |
 | `DocumentationTests` | bilingüismo y matriz de alcance | < 1 s |
-| `UiTests` | AXAML, ViewModels, las 64 vistas <!--medido:vistas--> | ~ 1 min |
+| `UiTests` | AXAML, ViewModels, las 65 vistas <!--medido:vistas--> | ~ 1 min |
 | `AccessibilityTests` | recorrido y paseo autónomo | ~ 5 min |
 | `IntegrationTests` | SQLite, sistema de archivos, TMDB | ~ 7 min |
 | `MediaTests` | LibVLC con vídeo real | ~ 7 min |
@@ -293,7 +293,7 @@ preguntar, y si no puede resolverlo **ensancha** la búsqueda en vez de estrecha
 **entero**, no con el corto: emitía `rev-parse --short HEAD`, que es justo el prefijo al que `gh`
 contesta `[]`.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **186** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **187** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -319,11 +319,14 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **186** <!--medido:trinquete-de-deuda-->
-desde el 2026-09-13, cuando **bajó por mejora**: `ScanSettingsViewModel.cs` llegó a 100/100 al ganar
-su «Restaurar valores por defecto» con pruebas, y salió de la lista. La rama que faltaba era la
-suscripción al evento de un comando que nunca cambia de disponibilidad — la ejecuta cualquier
-binding, y no la ejecutaba ninguna prueba.
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **187** <!--medido:trinquete-de-deuda-->
+desde el 2026-09-13, y ese día se movió **dos veces**, que es lo que enseña cómo funciona. Primero
+**bajó a 186 por mejora**: `ScanSettingsViewModel.cs` llegó a 100/100 al ganar su «Restaurar valores
+por defecto» con pruebas, y salió de la lista — la rama que faltaba era la suscripción al evento de
+un comando que nunca cambia de disponibilidad, que ejecuta cualquier binding y no ejecutaba ninguna
+prueba. Después **subió a 187 por una vista nueva**: `LanguageSettingsView.axaml` mide 100/50 como
+las otras sesenta y cuatro, porque esa mitad es la única rama que el compilador de Avalonia genera
+para un `.axaml`, y eso no es deuda. **Una vista nueva sube este número en uno.**
 Antes estuvo en **187** <!--desactivado:trinquete-anterior-->
 desde el 2026-09-13, cuando **subió en dos** por las dos vistas del engranaje del reproductor: un
 `.axaml` mide 100/50 y eso no es deuda, es la única rama que el compilador de Avalonia genera. **Y
@@ -505,11 +508,11 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
    **el marcado no escribe el número**, no que el valor coincida: un token de 8 y un literal de 8
    pintan igual, así que comparar el valor aprueba justo lo que debía rechazar.
 7. **Cada vista lidera con el botón que se decidió, o con ninguno.** `LeadingActionTests` lleva una
-   tabla cerrada de las 64 <!--medido:vistas-->; **una vista que no esté en la tabla falla**,
+   tabla cerrada de las 65 <!--medido:vistas-->; **una vista que no esté en la tabla falla**,
    y `primary-action` se afirma
    como **la única** de su vista. Si tu vista es nueva, la decisión es tuya y hay que escribirla ahí.
 8. **Ningún control se dibuja fuera de la ventana más estrecha que la aplicación permite** (900, el
-   `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 64 <!--medido:vistas-->, sin
+   `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 65 <!--medido:vistas-->, sin
    contexto de datos —lo
    que deja **todas** las ramas visibles a la vez—. Sus dos limitaciones están escritas dentro: un
    silencio suyo no es un certificado.

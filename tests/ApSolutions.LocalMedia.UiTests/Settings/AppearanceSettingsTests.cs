@@ -64,11 +64,14 @@ public sealed class AppearanceSettingsTests
             Assert.Contains(word, pills, StringComparer.Ordinal);
         }
 
-        // Four pill rows wear this class now, not two: the five themes, the two languages, the
-        // three densities and the three roundings. They are counted together because the class is
-        // what carries the grammar — accent fill and a state glyph — and a row that grew a pill
-        // without one would be the defect this counts against.
-        Assert.Equal(themes.Length + 2 + 3 + 3, pills.Length);
+        // Three pill rows wear this class on this page: the five themes, the three densities and the
+        // three roundings. They are counted together because the class is what carries the grammar
+        // — accent fill and a chosen edge — and a row that grew a pill without one would be the
+        // defect this counts against.
+        //
+        // The two language pills left on 2026-09-13 for a destination of their own (UX-010), which
+        // is why this no longer adds a 2.
+        Assert.Equal(themes.Length + 3 + 3, pills.Length);
         window.Close();
     }
 
@@ -98,7 +101,9 @@ public sealed class AppearanceSettingsTests
             .OfType<WrapPanel>()
             .Where(panel => panel.GetVisualChildren().OfType<Button>().Any(button => button.Classes.Contains("theme-option")))
             .ToArray();
-        Assert.Equal(4, rows.Length);
+        // Three since 2026-09-13: theme, density and rounding. The language row left this page for a
+        // destination of its own (UX-010), and it has its own test there.
+        Assert.Equal(3, rows.Length);
 
         foreach (var row in rows)
         {

@@ -47,6 +47,8 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
         ApplyDensityCommand = new ApplyEnumCommand<InterfaceDensity>(value => Density = value);
         ApplyRoundingCommand = new ApplyEnumCommand<CornerRounding>(value => Rounding = value);
         RestoreDefaultsCommand = new RestoreCommand(RestoreDefaults);
+        RestoreLanguageDefaultsCommand = new RestoreCommand(
+            () => ApplyLanguage(ILanguageService.DefaultLanguage));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -107,6 +109,12 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
     /// tidy the covers could switch the whole application into a language somebody does not read.
     /// </remarks>
     public ICommand RestoreDefaultsCommand { get; }
+
+    /// <summary>
+    /// The «Restaurar valores por defecto» of the language group (UX-010), which is a group of its
+    /// own with a destination of its own and shares only this view model.
+    /// </summary>
+    public ICommand RestoreLanguageDefaultsCommand { get; }
 
     private AppearanceOptions Options => _appearance?.Current ?? new AppearanceOptions();
 
