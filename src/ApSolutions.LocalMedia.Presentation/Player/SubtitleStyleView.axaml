@@ -17,12 +17,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
        section of that page shares. Without it this one started 158 px left of the others. -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
   <StackPanel x:Name="SubtitleStyleSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
-    <TextBlock
-        FontSize="{DynamicResource FontSizeSubtitle}"
-        FontWeight="SemiBold"
-        Foreground="{DynamicResource TextPrimaryBrush}"
-        Text="{DynamicResource SubtitleStyleAccessibleName}"
-        automation:AutomationProperties.HeadingLevel="2" />
+    <!-- UX-010: inside the group and in its heading row, never under the six row-cards. -->
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeSubtitle}"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource SubtitleStyleAccessibleName}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <Button
+          x:Name="SubtitleStyleResetButton"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+          Command="{Binding RestoreDefaultsCommand}"
+          Content="{DynamicResource RestoreDefaultsAction}" />
+    </Grid>
     <!--
       Six row-cards, which is the shape the rest of the settings page took: the label beside its
       control instead of above it, and the three sliders finally showing the number they are setting.

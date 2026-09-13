@@ -4808,6 +4808,25 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // And nothing outside the style was disturbed: it is one field of a row that also carries
         // the track choices, so saving it has to leave the rest as it was.
         Assert.Equal(chosen.FontFamily, stored.SubtitleStyle.FontFamily);
+
+        // UX-010, last because everything above is what gives it something to undo, and the probe is
+        // the stored style — the very field that was being written wrong all the way down this
+        // scene. ResetAsync had been here since the style was written with nothing calling it; this
+        // is the press that feeds it.
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            async () => (await preferences.GetAsync(
+                PreferenceScope.Global,
+                PlaybackPreference.GlobalKey,
+                TestContext.Current.CancellationToken))?.SubtitleStyle,
+            "clicking «restore default values» never put the stored subtitle style back");
+
+        var afterReset = await preferences.GetAsync(
+            PreferenceScope.Global,
+            PlaybackPreference.GlobalKey,
+            TestContext.Current.CancellationToken);
+        Assert.Equal(SubtitleStyle.EngineDefault, afterReset!.SubtitleStyle);
     }
 
     /// <summary>
