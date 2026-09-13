@@ -156,21 +156,21 @@ public sealed class OptionGroupTests
             OptionPlace.Settings,
             "SettingsSection.Lifecycle",
             "LifecycleSettingsView",
-            null,
+            "LifecycleResetButton",
             "The tray icon and starting with Windows are about the machine's session, which is "
                 + "settled before anything is played."),
         ["Privacy"] = new(
             OptionPlace.Settings,
             "SettingsSection.Privacy",
             "PrivacySettingsView",
-            null,
+            "PrivacyResetButton",
             "A consent is given deliberately and away from anything else, which is the whole "
                 + "reason this section leads with nothing either."),
         ["Updates"] = new(
             OptionPlace.Settings,
             "SettingsSection.Updates",
             "UpdateView",
-            null,
+            "UpdateResetButton",
             "Whether the application looks for a new version is decided once, and never by "
                 + "watching one."),
     };
@@ -234,13 +234,10 @@ public sealed class OptionGroupTests
         ["Language"] = "No button yet, and its destination does not exist: it is a card inside "
             + "Appearance today and needs a rail entry of its own.",
         ["Recommendations"] = "No button yet.",
-        ["Lifecycle"] = "No button yet.",
-        ["Privacy"] = "No button yet.",
-        ["Updates"] = "No button yet.",
     };
 
     /// <summary>The ratchet over <see cref="Pending"/>, which only ever comes down.</summary>
-    private const int MaximumPending = 9;
+    private const int MaximumPending = 6;
 
     /// <summary>
     /// Every button in the tree that puts something back, and what each one is allowed to say.
@@ -267,6 +264,9 @@ public sealed class OptionGroupTests
         ["PlaybackSettingsView#PlaybackResetButton"] = GroupResetKey,
         ["ScanSettingsView#ScanSettingsResetButton"] = GroupResetKey,
         ["SegmentDetectionSettingsView#SegmentDetectionResetButton"] = GroupResetKey,
+        ["LifecycleSettingsView#LifecycleResetButton"] = GroupResetKey,
+        ["PrivacySettingsView#PrivacyResetButton"] = GroupResetKey,
+        ["UpdateView#UpdateResetButton"] = GroupResetKey,
 
         // And the four that are NOT a group's reset, each with the reason it keeps a key of its own.
         // Three of these were invisible to the sweep by prose that this replaced, which is the

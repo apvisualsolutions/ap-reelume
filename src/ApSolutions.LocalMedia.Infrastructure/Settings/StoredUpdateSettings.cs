@@ -23,7 +23,8 @@ public sealed class StoredUpdateSettings : IUpdateSettings
     public StoredUpdateSettings(ISettingsStore store) =>
         _store = store ?? throw new ArgumentNullException(nameof(store));
 
-    public bool AutomaticCheckEnabled => _store.Read<bool?>(AutomaticKey) ?? false;
+    public bool AutomaticCheckEnabled =>
+        _store.Read<bool?>(AutomaticKey) ?? IUpdateSettings.AutomaticCheckEnabledByDefault;
 
     public void SetAutomaticCheckEnabled(bool enabled) => _store.Write(AutomaticKey, enabled);
 }

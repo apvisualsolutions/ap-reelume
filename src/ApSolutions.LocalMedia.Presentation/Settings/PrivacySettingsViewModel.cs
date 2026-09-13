@@ -29,6 +29,7 @@ public sealed class PrivacySettingsViewModel : INotifyPropertyChanged
     private readonly Func<bool> _hasConsentedConnection;
     private readonly PrivacyCommand _preview;
     private readonly PrivacyCommand _exportCommand;
+    private readonly PrivacyCommand _restoreDefaultsCommand;
     private string? _previewJson;
     private string _statusKey = "PrivacyStatusOff";
     private string? _exportedFileName;
@@ -58,6 +59,7 @@ public sealed class PrivacySettingsViewModel : INotifyPropertyChanged
         _exportCommand = new PrivacyCommand(
             () => _ = ExportAsync(CancellationToken.None),
             () => DiagnosticsEnabled);
+        _restoreDefaultsCommand = new PrivacyCommand(RestoreDefaults, () => true);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -65,6 +67,15 @@ public sealed class PrivacySettingsViewModel : INotifyPropertyChanged
     public ICommand PreviewCommand => _preview;
 
     public ICommand ExportCommand => _exportCommand;
+
+    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <remarks>
+    /// This group is two consents, so its factory value is the state of a machine nobody has asked
+    /// anything: both off. A restore may therefore only ever take a consent away — somebody putting
+    /// a group back is not somebody agreeing to anything, and a reset that could grant one would be
+    /// a consent obtained by a click that says the opposite.
+    /// </remarks>
+    public ICommand RestoreDefaultsCommand => _restoreDefaultsCommand;
 
     /// <summary>Every connection the application can make, so the screen can list them rather than promise.</summary>
     public IReadOnlyList<NetworkPurpose> NetworkPurposes { get; }
@@ -213,6 +224,16 @@ public sealed class PrivacySettingsViewModel : INotifyPropertyChanged
     /// The preview is produced by the same builder and the same serializer the export uses. Building the
     /// screen's own version of the payload would be exactly how the two drift apart.
     /// </summary>
+    /// <summary>
+    /// Withdraws both consents through the setters that already store them, so the report on disk is
+    /// discarded exactly the way switching diagnostics off by hand discards it.
+    /// </summary>
+    private void RestoreDefaults()
+    {
+        DiagnosticsEnabled = false;
+        AutomaticRefreshEnabled = false;
+    }
+
     private void ShowPreview()
     {
         try

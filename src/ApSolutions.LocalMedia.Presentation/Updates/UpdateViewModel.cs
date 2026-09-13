@@ -39,6 +39,7 @@ public sealed class UpdateViewModel : INotifyPropertyChanged
     private readonly UpdateCommand _downloadCommand;
     private readonly UpdateCommand _installCommand;
     private readonly UpdateCommand _cancelCommand;
+    private readonly UpdateCommand _restoreDefaultsCommand;
     private CancellationTokenSource? _cancellation;
     private UpdateRelease? _offer;
     private StagedUpdate? _staged;
@@ -69,11 +70,21 @@ public sealed class UpdateViewModel : INotifyPropertyChanged
             () => _ = InstallAsync(CancellationToken.None),
             () => !IsBusy && IsReadyToInstall);
         _cancelCommand = new UpdateCommand(Cancel, () => IsBusy);
+
+        // Always available, and not while-busy like the four above: putting the switch back does not
+        // touch a download in flight, and a reset a person cannot reach while something is happening
+        // is a reset they will look for exactly then.
+        _restoreDefaultsCommand = new UpdateCommand(
+            () => AutomaticCheckEnabled = IUpdateSettings.AutomaticCheckEnabledByDefault,
+            () => true);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand CheckCommand => _checkCommand;
+
+    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    public ICommand RestoreDefaultsCommand => _restoreDefaultsCommand;
 
     public ICommand DownloadCommand => _downloadCommand;
 

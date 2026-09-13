@@ -893,4 +893,23 @@ public sealed class UpdateSurfaceTests
         UpdateCheckStatus.Answered,
         UpdateDecision.Refused(UpdateRejection.NotNewer, "nothing newer"),
         null));
+
+    /// <summary>
+    /// UX-010, measured on the stored setting: this switch decides whether the application makes a
+    /// connection nobody asked for, so a reset that only moved the box would leave it connecting.
+    /// </summary>
+    [Fact]
+    public void Restoring_the_defaults_stops_the_application_looking_on_its_own()
+    {
+        var settings = new RememberedUpdateSettings();
+        var viewModel = Build(settings: settings);
+        viewModel.AutomaticCheckEnabled = true;
+        Assert.True(settings.AutomaticCheckEnabled);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+
+        Assert.Equal(IUpdateSettings.AutomaticCheckEnabledByDefault, settings.AutomaticCheckEnabled);
+        Assert.False(settings.AutomaticCheckEnabled);
+        Assert.False(viewModel.AutomaticCheckEnabled);
+    }
 }
