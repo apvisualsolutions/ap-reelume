@@ -54,12 +54,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   que es como el fabricante de tarjetas describe su propio afilado. Se probó una versión que llegaba al
   41,9 % y se descartó: dibujaba el contorno.
 
-- **Y quedó localizado por qué la imagen se llena de cuadros al subir la gamma**, que es un defecto
-  distinto y no del reescalado: el ajuste de tono se aplica con una tabla de 256 niveles, así que una
-  curva pronunciada manda tonos distintos al mismo valor y un degradado suave se convierte en parches
-  planos. Se nota sobre todo alrededor de letras claras en fondo oscuro. Está registrado con su
-  arreglo conocido y con la comprobación automática que le falta — ninguna había, y por eso lo
-  encontró una persona mirando una película.
+- **Los tres mandos de imagen ya no dejan la imagen medio tono por debajo de lo que se les pide.**
+  El ajuste redondeaba siempre hacia abajo, así que una curva que pedía 100,9 pintaba 100; con el brillo
+  se notaba en toda la pantalla, porque 0,1 son 25,5 tonos y la imagen entera salía medio tono oscura.
+  Ahora redondea al tono más cercano, y con los mandos sin tocar la imagen sigue saliendo idéntica.
+  **Y lo que el propietario estaba viendo —cuadros alrededor de las letras al subir la gamma— no era
+  esto ni era del programa**: él mismo lo zanjó abriendo el fichero en VLC, donde el reductor de ruido
+  los quita. Son marcas que dejó la compresión del vídeo, y subir la gamma las saca a la luz. Queda
+  registrado lo que falta para arreglarlas de verdad, que es un reductor de ruido.
 
 - **El razonamiento legal sobre los complementos de VideoLAN estaba cerrado y se ha reabierto, sin
   que nadie tocara una línea de código.** Decía que un complemento contagioso «encaja» dentro del

@@ -67,7 +67,7 @@ public static class PackedYuvConverter
         int sourceStride,
         int destinationStride,
         YuvColourMatrix matrix,
-        ReadOnlySpan<byte> lumaLookup = default)
+        ReadOnlySpan<int> lumaLookup = default)
     {
         // The width is paired rather than merely positive: the format carries one chroma sample for
         // every two pixels, so an odd width names a pixel with no partner. Refusing it here is what
@@ -86,6 +86,8 @@ public static class PackedYuvConverter
 
         // A table of any other size is an indexed read off the end of it, which paints whatever
         // follows in memory and does so differently every run. Empty means «leave the luma alone».
+        // Its entries are fixed point with PictureAdjustment.FractionBits of fraction, so the level
+        // written comes out of PictureAdjustment.Quantise and not out of a cast.
         if (lumaLookup.Length is not (0 or 256))
         {
             throw new ArgumentException(
@@ -103,9 +105,13 @@ public static class PackedYuvConverter
             {
                 var at = pair * 4;
                 var u = read[at] - 128;
-                var firstLuma = (adjusted ? lumaLookup[read[at + 1]] : read[at + 1]) - 16;
                 var v = read[at + 2] - 128;
-                var secondLuma = (adjusted ? lumaLookup[read[at + 3]] : read[at + 3]) - 16;
+                var firstLuma = adjusted
+                    ? PictureAdjustment.Quantise(lumaLookup[read[at + 1]]) - 16
+                    : read[at + 1] - 16;
+                var secondLuma = adjusted
+                    ? PictureAdjustment.Quantise(lumaLookup[read[at + 3]]) - 16
+                    : read[at + 3] - 16;
                 WritePixel(write[(pair * 8)..], firstLuma, u, v, matrix);
                 WritePixel(write[((pair * 8) + 4)..], secondLuma, u, v, matrix);
             }

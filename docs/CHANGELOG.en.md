@@ -54,11 +54,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   what already surrounded it, which is how the graphics vendor describes its own sharpening. A version
   that reached 41.9 % was measured and rejected: it drew the outline.
 
-- **And why the picture fills with blocks when gamma is raised is now pinned down**, which is a
-  separate defect and not the upscaler's: the tone adjustment is applied through a 256-level table, so a
-  steep curve sends distinct tones to the same value and a smooth gradient turns into flat patches. It
-  shows most around light lettering on a dark background. It is registered with its known fix and with
-  the automatic check it lacks — there was none, which is why a person watching a film found it.
+- **None of the three picture controls now leaves the picture half a tone below what it was asked
+  for.** The adjustment always rounded down, so a curve asking for 100.9 painted 100; with brightness it
+  showed across the whole screen, because 0.1 is 25.5 tones and the entire picture came out half a tone
+  dark. It now rounds to the nearest tone, and with the controls untouched the picture still comes out
+  identical. **And what the owner was actually seeing — blocks around lettering with gamma raised — was
+  neither this nor the program's doing**: he settled it himself by opening the file in VLC, where the
+  noise reduction removes them. They are marks the video's compression left behind, and raising gamma
+  brings them to light. What is needed to fix them properly — a noise reducer — is registered.
 
 - **The legal reasoning about VideoLAN's plugins was closed and has reopened, without anybody
   touching a line of code.** It said a copyleft plugin "fits" inside the program because both meet at

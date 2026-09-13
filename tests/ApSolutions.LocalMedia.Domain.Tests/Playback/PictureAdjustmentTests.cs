@@ -24,7 +24,7 @@ public sealed class PictureAdjustmentTests
         Assert.Equal(256, table.Length);
         for (var value = 0; value < 256; value++)
         {
-            Assert.Equal((byte)value, table[value]);
+            Assert.Equal((byte)value, Level(table, value));
         }
     }
 
@@ -44,21 +44,21 @@ public sealed class PictureAdjustmentTests
         // It is what FFmpeg's eq does and what the owner looked at and approved, so it is the
         // behaviour and not a defect; but a comment denying it would have the next reader trust a
         // curve that pins an end no video ever reaches.
-        Assert.Equal(0, table[0]);
-        Assert.Equal(255, table[255]);
-        Assert.InRange(table[16], 42, 48);
+        Assert.Equal(0, Level(table, 0));
+        Assert.Equal(255, Level(table, 255));
+        Assert.InRange(Level(table, 16), 42, 48);
 
         // And everything in between goes up, which is the whole point.
-        Assert.True(table[32] > 32 + 20, $"deep shadow only reached {table[32]}");
-        Assert.True(table[64] > 64 + 25, $"shadow only reached {table[64]}");
-        Assert.True(table[128] > 128 + 25, $"midtone only reached {table[128]}");
+        Assert.True(Level(table, 32) > 32 + 20, $"deep shadow only reached {Level(table, 32)}");
+        Assert.True(Level(table, 64) > 64 + 25, $"shadow only reached {Level(table, 64)}");
+        Assert.True(Level(table, 128) > 128 + 25, $"midtone only reached {Level(table, 128)}");
 
         // Monotonic, because a curve that crosses itself inverts detail somewhere.
         for (var value = 1; value < 256; value++)
         {
             Assert.True(
-                table[value] >= table[value - 1],
-                $"the curve went backwards at {value}: {table[value - 1]} then {table[value]}");
+                Level(table, value) >= Level(table, value - 1),
+                $"the curve went backwards at {value}: {Level(table, value - 1)} then {Level(table, value)}");
         }
     }
 
@@ -69,9 +69,9 @@ public sealed class PictureAdjustmentTests
         // whatever it is given.
         var table = new PictureAdjustment(Brightness: 0d, Contrast: 1d, Gamma: 0.6d).BuildLookup();
 
-        Assert.True(table[128] < 128, $"the midtone rose to {table[128]} with gamma below one");
-        Assert.Equal(0, table[0]);
-        Assert.Equal(255, table[255]);
+        Assert.True(Level(table, 128) < 128, $"the midtone rose to {Level(table, 128)} with gamma below one");
+        Assert.Equal(0, Level(table, 0));
+        Assert.Equal(255, Level(table, 255));
     }
 
     [Theory]
@@ -98,7 +98,7 @@ public sealed class PictureAdjustmentTests
     {
         var table = new PictureAdjustment(brightness, contrast, gamma).BuildLookup();
 
-        Assert.InRange(table[input], expected - 2, expected + 2);
+        Assert.InRange(Level(table, input), expected - 2, expected + 2);
     }
 
     [Theory]
@@ -116,7 +116,7 @@ public sealed class PictureAdjustmentTests
     {
         var table = new PictureAdjustment(brightness, contrast, gamma).BuildLookup();
 
-        Assert.Equal(0, table[0]);
+        Assert.Equal(0, Level(table, 0));
 
         // Monotonic all the way, which is what a wrapped-around cast breaks: a byte that came from
         // a negative double is any value at all, and one bright pixel in the middle of the shadows
@@ -124,16 +124,16 @@ public sealed class PictureAdjustmentTests
         for (var value = 1; value < 256; value++)
         {
             Assert.True(
-                table[value] >= table[value - 1],
-                $"the curve went backwards at {value}: {table[value - 1]} then {table[value]}");
+                Level(table, value) >= Level(table, value - 1),
+                $"the curve went backwards at {value}: {Level(table, value - 1)} then {Level(table, value)}");
         }
 
         // And the table still tells black from white, or one of all zeroes would pass the two
         // above. It is deliberately not «the top is still bright»: at −0.9 the whole picture IS
         // nearly black and level 255 lands at 25, which is the setting working, not failing.
         Assert.True(
-            table[255] > table[0],
-            $"the table stopped telling black from white: {table[0]} and {table[255]}");
+            Level(table, 255) > Level(table, 0),
+            $"the table stopped telling black from white: {Level(table, 0)} and {Level(table, 255)}");
     }
 
     [Theory]
@@ -162,4 +162,16 @@ public sealed class PictureAdjustmentTests
         Assert.False(new PictureAdjustment(0.1d, 1d, 1d).IsNeutral);
         Assert.False(new PictureAdjustment(0d, 1.2d, 1d).IsNeutral);
     }
+
+    /// <summary>
+    /// The level one entry of the curve paints.
+    /// </summary>
+    /// <remarks>
+    /// <b>The table stopped being whole levels on 2026-09-13</b>: it carries
+    /// <c>PictureAdjustment.FractionBits</c> bits of fraction so that the level painted can be the
+    /// nearest one instead of the one below. These tests measure the <i>shape</i> of the curve, which is
+    /// what a person sees as brightness and contrast; the fraction and its rounding are measured next
+    /// door in <c>PictureAdjustmentRoundingTests</c>.
+    /// </remarks>
+    private static int Level(int[] table, int input) => PictureAdjustment.Quantise(table[input]);
 }

@@ -226,10 +226,10 @@ public sealed class PackedYuvConverterTests
         // instead of a real curve because what is under test is «the table is read», not the shape
         // of any particular one.
         const int Width = 2;
-        var doubled = new byte[256];
+        var doubled = new int[256];
         for (var level = 0; level < doubled.Length; level++)
         {
-            doubled[level] = (byte)Math.Min(255, level * 2);
+            doubled[level] = Math.Min(255, level * 2) << PictureAdjustment.FractionBits;
         }
 
         var shadow = new byte[] { 128, 40, 128, 40 };
@@ -252,12 +252,89 @@ public sealed class PackedYuvConverterTests
         Assert.Equal(lifted[0], lifted[4]);
     }
 
-    private static byte[] Identity()
+    /// <summary>
+    /// A flat patch comes out flat, whatever the curve, because nothing spreads a pattern across it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>This is the guard on a mistake that shipped for twenty minutes on 2026-09-13.</b> The tone
+    /// curve bands a gradient, the textbook fix is to dither the fraction across neighbouring pixels,
+    /// and it was built — and the owner saw it at once: «ahora aparecen un montón de cuadraditos en toda
+    /// la imagen». The pattern lives in the resolution of the decoded frame and the screen is four times
+    /// that, so an 8×8 cell becomes a 32×32 block: one level of difference spread over an area large
+    /// enough to read as banding of its own.
+    /// </para>
+    /// <para>
+    /// So the conversion paints every pixel of a given level the same, and this is what says so. The
+    /// banding is not fixed by pretending it is gone — it is registered as `ENG-023`, whose fix is to
+    /// dither <b>after</b> the scaling rather than before, which is where a dither belongs.
+    /// </para>
+    /// </remarks>
+    [Theory]
+    [InlineData(1d)]
+    [InlineData(1.5d)]
+    [InlineData(0.6d)]
+    public void A_flat_patch_comes_out_flat_whatever_the_curve(double gamma)
     {
-        var table = new byte[256];
+        const int Width = 8;
+        const int Height = 8;
+
+        var curve = new PictureAdjustment(Brightness: 0d, Contrast: 1d, Gamma: gamma).BuildLookup();
+        var patch = Grey(Width, Height, 100);
+        var painted = new byte[Width * PackedYuvConverter.DestinationBytesPerPixel * Height];
+        PackedYuvConverter.UyvyToBgra(
+            patch,
+            painted,
+            Width,
+            Height,
+            Width * PackedYuvConverter.SourceBytesPerPixel,
+            Width * PackedYuvConverter.DestinationBytesPerPixel,
+            Bt601,
+            curve);
+
+        var tones = new SortedSet<int>();
+        for (var at = 0; at < painted.Length; at += 4)
+        {
+            _ = tones.Add(painted[at + 1]);
+        }
+
+        Assert.True(
+            tones.Count == 1,
+            $"At gamma {gamma} a flat patch came out as {tones.Count} tones "
+                + $"({string.Join(",", tones)}), so something is spreading a pattern across the picture "
+                + "in the resolution of the frame — which the screen then magnifies into blocks.");
+    }
+
+    /// <summary>A patch of one grey level, packed the way the decoder hands it over.</summary>
+    private static byte[] Grey(int width, int height, byte luma)
+    {
+        var packed = new byte[width * PackedYuvConverter.SourceBytesPerPixel * height];
+        for (var at = 0; at < packed.Length; at += 4)
+        {
+            packed[at] = 128;
+            packed[at + 1] = luma;
+            packed[at + 2] = 128;
+            packed[at + 3] = luma;
+        }
+
+        return packed;
+    }
+
+    /// <summary>
+    /// The identity curve in the fixed point the conversion now reads, which is a level shifted up.
+    /// </summary>
+    /// <remarks>
+    /// Written out here rather than asked of <c>PictureAdjustment</c>, for the reason the test above
+    /// gives: what this file measures is the conversion. What the fixed point buys — that a fraction of
+    /// a level survives into the picture instead of being lost to a band — is measured where the
+    /// arithmetic lives, in <c>PictureAdjustmentBandingTests</c>.
+    /// </remarks>
+    private static int[] Identity()
+    {
+        var table = new int[256];
         for (var level = 0; level < table.Length; level++)
         {
-            table[level] = (byte)level;
+            table[level] = level << PictureAdjustment.FractionBits;
         }
 
         return table;
@@ -278,7 +355,7 @@ public sealed class PackedYuvConverterTests
         // A short table is an indexed read off the end of it, which reads whatever follows in
         // memory and paints it — silently, and differently every run.
         var thrown = Assert.ThrowsAny<ArgumentException>(() => PackedYuvConverter.UyvyToBgra(
-            new byte[4], new byte[8], 2, 1, 4, 8, Bt601, new byte[length]));
+            new byte[4], new byte[8], 2, 1, 4, 8, Bt601, new int[length]));
 
         // And it names the buffer that is wrong, like the two guards above it. Without this the
         // name can be swapped for «source» and nothing notices.

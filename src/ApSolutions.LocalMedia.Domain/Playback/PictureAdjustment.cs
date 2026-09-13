@@ -86,20 +86,40 @@ public sealed record PictureAdjustment(double Brightness, double Contrast, doubl
     /// </summary>
     public bool IsNeutral => Brightness == 0d && Contrast == 1d && Gamma == 1d;
 
+    /// <summary>How much of a level the fixed-point curve keeps below the whole number.</summary>
+    /// <remarks>
+    /// Eight bits, so a level is 256 steps and the largest value is <c>255 × 256</c>. It is a shift and
+    /// not a division in the per-pixel path, which is the only reason a fraction is affordable there.
+    /// </remarks>
+    public const int FractionBits = 8;
+
+    /// <summary>The largest value <see cref="BuildLookup"/> can produce, which is white.</summary>
+    public const int FullScale = 255 << FractionBits;
+
     /// <summary>
     /// The 256 levels this setting turns each incoming level into, in one table so that a per-pixel
     /// loop pays one indexed read instead of three multiplications and a power.
     /// </summary>
-    public byte[] BuildLookup()
+    /// <remarks>
+    /// <b>In fixed point with <see cref="FractionBits"/> bits of fraction</b>, so that
+    /// <see cref="Quantise"/> can round to the nearest level instead of truncating. Truncation is a
+    /// defect of its own: a curve asking for 100,9 painted 100, and a control whose shift is not a whole
+    /// number of levels — brightness at 0.1 is 25,5 of them — left the entire picture half a level dark.
+    /// </remarks>
+    public int[] BuildLookup()
     {
-        var table = new byte[256];
+        var table = new int[256];
         var exponent = 1d / Gamma;
         for (var level = 0; level < table.Length; level++)
         {
             // FFmpeg's create_lut, verbatim in shape: the linear part first, then the curve, then
-            // the two saturating ends. The 256 rather than 255 is theirs too and it is not a typo —
-            // this branch only runs while v is below 1, so the truncation lands inside 0..255, and
-            // it is what makes the neutral table the identity instead of a curve one level short.
+            // the two saturating ends.
+            //
+            // The scale is 255 and not FFmpeg's 256, and the difference is the whole reason neutral
+            // still comes out byte for byte. Theirs relies on truncation — 256 × v truncated happens to
+            // give back the level — which is a scale of 256/255 papering over a rounding this path now
+            // does properly. At 255 the neutral curve lands on exact whole numbers, so rounding cannot
+            // move it and PLY-018's promise holds.
             var v = (Contrast * ((level / 255d) - 0.5d)) + 0.5d + Brightness;
             // Below black is pinned at black and never carried on with, and the reason is measured
             // rather than defensive: taking this branch out and asking for brightness −0.5 at
@@ -114,11 +134,66 @@ public sealed record PictureAdjustment(double Brightness, double Contrast, doubl
             }
 
             v = Math.Pow(v, exponent);
-            table[level] = v >= 1d ? (byte)255 : (byte)(256d * v);
+            table[level] = v >= 1d
+                ? FullScale
+                : (int)Math.Round(FullScale * v, MidpointRounding.AwayFromZero);
         }
 
         return table;
     }
+
+    /// <summary>
+    /// What the curve asks for at <paramref name="level"/>, in levels and with its fraction kept.
+    /// </summary>
+    /// <remarks>
+    /// Exists so a test can compare against the intention rather than against another copy of the
+    /// implementation: asserting that the painted level matches <see cref="BuildLookup"/> would be
+    /// asserting that a number equals itself.
+    /// </remarks>
+    public double ExactLevel(int level)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(level);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(level, 255);
+
+        var v = (Contrast * ((level / 255d) - 0.5d)) + 0.5d + Brightness;
+
+        return v <= 0d ? 0d : Math.Min(255d, 255d * Math.Pow(v, 1d / Gamma));
+    }
+
+    /// <summary>Half a level, in the fixed point of the curve.</summary>
+    /// <remarks>
+    /// Adding it before dropping the fraction is what turns a truncation into a rounding, which is the
+    /// difference between a picture that is systematically half a level dark and one that is not.
+    /// </remarks>
+    public const int HalfLevel = 1 << (FractionBits - 1);
+
+    /// <summary>
+    /// Turns one fixed-point value from <see cref="BuildLookup"/> into the level a pixel is painted.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Rounded to the nearest level rather than truncated, which fixes a defect of its own.</b> The
+    /// old table truncated, so a curve asking for 100,9 painted 100 — and a control whose shift is not
+    /// a whole number of levels, such as brightness at 0.1, is 25,5 levels and left the <i>entire</i>
+    /// picture half a level dark. Measured over all 256 levels in
+    /// <c>PictureAdjustmentRoundingTests</c>.
+    /// </para>
+    /// <para>
+    /// <b>What this deliberately does NOT do is dither, and the reason is measured.</b> Spreading the
+    /// fraction across neighbouring pixels is the textbook answer to the banding a tone curve leaves,
+    /// and it was built and shipped for twenty minutes on 2026-09-13. The owner saw it immediately:
+    /// «ahora aparecen un montón de cuadraditos en toda la imagen». <b>The pattern lives in the
+    /// resolution of the decoded frame and the screen is four times that</b>, so an 8×8 dither cell
+    /// becomes a 32×32 block of screen pixels — one level of difference spread over an area large
+    /// enough to read as banding of its own. Dither has to be the last step before the screen and here
+    /// it was the first. `ENG-023` carries the ordering.
+    /// </para>
+    /// <para>
+    /// No clamp is needed and that is arithmetic rather than optimism: the largest sum is
+    /// <c>(255 × 256) + 128</c>, and shifting that right by eight gives 255.
+    /// </para>
+    /// </remarks>
+    public static int Quantise(int curveValue) => (curveValue + HalfLevel) >> FractionBits;
 
     /// <summary>
     /// Refuses a setting no control can produce. Clamping would be the friendlier-looking choice and
