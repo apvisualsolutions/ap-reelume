@@ -373,7 +373,7 @@ src/ApSolutions.LocalMedia.Presentation/Settings/PlaybackSettingsView.axaml     
 src/ApSolutions.LocalMedia.Presentation/Settings/PrivacySettingsView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/PrivacySettingsViewModel.cs                  97  94
 src/ApSolutions.LocalMedia.Presentation/Settings/RecommendationSettingsView.axaml            100  50
-src/ApSolutions.LocalMedia.Presentation/Settings/RecommendationSettingsViewModel.cs           95  83
+src/ApSolutions.LocalMedia.Presentation/Settings/RecommendationSettingsViewModel.cs           96  85
 src/ApSolutions.LocalMedia.Presentation/Settings/RootManagementView.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/ScanSettingsView.axaml                      100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/SegmentDetectionSettingsView.axaml          100  50
