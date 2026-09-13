@@ -53,6 +53,7 @@ public sealed class ShellSurfaceIsolationTests
         typeof(ShellAssemblyTests),
         typeof(EditorPageTests),
         typeof(ShellWindowModeTests),
+        typeof(FullscreenPictureTests),
     ];
 
     private const string SharedBuilder = "EditorSurfaces(";

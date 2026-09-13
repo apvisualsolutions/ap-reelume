@@ -85,7 +85,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
         Grid.Row="0"
         Grid.ColumnSpan="2"
         Height="{x:Static presentation:App.TitleBarHeight}"
-        IsVisible="{Binding IsChromeRevealed}"
+        IsVisible="{Binding IsShellChromeVisible}"
         Background="{DynamicResource NavigationSurfaceBrush}"
         BorderBrush="{DynamicResource ShellHairlineBrush}"
         BorderThickness="0,0,0,1" />
@@ -100,7 +100,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
         Grid.Row="1"
         Width="64"
         Padding="9,8"
-        IsVisible="{Binding IsChromeRevealed}"
+        IsVisible="{Binding IsShellChromeVisible}"
         Background="{DynamicResource NavigationSurfaceBrush}"
         BorderBrush="{DynamicResource ShellHairlineBrush}"
         BorderThickness="0,0,1,0">
@@ -773,7 +773,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
           Grid.Row="0"
           Grid.ColumnSpan="2"
           Padding="14,10"
-          IsVisible="{Binding IsChromeRevealed}"
+          IsVisible="{Binding IsShellChromeVisible}"
           Background="{DynamicResource PlayerChromeBrush}"
           BorderBrush="{DynamicResource PlayerHairlineBrush}"
           BorderThickness="0,0,0,1"
