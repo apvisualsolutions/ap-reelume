@@ -77,4 +77,47 @@ public sealed class SegmentDetectionSettingsTests
         Assert.False(stored);
         Assert.False(viewModel.IsEnabled);
     }
+
+    /// <summary>
+    /// UX-010, and it is asserted on what was stored rather than on the property: a reset that only
+    /// moved the view model would leave the switch on across a restart while looking restored.
+    /// </summary>
+    [Fact]
+    public void Restoring_the_defaults_stores_the_factory_value_rather_than_only_showing_it()
+    {
+        var stored = true;
+        var viewModel = new SegmentDetectionSettingsViewModel(() => stored, value => stored = value);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+
+        Assert.Equal(SegmentDetectionSettingsViewModel.DefaultEnabled, stored);
+        Assert.False(stored);
+        Assert.False(viewModel.IsEnabled);
+    }
+
+    [Fact]
+    public void Restoring_what_is_already_the_default_writes_nothing()
+    {
+        var stored = false;
+        var writes = 0;
+        var viewModel = new SegmentDetectionSettingsViewModel(
+            () => stored,
+            value =>
+            {
+                stored = value;
+                writes++;
+            });
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+
+        Assert.Equal(0, writes);
+    }
+
+    [Fact]
+    public void The_restore_is_offered_whether_or_not_there_is_anything_to_undo()
+    {
+        var viewModel = new SegmentDetectionSettingsViewModel(() => false, _ => { });
+
+        Assert.True(viewModel.RestoreDefaultsCommand.CanExecute(null));
+    }
 }

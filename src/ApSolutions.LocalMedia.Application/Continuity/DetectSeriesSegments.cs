@@ -60,8 +60,15 @@ public sealed class DetectSeriesSegments
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
+    /// <summary>
+    /// What the switch is before anybody touches it, and what UX-010's reset puts it back to. It is
+    /// named rather than written twice: a literal in the reset and another one here is two numbers
+    /// that can disagree, and nothing would say which of them is the default.
+    /// </summary>
+    public const bool EnabledByDefault = false;
+
     /// <summary>Detection is an option a person chooses; nothing runs while this is false.</summary>
-    public bool IsEnabled => _settings.Read<bool?>(EnabledSettingKey) ?? false;
+    public bool IsEnabled => _settings.Read<bool?>(EnabledSettingKey) ?? EnabledByDefault;
 
     public void SetEnabled(bool enabled) => _settings.Write(EnabledSettingKey, enabled);
 

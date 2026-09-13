@@ -375,7 +375,6 @@ src/ApSolutions.LocalMedia.Presentation/Settings/RecommendationSettingsView.axam
 src/ApSolutions.LocalMedia.Presentation/Settings/RecommendationSettingsViewModel.cs           95  83
 src/ApSolutions.LocalMedia.Presentation/Settings/RootManagementView.axaml                    100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/ScanSettingsView.axaml                      100  50
-src/ApSolutions.LocalMedia.Presentation/Settings/ScanSettingsViewModel.cs                     81  50
 src/ApSolutions.LocalMedia.Presentation/Settings/SegmentDetectionSettingsView.axaml          100  50
 src/ApSolutions.LocalMedia.Presentation/Shell/MainWindowPlacement.cs                          97  75
 src/ApSolutions.LocalMedia.Presentation/Shell/ShellView.axaml                                100  50

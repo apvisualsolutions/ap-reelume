@@ -16,12 +16,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
   -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space12}">
-      <TextBlock
-          FontSize="{DynamicResource FontSizeSubtitle}"
-          FontWeight="SemiBold"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource ScanSettingsTitle}"
-          automation:AutomationProperties.HeadingLevel="2" />
+      <!--
+        UX-010: inside the group and in its heading row. This section shares its destination with the
+        library's folders, which are NOT a group — putting the folders back would empty the library —
+        so only one button says «Restaurar valores por defecto» on this screen, which is what lets
+        the walk resolve it at all.
+      -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource ScanSettingsTitle}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <Button
+            x:Name="ScanSettingsResetButton"
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+            Command="{Binding RestoreDefaultsCommand}"
+            Content="{DynamicResource RestoreDefaultsAction}" />
+      </Grid>
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource ScanSettingsDescription}"

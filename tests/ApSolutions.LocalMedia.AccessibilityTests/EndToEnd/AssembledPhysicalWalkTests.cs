@@ -660,6 +660,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             PlaybackSettingsViewModel.MinimumSeconds,
             PlaybackSettingsViewModel.MaximumSeconds);
 
+        // UX-010, and it comes after the slider on purpose: a click lands in the middle of a range,
+        // and a reset pressed before anything moved would answer with the value it already had. The
+        // probe is the facade the chaining code reads, so a reset that only moved the view model
+        // would leave this unchanged.
+        Assert.NotEqual(PlaybackSettingsViewModel.DefaultCountdownSeconds, chain.CountdownSeconds);
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => chain.CountdownSeconds,
+            "clicking «restore default values» never put the countdown back to its factory length");
+        Assert.Equal(PlaybackSettingsViewModel.DefaultCountdownSeconds, chain.CountdownSeconds);
+
         await PressAsync(
             host,
             "AppearanceTitle",
@@ -826,6 +838,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => scan!.WatchLocalRoots,
             "clicking the local-watching box never changed whether local roots are watched");
 
+        // UX-010, after the box rather than before it for the reason the whole batch shares: with
+        // nothing moved, the reset answers with the value it already had. This section shares its
+        // destination with the library's folders, which are not a group, so this is the only control
+        // on screen saying these words — which is what lets the walk resolve it.
+        Assert.NotEqual(ScanSettingsViewModel.DefaultWatchLocalRoots, scan!.WatchLocalRoots);
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => scan.WatchLocalRoots,
+            "clicking «restore default values» never put the scanning group back");
+        Assert.Equal(ScanSettingsViewModel.DefaultWatchLocalRoots, scan.WatchLocalRoots);
+        Assert.Equal(ScanSettingsViewModel.DefaultFallbackIntervalMinutes, scan.FallbackIntervalMinutes);
+
         // The segment switch reads and writes the use case itself rather than a field of its own, so
         // the probe is the use case: a switch that only moved its own bool would look identical.
         var segments = host.ViewModel.SegmentDetection;
@@ -843,6 +868,17 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => host.Application.Services.GetRequiredService<DetectSeriesSegments>().IsEnabled,
             "clicking the segment-detection switch never turned the detection on");
         Assert.True(segments!.IsEnabled);
+
+        // UX-010, and it is pressed AFTER the switch for the reason the gear's scene already
+        // carries: a reset with nothing to undo answers a click with the value it already had, and
+        // the walk would read «nothing happened» from a button working perfectly. The probe is the
+        // use case again, so a reset that only moved the view model would not satisfy it.
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => host.Application.Services.GetRequiredService<DetectSeriesSegments>().IsEnabled,
+            "clicking «restore default values» never turned the detection back off");
+        Assert.False(segments.IsEnabled);
     }
 
     /// <summary>

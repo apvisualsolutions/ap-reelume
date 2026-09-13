@@ -14,12 +14,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
        size every other section uses. -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel x:Name="PlaybackSettingsSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
-      <TextBlock
-          FontSize="{DynamicResource FontSizeSubtitle}"
-          FontWeight="SemiBold"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource PlaybackSettingsTitle}"
-          automation:AutomationProperties.HeadingLevel="2" />
+      <!-- UX-010: inside the group and in its heading row, never under the controls. -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource PlaybackSettingsTitle}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <Button
+            x:Name="PlaybackResetButton"
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+            Command="{Binding RestoreDefaultsCommand}"
+            Content="{DynamicResource RestoreDefaultsAction}" />
+      </Grid>
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource PlaybackSettingsDescription}"
