@@ -132,13 +132,17 @@ quedarse como una tarjeta dentro de ella.
 
 ### Enmienda del 2026-09-13 (tarde), al mudarlos
 
-**Bajaron DOS de las tres, y la tercera tiene una medición delante.** La cuenta atrás del siguiente
-episodio y la detección de segmentos están ya dentro del engranaje, con su «Restaurar valores por
-defecto» y su escena del paseo. **El estilo de subtítulos no cabe**: montado en la banda de 380 px
-del engranaje, un `Viewbox` de sus selectores de color llega a **2.010 px**. Hacerlo caber es
-rediseñar esa vista para un tercio de su ancho, con su propia maqueta, y eso es una fila aparte y no
-algo que improvisar dentro de ésta. Se queda en Ajustes **con su botón**, y la lista cerrada lo
-declara pendiente con ese motivo.
+**Bajaron las tres, y la tercera estuvo a punto de no bajar por una medición mal hecha.** La cuenta
+atrás del siguiente episodio, la detección de segmentos y el estilo de subtítulos están dentro del
+engranaje, cada uno con su «Restaurar valores por defecto» y su escena del paseo.
+
+**El estilo de subtítulos se declaró «no cabe» durante unas horas, y era falso.** La prueba de ancho
+leía `Bounds.Right`, que es relativo al padre e **ignora las transformaciones de render**: un
+`Viewbox` dispone a su hijo a tamaño natural y lo escala, así que el icono de sus selectores medía
+2.010 px en su espacio y **12 px dibujados**. Corregido a `TranslatePoint` contra la banda —que es lo
+que la puerta hermana `ViewOverflowTests` ya hacía— la vista cabe con holgura. **Medir el layout no
+es medir lo que se ve**, y aquí ni siquiera era el layout: era un número en un espacio de
+coordenadas que nadie dibuja.
 
 **Y la banda ganó un techo**, que es lo que el tercer grupo destapó: el menú del engranaje con todas
 sus ramas dibujadas mide **1.126 px**, más alto que la ventana más corta que la aplicación permite, y
@@ -255,13 +259,17 @@ own rather than staying as a card inside it.
 
 ### Amendment of 2026-09-13 (afternoon), while moving them
 
-**Two of the three moved, and the third has a measurement in front of it.** The next-episode
-countdown and segment detection are inside the gear, with their «Restore default values» and their
-walk scene. **The subtitle style does not fit**: mounted in the gear's 380 px band, a `Viewbox` in
-its colour pickers reaches **2,010 px**. Making it fit is a redesign of that view for a third of its
-width, with its own mock-up, and that is a row of its own rather than something to improvise inside
-this one. It stays in Settings **with its button**, and the closed list declares it pending with that
-reason.
+**All three moved, and the third nearly did not because of a badly made measurement.** The
+next-episode countdown, segment detection and the subtitle style are inside the gear, each with its
+«Restore default values» and its walk scene.
+
+**The subtitle style was declared «does not fit» for a few hours, and that was false.** The width
+gate read `Bounds.Right`, which is relative to the parent and **ignores render transforms**: a
+`Viewbox` lays its child out at natural size and scales it down, so the icon in its colour pickers
+measured 2,010 px in its own space and **12 px drawn**. Corrected to `TranslatePoint` against the
+band — which the sibling gate `ViewOverflowTests` already did — the view fits with room to spare.
+**Measuring layout is not measuring what is seen**, and this was not even layout: it was a number in
+a coordinate space nobody draws.
 
 **And the band gained a ceiling**, which the third group is what exposed: the gear's menu with every
 branch drawn measures **1,126 px**, taller than the shortest window the application allows, and a

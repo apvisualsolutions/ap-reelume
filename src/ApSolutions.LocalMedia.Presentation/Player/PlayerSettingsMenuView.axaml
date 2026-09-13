@@ -74,6 +74,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Command="{Binding OpenGroupCommand}"
             CommandParameter="{x:Static player:PlayerSettingsGroup.Segments}"
             Content="{DynamicResource SegmentDetectionSettingsTitle}" />
+        <Button
+            x:Name="PlayerSettingsSubtitlesEntry"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Left"
+            IsVisible="{Binding HasSubtitles}"
+            automation:AutomationProperties.Name="{DynamicResource SubtitleStyleAccessibleName}"
+            Command="{Binding OpenGroupCommand}"
+            CommandParameter="{x:Static player:PlayerSettingsGroup.Subtitles}"
+            Content="{DynamicResource SubtitleStyleAccessibleName}" />
       </StackPanel>
       <!--
         The second level, which REPLACES the first rather than sitting under it: a list plus an open
@@ -138,6 +147,26 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.HeadingLevel="2" />
         </Grid>
         <settings:SegmentDetectionSettingsView DataContext="{Binding Segments}" />
+      </StackPanel>
+      <StackPanel
+          x:Name="PlayerSettingsSubtitlesGroup"
+          IsVisible="{Binding IsSubtitlesVisible}"
+          Spacing="{DynamicResource Space12}">
+        <Grid ColumnDefinitions="Auto,*">
+          <Button
+              x:Name="PlayerSettingsSubtitlesBack"
+              automation:AutomationProperties.Name="{DynamicResource PlayerSettingsBackAction}"
+              Command="{Binding BackCommand}"
+              Content="{DynamicResource PlayerSettingsBackAction}" />
+          <TextBlock
+              Grid.Column="1"
+              Margin="12,0,0,0"
+              FontWeight="SemiBold"
+              VerticalAlignment="Center"
+              Text="{DynamicResource SubtitleStyleAccessibleName}"
+              automation:AutomationProperties.HeadingLevel="2" />
+        </Grid>
+        <player:SubtitleStyleView DataContext="{Binding Subtitles}" />
       </StackPanel>
   </StackPanel>
 </UserControl>

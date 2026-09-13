@@ -583,6 +583,10 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
     comparar el literal dejaría pasar dos claves con el mismo contenido, que es exactamente cómo
     llegaron a convivir «Volver a 1×» y «Restaurar campos del proveedor» para la misma idea.
 
+    **Los doce están puestos desde el 2026-09-13**, y con el último —el estilo de subtítulos— se
+    borró el trinquete de pendientes que sostuvo la deuda mientras se construían: una lista que se
+    vacía se lleva su mecanismo, que es lo que decía que haría.
+
     **Doce, y el número no se copia de aquí: se lee de la lista**, que es `Groups` dentro de
     `tests/ApSolutions.LocalMedia.UiTests/Theme/OptionGroupTests.cs`. Esta línea es una referencia y
     puede estar vieja. Decía **catorce** en once sitios antes de que nadie contara, y el propio

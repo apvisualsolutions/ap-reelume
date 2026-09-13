@@ -5,6 +5,7 @@ using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Continuity;
 using ApSolutions.LocalMedia.Domain.Playback;
 using ApSolutions.LocalMedia.Presentation.Player;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
@@ -227,28 +228,59 @@ public sealed class PlayerSettingsMenuTests
     /// </remarks>
     [AvaloniaTheory]
     [InlineData(typeof(PictureAdjustmentView))]
+    [InlineData(typeof(SubtitleStyleView))]
+    [InlineData(typeof(ApSolutions.LocalMedia.Presentation.Settings.PlaybackSettingsView))]
+    [InlineData(typeof(ApSolutions.LocalMedia.Presentation.Settings.SegmentDetectionSettingsView))]
     public void Every_group_the_gear_shows_fits_the_band_it_is_drawn_in(Type group)
     {
         var view = (UserControl)Activator.CreateInstance(group)!;
-        var window = new Window { Width = GearWidth, Height = 900, Content = view };
+
+        // The chain the group is really drawn in, and not the group alone at 380: the overlay's own
+        // padding and border take 34 px of that, so a control ending at 370 fits the number this
+        // gate used to compare against and is cut off where it is actually drawn. Measured on
+        // 2026-09-13: the view receives 346 px inside a 380 px band.
+        var band = new Border
+        {
+            Classes = { "player-overlay" },
+            Width = GearWidth,
+            Child = new ScrollViewer { MaxHeight = 360, Content = view },
+        };
+        var window = new Window { Width = GearWidth, Height = 900, Content = band };
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
-        var spilling = view.GetVisualDescendants()
-            .OfType<Control>()
-            .Where(control => control.Bounds.Width > 0)
-            .Where(control => control.Bounds.Right > GearWidth + 0.5)
-            .Select(control => $"{control.GetType().Name} reaches {control.Bounds.Right:0.#} px")
-            .Distinct(StringComparer.Ordinal)
-            .ToArray();
+        // TranslatePoint against the band and not Bounds.Right, which is the same correction
+        // ViewOverflowTests already carries. Bounds are relative to the parent and ignore render
+        // transforms, so a Viewbox — which lays its child out at natural size and scales it down —
+        // reads thousands of pixels while drawing twelve. That artefact is what made this gate say
+        // SubtitleStyleView could not fit the gear, and it was wrong.
+        var spilling = new List<string>();
+        var measured = 0;
+        foreach (var control in view.GetVisualDescendants().OfType<Control>())
+        {
+            if (control.Bounds.Width <= 0 || !control.IsEffectivelyVisible)
+            {
+                continue;
+            }
+
+            measured++;
+            if (control.TranslatePoint(new Point(control.Bounds.Width, 0), band) is not { } edge)
+            {
+                continue;
+            }
+
+            if (edge.X > GearWidth + 0.5 || edge.X < -0.5)
+            {
+                spilling.Add($"{control.GetType().Name} reaches {edge.X:0.#} px");
+            }
+        }
 
         Assert.True(
-            spilling.Length == 0,
+            spilling.Count == 0,
             $"{group.Name} does not fit the gear's {GearWidth} px band:\n  "
-                + string.Join("\n  ", spilling));
+                + string.Join("\n  ", spilling.Distinct(StringComparer.Ordinal)));
 
         // Anti-blindness floor: a view that laid out to nothing would spill nowhere and pass.
-        var measured = view.GetVisualDescendants().OfType<Control>().Count(c => c.Bounds.Width > 0);
         Assert.True(
             measured >= 10,
             $"only {measured} controls were laid out in {group.Name}, so the tree is not being "
@@ -256,6 +288,13 @@ public sealed class PlayerSettingsMenuTests
     }
 
     /// <summary>The band the gear is drawn in, read from the markup that decides it.</summary>
+    /// <remarks>
+    /// The left-hand boundary is not decoration: without it the pattern matches <c>MaxWidth</c> too,
+    /// and this number is used for BOTH the window and the threshold — so a wrong reading agrees
+    /// with itself perfectly and the gate passes a group that does not fit. Measured on 2026-09-13
+    /// by adding a <c>MaxWidth="900"</c>: the reader returned 900 and a 600 px overflow went green.
+    /// The value is asserted as well, because a boundary that stopped working would fail silently.
+    /// </remarks>
     private static double GearWidth
     {
         get
@@ -268,13 +307,16 @@ public sealed class PlayerSettingsMenuTests
                 "PlayerView.axaml"));
             var match = System.Text.RegularExpressions.Regex.Match(
                 markup,
-                @"x:Name=""PlayerSettingsHostSurface""[^>]*?Width=""(?<width>\d+)""",
+                @"x:Name=""PlayerSettingsHostSurface""[^>]*?(?<![\w.])Width=""(?<width>\d+)""",
                 System.Text.RegularExpressions.RegexOptions.Singleline,
                 TimeSpan.FromSeconds(2));
             Assert.True(match.Success, "PlayerView.axaml no longer declares the gear's width.");
-            return double.Parse(
+
+            var width = double.Parse(
                 match.Groups["width"].Value,
                 System.Globalization.CultureInfo.InvariantCulture);
+            Assert.InRange(width, 200, 600);
+            return width;
         }
     }
 

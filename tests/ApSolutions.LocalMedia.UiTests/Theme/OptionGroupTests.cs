@@ -97,7 +97,7 @@ public sealed class OptionGroupTests
                 + "somebody wants is the one that stops the film looking wrong."),
         ["SubtitleStyle"] = new(
             OptionPlace.Player,
-            "SettingsSection.Subtitles",
+            "PlayerSettingsGroup.Subtitles",
             "SubtitleStyleView",
             "SubtitleStyleResetButton",
             "The right font size is the one that reads over this film at this distance, which is "
@@ -214,29 +214,6 @@ public sealed class OptionGroupTests
     };
 
     /// <summary>
-    /// Groups that do not yet satisfy the rule, each with the reason. It is only allowed to shrink.
-    /// </summary>
-    /// <remarks>
-    /// The symmetric half of this gate — «a listed group without its button fails» — has to exist
-    /// <b>before</b> the buttons do, or every panel written between now and then is born without one,
-    /// which is exactly how the application came to have two reset controls. So the debt is declared
-    /// rather than hidden, the way <c>eng/walk-pending.txt</c> and <c>eng/coverage-debt.txt</c>
-    /// already are, and the mechanism is deleted when the list empties.
-    /// </remarks>
-    private static readonly Dictionary<string, string> Pending = new(StringComparer.Ordinal)
-    {
-        // The last one, and it is not forgetfulness: measured on 2026-09-13, SubtitleStyleView does
-        // not fit the gear's 380 px band — a Viewbox in its colour pickers reaches 2010 px there.
-        // Making it fit is a redesign of that view for a third of its width, with its own mock-up,
-        // and it is a separate row rather than something to improvise inside this one.
-        ["SubtitleStyle"] = "It has its button, and is still reached through Settings: it belongs in "
-            + "the gear and does not fit its 380 px band yet.",
-    };
-
-    /// <summary>The ratchet over <see cref="Pending"/>, which only ever comes down.</summary>
-    private const int MaximumPending = 1;
-
-    /// <summary>
     /// Every button in the tree that puts something back, and what each one is allowed to say.
     /// </summary>
     /// <remarks>
@@ -291,6 +268,8 @@ public sealed class OptionGroupTests
 
     private static readonly XNamespace Xaml = "http://schemas.microsoft.com/winfx/2006/xaml";
 
+    private static readonly XNamespace Automation = "clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls";
+
     [Fact]
     public void Every_destination_is_either_a_group_of_options_or_written_off_as_not_one()
     {
@@ -319,16 +298,11 @@ public sealed class OptionGroupTests
                 + "options, so rule 11 has not been applied to them:\n  "
                 + string.Join("\n  ", undecided));
 
-        // A group whose destination does not exist yet is admitted through Pending and nowhere else,
-        // so «the rail entry has not been built» stays distinguishable from «the list has drifted».
-        var promised = Groups
-            .Where(entry => Pending.ContainsKey(entry.Key))
-            .Select(entry => entry.Value.Home)
-            .ToHashSet(StringComparer.Ordinal);
-
+        // Every classified destination has to exist. There was an exemption here while a group was
+        // waiting for a rail entry nobody had built; it went with the pending list on 2026-09-13,
+        // and an exemption that outlives its reason is a hole.
         var invented = classified
             .Where(home => !destinations.Contains(home, StringComparer.Ordinal))
-            .Where(home => !promised.Contains(home))
             .ToArray();
         Assert.True(
             invented.Length == 0,
@@ -477,7 +451,7 @@ public sealed class OptionGroupTests
     }
 
     [Fact]
-    public void Nothing_is_pending_that_the_list_does_not_admit_to()
+    public void Every_group_satisfies_the_rule_it_was_classified_under()
     {
         // None is excluded here the same way the classification test excludes it: it is the gear
         // showing its list, not a group, and letting it stand as a Home in one test and not in the
@@ -489,39 +463,26 @@ public sealed class OptionGroupTests
                 .Select(name => $"{nameof(PlayerSettingsGroup)}.{name}"))
             .ToHashSet(StringComparer.Ordinal);
 
-        // Three ways a group can fall short, and all three are debt rather than a difference of
-        // opinion: no button, a destination that has not been built, or a group living somewhere
-        // other than where rule 11 puts it. That last one is checked in BOTH directions — a Settings
-        // group sitting in the gear is the same failure as a player group sitting in Settings, and
-        // a rule about which of two places cannot be enforced over one of them.
+        // Three ways a group can fall short: no button, a destination that has not been built, or a
+        // group living somewhere other than where rule 11 puts it. That last one is checked in BOTH
+        // directions — a Settings group sitting in the gear is the same failure as a player group
+        // sitting in Settings, and a rule about which of two places cannot be enforced over one.
+        //
+        // There is no pending list any more. It existed from the morning of 2026-09-13, when the
+        // gate arrived before the buttons did, to that evening, when the last group moved into the
+        // gear — and the list emptying is what deletes the mechanism, which is what it said it would
+        // do. Anything short of the rule is now a red, with nowhere to be written down.
         var owed = Groups
             .Where(entry => entry.Value.ResetButton is null
                 || !destinations.Contains(entry.Value.Home)
                 || entry.Value.Place != PlaceOf(entry.Value.Home))
-            .Select(entry => entry.Key)
+            .Select(entry => $"{entry.Key} ({entry.Value.Home})")
             .ToArray();
 
-        var unadmitted = owed.Where(name => !Pending.ContainsKey(name)).ToArray();
         Assert.True(
-            unadmitted.Length == 0,
-            "these groups do not satisfy the rule and are not admitted as pending, so the gate would "
-                + "be green over work nobody knows is owed:\n  " + string.Join("\n  ", unadmitted));
-
-        var stale = Pending.Keys.Where(name => !owed.Contains(name, StringComparer.Ordinal)).ToArray();
-        Assert.True(
-            stale.Length == 0,
-            "these are listed as pending and already satisfy the rule, so the list is only allowed "
-                + "to shrink and has not:\n  " + string.Join("\n  ", stale));
-
-        // Equal and not «at most», which is the difference between a ratchet and a ceiling: the two
-        // assertions above already force the list to be exactly the debt, so a «<=» would let three
-        // groups be fixed without the number moving and leave three silent slots behind. This is
-        // what eng/check-coverage.ps1 means by failing at a floor that is short AND at one that is
-        // long.
-        Assert.True(
-            Pending.Count == MaximumPending,
-            $"{Pending.Count} groups are pending and the ratchet says {MaximumPending}. It only "
-                + "comes down, and it comes down in the same change that fixes one.");
+            owed.Length == 0,
+            "these groups do not satisfy rule 11 — no button, no destination, or living in the "
+                + "place the list says they do not belong:\n  " + string.Join("\n  ", owed));
     }
 
     /// <summary>
@@ -645,7 +606,15 @@ public sealed class OptionGroupTests
     {
         var command = (string?)button.Attribute("Command") ?? string.Empty;
 
-        return Mentions(NameOf(button)) || Mentions(command);
+        // Or it simply says the shared key, which is the half a naming convention cannot cover: a
+        // button called AppearanceDefaultsButton bound to some other command, drawing «Restaurar
+        // valores por defecto», was invisible here — measured on 2026-09-13 with two of them on one
+        // screen and every suite green.
+        return Mentions(NameOf(button))
+            || Mentions(command)
+            || button.DescendantsAndSelf()
+                .SelectMany(element => element.Attributes())
+                .Any(attribute => attribute.Value.Contains($"Resource {GroupResetKey}", StringComparison.Ordinal));
 
         static bool Mentions(string value) =>
             value.Contains("Reset", StringComparison.Ordinal)
@@ -674,24 +643,47 @@ public sealed class OptionGroupTests
     /// </remarks>
     private static string KeySaidBy(XElement button)
     {
-        var candidates = button.DescendantsAndSelf()
-            .SelectMany(element => element.Attributes())
-            .Select(attribute => attribute.Value);
+        // The LABEL, not whatever key comes first in document order. Until 2026-09-13 (afternoon)
+        // this walked every attribute of every descendant and returned the first match, and in
+        // fourteen of the sixteen buttons in the census that is AutomationProperties.Name — so the
+        // gate that exists to assert «all of them say it through one resource key» was asserting the
+        // accessible name. Measured by mutation: changing one Content to a different key left 1415
+        // tests green with a group's reset reading «Restaurar campos del proveedor».
+        //
+        // The accessible name is asserted too, below, rather than instead: they have to agree, and
+        // an icon-only button has no label at all.
+        var label = KeyIn((string?)button.Attribute("Content"))
+            ?? button.Elements()
+                .Where(element => !element.Name.LocalName.Contains('.', StringComparison.Ordinal))
+                .SelectMany(element => element.DescendantsAndSelf())
+                .Select(element => KeyIn((string?)element.Attribute("Text")))
+                .FirstOrDefault(key => key is not null);
 
-        foreach (var value in candidates)
+        var accessible = KeyIn(
+            (string?)button.Attribute(Automation + "AutomationProperties.Name"));
+
+        if (label is not null && accessible is not null && !string.Equals(label, accessible, StringComparison.Ordinal))
         {
-            var match = System.Text.RegularExpressions.Regex.Match(
-                value,
-                @"^\{(?:Dynamic|Static)Resource\s+([^}]+)\}$",
-                System.Text.RegularExpressions.RegexOptions.None,
-                TimeSpan.FromSeconds(2));
-
-            if (match.Success)
-            {
-                return match.Groups[1].Value.Trim();
-            }
+            return $"<label {label} but read aloud as {accessible}>";
         }
 
-        return "<no resource key>";
+        return label ?? accessible ?? "<no resource key>";
+    }
+
+    /// <summary>The resource key inside a <c>{DynamicResource X}</c>, or null if there is none.</summary>
+    private static string? KeyIn(string? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        var match = System.Text.RegularExpressions.Regex.Match(
+            value,
+            @"^\{(?:Dynamic|Static)Resource\s+([^}]+)\}$",
+            System.Text.RegularExpressions.RegexOptions.None,
+            TimeSpan.FromSeconds(2));
+
+        return match.Success ? match.Groups[1].Value.Trim() : null;
     }
 }

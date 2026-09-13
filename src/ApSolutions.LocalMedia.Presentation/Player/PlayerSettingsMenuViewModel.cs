@@ -37,11 +37,13 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
     public PlayerSettingsMenuViewModel(
         PictureAdjustmentViewModel? picture = null,
         Settings.PlaybackSettingsViewModel? nextEpisode = null,
-        Settings.SegmentDetectionSettingsViewModel? segments = null)
+        Settings.SegmentDetectionSettingsViewModel? segments = null,
+        SubtitleStyleViewModel? subtitles = null)
     {
         Picture = picture;
         NextEpisode = nextEpisode;
         Segments = segments;
+        Subtitles = subtitles;
         ToggleCommand = new MenuCommand(_ => IsOpen = !_isOpen);
         CloseCommand = new MenuCommand(_ => IsOpen = false);
         BackCommand = new MenuCommand(_ => Group = PlayerSettingsGroup.None);
@@ -68,6 +70,9 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
 
     /// <summary>Automatic segment detection, down from Settings the same day and also global.</summary>
     public Settings.SegmentDetectionSettingsViewModel? Segments { get; }
+
+    /// <summary>The subtitle style, down from Settings the same day and also global.</summary>
+    public SubtitleStyleViewModel? Subtitles { get; }
 
     public ICommand ToggleCommand { get; }
 
@@ -102,10 +107,17 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
             // already adjusting — three controls disagreeing with the picture, and the first touch
             // writing that neutral over what had been chosen. Once per gear, because the row does
             // not change underneath it.
-            if (_isOpen && !_loaded && Picture is not null)
+            if (_isOpen && !_loaded)
             {
                 _loaded = true;
-                _ = Picture.LoadAsync();
+                _ = Picture?.LoadAsync();
+
+                // And the subtitle style, which came down from Settings on 2026-09-13 and arrived
+                // with the same hole: the page it left was loaded by the window's configuration, and
+                // the gear is configured by nobody. The walk caught it — «the style stored before
+                // this window opened never reached the screen it belongs to» — which is the second
+                // time this exact defect has been found inside this menu.
+                _ = Subtitles?.LoadAsync();
             }
 
             // Closing forgets which group was open, so the next opening starts at the list. Keeping
@@ -146,11 +158,17 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
     /// <inheritdoc cref="IsPictureVisible"/>
     public bool IsSegmentsVisible => _isOpen && _group is PlayerSettingsGroup.Segments;
 
+    /// <inheritdoc cref="IsPictureVisible"/>
+    public bool IsSubtitlesVisible => _isOpen && _group is PlayerSettingsGroup.Subtitles;
+
     /// <summary>Whether the gear has the countdown group to offer at all.</summary>
     public bool HasNextEpisode => NextEpisode is not null;
 
     /// <inheritdoc cref="HasNextEpisode"/>
     public bool HasSegments => Segments is not null;
+
+    /// <inheritdoc cref="HasNextEpisode"/>
+    public bool HasSubtitles => Subtitles is not null;
 
     private void RaiseEverything()
     {
@@ -162,6 +180,7 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
             nameof(IsPictureVisible),
             nameof(IsNextEpisodeVisible),
             nameof(IsSegmentsVisible),
+            nameof(IsSubtitlesVisible),
         })
         {
             OnPropertyChanged(name);

@@ -27,7 +27,6 @@ public enum SettingsSection
     // player's gear (ADR-0012) and are reached through PlayerSettingsGroup now: their value is
     // decided while watching something, which is not a question a settings page can be asked.
     Recommendations,
-    Subtitles,
     Shortcuts,
     Lifecycle,
     Privacy,

@@ -3,7 +3,7 @@
 - Fecha / Date: 2026-09-13
 - Rama / Branch: `codex/ap-reelume-mvp-x64`
 - Entorno / Environment: Windows 11 Pro 10.0.26200 x64, .NET SDK 10.0.302.
-- IDs: `UX-010=IN_PROGRESS`
+- IDs: `UX-010=IMPLEMENTED`
 - Pruebas re-ejecutables / Re-runnable tests:
   `tests/ApSolutions.LocalMedia.UiTests/Theme/OptionGroupTests.cs`,
   `tests/ApSolutions.LocalMedia.UiTests/Player/PlayerSettingsMenuTests.cs`,
@@ -31,7 +31,7 @@ con forma de restaurar, 1 botón con la clave compartida.
 
 | Sitio | Grupos |
 | --- | --- |
-| Engranaje del reproductor (4) | Imagen · Cuenta atrás del siguiente episodio · Detección de segmentos · *(Estilo de subtítulos, pendiente)* |
+| Engranaje del reproductor (4) | Imagen · Estilo de subtítulos · Cuenta atrás del siguiente episodio · Detección de segmentos |
 | Ajustes (8) | Apariencia · Idioma · Escaneo · Recomendaciones · Atajos · Ciclo de vida · Privacidad · Actualizaciones |
 
 El criterio que decide cada rechazo, y que está escrito en la propia lista: un grupo guarda al menos
@@ -84,8 +84,13 @@ respondían los dos a `PlayerSettingsSurface`, visibles a la vez uno dentro del 
 
 ## Lo que la mudanza al engranaje midió
 
-- **`SubtitleStyleView` no cabe**: en la banda de 380 px, un `Viewbox` de sus selectores de color
-  llega a **2.010 px**. `PlaybackSettingsView` y `SegmentDetectionSettingsView` sí caben.
+- **«`SubtitleStyleView` no cabe» fue una medición falsa mía, y estuvo escrita unas horas.** La
+  prueba de ancho leía `Bounds.Right`, relativo al padre y **ciego a las transformaciones de
+  render**: un `Viewbox` dispone a su hijo a tamaño natural y lo escala, así que un icono medía
+  2.010 px en su espacio y **12 dibujados**. Con `TranslatePoint` contra la banda —lo que
+  `ViewOverflowTests` ya hacía— las cuatro vistas caben. **Y la banda real no son 380 px sino 346**:
+  el borde y el relleno del panel se llevan 34, así que la prueba comparaba contra un número que la
+  vista nunca recibe.
 - **El menú con todas sus ramas dibujadas mide 1.126 px**, más alto que la ventana más corta que la
   aplicación permite. La banda ganó un `ScrollViewer` de 360 px: lo que un grupo necesita con
   holgura, así que no muerde en una ventana normal — y si mordiera, el hit test del paseo no sigue un
@@ -108,3 +113,31 @@ respondían los dos a `PlayerSettingsSurface`, visibles a la vez uno dentro del 
   posterior dijo **96/85**. La cautela seguía siendo correcta —un suelo sale del artefacto, y la
   previsualización sólo conoce las suites que le nombras— pero la sospecha de que la aritmética
   sumada de ramas hiciera divergir las dos cifras **no se sostuvo con el dato**.
+
+## Y la segunda pasada del auditor, que encontró seis más
+
+La primera auditoría cubrió la puerta de `UX-010`; estas tres piezas llegaron después y se auditaron
+aparte. Ocho hallazgos verificados con mutación, y dos cambiaron una decisión:
+
+- **La aritmética de la puerta de ancho era falsa** — `Bounds.Right` en vez de `TranslatePoint`—, y
+  sobre ella descansaba «el estilo de subtítulos no cabe» y una tarea de rediseño que no hacía falta.
+  Con el instrumento corregido, las cuatro vistas caben y el grupo bajó al engranaje.
+- **El regex que lee el ancho casaba `MaxWidth`**, y ese número alimenta **a la vez** la ventana de la
+  prueba y su umbral: un valor equivocado concuerda consigo mismo y deja pasar un desborde de 600 px.
+  Medido. Lleva frontera por la izquierda y una aserción del rango.
+- **La teoría tenía una fila para tres grupos**, y se montaba la vista suelta a 380 en vez de la
+  cadena real, que entrega 346.
+- **`KeySaidBy` devolvía el nombre accesible, no la etiqueta**, en catorce de los dieciséis botones
+  del censo: la puerta escrita para afirmar «todos lo dicen con la misma clave» afirmaba otra cosa.
+  Ahora lee la etiqueta y exige que las dos concuerden.
+- **`PutsSomethingBack` no leía la clave**, así que un botón llamado de otra manera y atado a otro
+  comando podía dibujar «Restaurar valores por defecto» sin que nada sonara.
+- **La puerta de altura era existencial y no transitiva**: una aparición bajo un `ScrollViewer` en
+  cualquier fichero valía por todos los montajes —incluida una con `IsVisible="False"`— y en cambio
+  no reconocía una vista scrolleada a través de la que la contiene. Ahora pregunta por **todos** sus
+  montajes y resuelve la contención hacia arriba.
+
+**Y la escena del paseo cazó un defecto de producción al mudar el grupo**: el estilo de subtítulos
+del engranaje **no leía lo guardado**. La página que dejó la cargaba la configuración de la ventana,
+y al engranaje no lo configura nadie — el mismo agujero que el grupo de imagen tuvo el día anterior,
+en el mismo menú. Abrir el engranaje es lo que carga, y ahora carga los dos.

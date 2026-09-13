@@ -671,7 +671,6 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsLanguageSection));
                 OnPropertyChanged(nameof(IsLibrarySection));
                 OnPropertyChanged(nameof(IsRecommendationsSection));
-                OnPropertyChanged(nameof(IsSubtitlesSection));
                 OnPropertyChanged(nameof(IsShortcutsSection));
                 OnPropertyChanged(nameof(IsLifecycleSection));
                 OnPropertyChanged(nameof(IsPrivacySection));
@@ -690,7 +689,6 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public bool IsRecommendationsSection => CurrentSettingsSection == SettingsSection.Recommendations;
 
-    public bool IsSubtitlesSection => CurrentSettingsSection == SettingsSection.Subtitles;
 
 
 

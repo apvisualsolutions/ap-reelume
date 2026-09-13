@@ -1097,7 +1097,12 @@ public static partial class CompositionRoot
                         .ConfigureCountdown(seconds)),
                 new SegmentDetectionSettingsViewModel(
                     () => provider.GetRequiredService<DetectSeriesSegments>().IsEnabled,
-                    enabled => provider.GetRequiredService<DetectSeriesSegments>().SetEnabled(enabled)))
+                    enabled => provider.GetRequiredService<DetectSeriesSegments>().SetEnabled(enabled)),
+
+                // The subtitle style keeps the global scope it had on the settings page, for the
+                // same reason the other two do: it is one answer for the whole library, and making
+                // it per-series would be a change to the stored model nobody asked for.
+                provider.GetRequiredService<SubtitleStyleViewModel>())
             : null;
 
     /// <summary>
