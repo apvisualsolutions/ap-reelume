@@ -240,6 +240,31 @@ public sealed class PlaybackSettingsTests
     }
 
     /// <summary>
+    /// Restoring a group that is already at its defaults writes nothing, and that branch is not a
+    /// nicety: without it this file measured 100/95 in CI and the coverage gate refused the change.
+    /// A reset that rewrote the same number would also announce a change nobody made.
+    /// </summary>
+    [Fact]
+    public void Restoring_what_is_already_the_factory_length_writes_nothing()
+    {
+        var stored = PlaybackSettingsViewModel.DefaultCountdownSeconds;
+        var writes = 0;
+        var viewModel = new PlaybackSettingsViewModel(
+            () => stored,
+            seconds =>
+            {
+                stored = seconds;
+                writes++;
+            });
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+
+        Assert.Equal(0, writes);
+        Assert.Equal(PlaybackSettingsViewModel.DefaultCountdownSeconds, stored);
+        Assert.True(viewModel.IsCountdownEnabled);
+    }
+
+    /// <summary>
     /// The factory length is the use case's own constant and not a second copy of the number ten,
     /// because two literals are two numbers that can disagree with nothing to say which is right.
     /// </summary>
