@@ -25,7 +25,8 @@ reproductor de YouTube. Contar lo que había dio la medida:
   estilo de subtítulos, velocidad y atajos—, sin ninguna regla escrita que dijera por qué unas
   estaban a un lado y otras al otro.
 - **Dos controles de restablecer en toda la aplicación**: «Volver a 1×» y «Restaurar campos del
-  proveedor». Ninguna sección de ajustes se podía deshacer.
+  proveedor». Ninguna sección de ajustes se podía deshacer. **Las dos mitades resultaron falsas** al
+  medirlas el 2026-09-13 — ver la enmienda del final.
 
 Nadie había decidido nunca el criterio, y por eso cada panel se escribió donde le tocó al que lo
 escribió.
@@ -49,13 +50,15 @@ todos los ajustes del reproductor fuera de la cobertura del paseo de una vez.
 
 **Cada grupo de opciones, esté donde esté, lleva dentro su «Restaurar valores por defecto».** Dentro
 del grupo y no en un menú aparte: restaurar lo que se está mirando es predecible, y un «restaurar
-todo» escondido es donde nacen los sustos. Los catorce usan **la misma clave de traducción**, no el
+todo» escondido es donde nacen los sustos. Los doce usan **la misma clave de traducción**, no el
 mismo literal.
 
 ### Consecuencias
 
-- **Tres secciones bajan de Ajustes al reproductor**: la superficie del reproductor, la cuenta atrás
-  del siguiente episodio y saltar intros. Las otras seis se quedan.
+- **Tres secciones bajan de Ajustes al reproductor**: la cuenta atrás del siguiente episodio, saltar
+  intros y el estilo de subtítulos. Las otras se quedan. *(Esta línea decía «la superficie del
+  reproductor» en vez del estilo de subtítulos, y se corrigió el 2026-09-13 al medir que esa fila no
+  tiene ningún mando — ver la enmienda del final.)*
 - **Los cinco paneles de hoy pierden su botón propio en la barra** y pasan dentro del engranaje. La
   barra queda con reproducir, volumen, engranaje, miniatura y pantalla completa.
 - **La puerta no puede juzgar el criterio**, porque «se decide mirando» no es medible. Lo que exige es
@@ -89,11 +92,43 @@ donde estaba escrita en general.
   quitar controles de transporte. Quitarlos sería una pérdida que ninguna sección de este documento
   justifica.
 
-**Y una cifra de este documento está por comprobar**: «los catorce». El estilo de subtítulos y los
-atajos se cuentan aquí como dos de los cinco grupos del reproductor **y** como dos de las nueve
-secciones de Ajustes, cuando hoy viven sólo en Ajustes. El recuento real se mide al escribir la lista
-cerrada de `UX-010`, y si no es catorce se corrigen este documento, la regla 11 de `CLAUDE.md` y la
-fila de la matriz.
+**Y una cifra de este documento estaba por comprobar**: «los catorce». El estilo de subtítulos y los
+atajos se contaban aquí como dos de los cinco grupos del reproductor **y** como dos de las nueve
+secciones de Ajustes, cuando entonces vivían sólo en Ajustes. Se midió el 2026-09-13 al escribir la
+lista cerrada, **y no eran catorce**: la enmienda siguiente lo cuenta.
+
+### Enmienda del 2026-09-13, al escribir la lista cerrada
+
+Cuatro correcciones, y las cuatro salen de que la puerta de `UX-010` enumerara el árbol en vez de que
+alguien lo leyera. Ninguna cambia la decisión; tres cambian hechos que este documento afirmaba.
+
+- **Son doce grupos, no catorce.** Cuatro en el reproductor —imagen, estilo de subtítulos, cuenta
+  atrás del siguiente episodio y detección de segmentos— y ocho en Ajustes: apariencia, idioma,
+  escaneo, recomendaciones, atajos, ciclo de vida, privacidad y actualizaciones. **La cifra vive en
+  `Groups`, dentro de `OptionGroupTests`, y de ahí se lee**; escribirla en un documento fue justo lo
+  que produjo el catorce.
+- **Los controles de restablecer eran cuatro, no dos, y uno estaba en una sección de ajustes.**
+  Faltaban `ShortcutSettingsRestore` —«Restaurar valores iniciales», en los atajos— y él solo
+  desmiente las dos mitades de la frase del contexto. Es además el más engañoso de los cuatro: su
+  botón ya se llama `RestoreDefaultsButton`, así que parece cumplir la regla y no la cumple. Que la
+  puerta afirme **la clave** y no el nombre ni el texto es lo único que lo distingue.
+- **«La superficie del reproductor» no puede bajar ni llevar botón.** No es una sección ni un grupo:
+  es una fila de sólo lectura sin un solo mando, y su propio comentario en el marcado dice que es
+  «una decisión y no una preferencia». Su sitio entre las tres que bajan lo ocupa **el estilo de
+  subtítulos**, que sí se juzga mirando la imagen y que este documento ya contaba entre los grupos
+  del reproductor.
+- **Ni las raíces de medios ni las copias son grupos**, así que `UX-010` **no necesita ninguna
+  confirmación destructiva** — lo contrario de lo que su criterio de aceptación prometía. Ninguna de
+  las dos guarda una sola preferencia: son datos y acciones. «Devolver las carpetas a sus valores de
+  fábrica» sería vaciar la biblioteca detrás de la palabra más inocente, que es la misma trampa que
+  este documento rechaza al descartar un «restaurar todo» global. La lista cerrada las **rechaza por
+  escrito**, porque un candidato ausente se lee igual que uno olvidado.
+
+**Y una restricción mecánica gobierna dónde puede vivir un grupo**, medida y no razonada: el paseo
+autónomo resuelve un control por su nombre accesible y **falla ante dos coincidencias visibles**.
+Como los doce botones dicen lo mismo por la misma clave, dos grupos alcanzables a la vez son una
+escena que no se puede pulsar. Por eso el idioma sale de Apariencia a una entrada propia en vez de
+quedarse como una tarjeta dentro de ella.
 
 ### Alternativas consideradas
 
@@ -116,7 +151,8 @@ On 2026-09-12 the owner asked for the picture options to move into the player, a
 conversation that **the rest of that view's settings should move too**, the way YouTube's player
 does it. Counting what existed gave the measure: **nine settings sections** and **five groups already
 in the player**, with no written rule saying why any of them was where it was; and **two reset
-controls in the whole application**, neither of them in a settings section.
+controls in the whole application**, neither of them in a settings section. **Both halves of that
+turned out to be false** when measured on 2026-09-13 — see the final amendment.
 
 ### Decision
 
@@ -129,12 +165,13 @@ by the automated walk, because its content lives in a separate popup root. Today
 `IsVisible` for exactly that reason.
 
 **Every group of options, wherever it lives, carries its «Restore default values» inside it** — in
-the group and not in a separate menu — and all fourteen use **the same resource key**, not the same
+the group and not in a separate menu — and all twelve use **the same resource key**, not the same
 literal.
 
 ### Consequences
 
-Three sections move down from Settings; the five existing panels lose their own button on the bar and
+Three sections move down from Settings — the next-episode countdown, skipping intros and the subtitle
+style; the five existing panels lose their own button on the bar and
 move inside the gear. The gate cannot judge the criterion, so what it requires is **the written
 decision**: a closed list classifies every group into one of the two places and fails on an
 unclassified one. The button's gate is symmetric — a group off the list fails, and a listed group
@@ -156,10 +193,44 @@ Three refinements, all three measured rather than reasoned. They do not change t
   what remains **of the controls this decision moves**, and nothing in the reasoning asks for
   transport controls to go.
 
-**And one figure here is unverified**: «the fourteen». Subtitle style and shortcuts are counted both
-as player groups and as two of the nine settings sections, while today they live only in Settings.
-The real count is measured when `UX-010`'s closed list is written, and if it is not fourteen this
-document, rule 11 and the matrix row are corrected.
+**And one figure here was unverified**: «the fourteen». Subtitle style and shortcuts were counted
+both as player groups and as two of the nine settings sections, while at the time they lived only in
+Settings. It was measured on 2026-09-13 when `UX-010`'s closed list was written, **and it was not
+fourteen**.
+
+### Amendment of 2026-09-13, while writing the closed list
+
+Four corrections, all four from letting the gate enumerate the tree instead of somebody reading it.
+None changes the decision; three change facts this document asserted.
+
+- **There are twelve groups, not fourteen.** Four in the player — picture, subtitle style,
+  next-episode countdown and segment detection — and eight in Settings: appearance, language,
+  scanning, recommendations, shortcuts, lifecycle, privacy and updates. **The figure lives in
+  `Groups`, inside `OptionGroupTests`, and is read from there**; writing it into a document is
+  exactly what produced the fourteen.
+- **There were four reset controls, not two, and one of them was in a settings section.**
+  `ShortcutSettingsRestore` — «Restaurar valores iniciales», on the shortcuts — was missing, and on
+  its own it disproves both halves of the context's sentence. It is also the most deceiving of the
+  four: its button is already called `RestoreDefaultsButton`, so it looks like it obeys the rule and
+  does not. That the gate asserts **the key** rather than the name or the text is the only thing
+  that tells them apart.
+- **«The player's surface» can neither move down nor carry a button.** It is not a section and not a
+  group: it is a read-only row with no control at all, and its own comment in the markup says it is
+  «a decision rather than a preference». Its place among the three that move down is taken by **the
+  subtitle style**, which is judged against the picture and which this document already counted
+  among the player's groups.
+- **Neither the media roots nor the backups are groups**, so `UX-010` **needs no destructive
+  confirmation at all** — the opposite of what its acceptance criterion promised. Neither stores a
+  single preference: they are data and actions. «Returning the folders to their factory values»
+  would empty the library behind the most innocent word, which is the same trap this document
+  rejects when it turns down a global «reset everything». The closed list **rejects them in
+  writing**, because an absent candidate reads exactly like a forgotten one.
+
+**And a mechanical restriction governs where a group may live**, measured rather than reasoned: the
+autonomous walk resolves a control by its accessible name and **fails on two visible matches**. Since
+all twelve buttons say the same thing through the same key, two groups reachable at once are a scene
+that cannot be clicked. That is why the language moves out of Appearance into a destination of its
+own rather than staying as a card inside it.
 
 ### Alternatives considered
 

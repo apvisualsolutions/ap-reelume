@@ -570,13 +570,26 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
     una regla de criterio.
 
     **La segunda mitad es `UX-010`** y su puerta es simétrica: un grupo que no esté en la lista
-    falla **y** un grupo listado sin su botón falla. Los catorce dicen «Restaurar valores por
+    falla **y** un grupo listado sin su botón falla. Los doce dicen «Restaurar valores por
     defecto» **por la misma clave de traducción**, y la prueba afirma la clave y no el texto —
     comparar el literal dejaría pasar dos claves con el mismo contenido, que es exactamente cómo
     llegaron a convivir «Volver a 1×» y «Restaurar campos del proveedor» para la misma idea.
 
+    **Doce, y el número no se copia de aquí: se lee de la lista**, que es `Groups` dentro de
+    `tests/ApSolutions.LocalMedia.UiTests/Theme/OptionGroupTests.cs`. Esta línea es una referencia y
+    puede estar vieja. Decía **catorce** en once sitios antes de que nadie contara, y el propio
+    `ADR-0012` la marcó como por comprobar porque ya se había visto el defecto: el estilo de
+    subtítulos y los atajos se contaban como grupos del reproductor **y** como secciones de Ajustes.
+    La lista lleva además **lo que se miró y NO es grupo, con la razón escrita**, porque un
+    candidato ausente se lee igual que uno olvidado.
+
     **Por qué hizo falta escribirlo**: el 2026-09-12 se contaron los controles de restablecer de
-    toda la aplicación y salieron **dos**, ninguno en una sección de ajustes. No fue una decisión de
+    toda la aplicación y salieron **dos**, ninguno en una sección de ajustes. **Las dos mitades de
+    esa frase eran falsas**, medido el 2026-09-13 por la propia puerta: son **cuatro**, y el que
+    faltaba está justamente en una sección de ajustes. Es el peor de todos —
+    `ShortcutSettingsRestore`, «Restaurar valores iniciales», con su botón ya llamado
+    `RestoreDefaultsButton`—: un grep por el nombre lo da por cumplido y sólo el grep por la clave
+    lo desmiente, que es exactamente por lo que la puerta afirma la clave. No fue una decisión de
     nadie: fue que cada panel se escribió sin que existiera la regla, y el siguiente habría hecho lo
     mismo.
 

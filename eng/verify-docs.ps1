@@ -56,10 +56,14 @@ $featureMatrix = Get-Content -LiteralPath $featureMatrixPath -Raw
 $featureIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|')
 $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*\| MVP \|')
 # 74 since 2026-09-12 (evening), when UX-010 was opened: the owner asked for a way to put any group
-# of options back the way it came, and measuring what exists found TWO reset controls in the whole
-# application — «back to 1x» on the speed, and «restore the provider's fields» on one title's
-# record. Not one settings section can be undone. Its gate is a closed list that fails from both
-# sides, so the next panel somebody writes cannot be born without the button.
+# of options back the way it came, and a first count found TWO reset controls in the whole
+# application. That count was short, and both halves of the sentence it produced were wrong:
+# measured on 2026-09-13 by the gate itself there are FOUR — «back to 1x» on the speed, «restore the
+# provider's fields» on one title's record, «restore default values» on the picture, and «restore
+# initial values» on the shortcuts, which IS in a settings section. The fourth is the one a grep
+# misses: its button is already named RestoreDefaultsButton while saying a different key, which is
+# why the gate asserts the key. Its gate is a closed list that fails from both sides, so the next
+# panel somebody writes cannot be born without the button.
 #
 # 73 since 2026-09-12 (evening), when PLY-018 was opened against POST_STABLE: the owner's own
 # library turned out to be the case nothing covered. A real episode measured 720x404 in a 2003 codec
