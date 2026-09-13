@@ -16,6 +16,72 @@
 > se borraron de aquí porque este documento es el registro de lo que pasó, y reescribir lo que pasó es
 > otra clase de error.
 
+> ## AVISO AL FRENTE — 2026-09-13, cierre: la medida de la nitidez estaba al revés, y dos diagnósticos míos eran falsos
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit. Al cerrar,
+> `main` y la rama quedaron **al día** y cada fast-forward se hizo con la conclusión de CI leída.
+>
+> ### Lo que se cerró
+>
+> · **La nitidez ya no se juzga por la anchura de un canto.** Esa medida tenía su mejor nota en el
+>   vecino más cercano —el peor reescalado que existe—, así que optimizar contra ella empujaba a un
+>   umbral duro. La sustituye el protocolo de la literatura de superresolución: se dibuja una verdad, se
+>   reduce, se amplía y se mide la distancia. La imagen pasó de un **30,4 %** a un **35,7 %** más cerca
+>   de la verdad, con el canto igual de fino y menos halo. Evidencia `PLY16-upscale-fidelity.md`.
+> · **El shader acota su resultado a su propio vecindario**, así que el halo no es pequeño: es
+>   imposible. 16 niveles con el tope y 29 sin él, comprobado por mutación.
+> · **El ajuste de imagen redondea al nivel más cercano** en vez de truncar. Con brillo 0,1 —25,5
+>   niveles— la imagen entera salía medio nivel oscura. Evidencia `PLY18-tone-banding.md`.
+>
+> ### Los dos diagnósticos falsos, que es la mitad que vale
+>
+> **El propietario reportó cuadros alrededor de las letras y se propusieron dos causas, las dos mías y
+> las dos equivocadas.** Primero el timbre del reescalador: su coeficiente bajó dos veces **y se aflojó
+> un suelo de fidelidad** para que pasara. Luego la cuantización de la curva de tono: el difuminado se
+> construyó entero, con su matriz ordenada, sus pruebas y su control, y llegó a producción veinte
+> minutos.
+>
+> **La tercera causa la encontró él con un control de treinta segundos**: abrió el fichero en VLC y
+> «con la reducción de ruido se arregla casi todo». Son marcas de la compresión del vídeo y la gamma
+> sólo las saca a la luz.
+>
+> **Lo que hay que llevarse de aquí**: lo que alguien ve es un **síntoma, no un diagnóstico**. Había dos
+> cosas tocando el mismo píxel y se ajustó una sin apagarla primero. Todo lo del reescalador se deshizo
+> — coeficiente, suelo y techo.
+>
+> ### Las trampas medidas, y tres son de método
+>
+> · **Un patrón de difuminado en resolución de origen se amplía a bloques de 32 píxeles.** La culpa no
+>   era la amplitud —el afilado no lo amplifica, medido— sino el orden: **un difuminado va después del
+>   escalado**, y ninguna de sus pruebas podía verlo porque todas medían la resolución del fotograma.
+> · **Una verdad alineada a la rejilla del origen premia lo mismo que la medida que sustituye.** El
+>   primer patrón tenía los cantos en múltiplos de cuatro, así que reducir no perdía nada y el vecino
+>   más cercano lo reconstruía byte a byte: **0,50 contra 30,54**. La verdad va fuera de rejilla, y una
+>   prueba no hace otra cosa que afirmar que el vecino más cercano puntúa **peor** que el borrón.
+> · **Un modelo calibrado sirve para elegir, no para medir.** Un guion fuera de línea reprodujo el
+>   perfil archivado exacto y acertó tres predicciones seguidas — y falló la anchura de la rampa en un
+>   punto de la frontera, que es un recuento discreto pegado a dos umbrales.
+> · **El techo de este reescalador está medido con tres shaders distintos**: todo lo que no puede
+>   salirse del rango local se queda en un **13 %**, y toda la nitidez por encima sale de los lóbulos
+>   negativos — y el escalón también. Es `ENG-022`.
+> · **La copia del auditor de puertas pone roja `EvidenceLinkTests`** mientras exista, y hay que
+>   retirarla con `git worktree remove` antes de correr las suites de documentación. Pasó dos veces.
+>
+> ### Lo pendiente NO está aquí
+>
+> Está en `docs/FEATURES.md` (alcance) y `docs/TAREAS.md` (faenas). De esta tanda salieron `ENG-019` a
+> `ENG-024`, y la que más cambia lo que se ve es **`ENG-024`, el reductor de ruido**: el complemento
+> `libhqdn3d_plugin.dll` **ya viaja** en el paquete, y el «los filtros de VLC 3 no procesan un
+> fotograma» que hay archivado se midió con un filtro que **cambia el formato** — éste no lo cambia, así
+> que es una sonda distinta y sin hacer.
+>
+> ### Lo que espera al propietario
+>
+> · **El juicio visual de `PLY-016` sigue siendo suyo** y ya lo dio tres veces esta tanda; la cadena
+>   está en el punto que mejor mide y él no ha visto todavía una versión sin ruido de compresión encima.
+> · **La regla del orden del backlog propuesta para las reglas comunes**, que sigue esperando su sí.
+
 > ## AVISO AL FRENTE — 2026-09-13, cierre: el escalador dibuja, y lo pendiente ya tiene quien lo cuente
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

@@ -16,6 +16,73 @@
 > deleted from here, because this document is the record of what happened, and rewriting what happened
 > is a different kind of mistake.
 
+> ## FRONT NOTICE — 2026-09-13, close: the yardstick for sharpness was backwards, and two diagnoses were false
+>
+> **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here. At close,
+> `main` and the branch were **up to date** and every fast-forward was made with CI's conclusion read.
+>
+> ### What closed
+>
+> · **Sharpness is no longer judged by the width of an edge.** That yardstick had its best score at
+>   nearest-neighbour — the worst enlargement there is — so optimising against it pushed towards a hard
+>   threshold. It is replaced by the protocol the super-resolution literature uses: draw a truth, shrink
+>   it, enlarge it and measure the distance. The picture went from **30.4 %** to **35.7 %** closer to the
+>   truth, with the edge just as fine and less haloing. Evidence `PLY16-upscale-fidelity.md`.
+> · **The shader bounds its result to its own neighbourhood**, so the halo is not small: it is
+>   impossible. 16 levels with the bound and 29 without, killed by mutation.
+> · **The picture adjustment rounds to the nearest level** instead of truncating. At brightness 0.1 —
+>   25.5 levels — the whole picture came out half a level dark. Evidence `PLY18-tone-banding.md`.
+>
+> ### The two false diagnoses, which are the half that counts
+>
+> **The owner reported blocks around lettering and two causes were proposed, both mine and both wrong.**
+> First the upscaler's ringing: its coefficient came down twice **and a fidelity floor was loosened** to
+> let it pass. Then the tone curve's quantisation: the dither was built whole, with its ordered matrix,
+> its tests and its control, and it reached production for twenty minutes.
+>
+> **He found the third cause with a thirty-second control**: he opened the file in VLC and «with the
+> noise reduction almost everything is fixed». They are marks the video's compression left behind and
+> gamma only brings them to light.
+>
+> **What to take from this**: what somebody sees is a **symptom, not a diagnosis**. Two things were
+> touching the same pixel and one was tuned without switching it off first. Everything about the
+> upscaler was undone — coefficient, floor and ceiling.
+>
+> ### The measured traps, and three are about method
+>
+> · **A dither pattern at source resolution is magnified into 32-pixel blocks.** The fault was not the
+>   amplitude — the sharpening does not amplify it, measured — but the ordering: **a dither goes after
+>   the scaling**, and none of its tests could see this because they all measured the resolution of the
+>   frame.
+> · **A truth aligned to the source grid rewards the same thing as the yardstick it replaces.** The
+>   first pattern had its edges on multiples of four, so shrinking lost nothing and nearest-neighbour
+>   reconstructed it byte for byte: **0.50 against 30.54**. The truth goes off-grid, and one test does
+>   nothing but assert that nearest-neighbour scores **worse** than the blur.
+> · **A calibrated model is for choosing, not for measuring.** An offline script reproduced the archived
+>   profile exactly and got three predictions right in a row — and got the ramp width wrong at a
+>   boundary point, which is a discrete count sitting against two thresholds.
+> · **This upscaler's ceiling is measured across three different shaders**: anything that cannot leave
+>   the local range stops at **13 %**, and all the sharpness above that comes from the negative lobes —
+>   and so does the step. That is `ENG-022`.
+> · **The gate auditor's copy turns `EvidenceLinkTests` red** while it exists, and it has to be removed
+>   with `git worktree remove` before running the documentation suites. It happened twice.
+>
+> ### What is pending is NOT here
+>
+> It is in `docs/FEATURES.md` (scope) and `docs/TAREAS.md` (chores). This batch produced `ENG-019` to
+> `ENG-024`, and the one that changes most of what is seen is **`ENG-024`, the noise reducer**: the
+> `libhqdn3d_plugin.dll` plugin **already travels** in the package, and the archived «VLC 3's video
+> filters never process a frame» was measured with a filter that **changes the format** — this one does
+> not, so it is a different probe and it has not been run.
+>
+> ### What is waiting for the owner
+>
+> · **The visual judgement on `PLY-016` is still his** and he gave it three times this batch; the chain
+>   sits at the point that measures best and he has not yet seen a version without compression noise on
+>   top of it.
+> · **The backlog ordering rule proposed for the shared rules**, still waiting for his yes.
+
 > ## FRONT NOTICE — 2026-09-13, closing: the upscaler draws, and open work finally has something counting it
 >
 > **Read the tree first; it overrules this document**: `git log --oneline -1 main`,
