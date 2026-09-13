@@ -66,13 +66,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 - **El razonamiento legal sobre los complementos de VideoLAN estaba cerrado y se ha reabierto, sin
   que nadie tocara una línea de código.** Decía que un complemento contagioso «encaja» dentro del
   programa porque ambos se encuentran en la misma versión de la licencia libre. El razonamiento era
-  correcto y lo sigue siendo; lo que cambió es la premisa. Medido el 2026-09-13: el complemento que
-  importa **no es el codificador que un reproductor no usa**, sino el **decodificador**, cuya línea
-  de compilación empieza por `--enable-gpl` —leída dentro del binario, con tres complementos de
-  control que no la llevan—. **Mientras viaje ahí, el artefacto no se puede distribuir**, y queda
-  escrito como hallazgo abierto en vez de como pregunta pendiente. La salida medida no pierde
-  formatos: la biblioteca que descodifica es permisiva por defecto y lo contagioso son piezas
-  opcionales que se activan al compilar.
+  correcto y lo sigue siendo; lo que cambió es la premisa. Medido el 2026-09-13 y recontado entero el
+  2026-09-14 sobre los ~300 complementos del paquete: los que importan **no son el codificador que un
+  reproductor no usa**, son dos **decodificadores** —`libavcodec_plugin.dll` y `libswscale_plugin.dll`,
+  que comparten build de FFmpeg y cuya línea de compilación empieza por `--enable-gpl`— más un tercero,
+  el propio codificador x264, que es GPL por licencia propia y no por esa cadena. **Mientras viajen
+  ahí, el artefacto no se puede distribuir**, y queda escrito como hallazgo abierto en vez de como
+  pregunta pendiente. La salida medida no pierde formatos: la biblioteca que descodifica es permisiva
+  por defecto y lo contagioso son piezas opcionales que se activan al compilar.
 
 - **Una puerta se habría quedado ciega y en verde.** La comprobación que impide que una licencia sin
   archivar llegue al artefacto reconoce identificadores con forma de licencia publicada, y un

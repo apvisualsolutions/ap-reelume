@@ -67,11 +67,15 @@ your option) any later version" clause, so a `GPL-2.0-or-later` plugin rises to 
 inside a GPL-3.0 program**. The reasoning was valid and still is; what changed is the premise — **the
 program is no longer GPL**, so there is no version to rise to.
 
-Measured on 2026-09-13: the package carries some three hundred VideoLAN plugins and **at least one
-indispensable plugin is GPL**. It is not the x264 encoder, which could be dropped because a player
-does not encode: it is **`libavcodec_plugin.dll`, the decoder**, whose build configuration line begins
-with `--enable-gpl`. It was read inside the binary itself, with three control plugins that do not
-carry it.
+Measured on 2026-09-13 and recounted in full on 2026-09-14 — across all three hundred plugins, not a
+sample —: **two carry `--enable-gpl` in their build configuration line, `libavcodec_plugin.dll` and
+`libswscale_plugin.dll`**, none of the rest. They share the same FFmpeg build, which is why it is two
+and not one. Neither is the x264 encoder, which could be dropped because a player does not encode.
+
+**And these are two different kinds of evidence, worth keeping apart.** That build string only
+certifies FFmpeg. `libx26410b_plugin.dll` — the 10-bit x264 — is `GPL-2.0-or-later` by the library's
+own licence, not by any build option: grepping it for `--enable-gpl` correctly returns zero matches,
+and that does not make it any less GPL.
 
 **The practical consequence is hard**: while that plugin travels inside the package, **the artifact
 cannot be distributed** under the proprietary licence. This repository's source can carry it — the

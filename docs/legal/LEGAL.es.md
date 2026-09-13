@@ -69,11 +69,16 @@ que un complemento `GPL-2.0-or-later` sube a GPL-3.0 y **encaja dentro de un pro
 razonamiento era válido y sigue siéndolo; lo que cambió es la premisa: **el programa ya no es GPL**,
 así que no hay ninguna versión a la que subir.
 
-Medido el 2026-09-13: el paquete transporta unos trescientos complementos de VideoLAN y **al menos
-uno imprescindible es GPL**. No es el codificador x264, que se podría quitar por ser un codificador
-que un reproductor no usa: es **`libavcodec_plugin.dll`, el decodificador**, cuya línea de
-compilación empieza por `--enable-gpl`. Se leyó dentro del propio binario, con tres complementos de
-control que no la llevan.
+Medido el 2026-09-13 y recontado entero el 2026-09-14 —sobre los trescientos complementos, no sobre
+una muestra—: **dos llevan `--enable-gpl` en su línea de compilación, `libavcodec_plugin.dll` y
+`libswscale_plugin.dll`**, ninguno más. Comparten el mismo build de FFmpeg, por eso son los dos y no
+uno. Ninguno es el codificador x264, que se podría quitar por ser un codificador que un reproductor no
+usa.
+
+**Y son dos pruebas de naturaleza distinta, que conviene no confundir.** Esa cadena de compilación
+sólo certifica FFmpeg. `libx26410b_plugin.dll` —el x264 de 10 bits— es `GPL-2.0-or-later` por licencia
+propia de la librería, no por ninguna opción de compilación: grep-earlo buscando `--enable-gpl` da,
+correctamente, cero coincidencias, y eso no lo hace menos GPL.
 
 **Consecuencia práctica, y es dura**: mientras ese complemento viaje dentro del paquete, **el
 artefacto no se puede distribuir** bajo la licencia propia. El código fuente de este repositorio sí

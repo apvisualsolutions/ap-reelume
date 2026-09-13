@@ -246,3 +246,41 @@ un árbol que llevaba trabajo de PLY-016 a medias —siete archivos, entre ellos
 revisión del diff se hizo filtrando por número de líneas y **no los enseñó**, así que se anunciaron
 «25 archivos con cambios reales» cuando eran 32. Un `add -A` no es una revisión; la revisión es mirar
 la lista entera de lo que se va a commitear.
+
+---
+
+## Enmienda del 2026-09-14 — la medición de qué complementos son GPL, completa y con evidencia
+
+La enmienda del 2026-09-13, punto 1, decía que `libavcodec_plugin.dll` llevaba `--enable-gpl` "con
+tres complementos de control que no la llevan" — sin nombrarlos ni archivar el comando. `ENG-014`
+(`docs/TAREAS.md`) lo señaló como dato malo para quien empezara `ENG-013` con él. / The 2026-09-13
+amendment measured one plugin against three unnamed controls and archived neither; this closes that
+gap with a full scan.
+
+**Medido esta vez sobre los trescientos complementos del paquete, no sobre una muestra**, en las dos
+arquitecturas:
+
+```
+grep -rla -- "--enable-gpl" plugins/    # x64: 323 .dll, arm64: 310 .dll
+→ codec/libavcodec_plugin.dll
+→ video_chroma/libswscale_plugin.dll
+(ningún otro, en ninguna de las dos arquitecturas)
+
+find plugins/ -iname "*x264*" -o -iname "*x265*"
+→ codec/libx26410b_plugin.dll   (única coincidencia, las dos arquitecturas; no hay x264 de 8 bits ni x265)
+```
+
+**La tabla completa y correcta es de tres plugins, no de uno**, y por dos razones distintas que la
+redacción anterior mezclaba sin avisar:
+
+| Plugin | Por qué es GPL | Lo detecta el grep de `--enable-gpl` |
+| --- | --- | --- |
+| `libavcodec_plugin.dll` | Su build de FFmpeg se compiló con `--enable-gpl` | Sí |
+| `libswscale_plugin.dll` | Comparte esa misma build de FFmpeg | Sí |
+| `libx26410b_plugin.dll` (x264, 10 bits) | Licencia propia de la librería x264 | **No** — y no lo hace menos GPL |
+
+`docs/legal/LEGAL.{es,en}.md`, `docs/release/THIRD-PARTY-NOTICES.{es,en}.md` y
+`docs/release/licenses/NOTICE-VideoLAN.txt` sólo nombraban `libavcodec_plugin.dll` y presentaban x264
+como "el ejemplo más claro" sin decir que su prueba de licencia es otra. Los cinco quedan corregidos
+con esta tabla. `ENG-014` cerrado; evidencia completa en
+[audit-eng014-plugin-gpl-scan.md](audit-eng014-plugin-gpl-scan.md).

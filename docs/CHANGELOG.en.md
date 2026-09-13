@@ -66,12 +66,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **The legal reasoning about VideoLAN's plugins was closed and has reopened, without anybody
   touching a line of code.** It said a copyleft plugin "fits" inside the program because both meet at
   the same version of the free licence. The reasoning was correct and still is; what changed is the
-  premise. Measured on 2026-09-13: the plugin that matters is **not the encoder a player never
-  uses**, it is the **decoder**, whose build configuration line begins with `--enable-gpl` — read
-  inside the binary, with three control plugins that do not carry it. **While it travels there the
-  artifact cannot be distributed**, and that is recorded as an open finding rather than a pending
-  question. The measured way out costs no formats: the decoding library is permissive by default and
-  what is copyleft are optional pieces enabled at build time.
+  premise. Measured on 2026-09-13 and recounted in full on 2026-09-14 across the package's ~300
+  plugins: what matters is **not the encoder a player never uses**, it is two **decoders** —
+  `libavcodec_plugin.dll` and `libswscale_plugin.dll`, which share an FFmpeg build and whose build
+  configuration line begins with `--enable-gpl` — plus a third one, the x264 encoder itself, which is
+  GPL by its own licence rather than by that string. **While they travel there the artifact cannot be
+  distributed**, and that is recorded as an open finding rather than a pending question. The measured
+  way out costs no formats: the decoding library is permissive by default and what is copyleft are
+  optional pieces enabled at build time.
 
 - **A gate would have gone blind and stayed green.** The check that stops an unfiled licence reaching
   the artifact recognises identifiers shaped like a published licence, and a `LicenseRef-` is not
