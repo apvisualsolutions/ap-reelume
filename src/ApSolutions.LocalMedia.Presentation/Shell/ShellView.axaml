@@ -456,11 +456,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Tag="{x:Static shell:SettingsSection.Recommendations}"
               automation:AutomationProperties.Name="{DynamicResource RecommendationSettingsTitle}" />
           <ListBoxItem
-              Content="{DynamicResource SubtitleStyleAccessibleName}"
-              IsVisible="{Binding HasSubtitleStyle}"
-              Tag="{x:Static shell:SettingsSection.Subtitles}"
-              automation:AutomationProperties.Name="{DynamicResource SubtitleStyleAccessibleName}" />
-          <ListBoxItem
               Content="{DynamicResource ShortcutSettingsAccessibleName}"
               IsVisible="{Binding HasShortcuts}"
               Tag="{x:Static shell:SettingsSection.Shortcuts}"
@@ -525,11 +520,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
             <ContentControl Margin="48,0" IsVisible="{Binding IsRecommendationsSection}">
               <ContentControl IsVisible="{Binding HasRecommendationSettings}">
                 <settings:RecommendationSettingsView DataContext="{Binding RecommendationSettings}" />
-              </ContentControl>
-            </ContentControl>
-            <ContentControl Margin="48,0" IsVisible="{Binding IsSubtitlesSection}">
-              <ContentControl IsVisible="{Binding HasSubtitleStyle}">
-                <player:SubtitleStyleView DataContext="{Binding SubtitleStyle}" />
               </ContentControl>
             </ContentControl>
             <ContentControl Margin="48,0" IsVisible="{Binding IsShortcutsSection}">

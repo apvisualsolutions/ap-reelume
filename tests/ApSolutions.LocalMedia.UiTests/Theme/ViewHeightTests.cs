@@ -158,23 +158,45 @@ public sealed class ViewHeightTests
     /// containment — the view's own element, or the template that stands in for it, below a
     /// <c>ScrollViewer</c> — rather than for the two words appearing in one file.
     /// </remarks>
-    private static bool IsScrolledInTheMarkup(string viewName)
+    private static bool IsScrolledInTheMarkup(string viewName) =>
+        IsScrolledInTheMarkup(viewName, []);
+
+    private static bool IsScrolledInTheMarkup(string viewName, HashSet<string> visiting)
     {
+        // A view already being asked about cannot answer for itself: a cycle in the markup would
+        // otherwise recurse forever, and "it is scrolled because it contains itself" is not a fact.
+        if (!visiting.Add(viewName))
+        {
+            return false;
+        }
+
+        var mounted = false;
+
         foreach (var path in Directory.EnumerateFiles(
             Path.Combine(RepositoryLayout.Root, "src"), "*.axaml", SearchOption.AllDirectories))
         {
             var document = XDocument.Load(path);
-            var scrolled = document.Descendants()
-                .Where(element => element.Name.LocalName == "ScrollViewer")
-                .SelectMany(scroller => scroller.Descendants())
-                .Any(descendant => descendant.Name.LocalName == viewName);
+            var host = Path.GetFileNameWithoutExtension(path);
 
-            if (scrolled)
+            foreach (var mount in document.Descendants()
+                .Where(element => element.Name.LocalName == viewName))
             {
-                return true;
+                mounted = true;
+
+                // ALL its mountings, not any of them, and that is the correction of 2026-09-13
+                // (afternoon): an existential answer let one appearance under a scroller vouch for
+                // every other place the view is drawn — measured with a second mounting carrying
+                // IsVisible="False", which satisfied a gate about content nobody can reach.
+                var scrolled = mount.Ancestors().Any(a => a.Name.LocalName == "ScrollViewer")
+                    || IsScrolledInTheMarkup(host, visiting);
+
+                if (!scrolled)
+                {
+                    return false;
+                }
             }
         }
 
-        return false;
+        return mounted;
     }
 }

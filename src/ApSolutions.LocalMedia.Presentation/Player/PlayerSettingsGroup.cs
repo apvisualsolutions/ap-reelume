@@ -31,4 +31,12 @@ public enum PlayerSettingsGroup
     /// for the same reason: it is judged the moment one is, or is not, skipped.
     /// </summary>
     Segments,
+
+    /// <summary>
+    /// How the subtitles look: size, family, the two colours, the background's opacity and the
+    /// outline. Down from Settings on 2026-09-13 as well, and the last of the three: the right font
+    /// size is the one that reads over THIS film at this distance, which nobody can answer without
+    /// something playing behind the text.
+    /// </summary>
+    Subtitles,
 }

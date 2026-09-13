@@ -101,8 +101,8 @@ public sealed class AssembledJourneyTests : IDisposable
         Assert.NotNull(Find<RootManagementView>(host));
         Show(host, SettingsSection.Shortcuts);
         Assert.NotNull(Find<ShortcutSettingsView>(host));
-        Show(host, SettingsSection.Subtitles);
-        Assert.NotNull(Find<SubtitleStyleView>(host));
+        // El estilo de subtítulos ya no está aquí: bajó al engranaje del reproductor el
+        // 2026-09-13 (ADR-0012), y su recorrido vive en la escena del engranaje.
         Show(host, SettingsSection.Lifecycle);
         Assert.NotNull(Find<LifecycleSettingsView>(host));
         Show(host, SettingsSection.Privacy);

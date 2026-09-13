@@ -4603,26 +4603,23 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     [AvaloniaFact(Timeout = 120_000)]
     public async Task The_subtitle_style_is_chosen_with_the_mouse_and_kept()
     {
-        _ = await SeedRootAsync(Path.Combine(_dataRoot, "media"), ScanPolicy.Manual);
+        // Reached through the player since 2026-09-13 (ADR-0012) rather than through the settings
+        // index: the right font size is the one that reads over a film, so the group moved into the
+        // gear. Everything below this is the scene it already was.
+        var sample = await RequireSampleAsync("walk-subtitles.mp4", durationSeconds: 30);
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        var mediaPath = Path.Combine(media, "Subtitles.2024.mp4");
+        File.Copy(sample, mediaPath);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        var fileId = await SeedMediaFileAsync(factory, media, mediaPath, TimeSpan.FromSeconds(30));
 
         using var host = ShowShell(height: 2000);
-        Navigate(host, AppRoute.Settings);
-
-        await PressAsync(
-            host,
-            "SubtitleStyleAccessibleName",
-            () => host.ViewModel.CurrentSettingsSection,
-            "clicking Estilo de subtítulos in the settings index never opened its section");
-        Assert.Equal(SettingsSection.Subtitles, host.ViewModel.CurrentSettingsSection);
-
-        var style = host.ViewModel.SubtitleStyle;
-        Assert.NotNull(style);
-
         var preferences = host.Application.Services.GetRequiredService<IPlaybackPreferenceRepository>();
 
-        // A style somebody chose on a previous run, waiting in the database. Storing it and then
-        // starting the window is the whole round trip: the half that reads was as absent as the half
-        // that writes, so a choice stored by this scene's presses would have come back to nobody.
+        // A style somebody chose on a previous run, waiting in the database, and stored BEFORE the
+        // session opens — because opening the gear is what reads it. Storing it afterwards is how
+        // this scene found that the gear did not read it at all.
         var chosen = SubtitleStyle.Create(
             fontSizePercent: 130,
             fontFamily: "Verdana",
@@ -4639,12 +4636,30 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             },
             TestContext.Current.CancellationToken);
 
-        // The startup a person gets, which is where the load lives. It also starts the watchers and
-        // the two passes that read their own switches — both off by default, so nothing is contacted.
-        host.Application.ConfigureWindow(host.Window);
+        await host.ViewModel.OpenPlayerAsync(
+            new PlayDetailsRequest(new MediaFileId(fileId), StartPosition: null),
+            TestContext.Current.CancellationToken);
+        await WaitForAsync(
+            () => Task.FromResult(host.ViewModel.Player?.Player.IsPlaying == true),
+            "the session never reached the playing state on the real engine");
+        Dispatcher.UIThread.RunJobs();
+        await RevealChromeAsync(host);
+
+        var settings = host.ViewModel.Player!.Player.Settings;
+        Assert.NotNull(settings);
+        await PressAsync(host, "PlayerSettingsAction", () => settings!.IsOpen,
+            "clicking the gear never opened the settings over the picture");
+        await PressAsync(host, "SubtitleStyleAccessibleName", () => settings!.Group,
+            "clicking Estilo de subtítulos in the gear never replaced the list with its group");
+        Assert.Equal(PlayerSettingsGroup.Subtitles, settings!.Group);
+
+        var style = settings.Subtitles;
+        Assert.NotNull(style);
+
+        // Opening the gear is what reads the stored style, so by here it is on screen.
         await WaitForAsync(
             () => Task.FromResult(style!.FontSizePercent == chosen.FontSizePercent),
-            "the style stored before this window opened never reached the screen it belongs to");
+            "the style stored before this session opened never reached the gear it belongs to");
         Assert.Equal(chosen.FontFamily, style!.FontFamily);
         Assert.Equal(chosen.OutlineThickness, style.OutlineThickness);
 
