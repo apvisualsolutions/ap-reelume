@@ -25,12 +25,27 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </UserControl.Resources>
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space16}">
-      <TextBlock
-          FontSize="{DynamicResource FontSizeSubtitle}"
-          FontWeight="SemiBold"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource AppearanceTitle}"
-          automation:AutomationProperties.HeadingLevel="2" />
+      <!--
+        UX-010: inside the group and in its heading row, and here the heading row is the only place
+        it can be. This page is the tallest in the application — eleven row-cards — and the walk's
+        hit testing does not follow a scrolled panel, so a button under the controls would be one
+        the harness could never press and would raise a ratchet that only comes down.
+      -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource AppearanceTitle}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <Button
+            x:Name="AppearanceResetButton"
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+            Command="{Binding RestoreDefaultsCommand}"
+            Content="{DynamicResource RestoreDefaultsAction}" />
+      </Grid>
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource AppearanceDescription}"

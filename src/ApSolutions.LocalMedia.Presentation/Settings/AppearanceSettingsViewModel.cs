@@ -46,6 +46,7 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
         ApplyAccentCommand = new ApplyAccentCommandImplementation(ApplyAccent);
         ApplyDensityCommand = new ApplyEnumCommand<InterfaceDensity>(value => Density = value);
         ApplyRoundingCommand = new ApplyEnumCommand<CornerRounding>(value => Rounding = value);
+        RestoreDefaultsCommand = new RestoreCommand(RestoreDefaults);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -98,6 +99,14 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
 
     /// <summary>Takes a <c>#RRGGBB</c> and derives the whole accent family from it.</summary>
     public ICommand ApplyAccentCommand { get; }
+
+    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <remarks>
+    /// The language is deliberately left alone. It is a group of its own — the interface's language
+    /// is chosen once and governs every screen — and folding it in here would mean a click meant to
+    /// tidy the covers could switch the whole application into a language somebody does not read.
+    /// </remarks>
+    public ICommand RestoreDefaultsCommand { get; }
 
     private AppearanceOptions Options => _appearance?.Current ?? new AppearanceOptions();
 
@@ -296,6 +305,16 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
     /// Windows theme off changes which pill is lit, and a change of theme re-derives the accent, so
     /// a page that only refreshed what was touched would show the rest as it was a moment ago.
     /// </remarks>
+    /// <summary>
+    /// Puts the whole group back: the nine appearance options in one write, and the theme, which
+    /// lives in its own service rather than in the options record.
+    /// </summary>
+    private void RestoreDefaults()
+    {
+        ApplyTheme(ThemePreference.System);
+        Update(_ => new AppearanceOptions());
+    }
+
     private void Update(Func<AppearanceOptions, AppearanceOptions> change)
     {
         if (_appearance is not { } service)
@@ -401,6 +420,19 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
                 apply(accent);
             }
         }
+    }
+
+    private sealed class RestoreCommand(Action restore) : ICommand
+    {
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public bool CanExecute(object? parameter) => true;
+
+        public void Execute(object? parameter) => restore();
     }
 
     private sealed class ApplyPreferenceCommand(Action<ThemePreference> apply) : ICommand

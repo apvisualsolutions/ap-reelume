@@ -120,7 +120,7 @@ public sealed class OptionGroupTests
             OptionPlace.Settings,
             "SettingsSection.Appearance",
             "AppearanceSettingsView",
-            null,
+            "AppearanceResetButton",
             "Theme, accent, density and cover size dress the library, and nobody picks them in the "
                 + "middle of a film."),
         ["Language"] = new(
@@ -143,7 +143,7 @@ public sealed class OptionGroupTests
             OptionPlace.Settings,
             "SettingsSection.Recommendations",
             "RecommendationSettingsView",
-            null,
+            "RecommendationResetButton",
             "What counts as watched is a rule over the whole library, and changing it rewrites "
                 + "every title's state — the opposite of something tried against one film."),
         ["Shortcuts"] = new(
@@ -230,14 +230,12 @@ public sealed class OptionGroupTests
             + "moves into the gear.",
         ["SegmentDetection"] = "It has its button, and is still reached through Settings: it moves "
             + "into the gear.",
-        ["Appearance"] = "No button yet.",
         ["Language"] = "No button yet, and its destination does not exist: it is a card inside "
             + "Appearance today and needs a rail entry of its own.",
-        ["Recommendations"] = "No button yet.",
     };
 
     /// <summary>The ratchet over <see cref="Pending"/>, which only ever comes down.</summary>
-    private const int MaximumPending = 6;
+    private const int MaximumPending = 4;
 
     /// <summary>
     /// Every button in the tree that puts something back, and what each one is allowed to say.
@@ -267,6 +265,8 @@ public sealed class OptionGroupTests
         ["LifecycleSettingsView#LifecycleResetButton"] = GroupResetKey,
         ["PrivacySettingsView#PrivacyResetButton"] = GroupResetKey,
         ["UpdateView#UpdateResetButton"] = GroupResetKey,
+        ["RecommendationSettingsView#RecommendationResetButton"] = GroupResetKey,
+        ["AppearanceSettingsView#AppearanceResetButton"] = GroupResetKey,
 
         // And the four that are NOT a group's reset, each with the reason it keeps a key of its own.
         // Three of these were invisible to the sweep by prose that this replaced, which is the

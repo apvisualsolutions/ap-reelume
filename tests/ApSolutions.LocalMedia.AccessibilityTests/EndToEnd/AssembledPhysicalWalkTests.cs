@@ -823,6 +823,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         appearance.Density = InterfaceDensity.Comfortable;
         appearance.Rounding = CornerRounding.Soft;
 
+        // UX-010, and it is reachable for exactly the reason it sits in the heading row: everything
+        // below the accent tint on this page is past the first viewport, so a reset under the
+        // controls would be one the harness could never press. The tint above was moved, so there is
+        // something to come back from, and the probe is the option the service holds.
+        Assert.NotEqual(new AppearanceOptions().TintPercent, appearance.TintPercent);
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => appearance.TintPercent,
+            "clicking «restore default values» never put the appearance options back");
+        Assert.Equal(new AppearanceOptions().TintPercent, appearance.TintPercent);
+        Assert.Equal(ThemePreference.System, appearance.CurrentPreference);
+
         var scan = host.ViewModel.ScanSettings;
         Assert.NotNull(scan);
         await PressAsync(
@@ -1133,6 +1146,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => recommendations.HasThresholdResult,
             "clicking Apply never recalculated anything");
         Assert.Equal(0, recommendations.RecalculatedCount);
+
+        // UX-010, and this group's reset APPLIES rather than only moving the slider — in here the
+        // slider alone governs nothing. The probe is the threshold in force, read off the use case
+        // the library is scored with, so a reset that stopped at the view model would not satisfy it.
+        var threshold = host.Application.Services.GetRequiredService<ConfigureWatchedThreshold>();
+        Assert.NotEqual(WatchStatePolicy.DefaultWatchedThreshold, threshold.Current);
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => threshold.Current,
+            "clicking «restore default values» never put the watched threshold back in force");
+        Assert.Equal(WatchStatePolicy.DefaultWatchedThreshold, threshold.Current);
 
         // The shortcut map is restored from something other than its defaults, or restoring it would
         // be indistinguishable from doing nothing.

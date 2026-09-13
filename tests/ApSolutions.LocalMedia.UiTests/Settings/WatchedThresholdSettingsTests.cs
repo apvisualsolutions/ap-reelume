@@ -31,6 +31,33 @@ public sealed class WatchedThresholdSettingsTests
         Assert.True(with.HasWatchedThreshold);
     }
 
+    /// <summary>
+    /// UX-010, and it is asserted on what is in force rather than on the slider: in this group the
+    /// slider alone changes nothing, so a reset that only moved it would leave 75 % governing the
+    /// library while the screen read 90 %.
+    /// </summary>
+    [Fact]
+    public async Task Restoring_the_defaults_puts_the_threshold_back_in_force_and_not_only_on_the_slider()
+    {
+        var store = new InMemorySettingsStore();
+        store.Write(ConfigureWatchedThreshold.SettingKey, 0.75);
+        var threshold = Threshold(store, new InMemoryWatchStateRepository());
+        var recommendations = new StubRecommendationSettings();
+        recommendations.SetEnabled(false);
+        var viewModel = new RecommendationSettingsViewModel(recommendations, threshold);
+        Assert.Equal(75, viewModel.WatchedThresholdPercent);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+        await WaitForAsync(() => viewModel.HasThresholdResult);
+
+        Assert.Equal(WatchStatePolicy.DefaultWatchedThreshold, threshold.Current);
+        Assert.Equal(
+            Math.Round(WatchStatePolicy.DefaultWatchedThreshold * 100),
+            viewModel.WatchedThresholdPercent);
+        Assert.Equal(IRecommendationSettings.EnabledByDefault, recommendations.IsEnabled);
+        Assert.True(recommendations.IsEnabled);
+    }
+
     [Fact]
     public void The_slider_arrives_showing_the_threshold_in_force()
     {

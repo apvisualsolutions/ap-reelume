@@ -64,6 +64,9 @@ public sealed class CommandNotificationTests
                     "public bool CanExecute(object? parameter) => parameter is ThemePreference;",
                     "public bool CanExecute(object? parameter) => AccentPalette.IsAccent(parameter as string);",
                     "public bool CanExecute(object? parameter) => parameter is T value && Enum.IsDefined(value);",
+                    // Five now, and the fifth is UX-010's «Restaurar valores por defecto»: a group
+                    // can always be put back, including when it is already where it started.
+                    "public bool CanExecute(object? parameter) => true;",
                 ],
             // The three channel layouts, whose question is whether the parameter is one of the three
             // words the markup carries. Whether a layout can be CHOSEN is a different question and
