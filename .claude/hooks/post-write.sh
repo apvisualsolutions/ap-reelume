@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-FileCopyrightText: 2026 AP Solutions
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: LicenseRef-AP-Reelume
 #
 # PostToolUse de Write, Edit y MultiEdit.
 #
@@ -30,8 +30,8 @@ changed () {
 
 case "$f" in
   *.cs|*.axaml)
-    grep -q 'SPDX-License-Identifier: GPL-3.0-or-later' "$f" 2>/dev/null && exit 0
-    printf 'Regla 1: LA ESCRITURA NO FALLO, el archivo esta en disco. Le falta la cabecera SPDX-License-Identifier: GPL-3.0-or-later, que exige IDE0073 (CLAUDE.md). No reintentes la misma escritura: anade la cabecera y escribelo otra vez.\n' >&2
+    grep -q 'SPDX-License-Identifier: LicenseRef-AP-Reelume' "$f" 2>/dev/null && exit 0
+    printf 'Regla 1: LA ESCRITURA NO FALLO, el archivo esta en disco. Le falta la cabecera SPDX-License-Identifier: LicenseRef-AP-Reelume, que exige IDE0073 (CLAUDE.md). No reintentes la misma escritura: anade la cabecera y escribelo otra vez.\n' >&2
     exit 2
     ;;
   *docs*.es.md)

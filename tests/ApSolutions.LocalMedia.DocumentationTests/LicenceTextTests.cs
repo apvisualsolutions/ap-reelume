@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: LicenseRef-AP-Reelume
 
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -37,7 +37,7 @@ public sealed class LicenceTextTests
     /// The program's own licence. It travels as <c>LICENSE</c> at the root of the artifact, so it is
     /// the one identifier the notices may name without a file in this folder.
     /// </summary>
-    private const string OwnLicence = "GPL-3.0-or-later";
+    private const string OwnLicence = "LicenseRef-AP-Reelume";
 
     /// <summary>
     /// Every licence this repository knows how to file, with the last line of its canonical text.
@@ -59,9 +59,18 @@ public sealed class LicenceTextTests
 
     private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled, TimeSpan.FromSeconds(2));
 
-    /// <summary>Anything shaped like an SPDX identifier, so an unfiled licence cannot pass unseen.</summary>
+    /// <summary>
+    /// Anything shaped like an SPDX identifier, so an unfiled licence cannot pass unseen.
+    /// </summary>
+    /// <remarks>
+    /// <b><c>LicenseRef-</c> is in here for a measured reason.</b> The day this repository left
+    /// GPL-3.0-or-later for a licence of its own, the pattern stopped recognising the program's own
+    /// identifier — it matches names of published licences, and a <c>LicenseRef-</c> is neither. The
+    /// guard would have kept passing while seeing one identifier fewer than it used to, which is this
+    /// repository's characteristic defect: a check that goes blind instead of red.
+    /// </remarks>
     private static readonly Regex LicenceShaped = new(
-        @"(?<![\w-])(?:MIT|(?:L?GPL|Apache|BSD|MPL|EPL|CDDL)-[0-9][0-9A-Za-z.\-]*)",
+        @"(?<![\w-])(?:MIT|LicenseRef-[0-9A-Za-z.\-]+|(?:L?GPL|Apache|BSD|MPL|EPL|CDDL)-[0-9][0-9A-Za-z.\-]*)",
         RegexOptions.Compiled,
         TimeSpan.FromSeconds(2));
 

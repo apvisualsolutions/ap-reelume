@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: LicenseRef-AP-Reelume
 
 using System.Globalization;
 using ApSolutions.LocalMedia.Domain.Catalog;
@@ -167,7 +167,12 @@ public sealed class AssembledJourneyTests : IDisposable
             " ",
             credits!.GetVisualDescendants().OfType<TextBlock>().Select(block => block.Text));
         Assert.Contains("TMDB", text, StringComparison.Ordinal);
-        Assert.Contains("GPL-3.0", text, StringComparison.Ordinal);
+
+        // The licence the application states about itself, asserted through the one word both
+        // languages spell identically: the file name. «Licencia» and «Licence» differ, so asserting
+        // either would have made this pass in one language and fail in the other — and the string it
+        // replaced, «GPL-3.0», only read the same in both by accident of being an identifier.
+        Assert.Contains("LICENSE", text, StringComparison.Ordinal);
     }
 
     /// <summary>

@@ -8,12 +8,28 @@ utilidad es que nadie tenga que adivinar dónde están los bordes.
 
 ## Licencia del programa
 
-AP Reelume by AP Solutions se publica bajo `GPL-3.0-or-later`. El texto íntegro está en
-[LICENSE](../../LICENSE) y la atribución del producto en [NOTICE](../../NOTICE).
+AP Reelume by AP Solutions se publica bajo **una licencia propia**, identificada como
+`LicenseRef-AP-Reelume`: gratuita para quien la use, sin derecho a modificar, redistribuir ni vender.
+El texto íntegro está en [LICENSE](../../LICENSE) y la atribución del producto en
+[NOTICE](../../NOTICE).
 
-Desde la revisión de 2026-08-10, **cada archivo fuente lleva su cabecera SPDX**: 556 archivos `.cs`,
-51 `.axaml` y 17 `.ps1` declaran `SPDX-License-Identifier: GPL-3.0-or-later` junto al titular del
-copyright. Una licencia que solo vive en `LICENSE` deja de estar unida al archivo en cuanto alguien
+**Hasta el 2026-09-13 el programa fue `GPL-3.0-or-later`**, y el cambio lo decidió el propietario por
+un motivo de negocio, no técnico: la licencia libre concedía a cualquiera el derecho a modificar,
+redistribuir y vender el programa, que son las tres cosas que él quiere reservarse. Lo publicado
+hasta esa fecha conserva sus derechos para siempre; esta licencia rige de ahí en adelante. Que sea
+posible lo permite un hecho medido: **los 646 commits del repositorio tienen un solo autor**, así que
+no hay copyright ajeno que relicenciar.
+
+**El identificador no lleva versión, y es deliberado.** Antes nombraba una licencia concreta, así que
+el día que cambió hubo que tocar **1.033 archivos**. Un `LicenseRef-` nombra «la licencia propia de
+este proyecto» y apunta al documento; la versión y la fecha viven dentro de `LICENSE`, que es adonde
+hay que ir de todos modos para conocer las condiciones. Reescribir las condiciones ya no toca ningún
+archivo de código.
+
+Desde la revisión de 2026-08-10, **cada archivo fuente lleva su cabecera SPDX**: 925 archivos `.cs`,
+71 `.axaml` y 29 `.ps1` declaran `SPDX-License-Identifier: LicenseRef-AP-Reelume` junto al titular del
+copyright. (Las cifras anteriores —556, 51 y 17— llevaban tiempo desfasadas: **ninguna puerta las
+comprueba**, y eso sigue siendo cierto.) Una licencia que solo vive en `LICENSE` deja de estar unida al archivo en cuanto alguien
 lo copia fuera del árbol; la cabecera viaja con él. La regla `IDE0073` la exige en `.editorconfig`, de
 modo que `dotnet format --verify-no-changes` —una puerta que ya se ejecutaba— rechaza un archivo
 nuevo sin cabecera.
@@ -21,8 +37,9 @@ nuevo sin cabecera.
 ## Descargo de garantía
 
 El programa se entrega **sin garantía alguna**, en la medida en que lo permita la ley aplicable. Las
-secciones 15, 16 y 17 de la GPL-3.0 lo dicen con todas sus letras, y ni el README ni la aplicación
-prometen nada distinto. En particular, y porque son las confusiones que de verdad ocurren:
+secciones 6 y 7 de [LICENSE](../../LICENSE) lo dicen con todas sus letras —incluido que, por tratarse
+de un programa gratuito, el límite de responsabilidad es de cero euros—, y ni el README ni la
+aplicación prometen nada distinto. En particular, y porque son las confusiones que de verdad ocurren:
 
 - El artefacto **no está firmado con Authenticode**, y SmartScreen avisará. Está explicado en
   [SMARTSCREEN.es.md](../release/SMARTSCREEN.es.md); la firma de la publicación es otra capa —
@@ -38,14 +55,35 @@ El inventario contrastado con la compilación real, con la licencia de cada comp
 [los avisos de terceros](../release/THIRD-PARTY-NOTICES.es.md), y `ThirdPartyNoticeTests` impide que
 una dependencia entre en el artefacto sin aparecer allí.
 
-Compatibilidad: `GPL-3.0-or-later` admite incorporar `LGPL-2.1-or-later`, `MIT`, `Apache-2.0` y
-`BSD-3-Clause`, que es todo lo que el paquete transporta.
+Compatibilidad: una licencia propietaria admite incorporar `LGPL-2.1-or-later`, `MIT`, `Apache-2.0` y
+`BSD-3-Clause` cumpliendo sus condiciones —que en el caso de la LGPL son las del §6, y se cumplen
+porque las bibliotecas viajan como archivos separados que quien quiera puede sustituir—. **Lo que no
+admite es código GPL.**
 
-**Complementos de VideoLAN — cerrado el 2026-08-10.** Estaba anotado como pregunta para el dictamen:
-si algún complemento fuera `GPL-2.0-only` sería incompatible con GPL-3.0. Se comprobó en la fuente:
-el `COPYING` del árbol de VLC es la GPL versión 2 **con** la cláusula «either version 2 of the
-License, or (at your option) any later version», así que el conjunto es `GPL-2.0-or-later` y encaja
-bajo GPL-3.0. El punto sale de la lista de pendientes.
+**Complementos GPL de VideoLAN — ABIERTO desde el 2026-09-13, y bloquea la publicación.** Este punto
+estuvo cerrado desde el 2026-08-10 **con el razonamiento contrario**, y conviene leer cómo se
+invirtió, porque es el ejemplo de que una conclusión correcta puede dejar de serlo sin que nadie
+toque el código. Entonces el argumento era: el `COPYING` del árbol de VLC lleva la GPL versión 2
+**con** la cláusula «either version 2 of the License, or (at your option) any later version», de modo
+que un complemento `GPL-2.0-or-later` sube a GPL-3.0 y **encaja dentro de un programa GPL-3.0**. El
+razonamiento era válido y sigue siéndolo; lo que cambió es la premisa: **el programa ya no es GPL**,
+así que no hay ninguna versión a la que subir.
+
+Medido el 2026-09-13: el paquete transporta unos trescientos complementos de VideoLAN y **al menos
+uno imprescindible es GPL**. No es el codificador x264, que se podría quitar por ser un codificador
+que un reproductor no usa: es **`libavcodec_plugin.dll`, el decodificador**, cuya línea de
+compilación empieza por `--enable-gpl`. Se leyó dentro del propio binario, con tres complementos de
+control que no la llevan.
+
+**Consecuencia práctica, y es dura**: mientras ese complemento viaje dentro del paquete, **el
+artefacto no se puede distribuir** bajo la licencia propia. El código fuente de este repositorio sí
+puede llevarla —el árbol solo contiene código de AP Solutions—, pero el empaquetado queda suspendido.
+
+**La salida está medida y no implica perder nada de funcionalidad**: la biblioteca que descodifica es
+`LGPL` por defecto, y lo contagioso son piezas **opcionales** que se activan al compilar —un filtro
+de posprocesado heredado y algunas optimizaciones—; **ningún decodificador está entre ellas**. La vía
+es compilar LibVLC y sus dependencias sin esa opción, en las dos arquitecturas, y mantener esa
+compilación. Es trabajo de infraestructura permanente, no una renuncia de formatos.
 
 **Los textos de las licencias ya viajan — cerrado el 2026-08-10.** Era el incumplimiento abierto: el
 artefacto llevaba la `LICENSE` de AP Reelume y los avisos de terceros, pero **no el texto de las
@@ -77,9 +115,16 @@ Eso es lo que hace ahora la versión: `eng/fetch-corresponding-source.ps1` trae 
 junto a los binarios. La oferta escrita se queda para los canales donde «el mismo sitio» no significa
 nada, como una tienda, y ahora vale explícitamente para cualquier tercero. De paso se corrigieron dos
 cosas: el aviso nombraba `libvlc 3.0.23.1` —una versión cuyo fuente **no existe**, porque ese cuarto
-dígito es del paquete NuGet— y no mencionaba que el trabajo que usa la biblioteca es este programa,
-público bajo `GPL-3.0-or-later`, que es lo que el §6(a) pide para poder relinkar. Medido en
-[audit-corresponding-source.md](../evidence/stable/audit-corresponding-source.md).
+dígito es del paquete NuGet— y no mencionaba que el trabajo que usa la biblioteca es este programa.
+Medido en [audit-corresponding-source.md](../evidence/stable/audit-corresponding-source.md).
+
+**Y el §6(a) dejó de estar disponible el 2026-09-13.** Hasta entonces se cumplía por la vía más
+cómoda: publicar el fuente de este programa, que era libre, bastaba para que cualquiera pudiera
+relinkar LibVLC. Con una licencia propietaria esa puerta se cierra, y el cumplimiento pasa a
+apoyarse en la que la LGPL ofrece justo al lado y que aquí ya se daba de hecho: **las bibliotecas
+viajan como archivos separados** que quien quiera puede sustituir por su propia compilación sin tocar
+el programa. Esa es la forma habitual en que un programa cerrado usa una biblioteca LGPL, y es
+sólida; lo que ya no vale es el argumento anterior, y por eso queda escrito aquí en vez de borrado.
 
 Nada de esto es un dictamen ni lo sustituye: es cumplimiento comprobable contra el texto de las
 licencias, y lo que consigue es que no haga falta interpretar.
@@ -97,9 +142,11 @@ La aplicación consulta `api.themoviedb.org` únicamente si usted pone un token 
   blanda de la caché (un día) no bastaba: cuando la red fallaba o el token desaparecía, el programa
   servía la copia guardada **sin límite de antigüedad**. Ahora hay un suelo duro de 180 días
   (`TmdbOptions.RetentionLimit`): pasado ese plazo la entrada no se sirve y **se borra**.
-- **Uso comercial.** Los términos lo reservan a un acuerdo escrito aparte. AP Reelume es software
-  libre y no obtiene ingresos de TMDB ni de su contenido, así que hoy no aplica. Si algún día se
-  cobrara por el programa, este punto cambia y hay que releerlo antes.
+- **Uso comercial.** Los términos lo reservan a un acuerdo escrito aparte. AP Reelume se entrega
+  gratuitamente y no obtiene ingresos de TMDB ni de su contenido, así que hoy no aplica. **El cambio
+  de licencia del 2026-09-13 no lo activa** —lo que decide es si se cobra, no cómo se licencia—,
+  pero sí acerca el día: la licencia nueva existe precisamente para dejar abierta la puerta de
+  cobrar. Si algún día se cobra por el programa, este punto cambia y hay que releerlo antes.
 - **Logotipo — cerrado el 2026-08-10.** Los términos piden identificar el uso de TMDB **con su
   logotipo**, menos prominente que el del propio producto. Créditos lo muestra desde esta sesión,
   encima de la frase de atribución, con texto alternativo y sin enlace: identifica el origen de los
@@ -110,10 +157,15 @@ La aplicación consulta `api.themoviedb.org` únicamente si usted pone un token 
 ## Términos de GitHub
 
 El repositorio se aloja en GitHub y el actualizador consulta `api.github.com` y descarga desde
-`github.com` y su almacenamiento. Publicar código bajo una licencia libre en un repositorio público
-es exactamente el uso previsto por sus Términos de Servicio, y la sección F de esos términos ya
-concede a otros usuarios el derecho de ver y bifurcar el repositorio; la GPL-3.0-or-later concede
-más. No se usa ninguna API de GitHub que exija autenticación ni acuerdo adicional: las peticiones del
+`github.com` y su almacenamiento. Publicar código en un repositorio público es el uso previsto por
+sus Términos de Servicio, **pero desde el 2026-09-13 la relación se invirtió y conviene tenerlo
+claro**: esos términos conceden por sí mismos a cualquier usuario el derecho a ver el repositorio y a
+**bifurcarlo** dentro de la propia plataforma, y ahora la licencia del programa concede **menos** que
+eso. GitHub no lo concede en nombre de AP Solutions y AP Solutions no lo puede retirar mientras el
+repositorio sea público; la sección 5 de [LICENSE](../../LICENSE) lo reconoce por escrito y reserva
+todo lo demás, en vez de prohibir algo que la plataforma ya permite. **El repositorio sigue público a
+propósito**: de ello dependen las máquinas de compilación gratuitas del proyecto, incluidas las
+ARM64. No se usa ninguna API de GitHub que exija autenticación ni acuerdo adicional: las peticiones del
 actualizador son lecturas anónimas de publicaciones públicas.
 
 ## Criptografía y exportación

@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: 2026 AP Solutions
-SPDX-License-Identifier: GPL-3.0-or-later
+SPDX-License-Identifier: LicenseRef-AP-Reelume
 -->
 <ResourceDictionary
     xmlns="https://github.com/avaloniaui"
@@ -679,7 +679,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="DiagnosticsPreviewTitle">Esto es exactamente lo que se guardaría</x:String>
   <x:String x:Key="DiagnosticsPreviewDescription">El informe es este texto y nada más. Puedes leerlo entero antes de guardarlo.</x:String>
   <x:String x:Key="AboutCreditsAccessibleName">Créditos y atribución</x:String>
-  <x:String x:Key="AboutLicenseNotice">AP Reelume es software libre publicado bajo la licencia GPL-3.0-or-later.</x:String>
+  <x:String x:Key="AboutLicenseNotice">AP Reelume es gratuito y su código es público. Se publica bajo la Licencia de AP Reelume, cuyo texto viaja en el fichero LICENSE.</x:String>
   <x:String x:Key="TitleActionsAccessibleName">Acciones del título abierto</x:String>
   <x:String x:Key="TitleEditMetadataAction">Editar metadatos</x:String>
   <x:String x:Key="TitlePreviewRenameAction">Previsualizar renombrado</x:String>

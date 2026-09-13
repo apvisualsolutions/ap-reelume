@@ -27,7 +27,7 @@ copyright. Nombrar el componente en una tabla no es ninguna de las dos cosas.
 | `NOTICE-SQLitePCLRaw.txt` | Aviso compuesto | SQLitePCLRaw |
 | `NOTICE-VideoLAN.txt` | Aviso compuesto | LibVLC y sus complementos |
 
-No hay `GPL-3.0.txt`: la licencia del propio programa viaja como `LICENSE` en la raíz del paquete,
+No hay texto de una licencia de catálogo para el propio programa: su licencia del propio programa viaja como `LICENSE` en la raíz del paquete,
 que es donde se busca.
 
 ## De dónde salió cada texto

@@ -18,8 +18,9 @@ clearest example.
 The GPL-2.0 text in this folder was taken from VLC's own tree rather than from a third party: the
 package ships it as the string vlc_about.h compiles into libvlc, which is the licence VLC displays
 for itself. It carries the "either version 2 of the License, or (at your option) any later version"
-clause, which is what lets a GPL-2.0-or-later plugin sit inside a program released under
-GPL-3.0-or-later.
+clause. Until 2026-09-13 that clause was what let a GPL-2.0-or-later plugin sit inside this program,
+which was then GPL-3.0-or-later; the program now carries a licence of its own, so the clause no longer
+resolves the question and the copyleft plugins are an open point recorded in the third-party notices.
 
 Nothing in these binaries has been modified. They are the files VideoLAN publishes, placed in the
 payload as separate dynamic libraries that the program loads at run time; replacing them with another
@@ -47,10 +48,12 @@ access to copy the source from that same place is distribution of the source. Th
 fetched during the release with their digests recorded in SHA256SUMS.txt, which the release signs, and
 the digest of the VLC archive is checked against the one VideoLAN publishes for it.
 
-The work that uses the library is this program itself, and it is source code: AP Reelume is
-GPL-3.0-or-later and its complete source is public at https://github.com/apvisualsolutions/ap-reelume.
-Anyone who wants to modify LibVLC and use the result has both halves — the library's source above and
-the program's — and does not have to relink anything, because the libraries are separate files.
+The work that uses the library is this program itself. Its source is public at
+https://github.com/apvisualsolutions/ap-reelume, though since 2026-09-13 under a licence of its own
+rather than a free one, so LGPL-2.1 §6(a) is no longer the route. The route is the one that was
+already true in fact: anyone who wants to modify LibVLC and use the result has the library's source
+above, and does not have to relink anything, because the libraries are separate files this program
+loads at run time and anybody may replace.
 
 For any channel where "the same place" means nothing — a store, a mirror, a copy passed on by hand —
 this offer stands instead, and it stands for any third party, not only for whoever received the

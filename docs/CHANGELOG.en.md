@@ -8,6 +8,63 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Changed
+
+- **AP Reelume stops being free software and moves to a licence of its own, free of charge for
+  whoever uses it.** The owner decided it for a business reason: the previous licence granted anyone
+  the right to modify the program, redistribute it and sell it, which are the three things he wants
+  to keep. The program is still given away and its source stays public so it can be examined, but
+  reading it no longer grants the right to use it. The text is in `LICENSE`, authentic Spanish with
+  an English courtesy translation, and the forum is Tenerife. It was possible because the
+  repository's 646 commits **have a single author**: there is no third-party copyright to
+  relicense. Anything published before 2026-09-13 keeps its rights forever.
+
+- **The licence identifier in the headers no longer names a licence: it points at one.** Each file
+  used to declare `GPL-3.0-or-later`, so changing licence meant touching **1,033 files**. They now
+  say `LicenseRef-AP-Reelume`, **with no version**, and the version and date live inside `LICENSE`.
+  Rewording the terms now touches no source file at all, and the reason is written beside the rule so
+  nobody puts the version back there.
+
+- **The licence section about the public repository acknowledges what GitHub grants of its own
+  force.** Its terms give any user the right to view and **fork** a public repository, AP Solutions
+  neither grants nor can withdraw that, and the repository stays public on purpose because the free
+  build machines depend on it. The licence says so and reserves everything else, rather than
+  forbidding something the platform already permits: a clause that forbids the impossible weakens the
+  ones that do hold.
+
+- **The contribution rules now tell the truth.** They promised "no copyright assignment and you keep
+  yours", which is incompatible with a single owner: one line written by somebody else would be
+  enough for AP Solutions to stop being able to decide about its own product. Code contributions are
+  not accepted, and in exchange the document says what does help — a bug report with steps to
+  reproduce is worth more than a patch, because the patch cannot be accepted.
+
+### Fixed
+
+- **The legal reasoning about VideoLAN's plugins was closed and has reopened, without anybody
+  touching a line of code.** It said a copyleft plugin "fits" inside the program because both meet at
+  the same version of the free licence. The reasoning was correct and still is; what changed is the
+  premise. Measured on 2026-09-13: the plugin that matters is **not the encoder a player never
+  uses**, it is the **decoder**, whose build configuration line begins with `--enable-gpl` — read
+  inside the binary, with three control plugins that do not carry it. **While it travels there the
+  artifact cannot be distributed**, and that is recorded as an open finding rather than a pending
+  question. The measured way out costs no formats: the decoding library is permissive by default and
+  what is copyleft are optional pieces enabled at build time.
+
+- **A gate would have gone blind and stayed green.** The check that stops an unfiled licence reaching
+  the artifact recognises identifiers shaped like a published licence, and a `LicenseRef-` is not
+  one: after the change it would have kept passing while **seeing one identifier fewer**. That is
+  this repository's characteristic defect — a test that goes blind instead of red — and the
+  expression now recognises it, with the reason written beside it.
+
+- **The test that reads the credits screen asserted a string that matched in both languages by
+  accident.** It checked "GPL-3.0", which reads the same in Spanish and English because it is an
+  identifier; with «Licencia» and «Licence» that broke. It now checks the file name, which really is
+  identical in both.
+
+- **The legal document claimed 556 files carried the header, and there are 925.** It had been stale
+  for a long time because **no gate checks it**, and that is still true: it is now said in the
+  document itself.
+
 ### Added
 
 - **Every group of options sits where it is decided and can be returned to its factory values from
@@ -4846,7 +4903,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **Every source file states the licence it is under.** The licence lived only in `LICENSE`, and a
   licence that lives only there stops being attached to a file the moment somebody copies it out of
   the tree. All 556 code files, 51 interface files, and 17 build scripts now carry their
-  `SPDX-License-Identifier: GPL-3.0-or-later` header next to the copyright holder, and the formatting
+  `SPDX-License-Identifier: LicenseRef-AP-Reelume` header next to the copyright holder, and the formatting
   gate that already ran rejects a new file that arrives without one.
 - **The third-party notices name what the package actually carries.** They listed eight components —
   the ones somebody remembered asking for — while the artifact carried thirty, among them ANGLE under

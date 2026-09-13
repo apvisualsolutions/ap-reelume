@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 AP Solutions
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: LicenseRef-AP-Reelume
 
 <#
 .SYNOPSIS
@@ -30,6 +30,17 @@ New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
 
 $commit = (git -C $repoRoot rev-parse HEAD).Trim()
 $commitDate = (git -C $repoRoot log -1 --format=%cI).Trim()
+
+# The program's own licence, which is not on the SPDX list and therefore cannot be named the way a
+# third-party licence is. SPDX calls that a `LicenseRef-`, and requires the document to carry the
+# text of any it names; CycloneDX refuses one in `id` and takes it in `name`. Both are fed from here
+# so the two documents cannot drift apart, and the text is read from LICENSE rather than repeated,
+# because a licence quoted twice is a licence that will eventually say two things.
+$ownLicenceId = 'LicenseRef-AP-Reelume'
+$ownLicenceName = 'AP Reelume Licence'
+$ownLicencePath = Join-Path $repoRoot 'LICENSE'
+if (-not (Test-Path -LiteralPath $ownLicencePath)) { throw "LICENSE is missing, so the bill of materials cannot state the program's own licence." }
+$ownLicenceText = Get-Content -LiteralPath $ownLicencePath -Raw
 
 # Every lock file the shipped code is built from. Test projects are deliberately absent: their
 # dependencies are not in the artifact, and listing them would describe a payload nobody downloads.
@@ -93,7 +104,10 @@ $cyclone = [ordered]@{
             name    = 'AP Reelume'
             version = $Version
             purl    = "pkg:generic/APSolutions.LocalMedia@$Version"
-            licenses = @(@{ license = @{ id = 'GPL-3.0-or-later' } })
+            # `name`, not `id`: CycloneDX only accepts an SPDX list identifier in `id`, and the
+            # program's own licence is not on that list. Declaring it there produces a document a
+            # strict validator rejects, which is worse than the plain name a reader can act on.
+            licenses = @(@{ license = @{ name = $ownLicenceName } })
         }
         properties = @(
             [ordered]@{ name = 'apsolutions:commit'; value = $commit },
@@ -141,8 +155,8 @@ $spdx = [ordered]@{
             versionInfo      = $Version
             downloadLocation = 'NOASSERTION'
             filesAnalyzed    = $false
-            licenseConcluded = 'GPL-3.0-or-later'
-            licenseDeclared  = 'GPL-3.0-or-later'
+            licenseConcluded = $ownLicenceId
+            licenseDeclared  = $ownLicenceId
         }
     ) + @($components | ForEach-Object {
             $package = [ordered]@{
@@ -162,6 +176,15 @@ $spdx = [ordered]@{
             }
             $package
         })
+    # SPDX 2.3 §10: a document that names a `LicenseRef-` has to carry its text, or a reader is left
+    # with an identifier that resolves to nothing. This is the section that makes the reference real.
+    hasExtractedLicensingInfos = @(
+        [ordered]@{
+            licenseId   = $ownLicenceId
+            name        = $ownLicenceName
+            extractedText = $ownLicenceText
+        }
+    )
 }
 
 $cyclonePath = Join-Path $outputRoot 'sbom.cyclonedx.json'

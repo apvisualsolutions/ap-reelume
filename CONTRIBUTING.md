@@ -1,8 +1,12 @@
 # Cómo contribuir / Contributing
 
-Gracias por mirar el código. AP Reelume es software libre bajo `GPL-3.0-or-later`, y este documento
-dice qué esperar antes de que inviertas tiempo. / Thanks for looking at the code. AP Reelume is free
-software under `GPL-3.0-or-later`, and this document says what to expect before you spend time.
+Gracias por mirar el código. AP Reelume es gratuito y su código es público, pero **no es software
+libre**: se publica bajo una licencia propia de AP Solutions que permite usarlo sin pagar y no
+permite modificarlo ni redistribuirlo. Este documento dice qué esperar antes de que inviertas tiempo.
+/ Thanks for looking at the code. AP Reelume is free of charge and its source is public, but it is
+**not free software**: it is published under AP Solutions' own licence, which allows use at no cost
+and allows neither modification nor redistribution. This document says what to expect before you
+spend time.
 
 ## Antes que nada: el proyecto tiene un alcance cerrado / First: the project has a closed scope
 
@@ -79,7 +83,7 @@ promises.
 ## Lo que la revisión va a mirar / What review will look at
 
 - **Cabecera de licencia.** Todo archivo fuente nuevo lleva `SPDX-License-Identifier:
-  GPL-3.0-or-later`. La puerta de formato lo exige, así que lo verás antes que nadie.
+  LicenseRef-AP-Reelume`. La puerta de formato lo exige, así que lo verás antes que nadie.
   / **Licence header** on every new source file; the formatting gate demands it.
 - **Bilingüismo.** Cadenas de interfaz y documentos públicos, en español y en inglés. Una prueba
   compara la estructura de los dos. / **Both languages** for user-facing strings and public
@@ -103,7 +107,18 @@ findings. Discuss a large feature in an issue first.
 
 ## Licencia de tus aportaciones / Licensing of your contributions
 
-Al enviar un pull request aceptas que tu aportación se publique bajo `GPL-3.0-or-later`, la misma
-licencia del proyecto. No se pide firmar un CLA ni ceder el copyright: conservas el tuyo.
-/ By opening a pull request you agree that your contribution is published under
-`GPL-3.0-or-later`. There is no CLA and no copyright assignment: you keep yours.
+**AP Solutions no acepta aportaciones de código y las rechazará.** No es descortesía: el programa
+tiene un único titular, y basta con que una línea sea de otra persona para que AP Solutions ya no
+pueda decidir sola sobre su propio producto. Si aun así envías código, sugerencias o comentarios y AP
+Solutions decide incorporarlos, con ello cedes el derecho a usarlos sin límite, sin contraprestación
+y sin atribución, y declaras tener derecho a cederlo; es la sección 5 de [LICENSE](LICENSE).
+
+**Lo que sí sirve, y mucho: contar lo que falla.** Un informe de error con pasos para reproducirlo
+vale más que un parche, porque el parche no se puede aceptar y el informe sí.
+/ **AP Solutions does not accept code contributions and will reject them.** It is not rudeness: the
+program has a single owner, and one line written by somebody else is enough for AP Solutions to stop
+being able to decide about its own product alone. If you send code, suggestions or comments anyway
+and AP Solutions decides to incorporate them, you thereby grant the right to use them without limit,
+without consideration and without attribution, and you represent that you may do so; that is section
+5 of [LICENSE](LICENSE). **What does help, a lot: telling us what breaks.** A bug report with steps
+to reproduce is worth more than a patch, because the patch cannot be accepted and the report can.

@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 AP Solutions
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: LicenseRef-AP-Reelume
 
 <#
 .SYNOPSIS
@@ -118,7 +118,7 @@ Write-Manifest "$identifier.locale.en-US.yaml" @(
     "PublisherSupportUrl: $projectUrl/issues"
     "PackageName: $displayName"
     "PackageUrl: $projectUrl"
-    "License: GPL-3.0-or-later"
+    "License: AP Reelume Licence"
     "LicenseUrl: $projectUrl/blob/main/LICENSE"
     "ShortDescription: $english"
     "Tags:"

@@ -27,7 +27,7 @@ test, say why.
 
 ## Lo que la revisión mira / What review looks at
 
-- [ ] Todo archivo fuente nuevo lleva su cabecera `SPDX-License-Identifier: GPL-3.0-or-later`. / New source files carry the SPDX header.
+- [ ] Todo archivo fuente nuevo lleva su cabecera `SPDX-License-Identifier: LicenseRef-AP-Reelume`. / New source files carry the SPDX header.
 - [ ] Las cadenas visibles y los documentos públicos están en los dos idiomas. / User-facing strings and public documents exist in both languages.
 - [ ] Las superficies nuevas se recorren con teclado y tienen nombre accesible. / New surfaces are keyboard-reachable and named.
 - [ ] No añado ninguna conexión de red fuera de `NetworkPurposeRegistry`. / No network host outside the registry.
@@ -41,6 +41,11 @@ test, say why.
 - [ ] Encaja en el alcance de [FEATURES.md](../blob/main/docs/FEATURES.md) y no contradice la hoja de ruta. / It fits the feature matrix and does not contradict the roadmap.
 
 <!--
-Al abrir este pull request aceptas publicar tu aportación bajo GPL-3.0-or-later. No hay CLA.
-/ By opening this pull request you agree to publish your contribution under GPL-3.0-or-later.
+AP Solutions no acepta aportaciones de código y este pull request será rechazado. Si aun así lo
+abres y AP Solutions decidiera incorporar algo de él, cedes el derecho a usarlo sin límite, sin
+contraprestación y sin atribución (sección 5 de LICENSE). Un informe de error sí es bienvenido.
+/ AP Solutions does not accept code contributions and this pull request will be rejected. If you
+open it anyway and AP Solutions were to incorporate anything from it, you grant the right to use it
+without limit, without consideration and without attribution (section 5 of LICENSE). A bug report
+is welcome.
 -->

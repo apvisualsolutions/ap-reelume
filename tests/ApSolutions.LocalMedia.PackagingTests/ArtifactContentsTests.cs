@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: LicenseRef-AP-Reelume
 
 using System.Globalization;
 using System.Security.Cryptography;
@@ -121,7 +121,7 @@ public sealed class ArtifactContentsTests
     }
 
     /// <summary>
-    /// The licence conditions travel with the binary or they are not met. GPL-3.0-or-later and the
+    /// The licence conditions travel with the binary or they are not met. The AP Reelume Licence and the
     /// third-party notices are part of the payload, in both languages, not a link somewhere else.
     /// </summary>
     [Fact]

@@ -1,7 +1,7 @@
 # AP Reelume — guía para agentes
 
 Biblioteca de medios local para Windows 11: cataloga y reproduce vídeos que ya están en el disco de
-quien la usa. Sin cuentas, sin telemetría, sin servidor. `GPL-3.0-or-later`.
+quien la usa. Sin cuentas, sin telemetría, sin servidor. Licencia propia, gratuita para quien la usa (`LicenseRef-AP-Reelume`).
 
 Este archivo es para un agente que llega al repositorio sin contexto. Está en español porque el
 proyecto se piensa en español y se publica en dos idiomas; el código, los commits y los nombres de
@@ -467,7 +467,7 @@ Cinco capas, dependencias hacia dentro:
 
 No son estilo: hay una puerta que falla si las rompes.
 
-1. **Licencia por archivo.** Todo fuente nuevo lleva `SPDX-License-Identifier: GPL-3.0-or-later`. Lo
+1. **Licencia por archivo.** Todo fuente nuevo lleva `SPDX-License-Identifier: LicenseRef-AP-Reelume`. Lo
    exige `IDE0073` desde `.editorconfig`, así que lo caza `dotnet format`.
 2. **Red declarada.** Ninguna conexión fuera de `NetworkPurposeRegistry`. Una prueba recorre `src/`
    buscando hosts no declarados y falla; otra levanta un proceso hijo y escucha si abre algo.

@@ -8,12 +8,27 @@ Last full review: 2026-08-10, over the public repository.
 
 ## The program's licence
 
-AP Reelume by AP Solutions is published under `GPL-3.0-or-later`. The full text is in
-[LICENSE](../../LICENSE) and the product attribution in [NOTICE](../../NOTICE).
+AP Reelume by AP Solutions is published under **a licence of its own**, identified as
+`LicenseRef-AP-Reelume`: free of charge for whoever uses it, with no right to modify, redistribute or
+sell it. The full text is in [LICENSE](../../LICENSE) and the product attribution in
+[NOTICE](../../NOTICE).
 
-Since the 2026-08-10 review, **every source file carries its SPDX header**: 556 `.cs` files, 51
-`.axaml`, and 17 `.ps1` declare `SPDX-License-Identifier: GPL-3.0-or-later` next to the copyright
-holder. A licence that lives only in `LICENSE` stops being attached to a file the moment somebody
+**Until 2026-09-13 the program was `GPL-3.0-or-later`**, and the owner changed it for a business
+reason rather than a technical one: the free licence granted anyone the right to modify, redistribute
+and sell the program, which are the three things he wants to keep. Everything published up to that
+date keeps its rights forever; this licence governs from then on. What made it possible is a measured
+fact: **the repository's 646 commits have a single author**, so there is no third-party copyright to
+relicense.
+
+**The identifier carries no version, and that is deliberate.** It used to name a specific licence, so
+the day it changed **1,033 files** had to change with it. A `LicenseRef-` names "this project's own
+licence" and points at the document; the version and the date live inside `LICENSE`, which is where a
+reader has to go anyway to learn the terms. Rewording those terms now touches no source file at all.
+
+Since the 2026-08-10 review, **every source file carries its SPDX header**: 925 `.cs` files, 71
+`.axaml`, and 29 `.ps1` declare `SPDX-License-Identifier: LicenseRef-AP-Reelume` next to the copyright
+holder. (The earlier figures — 556, 51 and 17 — had been stale for a long time: **no gate checks
+them**, and that is still true.) A licence that lives only in `LICENSE` stops being attached to a file the moment somebody
 copies it out of the tree; the header travels with it. The `IDE0073` rule demands it in
 `.editorconfig`, so `dotnet format --verify-no-changes` — a gate that already ran — rejects a new
 file without one.
@@ -21,8 +36,9 @@ file without one.
 ## Warranty disclaimer
 
 The program comes with **no warranty whatsoever**, to the extent permitted by applicable law.
-Sections 15, 16, and 17 of the GPL-3.0 say so in full, and neither the README nor the application
-promises anything else. In particular, because these are the confusions that actually happen:
+Sections 6 and 7 of [LICENSE](../../LICENSE) say so in full — including that, the program being free
+of charge, the liability cap is zero euros — and neither the README nor the application promises
+anything else. In particular, because these are the confusions that actually happen:
 
 - The artifact is **not Authenticode-signed**, and SmartScreen will warn. This is explained in
   [SMARTSCREEN.en.md](../release/SMARTSCREEN.en.md); the release signature — minisign over the
@@ -38,13 +54,34 @@ The inventory checked against the real build, with each component's licence, is 
 [the third-party notices](../release/THIRD-PARTY-NOTICES.en.md), and `ThirdPartyNoticeTests` stops a
 dependency from entering the artifact without appearing there.
 
-Compatibility: `GPL-3.0-or-later` allows incorporating `LGPL-2.1-or-later`, `MIT`, `Apache-2.0`, and
-`BSD-3-Clause`, which covers everything the package carries.
+Compatibility: a proprietary licence allows incorporating `LGPL-2.1-or-later`, `MIT`, `Apache-2.0`
+and `BSD-3-Clause` while meeting their conditions — which for the LGPL are those of §6, and they are
+met because the libraries travel as separate files anyone may replace. **What it does not allow is
+GPL code.**
 
-**VideoLAN's plugins — closed on 2026-08-10.** This was recorded as a question for the opinion: a
-`GPL-2.0-only` plugin would be incompatible with GPL-3.0. It was checked at the source: VLC's tree
-carries the GPL version 2 **with** the "either version 2 of the License, or (at your option) any later
-version" clause, so the set is `GPL-2.0-or-later` and sits under GPL-3.0. The point leaves the list.
+**VideoLAN's GPL plugins — OPEN since 2026-09-13, and it blocks release.** This point was closed on
+2026-08-10 **with the opposite reasoning**, and how it inverted is worth reading, because it is the
+example of a correct conclusion ceasing to be one without anybody touching the code. The argument
+then was: VLC's tree carries the GPL version 2 **with** the "either version 2 of the License, or (at
+your option) any later version" clause, so a `GPL-2.0-or-later` plugin rises to GPL-3.0 and **sits
+inside a GPL-3.0 program**. The reasoning was valid and still is; what changed is the premise — **the
+program is no longer GPL**, so there is no version to rise to.
+
+Measured on 2026-09-13: the package carries some three hundred VideoLAN plugins and **at least one
+indispensable plugin is GPL**. It is not the x264 encoder, which could be dropped because a player
+does not encode: it is **`libavcodec_plugin.dll`, the decoder**, whose build configuration line begins
+with `--enable-gpl`. It was read inside the binary itself, with three control plugins that do not
+carry it.
+
+**The practical consequence is hard**: while that plugin travels inside the package, **the artifact
+cannot be distributed** under the proprietary licence. This repository's source can carry it — the
+tree holds only AP Solutions' code — but packaging is suspended.
+
+**The way out is measured and costs no functionality**: the decoding library is `LGPL` by default, and
+what is copyleft are **optional** pieces enabled at build time — a legacy post-processing filter and
+some optimisations; **no decoder is among them**. The route is to build LibVLC and its dependencies
+without that option, for both architectures, and to maintain that build. That is permanent
+infrastructure work, not a loss of formats.
 
 **The licence texts now travel — closed on 2026-08-10.** This was the open breach: the artifact
 carried AP Reelume's `LICENSE` and the third-party notices, but **not the text of the other
@@ -76,8 +113,16 @@ them beside the binaries. The written offer stays for channels where "the same p
 such as a store, and it now explicitly stands for any third party. Two things were corrected along the
 way: the notice named `libvlc 3.0.23.1` — a version whose source **does not exist**, that fourth digit
 belonging to the NuGet package — and it did not mention that the work using the library is this
-program, public under `GPL-3.0-or-later`, which is what 6(a) asks for so the library can be relinked.
-Measured in [audit-corresponding-source.md](../evidence/stable/audit-corresponding-source.md).
+program. Measured in
+[audit-corresponding-source.md](../evidence/stable/audit-corresponding-source.md).
+
+**And §6(a) stopped being available on 2026-09-13.** Until then it was met the easy way: publishing
+this program's source, which was free software, was enough for anyone to relink LibVLC. A proprietary
+licence closes that door, and compliance now rests on the option the LGPL offers right beside it and
+which was already true here in fact: **the libraries travel as separate files** that anyone may
+replace with their own build without touching the program. That is the usual way a closed program
+uses an LGPL library, and it is sound; what no longer holds is the earlier argument, which is why it
+is written here rather than deleted.
 
 None of this is a legal opinion or a substitute for one: it is compliance checkable against the text of
 the licences, and what it achieves is that no interpretation is needed.
@@ -95,9 +140,12 @@ The application queries `api.themoviedb.org` only if you place a token in
   cache's soft expiry (one day) was not enough on its own: when the network failed or the token went
   away, the program served the stored copy **with no age limit at all**. There is now a hard floor of
   180 days (`TmdbOptions.RetentionLimit`): past it the entry is not served and **is deleted**.
-- **Commercial use.** The terms reserve it for a separate written agreement. AP Reelume is free
-  software and derives no revenue from TMDB or its content, so it does not apply today. If the
-  program were ever charged for, this point changes and must be read again first.
+- **Commercial use.** The terms reserve it for a separate written agreement. AP Reelume is supplied
+  free of charge and derives no revenue from TMDB or its content, so it does not apply today. **The
+  2026-09-13 licence change does not trigger it** — what decides is whether money is charged, not how
+  the program is licensed — but it does bring the day closer: the new licence exists precisely to
+  leave the door to charging open. If the program is ever charged for, this point changes and must be
+  read again first.
 - **Logo — closed on 2026-08-10.** The terms ask that TMDB's use be identified **with their logo**,
   less prominent than the product's own. Credits shows it as of this session, above the attribution
   sentence, with alternative text and no link: it identifies where the data comes from, it does not
@@ -108,9 +156,14 @@ The application queries `api.themoviedb.org` only if you place a token in
 ## GitHub's terms
 
 The repository is hosted on GitHub, and the updater queries `api.github.com` and downloads from
-`github.com` and its storage. Publishing code under a free licence in a public repository is exactly
-the use their Terms of Service anticipate, and section F of those terms already grants other users
-the right to view and fork the repository; `GPL-3.0-or-later` grants more. No GitHub API requiring
+`github.com` and its storage. Publishing code in a public repository is the use their Terms of
+Service anticipate, **but since 2026-09-13 the relationship has inverted and it is worth being clear
+about it**: those terms grant any user, of their own force, the right to view the repository and to
+**fork** it within the platform itself, and the program's licence now grants **less** than that.
+GitHub does not grant it on AP Solutions' behalf, and AP Solutions cannot withdraw it while the
+repository is public; section 5 of [LICENSE](../../LICENSE) acknowledges this in writing and reserves
+everything else, rather than forbidding something the platform already permits. **The repository
+stays public on purpose**: the project's free build machines depend on it, the ARM64 ones included. No GitHub API requiring
 authentication or an additional agreement is used: the updater's requests are anonymous reads of
 public releases.
 

@@ -8,6 +8,64 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Cambiado
+
+- **AP Reelume deja de ser software libre y pasa a una licencia propia, gratuita para quien la
+  use.** Lo decidió el propietario por un motivo de negocio: la licencia anterior concedía a
+  cualquiera el derecho a modificar el programa, redistribuirlo y venderlo, que son las tres cosas
+  que él quiere reservarse. El programa se sigue entregando gratis y su código sigue siendo público
+  para que se pueda examinar, pero leerlo ya no da derecho a usarlo. El texto está en `LICENSE`,
+  español auténtico e inglés de cortesía, y con el fuero en Tenerife. Fue posible porque los 646
+  commits del repositorio **tienen un solo autor**: no hay copyright ajeno que relicenciar. Lo
+  publicado antes del 2026-09-13 conserva sus derechos para siempre.
+
+- **El identificador de licencia de las cabeceras ya no nombra una licencia: apunta a una.** Antes
+  cada archivo declaraba `GPL-3.0-or-later`, así que cambiar de licencia obligó a tocar **1.033
+  archivos**. Ahora dicen `LicenseRef-AP-Reelume`, **sin versión**, y la versión y la fecha viven
+  dentro de `LICENSE`. Reescribir las condiciones ya no toca ni un archivo de código, y el porqué
+  está escrito junto a la regla para que nadie vuelva a meter la versión ahí.
+
+- **La sección de la licencia que habla del repositorio público reconoce lo que GitHub concede por
+  su cuenta.** Sus términos dan a cualquier usuario el derecho a ver y **bifurcar** un repositorio
+  público, AP Solutions no lo concede ni lo puede retirar, y el repositorio sigue público a
+  propósito porque de ello dependen las máquinas de compilación gratuitas. La licencia lo dice y
+  reserva todo lo demás, en vez de prohibir algo que la plataforma ya permite: una cláusula que
+  prohíbe lo imposible debilita las que sí se sostienen.
+
+- **Las normas de contribución dicen ahora la verdad.** Prometían «no hay cesión de derechos y
+  conservas tu copyright», que es incompatible con un titular único: una sola línea ajena bastaría
+  para que AP Solutions no pudiera decidir sola sobre su producto. No se aceptan aportaciones de
+  código, y a cambio se dice lo que sí sirve — un informe de error con pasos para reproducirlo vale
+  más que un parche, porque el parche no se puede aceptar.
+
+### Corregido
+
+- **El razonamiento legal sobre los complementos de VideoLAN estaba cerrado y se ha reabierto, sin
+  que nadie tocara una línea de código.** Decía que un complemento contagioso «encaja» dentro del
+  programa porque ambos se encuentran en la misma versión de la licencia libre. El razonamiento era
+  correcto y lo sigue siendo; lo que cambió es la premisa. Medido el 2026-09-13: el complemento que
+  importa **no es el codificador que un reproductor no usa**, sino el **decodificador**, cuya línea
+  de compilación empieza por `--enable-gpl` —leída dentro del binario, con tres complementos de
+  control que no la llevan—. **Mientras viaje ahí, el artefacto no se puede distribuir**, y queda
+  escrito como hallazgo abierto en vez de como pregunta pendiente. La salida medida no pierde
+  formatos: la biblioteca que descodifica es permisiva por defecto y lo contagioso son piezas
+  opcionales que se activan al compilar.
+
+- **Una puerta se habría quedado ciega y en verde.** La comprobación que impide que una licencia sin
+  archivar llegue al artefacto reconoce identificadores con forma de licencia publicada, y un
+  `LicenseRef-` no lo es: tras el cambio habría seguido pasando **viendo un identificador menos**.
+  Es el defecto característico de esta casa —una prueba que se vuelve ciega en vez de roja—, y ahora
+  la expresión lo reconoce, con el motivo escrito al lado.
+
+- **La prueba que lee la pantalla de créditos comprobaba una cadena que coincidía en los dos idiomas
+  por casualidad.** Afirmaba «GPL-3.0», que se escribe igual en español y en inglés por ser un
+  identificador; con «Licencia» y «Licence» eso se rompía. Ahora comprueba el nombre del fichero,
+  que sí es idéntico en ambos.
+
+- **El documento legal afirmaba 556 archivos con cabecera y son 925.** Llevaba tiempo desfasado
+  porque **ninguna puerta lo comprueba**, y eso sigue siendo cierto: queda dicho en el propio
+  documento.
+
 ### Añadido
 
 - **Cada grupo de opciones está donde se decide y se puede devolver a sus valores de fábrica desde
@@ -4932,7 +4990,7 @@ evidencia, es [FEATURES.md](FEATURES.md).
 - **Cada archivo fuente dice bajo qué licencia está.** La licencia vivía solo en `LICENSE`, y una
   licencia que solo vive ahí deja de estar unida al archivo en cuanto alguien lo copia fuera del
   árbol. Los 556 archivos de código, los 51 de interfaz y los 17 de compilación llevan ahora su
-  cabecera `SPDX-License-Identifier: GPL-3.0-or-later` junto al titular del copyright, y la puerta de
+  cabecera `SPDX-License-Identifier: LicenseRef-AP-Reelume` junto al titular del copyright, y la puerta de
   formato que ya se ejecutaba rechaza un archivo nuevo que llegue sin ella.
 - **Los avisos de terceros nombran lo que el paquete lleva de verdad.** Listaban ocho componentes —
   los que alguien recordaba haber pedido— mientras el artefacto transportaba treinta, entre ellos

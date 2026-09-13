@@ -8,7 +8,7 @@ enviar nada a ninguna parte.
 
 ![La pantalla de inicio: lo que quedó a medias, lo que está en curso y lo que llegó hace poco](docs/assets/home.png)
 
-**Windows 11 x64** · **GPL-3.0-or-later** · [Descargar la última versión](https://github.com/apvisualsolutions/ap-reelume/releases/latest)
+**Windows 11 x64** · **Gratis, licencia propia** · [Descargar la última versión](https://github.com/apvisualsolutions/ap-reelume/releases/latest)
 
 Todo commit que llega a `main` ha pasado [la verificación
 completa](https://github.com/apvisualsolutions/ap-reelume/actions/workflows/ci.yml) en un ejecutor
@@ -107,7 +107,7 @@ donde estaban.
 
 ## Licencia
 
-GPL-3.0-or-later. Vea [LICENSE](LICENSE), [NOTICE](NOTICE) y los
+Licencia de AP Reelume: gratuita para usar, sin derecho a modificar ni redistribuir. Vea [LICENSE](LICENSE), [NOTICE](NOTICE) y los
 [avisos de terceros](docs/release/THIRD-PARTY-NOTICES.es.md). Este producto usa TMDB y las API de
 TMDB, pero no está avalado, certificado ni aprobado de ningún otro modo por TMDB.
 

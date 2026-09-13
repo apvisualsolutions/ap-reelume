@@ -71,7 +71,7 @@ dentro sí lo es.
 ## Qué contiene el paquete
 
 - El SBOM viaja dentro del artefacto, en `sbom/`, en formatos CycloneDX y SPDX.
-- La licencia GPL-3.0-or-later y los avisos de terceros viajan en `LICENSE`, `NOTICE` y `licenses/`.
+- La Licencia de AP Reelume y los avisos de terceros viajan en `LICENSE`, `NOTICE` y `licenses/`.
 - El paquete **no** declara ninguna capacidad más allá de `runFullTrust`, que es la que necesita
   cualquier aplicación de escritorio. No pide red, ni ubicación, ni acceso a bibliotecas del sistema.
 - El paquete **no** lleva ningún token de acceso. La identificación remota sólo funciona si usted pone

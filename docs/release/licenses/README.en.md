@@ -27,7 +27,7 @@ reproduced. Naming the component in a table is neither of those.
 | `NOTICE-SQLitePCLRaw.txt` | Assembled notice | SQLitePCLRaw |
 | `NOTICE-VideoLAN.txt` | Assembled notice | LibVLC and its plugins |
 
-There is no `GPL-3.0.txt`: the program's own licence travels as `LICENSE` at the root of the package,
+There is no catalogue licence text for the program itself: its own licence's own licence travels as `LICENSE` at the root of the package,
 which is where anyone looks for it.
 
 ## Where each text came from

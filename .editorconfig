@@ -13,11 +13,17 @@ csharp_new_line_before_open_brace = all
 csharp_style_namespace_declarations = file_scoped:warning
 dotnet_sort_system_directives_first = true
 dotnet_diagnostic.IDE0005.severity = suggestion
-# The repository is published under GPL-3.0-or-later, and a licence stated only in LICENSE stops
-# being attached to a file the moment that file is copied out of the tree. The SPDX header travels
-# with it. `dotnet format --verify-no-changes` is the gate: a source file added without the header
-# fails the same check that already guards the rest of the style.
-file_header_template = SPDX-FileCopyrightText: 2026 AP Solutions\nSPDX-License-Identifier: GPL-3.0-or-later
+# The repository is published under the project's own licence, whose text is LICENSE at the root. A
+# licence stated only there stops being attached to a file the moment that file is copied out of the
+# tree; the SPDX header travels with it. `dotnet format --verify-no-changes` is the gate: a source
+# file added without the header fails the same check that already guards the rest of the style.
+#
+# The identifier carries NO version, and that is deliberate. It used to name a licence outright
+# (`GPL-3.0-or-later`), so the day the licence changed, 1.028 files had to change with it. A
+# `LicenseRef-` names the project's own licence and points at the document; the version and the date
+# live inside LICENSE, which is where a reader has to go anyway to learn the terms. Rewording the
+# licence now touches one file instead of a thousand, and this line never moves again.
+file_header_template = SPDX-FileCopyrightText: 2026 AP Solutions\nSPDX-License-Identifier: LicenseRef-AP-Reelume
 dotnet_diagnostic.IDE0073.severity = warning
 # QA-001: where a format is data rather than language, the culture has to be stated. These three are
 # off by default, so nothing was watching: CA1305 for a missing IFormatProvider, CA1304 and CA1310

@@ -1,6 +1,6 @@
 # AP Reelume — paquete de diseño
 
-Biblioteca de medios local para Windows 11 (C# + Avalonia 12.1.1, LibVLC, SQLite). Sin cuentas, sin telemetría por defecto, sin streaming. GPL-3.0-or-later.
+Biblioteca de medios local para Windows 11 (C# + Avalonia 12.1.1, LibVLC, SQLite). Sin cuentas, sin telemetría por defecto, sin streaming. Licencia propia de AP Solutions, gratuita para quien la usa.
 
 **Estado.** El rediseño de las 53 vistas está **implementado y verificado** en el repositorio (`PRD-006`, matriz de paridad cerrada el 2026-08-24). Este proyecto queda como fuente de diseño viva: el prototipo navegable, cada vista por separado, y **una única propuesta abierta: Cursos (CRS)**.
 
