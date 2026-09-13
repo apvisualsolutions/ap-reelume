@@ -200,4 +200,54 @@ public sealed class PlaybackSettingsTests
         Assert.Throws<ArgumentNullException>(() => new PlaybackSettingsViewModel(null!, _ => { }));
         Assert.Throws<ArgumentNullException>(() => new PlaybackSettingsViewModel(() => 0, null!));
     }
+
+    /// <summary>
+    /// UX-010, asserted on the stored seconds rather than on the property: a reset that only moved
+    /// the slider would come back at the old length after a restart while looking restored.
+    /// </summary>
+    [Fact]
+    public void Restoring_the_defaults_stores_the_factory_length()
+    {
+        var stored = 45;
+        var viewModel = new PlaybackSettingsViewModel(() => stored, seconds => stored = seconds);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+
+        Assert.Equal(PlaybackSettingsViewModel.DefaultCountdownSeconds, stored);
+        Assert.True(viewModel.IsCountdownEnabled);
+    }
+
+    /// <summary>
+    /// The half a reset that only wrote the number would miss: switching off remembers the length so
+    /// switching back on does not lose it, and a restored group has nothing left to remember.
+    /// </summary>
+    [Fact]
+    public void Restoring_the_defaults_forgets_the_length_the_switch_was_holding()
+    {
+        var stored = 45;
+        var viewModel = new PlaybackSettingsViewModel(() => stored, seconds => stored = seconds);
+
+        viewModel.IsCountdownEnabled = false;
+        Assert.Equal(0, stored);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+        Assert.Equal(PlaybackSettingsViewModel.DefaultCountdownSeconds, stored);
+
+        viewModel.IsCountdownEnabled = false;
+        viewModel.IsCountdownEnabled = true;
+
+        Assert.Equal(PlaybackSettingsViewModel.DefaultCountdownSeconds, stored);
+    }
+
+    /// <summary>
+    /// The factory length is the use case's own constant and not a second copy of the number ten,
+    /// because two literals are two numbers that can disagree with nothing to say which is right.
+    /// </summary>
+    [Fact]
+    public void The_factory_length_is_the_one_the_store_defaults_to()
+    {
+        Assert.Equal(
+            ApSolutions.LocalMedia.Application.Continuity.ContinuityCountdown.DefaultCountdownSeconds,
+            PlaybackSettingsViewModel.DefaultCountdownSeconds);
+    }
 }

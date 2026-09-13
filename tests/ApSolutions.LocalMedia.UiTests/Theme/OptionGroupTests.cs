@@ -106,13 +106,13 @@ public sealed class OptionGroupTests
             OptionPlace.Player,
             "SettingsSection.Playback",
             "PlaybackSettingsView",
-            null,
+            "PlaybackResetButton",
             "How long to wait before the next episode is decided by having just sat through one."),
         ["SegmentDetection"] = new(
             OptionPlace.Player,
             "SettingsSection.SegmentDetection",
             "SegmentDetectionSettingsView",
-            null,
+            "SegmentDetectionResetButton",
             "Whether intros are skipped is judged the moment one is, or is not, skipped."),
 
         // Settings: configured once, and not while watching a film.
@@ -136,7 +136,7 @@ public sealed class OptionGroupTests
             OptionPlace.Settings,
             "SettingsSection.Library",
             "ScanSettingsView",
-            null,
+            "ScanSettingsResetButton",
             "Watching folders for changes is a property of the machine and its disks, not of "
                 + "anything on screen."),
         ["Recommendations"] = new(
@@ -226,12 +226,13 @@ public sealed class OptionGroupTests
     private static readonly Dictionary<string, string> Pending = new(StringComparer.Ordinal)
     {
         ["SubtitleStyle"] = "No button yet, and still reached through Settings: it moves into the gear.",
-        ["NextEpisodeCountdown"] = "No button yet, and still reached through Settings: it moves into the gear.",
-        ["SegmentDetection"] = "No button yet, and still reached through Settings: it moves into the gear.",
+        ["NextEpisodeCountdown"] = "It has its button, and is still reached through Settings: it "
+            + "moves into the gear.",
+        ["SegmentDetection"] = "It has its button, and is still reached through Settings: it moves "
+            + "into the gear.",
         ["Appearance"] = "No button yet.",
         ["Language"] = "No button yet, and its destination does not exist: it is a card inside "
             + "Appearance today and needs a rail entry of its own.",
-        ["Scanning"] = "No button yet.",
         ["Recommendations"] = "No button yet.",
         ["Lifecycle"] = "No button yet.",
         ["Privacy"] = "No button yet.",
@@ -239,7 +240,7 @@ public sealed class OptionGroupTests
     };
 
     /// <summary>The ratchet over <see cref="Pending"/>, which only ever comes down.</summary>
-    private const int MaximumPending = 10;
+    private const int MaximumPending = 9;
 
     /// <summary>
     /// Every resource key in the tree shaped like a reset, and what kind of thing each one undoes.

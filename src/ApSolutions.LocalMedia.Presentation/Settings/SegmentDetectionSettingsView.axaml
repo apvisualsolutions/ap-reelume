@@ -14,12 +14,26 @@ SPDX-License-Identifier: GPL-3.0-or-later
        the appearance page already used. The name stays on the panel it was on. -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel x:Name="SegmentDetectionSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
-      <TextBlock
-          FontSize="{DynamicResource FontSizeSubtitle}"
-          FontWeight="SemiBold"
-          Foreground="{DynamicResource TextPrimaryBrush}"
-          Text="{DynamicResource SegmentDetectionSettingsTitle}"
-          automation:AutomationProperties.HeadingLevel="2" />
+      <!--
+        UX-010: the button that puts this group back sits inside the group and in its heading row,
+        never under the controls — there, appearing and going would move every control the mouse was
+        about to press, and past a list it would fall outside the first viewport the walk can reach.
+      -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource SegmentDetectionSettingsTitle}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <Button
+            x:Name="SegmentDetectionResetButton"
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+            Command="{Binding RestoreDefaultsCommand}"
+            Content="{DynamicResource RestoreDefaultsAction}" />
+      </Grid>
       <TextBlock
           Foreground="{DynamicResource TextPrimaryBrush}"
           Text="{DynamicResource SegmentDetectionSettingsDescription}"

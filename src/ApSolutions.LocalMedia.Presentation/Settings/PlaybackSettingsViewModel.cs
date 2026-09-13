@@ -3,6 +3,9 @@
 
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
+
+using ApSolutions.LocalMedia.Application.Continuity;
 
 namespace ApSolutions.LocalMedia.Presentation.Settings;
 
@@ -53,8 +56,12 @@ public sealed class PlaybackSettingsViewModel : INotifyPropertyChanged
     /// <inheritdoc cref="MinimumCountdownSeconds"/>
     public static double MaximumCountdownSeconds => MaximumSeconds;
 
-    /// <summary>What the toggle restores when the stored length is zero.</summary>
-    public const int DefaultCountdownSeconds = 10;
+    /// <summary>
+    /// What the toggle restores when the stored length is zero, and what UX-010's reset puts back.
+    /// It is the use case's own constant rather than a second copy of the number ten: two literals
+    /// are two numbers that can disagree, with nothing to say which of them is the default.
+    /// </summary>
+    public const int DefaultCountdownSeconds = ContinuityCountdown.DefaultCountdownSeconds;
 
     private readonly Func<int> _readCountdownSeconds;
     private readonly Action<int> _writeCountdownSeconds;
@@ -68,9 +75,13 @@ public sealed class PlaybackSettingsViewModel : INotifyPropertyChanged
     {
         _readCountdownSeconds = readCountdownSeconds ?? throw new ArgumentNullException(nameof(readCountdownSeconds));
         _writeCountdownSeconds = writeCountdownSeconds ?? throw new ArgumentNullException(nameof(writeCountdownSeconds));
+        RestoreDefaultsCommand = new RelayCommand(RestoreDefaults);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    public ICommand RestoreDefaultsCommand { get; }
 
     /// <summary>Whether the next thing starts on its own; false is the stored zero.</summary>
     public bool IsCountdownEnabled
@@ -133,9 +144,41 @@ public sealed class PlaybackSettingsViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Puts the whole group back, which is two things and not one: the stored length, and the length
+    /// the switch was holding on to. Leaving the second behind would restore a group that went back
+    /// to the old number the next time somebody switched it off and on — restored to look at, and
+    /// not restored at all.
+    /// </summary>
+    private void RestoreDefaults()
+    {
+        _lengthBeforeSwitchingOff = 0;
+
+        if (_readCountdownSeconds() != DefaultCountdownSeconds)
+        {
+            _writeCountdownSeconds(DefaultCountdownSeconds);
+        }
+
+        OnPropertyChanged(nameof(IsCountdownEnabled));
+        OnPropertyChanged(nameof(CountdownSeconds));
+    }
+
     private static int Clamp(int seconds) =>
         Math.Clamp(seconds <= 0 ? DefaultCountdownSeconds : seconds, MinimumSeconds, MaximumSeconds);
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    private sealed class RelayCommand(Action execute) : ICommand
+    {
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public bool CanExecute(object? parameter) => true;
+
+        public void Execute(object? parameter) => execute();
+    }
 }
