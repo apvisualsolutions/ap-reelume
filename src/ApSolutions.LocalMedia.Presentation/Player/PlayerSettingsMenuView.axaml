@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
     xmlns:player="clr-namespace:ApSolutions.LocalMedia.Presentation.Player"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
     x:DataType="player:PlayerSettingsMenuViewModel"
     automation:AutomationProperties.Name="{DynamicResource PlayerSettingsAction}">
   <!--
@@ -50,6 +51,29 @@ SPDX-License-Identifier: GPL-3.0-or-later
             Command="{Binding OpenGroupCommand}"
             CommandParameter="{x:Static player:PlayerSettingsGroup.Picture}"
             Content="{DynamicResource PlayerSettingsGroupPicture}" />
+        <!--
+          The two groups that came down from Settings on 2026-09-13 (ADR-0012). They keep the
+          resource keys they had there rather than gaining names of their own: it is the same group,
+          and a second key for one idea is what UX-010 exists to stop.
+        -->
+        <Button
+            x:Name="PlayerSettingsNextEpisodeEntry"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Left"
+            IsVisible="{Binding HasNextEpisode}"
+            automation:AutomationProperties.Name="{DynamicResource PlaybackSettingsTitle}"
+            Command="{Binding OpenGroupCommand}"
+            CommandParameter="{x:Static player:PlayerSettingsGroup.NextEpisode}"
+            Content="{DynamicResource PlaybackSettingsTitle}" />
+        <Button
+            x:Name="PlayerSettingsSegmentsEntry"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Left"
+            IsVisible="{Binding HasSegments}"
+            automation:AutomationProperties.Name="{DynamicResource SegmentDetectionSettingsTitle}"
+            Command="{Binding OpenGroupCommand}"
+            CommandParameter="{x:Static player:PlayerSettingsGroup.Segments}"
+            Content="{DynamicResource SegmentDetectionSettingsTitle}" />
       </StackPanel>
       <!--
         The second level, which REPLACES the first rather than sitting under it: a list plus an open
@@ -74,6 +98,46 @@ SPDX-License-Identifier: GPL-3.0-or-later
               automation:AutomationProperties.HeadingLevel="2" />
         </Grid>
         <player:PictureAdjustmentView DataContext="{Binding Picture}" />
+      </StackPanel>
+      <StackPanel
+          x:Name="PlayerSettingsNextEpisodeGroup"
+          IsVisible="{Binding IsNextEpisodeVisible}"
+          Spacing="{DynamicResource Space12}">
+        <Grid ColumnDefinitions="Auto,*">
+          <Button
+              x:Name="PlayerSettingsNextEpisodeBack"
+              automation:AutomationProperties.Name="{DynamicResource PlayerSettingsBackAction}"
+              Command="{Binding BackCommand}"
+              Content="{DynamicResource PlayerSettingsBackAction}" />
+          <TextBlock
+              Grid.Column="1"
+              Margin="12,0,0,0"
+              FontWeight="SemiBold"
+              VerticalAlignment="Center"
+              Text="{DynamicResource PlaybackSettingsTitle}"
+              automation:AutomationProperties.HeadingLevel="2" />
+        </Grid>
+        <settings:PlaybackSettingsView DataContext="{Binding NextEpisode}" />
+      </StackPanel>
+      <StackPanel
+          x:Name="PlayerSettingsSegmentsGroup"
+          IsVisible="{Binding IsSegmentsVisible}"
+          Spacing="{DynamicResource Space12}">
+        <Grid ColumnDefinitions="Auto,*">
+          <Button
+              x:Name="PlayerSettingsSegmentsBack"
+              automation:AutomationProperties.Name="{DynamicResource PlayerSettingsBackAction}"
+              Command="{Binding BackCommand}"
+              Content="{DynamicResource PlayerSettingsBackAction}" />
+          <TextBlock
+              Grid.Column="1"
+              Margin="12,0,0,0"
+              FontWeight="SemiBold"
+              VerticalAlignment="Center"
+              Text="{DynamicResource SegmentDetectionSettingsTitle}"
+              automation:AutomationProperties.HeadingLevel="2" />
+        </Grid>
+        <settings:SegmentDetectionSettingsView DataContext="{Binding Segments}" />
       </StackPanel>
   </StackPanel>
 </UserControl>

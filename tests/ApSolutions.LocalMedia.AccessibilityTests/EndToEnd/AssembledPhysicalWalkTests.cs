@@ -596,87 +596,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         await PressAsync(
             host,
-            "SegmentDetectionSettingsTitle",
-            () => host.ViewModel.CurrentSettingsSection,
-            "clicking Detección de segmentos in the settings index never opened its section");
-        Assert.Equal(SettingsSection.SegmentDetection, host.ViewModel.CurrentSettingsSection);
-
-        await PressAsync(
-            host,
             "AppearanceTitle",
             () => host.ViewModel.CurrentSettingsSection,
             "clicking Apariencia in the settings index never opened the appearance section");
-        Assert.Equal(SettingsSection.Appearance, host.ViewModel.CurrentSettingsSection);
-
-        // Playback, the section PLY-011's criterion promised and did not have. Pressed from the
-        // index like the others, and then its switch. The assertion reads the same facade the player
-        // reads at chaining time, not the view model beside it: a switch that moves and writes
-        // nothing is exactly the defect this application keeps finding in itself, and only the
-        // store can tell the two apart.
-        await PressAsync(
-            host,
-            "PlaybackSettingsTitle",
-            () => host.ViewModel.CurrentSettingsSection,
-            "clicking Reproducción in the settings index never opened its section");
-        Assert.Equal(SettingsSection.Playback, host.ViewModel.CurrentSettingsSection);
-
-        var playback = host.ViewModel.PlaybackSettings;
-        Assert.NotNull(playback);
-        var chain = host.Application.Services.GetRequiredService<StartNextEpisodeCountdown>();
-        Assert.True(playback!.IsCountdownEnabled);
-
-        await PressAsync(
-            host,
-            "PlaybackSettingsCountdownEnable",
-            () => playback.IsCountdownEnabled,
-            "clicking the next-episode countdown switch never turned it off");
-        Assert.False(playback.IsCountdownEnabled);
-
-        // Off is a stored zero, which is what the chaining code reads to stay quiet. And the length
-        // row goes with it: absent rather than disabled, because a wait that does not happen has no
-        // length to ask for.
-        Assert.Equal(0, chain.CountdownSeconds);
-
-        await PressAsync(
-            host,
-            "PlaybackSettingsCountdownEnable",
-            () => playback.IsCountdownEnabled,
-            "clicking the countdown switch again never turned it back on");
-        Assert.True(playback.IsCountdownEnabled);
-        Assert.Equal(playback.CountdownSeconds, chain.CountdownSeconds);
-        Assert.True(chain.CountdownSeconds >= PlaybackSettingsViewModel.MinimumSeconds);
-
-        // And the length itself, pressed rather than assigned. A click lands the slider wherever the
-        // pointer fell, which is why the assertion is that the store followed it and stayed inside
-        // the range - not that it reached one particular number the harness would have to predict.
-        await PressAsync(
-            host,
-            "PlaybackSettingsCountdownSeconds",
-            () => playback.CountdownSeconds,
-            "clicking the countdown length never changed the stored wait");
-        Assert.Equal(playback.CountdownSeconds, chain.CountdownSeconds);
-        Assert.InRange(
-            chain.CountdownSeconds,
-            PlaybackSettingsViewModel.MinimumSeconds,
-            PlaybackSettingsViewModel.MaximumSeconds);
-
-        // UX-010, and it comes after the slider on purpose: a click lands in the middle of a range,
-        // and a reset pressed before anything moved would answer with the value it already had. The
-        // probe is the facade the chaining code reads, so a reset that only moved the view model
-        // would leave this unchanged.
-        Assert.NotEqual(PlaybackSettingsViewModel.DefaultCountdownSeconds, chain.CountdownSeconds);
-        await PressAsync(
-            host,
-            "RestoreDefaultsAction",
-            () => chain.CountdownSeconds,
-            "clicking «restore default values» never put the countdown back to its factory length");
-        Assert.Equal(PlaybackSettingsViewModel.DefaultCountdownSeconds, chain.CountdownSeconds);
-
-        await PressAsync(
-            host,
-            "AppearanceTitle",
-            () => host.ViewModel.CurrentSettingsSection,
-            "clicking Apariencia after Playback never came back to the appearance section");
         Assert.Equal(SettingsSection.Appearance, host.ViewModel.CurrentSettingsSection);
 
         var appearance = host.ViewModel.AppearanceSettings;
@@ -896,34 +818,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Equal(ScanSettingsViewModel.DefaultWatchLocalRoots, scan.WatchLocalRoots);
         Assert.Equal(ScanSettingsViewModel.DefaultFallbackIntervalMinutes, scan.FallbackIntervalMinutes);
 
-        // The segment switch reads and writes the use case itself rather than a field of its own, so
-        // the probe is the use case: a switch that only moved its own bool would look identical.
-        var segments = host.ViewModel.SegmentDetection;
-        Assert.NotNull(segments);
-        await PressAsync(
-            host,
-            "SegmentDetectionSettingsTitle",
-            () => host.ViewModel.CurrentSettingsSection,
-            "clicking Detección de segmentos in the settings index never reopened its section");
-        Assert.Equal(SettingsSection.SegmentDetection, host.ViewModel.CurrentSettingsSection);
-
-        await PressAsync(
-            host,
-            "SegmentDetectionSettingsEnable",
-            () => host.Application.Services.GetRequiredService<DetectSeriesSegments>().IsEnabled,
-            "clicking the segment-detection switch never turned the detection on");
-        Assert.True(segments!.IsEnabled);
-
-        // UX-010, and it is pressed AFTER the switch for the reason the gear's scene already
-        // carries: a reset with nothing to undo answers a click with the value it already had, and
-        // the walk would read «nothing happened» from a button working perfectly. The probe is the
-        // use case again, so a reset that only moved the view model would not satisfy it.
-        await PressAsync(
-            host,
-            "RestoreDefaultsAction",
-            () => host.Application.Services.GetRequiredService<DetectSeriesSegments>().IsEnabled,
-            "clicking «restore default values» never turned the detection back off");
-        Assert.False(segments.IsEnabled);
     }
 
     /// <summary>
@@ -3126,6 +3020,57 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "PlayerSettingsBackAction",
             () => settings.Group,
             "clicking back never returned the gear to its list of groups");
+        Assert.Equal(PlayerSettingsGroup.None, settings.Group);
+
+        // The two groups that came down from Settings on 2026-09-13 (ADR-0012). They are pressed
+        // here rather than on the settings page they left, and their probes are the same facades the
+        // chaining code reads: a switch that moves and writes nothing is exactly the defect this
+        // application keeps finding in itself, and only the store can tell the two apart.
+        var chain = host.Application.Services.GetRequiredService<StartNextEpisodeCountdown>();
+        var countdown = settings.NextEpisode;
+        Assert.NotNull(countdown);
+
+        await PressAsync(host, "PlaybackSettingsTitle", () => settings.Group,
+            "clicking Reproduccion in the gear never replaced the list with the countdown group");
+        Assert.Equal(PlayerSettingsGroup.NextEpisode, settings.Group);
+
+        await PressAsync(host, "PlaybackSettingsCountdownEnable", () => countdown!.IsCountdownEnabled,
+            "clicking the next-episode countdown switch never turned it off");
+        Assert.False(countdown!.IsCountdownEnabled);
+        Assert.Equal(0, chain.CountdownSeconds);
+
+        await PressAsync(host, "PlaybackSettingsCountdownEnable", () => countdown.IsCountdownEnabled,
+            "clicking the countdown switch again never turned it back on");
+        Assert.True(countdown.IsCountdownEnabled);
+
+        await PressAsync(host, "PlaybackSettingsCountdownSeconds", () => countdown.CountdownSeconds,
+            "clicking the countdown length never changed the stored wait");
+        Assert.Equal(countdown.CountdownSeconds, chain.CountdownSeconds);
+
+        // UX-010, after the slider so there is something to come back from.
+        Assert.NotEqual(PlaybackSettingsViewModel.DefaultCountdownSeconds, chain.CountdownSeconds);
+        await PressAsync(host, "RestoreDefaultsAction", () => chain.CountdownSeconds,
+            "clicking restore default values never put the countdown back to its factory length");
+        Assert.Equal(PlaybackSettingsViewModel.DefaultCountdownSeconds, chain.CountdownSeconds);
+
+        await PressAsync(host, "PlayerSettingsBackAction", () => settings.Group,
+            "clicking back never returned the gear to its list after the countdown group");
+
+        var detection = host.Application.Services.GetRequiredService<DetectSeriesSegments>();
+        await PressAsync(host, "SegmentDetectionSettingsTitle", () => settings.Group,
+            "clicking Deteccion de segmentos in the gear never replaced the list with its group");
+        Assert.Equal(PlayerSettingsGroup.Segments, settings.Group);
+
+        await PressAsync(host, "SegmentDetectionSettingsEnable", () => detection.IsEnabled,
+            "clicking the segment-detection switch never turned the detection on");
+        Assert.True(detection.IsEnabled);
+
+        await PressAsync(host, "RestoreDefaultsAction", () => detection.IsEnabled,
+            "clicking restore default values never turned the detection back off");
+        Assert.False(detection.IsEnabled);
+
+        await PressAsync(host, "PlayerSettingsBackAction", () => settings.Group,
+            "clicking back never returned the gear to its list after the segments group");
         Assert.Equal(PlayerSettingsGroup.None, settings.Group);
 
         await PressAsync(

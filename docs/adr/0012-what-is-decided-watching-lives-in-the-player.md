@@ -130,6 +130,27 @@ Como los doce botones dicen lo mismo por la misma clave, dos grupos alcanzables 
 escena que no se puede pulsar. Por eso el idioma sale de Apariencia a una entrada propia en vez de
 quedarse como una tarjeta dentro de ella.
 
+### Enmienda del 2026-09-13 (tarde), al mudarlos
+
+**Bajaron DOS de las tres, y la tercera tiene una medición delante.** La cuenta atrás del siguiente
+episodio y la detección de segmentos están ya dentro del engranaje, con su «Restaurar valores por
+defecto» y su escena del paseo. **El estilo de subtítulos no cabe**: montado en la banda de 380 px
+del engranaje, un `Viewbox` de sus selectores de color llega a **2.010 px**. Hacerlo caber es
+rediseñar esa vista para un tercio de su ancho, con su propia maqueta, y eso es una fila aparte y no
+algo que improvisar dentro de ésta. Se queda en Ajustes **con su botón**, y la lista cerrada lo
+declara pendiente con ese motivo.
+
+**Y la banda ganó un techo**, que es lo que el tercer grupo destapó: el menú del engranaje con todas
+sus ramas dibujadas mide **1.126 px**, más alto que la ventana más corta que la aplicación permite, y
+una banda que crece con lo que lleva dentro no tiene techo — la imagen es quien paga esa altura. Un
+`ScrollViewer` de 360 px la acota: es lo que un grupo necesita con holgura, así que no actúa en una
+ventana normal y sí en una corta. Eso importa para el paseo, cuyo hit test no sigue un panel
+desplazado: un techo que mordiera en el caso normal dejaría controles fuera de alcance.
+
+**El ámbito de estos dos sigue siendo global y no la serie**, al contrario de lo que la enmienda de
+la mañana dice para un grupo del engranaje. Diez segundos es una respuesta para toda la biblioteca, y
+hacerla por serie sería un cambio del modelo almacenado con su migración que nadie ha pedido.
+
 ### Alternativas consideradas
 
 - **Un menú emergente, como el de YouTube.** Rechazada por el mecanismo: deja el contenido fuera del
@@ -231,6 +252,27 @@ autonomous walk resolves a control by its accessible name and **fails on two vis
 all twelve buttons say the same thing through the same key, two groups reachable at once are a scene
 that cannot be clicked. That is why the language moves out of Appearance into a destination of its
 own rather than staying as a card inside it.
+
+### Amendment of 2026-09-13 (afternoon), while moving them
+
+**Two of the three moved, and the third has a measurement in front of it.** The next-episode
+countdown and segment detection are inside the gear, with their «Restore default values» and their
+walk scene. **The subtitle style does not fit**: mounted in the gear's 380 px band, a `Viewbox` in
+its colour pickers reaches **2,010 px**. Making it fit is a redesign of that view for a third of its
+width, with its own mock-up, and that is a row of its own rather than something to improvise inside
+this one. It stays in Settings **with its button**, and the closed list declares it pending with that
+reason.
+
+**And the band gained a ceiling**, which the third group is what exposed: the gear's menu with every
+branch drawn measures **1,126 px**, taller than the shortest window the application allows, and a
+band that grows with whatever is inside it has no ceiling — the picture is what pays for the height.
+A 360 px `ScrollViewer` caps it: that is what one group needs with room to spare, so it does nothing
+in an ordinary window and catches a short one. That matters for the walk, whose hit testing does not
+follow a scrolled panel: a cap that bit in the normal case would put controls out of reach.
+
+**These two keep the global scope** rather than the series this morning's amendment describes for a
+gear group. Ten seconds is an answer for the whole library, and making it per-series would be a
+change to the stored model, with its migration, that nobody has asked for.
 
 ### Alternatives considered
 
