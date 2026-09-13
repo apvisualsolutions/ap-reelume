@@ -74,7 +74,8 @@ comodidad es lo que mete varios cientos de archivos con licencia de Microsoft de
 El paquete `VideoLAN.LibVLC.Windows` declara `LGPL-2.1-or-later`, que cubre `libvlc.dll` y
 `libvlccore.dll`. Además transporta unos trescientos complementos en `plugins/`, y **esos llevan sus
 propias licencias**, algunas `GPL-2.0-or-later` en lugar de LGPL — el codificador x264 que hay detrás
-de `libx26410b_plugin.dll` es el ejemplo más claro. La biblioteca se distribuye sin modificar. El
+de `libx26410b_plugin.dll` es GPL por licencia propia de la librería, y `libavcodec_plugin.dll` y
+`libswscale_plugin.dll` lo son porque su build de FFmpeg se compiló con `--enable-gpl`. La biblioteca se distribuye sin modificar. El
 paquete NuGet de VideoLAN **no trae ningún archivo `COPYING`**, así que nadie aporta el texto salvo
 este artefacto: lo lleva en `licenses/LGPL-2.1.txt`, `licenses/GPL-2.0.txt` y
 `licenses/NOTICE-VideoLAN.txt`.
@@ -86,11 +87,12 @@ Era correcto y lo sigue siendo. **Lo que cambió es el programa**: desde el 2026
 propia, así que no hay ninguna versión común a la que llegar, y un complemento contagioso dentro de
 un programa propietario es un incumplimiento, no un encaje.
 
-**Y la palanca de recortar complementos ya no es opcional: es la única salida.** Medido el
-2026-09-13, el complemento contagioso que importa **no es el codificador x264** —un reproductor no
-codifica y ése se puede quitar—, sino **`libavcodec_plugin.dll`, el decodificador**: su línea de
-compilación empieza por `--enable-gpl`, leída dentro del propio binario, con tres complementos de
-control que no la llevan.
+**Y la palanca de recortar complementos ya no es opcional: es la única salida.** Medido el 2026-09-13 y
+recontado entero el 2026-09-14 —sobre los trescientos complementos, no sobre una muestra—, los
+complementos contagiosos que importan **no son el codificador x264** —un reproductor no codifica y ése
+se puede quitar—, sino **`libavcodec_plugin.dll` y `libswscale_plugin.dll`, los decodificadores**: su
+línea de compilación empieza por `--enable-gpl`, leída dentro de los dos binarios, y en ningún otro de
+los trescientos.
 
 **Mientras ese complemento viaje aquí, el artefacto no se puede distribuir.** La salida medida no
 pierde formatos: la biblioteca que descodifica es permisiva por defecto y lo contagioso son piezas

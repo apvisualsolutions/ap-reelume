@@ -12,8 +12,10 @@ Copyright © the VideoLAN project and its contributors.
 
 Neither package carries a COPYING file, so nothing upstream supplies the texts and they are supplied
 here: LGPL-2.1.txt covers the binding and the core, and GPL-2.0.txt covers the plugins that are
-licensed GPL-2.0-or-later rather than LGPL — the x264 encoder behind libx26410b_plugin.dll is the
-clearest example.
+licensed GPL-2.0-or-later rather than LGPL. Measured across the roughly three hundred plugins under
+plugins/ (2026-09-14): the x264 encoder behind libx26410b_plugin.dll is GPL-2.0-or-later by the
+library's own licence, and libavcodec_plugin.dll and libswscale_plugin.dll are GPL-2.0-or-later
+because their FFmpeg build was compiled with --enable-gpl; no other plugin in the package is.
 
 The GPL-2.0 text in this folder was taken from VLC's own tree rather than from a third party: the
 package ships it as the string vlc_about.h compiles into libvlc, which is the licence VLC displays
