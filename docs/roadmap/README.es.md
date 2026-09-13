@@ -52,6 +52,22 @@ que esa fila prohíbe. Así que `PLY-016` sólo llegará a `VERIFIED` en dos ter
 decisión de gasto se tome: es del propietario, se le vuelve a plantear cuando la cadena de AMD esté
 escrita, y la recomendación sigue siendo sí — son horas sueltas de una máquina, no una compra.
 
+**Y el 2026-09-13 `PLY-016` dejó de ser sólo una medición: su eslabón portátil dibuja.** Un vídeo por
+debajo de la caja en la que se dibuja se ve más nítido **sin que nadie encienda nada**, y está medido
+en tinta: la rampa de un borde duro ampliado cuatro veces baja de **4 píxeles a 2**. Corre en cualquier
+tarjeta, así que es la parte que llega al 100 % de quien use el programa — que es lo que el propietario
+pidió. Evidencia:
+[PLY16-portable-upscaler.md](../evidence/stable/PLY16-portable-upscaler.md).
+
+**Eso reordena lo que queda, y conviene decirlo con precisión**: la fila sigue `IN_PROGRESS`, porque su
+criterio promete además el indicador en pantalla y la superresolución **del fabricante** en las tres
+marcas. Y esa mitad **no puede llegar a un fotograma con la arquitectura de hoy**, medido por dos
+caminos: el compositor contesta que no tiene interop de GPU, y la única vía que queda —leer la textura
+de vuelta a memoria— son 33 MB por fotograma a 4K. Lo desbloquea compilar LibVLC sin la opción
+contagiosa y después el kit de vídeo RTX, que corre dentro del proceso y no necesita ni textura
+compartida ni lectura de vuelta. Así que **el bloqueo de gasto de AMD ya no es el primero de la cola**:
+delante va esa compilación.
+
 **Y el 2026-09-12 `PLY-016` dejó de ser una intención: tiene un tercio verificado.** La sonda del
 procesador de vídeo mide que la superresolución de **Intel funciona en la UHD 770 del propio equipo**
 —cambia el 54,6 % de la imagen, con su control negativo en cero y un control positivo que prueba que

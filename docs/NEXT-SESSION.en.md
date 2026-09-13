@@ -16,6 +16,77 @@
 > deleted from here, because this document is the record of what happened, and rewriting what happened
 > is a different kind of mistake.
 
+> ## FRONT NOTICE — 2026-09-13, closing: the upscaler draws, and open work finally has something counting it
+>
+> **Read the tree first; it overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here. At close
+> `main` and the branch were **level**, and the fast-forward was made with the conclusion read —
+> `success`, with all three figures where they have to be: 187/187 and no «improved», «3 new file(s) …
+> are where they have to be», and the walk's ratchet still at 23.
+>
+> ### What was closed
+>
+> · **`PLY-016`'s portable link really draws.** A video below the box it is drawn in looks sharper
+>   **with nobody switching anything on**: the ramp across a hard edge enlarged four times falls from
+>   **4 pixels to 2**, profile `31,95,159,223` becoming `3,86,169,252`. Switched off it comes out byte
+>   for byte the same, because «off» is the composition link that already existed and not a second path.
+> · **The order of the links was inverted**, reasoned in the plan: the portable one was last and became
+>   first because it is the promise, it is the only one CI can verify, and it needs no GPU import.
+> · **`docs/TAREAS.md`**, the register of what the matrix cannot hold, with the owner's rule — oldest
+>   first — made mechanical by `TareasRegisterTests`.
+> · **Three new files at 100/100** with rule 10's seam, and `VideoFrameView`'s floor raised to 100/94 by
+>   copying CI's artefact.
+>
+> ### What the gate audit found, and it is the half that matters
+>
+> **Nine mutants were surviving the whole suite.** The three worst:
+>
+> · **The suite was colour-blind.** The other byte order would swap red and blue in every enlarged
+>   video with nothing saying so — every test picture was grey and the only one with colour was **pure
+>   green, the single colour identical in both orders**.
+> · **The sampler's matrix could lose the letterbox offset**, sliding a 4:3 episode inside its own box.
+>   Invisible because the scene with an edge had no bars and the scenes with bars were flat colour:
+>   **two orthogonal scenes do not cover their crossing**.
+> · **The question the probe exists to answer could not fail.** Its fallback paint and its shader were
+>   both green, so «the shader ran» and «the shader was ignored» read the same — and the architecture
+>   was chosen on that reading. With the paint in red, the shader does run.
+>
+> And a piece of **mine** was deleted rather than kept: `WithoutWhatItCannotAfford` was called only by
+> its own test file, which is this repository's defining defect in my own work.
+>
+> ### Measured traps, and two are about method
+>
+> · **Running a suite BEFORE adding a file is not running it.** `ArchitectureTests` sweeps all of
+>   `tests/`, so it is the suite that READS any new test; it was run before one was written and CI went
+>   red over a duplicated repository-root walker. **The affected suite is whoever reads the file, even
+>   when the file is a test.**
+> · **Two reds in a row mean stop iterating.** The second was fixed by running `verify.ps1` in full here
+>   before pushing, which is what it is for.
+> · **Counting by eye lies exactly like an empty grep.** The first count of the unexecuted decisions said
+>   **116** and they were **30**: it counted every bullet in the relay, because the document uses the
+>   same mark for its lessons and its closings.
+> · **The coverage-floor preview cannot see uncommitted files.** It said «nothing falls short» with
+>   three new ones in the tree and two were below 96/96. That is `ENG-016`.
+> · **A default value is looked at by no test that passes it explicitly.** Seven passed it, so flipping
+>   it would have switched the feature off for everybody with everything green.
+> · **`[ExcludeFromCodeCoverage]` was hiding four decisions** and its written justification was false on
+>   both halves. A justification is not a measurement.
+>
+> ### Open work is NOT here
+>
+> It is in `docs/FEATURES.md` (scope) and `docs/TAREAS.md` (chores), and the closing ritual now says to
+> write it there. This batch produced `ENG-013` to `ENG-017`, and the most surprising finding: **the
+> cover ordering `ADR-0009` decided is not built and has no row in the matrix** — zero occurrences of
+> `CoverOrigin`, `CoverOrder` or `CoverPolicy` in `src/`, measured. That is `ENG-003`.
+>
+> ### What waits for the owner
+>
+> · **`PLY-016`'s final visual judgement**, which its criterion asks for by name. The gate measures an
+>   edge's width; whether a strength of 0.6 draws an outline around everything can only be seen on real
+>   material. **The application has to be opened**, and it is not opened without his yes.
+> · **The backlog ordering rule proposed for the shared rules**, because it holds for any of his
+>   projects and nothing enters the shared drawer without permission.
+
 > ## FRONT NOTICE — 2026-09-13, evening: the program stopped being free software, and CI was left running
 >
 > **Read the tree first; it outranks this document**: `git log --oneline -1 main`,

@@ -130,8 +130,31 @@ evidencia bilingüe → changelogs ES/EN → un commit → push con `main` en fa
      documentación de Avalonia nombra otras tres llamadas y **ninguna existe**; la ruta buena está
      medida en el ensamblado. El arnés headless no puede correr esto —contesta que no hay interop—,
      así que lo que se prueba aquí es lo que decide, con un visual de composición por software.
-  4. **FSR 1 en SkSL** para las tarjetas sin superresolución propia, y **AMD**, que sigue escrita y
-     sin verificar por falta de máquina.
+  4. **El eslabón portátil. HECHO el 2026-09-13, y el orden de los eslabones se invirtió para
+     hacerlo** —
+     [PLY16-portable-upscaler.md](../../evidence/stable/PLY16-portable-upscaler.md)—. Era el último de
+     la lista y pasó a ser el primero, por tres razones medidas: **es la promesa** y los del fabricante
+     son el extra, que es lo que la propia hoja de ruta dice; **es el único que CI puede verificar**,
+     porque el runner no expone `ID3D11VideoDevice`; y **no necesita la importación en la
+     composición**, así que esquiva la pregunta sin contestar del eslabón 3.
+
+     **No es FSR 1, y la razón es de licencia.** FSR es MIT y MIT permite el uso, pero exige
+     atribución en los avisos de terceros — y `ThirdPartyNoticeTests` lee el fichero de bloqueo de
+     paquetes, así que un shader pegado en el fuente traería una obligación que **ninguna puerta de
+     este árbol puede ver**. Con la licencia propia de tres días y la publicación ya bloqueada por un
+     complemento GPL, era el intercambio equivocado. Lo que hay es una máscara de desenfoque propia:
+     aritmética, no el código de nadie.
+
+     Medido: la rampa de un borde duro ampliado ×4 baja de **4 píxeles a 2**, perfil de
+     `31,95,159,223` a `3,86,169,252`. La fuerza está medida y no elegida a ojo — a 0,3 la rampa se
+     queda en 4 —, y su rebase tiene puerta sobre una fila **gris** porque un borde saturado recorta
+     el exceso invisiblemente.
+
+     **Y la sonda que lo autorizó estuvo a punto de no medir nada**: su pintura de respaldo y su shader
+     eran los dos verdes, así que «el shader corrió» y «el shader se ignoró» se leían igual. Con la
+     pintura en rojo, el shader sí corre.
+
+     **Lo que queda del eslabón**: AMD, que sigue escrita y sin verificar por decisión de gasto.
 
   **Y una pregunta previa que nada del árbol contesta hoy**: qué motor gráfico elige la aplicación
   real. `Program.cs` usa `UsePlatformDetect()`, la importación D3D11 vive en la ruta ANGLE, y ningún

@@ -187,9 +187,14 @@ verde que autorizó el fast-forward, no un aviso que ignorar.
 ## 7. Cerrar los documentos
 
 Changelog **en los dos idiomas**, `docs/NEXT-SESSION.{es,en}.md` con el SHA real, y evidencia en
-`docs/evidence/stable/` si la tanda midió algo. Una evidencia nueva se enlaza **también** desde
-`docs/FEATURES.md` y desde `docs/evidence/mvp/verification-manifest.json`, o `EvidenceLinkTests`
-falla con «matrix has N, manifest has N-1».
+`docs/evidence/stable/` si la tanda midió algo. Una evidencia nueva se enlaza **siempre** desde
+`docs/FEATURES.md`.
+
+**Y desde `docs/evidence/mvp/verification-manifest.json` SÓLO si la fila es del MVP.** Esta línea lo
+pedía para toda evidencia y era falso: `EvidenceLinkTests` lee `FeatureMatrix.Mvp` y nada más, y el
+manifiesto no lleva ni una entrada de una fila `POST_STABLE` — medido el 2026-09-13 al enlazar la
+evidencia de `PLY-016`, que es `POST_STABLE`. Escrito en plano, mandaba a buscar una entrada que no
+debe existir. Si la fila **sí** es del MVP y falta, el fallo es «matrix has N, manifest has N-1».
 
 **Antes de crear un archivo de evidencia, comprueba que el nombre no existe ya.** El 2026-08-29 se
 sobrescribió uno de agosto por reutilizar su nombre.

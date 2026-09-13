@@ -16,6 +16,78 @@
 > se borraron de aquí porque este documento es el registro de lo que pasó, y reescribir lo que pasó es
 > otra clase de error.
 
+> ## AVISO AL FRENTE — 2026-09-13, cierre: el escalador dibuja, y lo pendiente ya tiene quien lo cuente
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit. Al
+> cerrar, `main` y la rama quedaron **al día**, y el fast-forward se hizo con la conclusión leída —
+> `success`, con las tres cifras en su sitio: 187/187 sin «improved», «3 new file(s) … are where they
+> have to be», y el trinquete del paseo quieto en 23.
+>
+> ### Lo que se cerró
+>
+> · **El eslabón portátil de `PLY-016` dibuja de verdad.** Un vídeo por debajo de la caja en la que se
+>   dibuja se ve más nítido **sin que nadie encienda nada**: la rampa de un borde duro ampliado cuatro
+>   veces baja de **4 píxeles a 2**, perfil de `31,95,159,223` a `3,86,169,252`. Apagado sale byte a
+>   byte igual, porque «apagado» es el eslabón de la composición que ya existía y no un segundo camino.
+> · **El orden de los eslabones se invirtió**, y está razonado en el plan: el portátil era el último y
+>   pasó a ser el primero porque es la promesa, es el único que CI puede verificar, y no necesita la
+>   importación en la composición.
+> · **`docs/TAREAS.md`**, el registro de lo que la matriz no puede llevar, con la regla del propietario
+>   —la más vieja arriba— hecha mecánica por `TareasRegisterTests`.
+> · **Tres ficheros nuevos a 100/100** con la costura de la regla 10, y el suelo de `VideoFrameView`
+>   subido a 100/94 copiando el artefacto de CI.
+>
+> ### Lo que la auditoría de puertas encontró, y es la mitad que vale
+>
+> **Nueve mutantes sobrevivían mi suite entera.** Los tres peores:
+>
+> · **La suite era ciega al color.** El otro orden de bytes cambiaría el rojo por el azul en todo vídeo
+>   ampliado sin que nada lo dijera — todas las imágenes de prueba eran grises y la única con color era
+>   **verde puro, el único color idéntico en los dos órdenes**.
+> · **La matriz del muestreador podía perder el desplazamiento de las barras**, deslizando un 4:3
+>   dentro de su propia caja. Invisible porque la escena con borde no tenía barras y las que tenían
+>   barras eran de color plano: **dos escenas ortogonales no cubren su cruce**.
+> · **La pregunta que la sonda existe para contestar no podía fallar.** Su pintura de respaldo y su
+>   shader eran los dos verdes, así que «el shader corrió» y «el shader se ignoró» se leían igual — y
+>   sobre esa lectura se eligió la arquitectura. Con la pintura en rojo, el shader sí corre.
+>
+> Y una pieza **mía** se borró en vez de conservarse: `WithoutWhatItCannotAfford` sólo la llamaba su
+> fichero de pruebas, que es el defecto de esta casa en mi propio trabajo.
+>
+> ### Las trampas medidas, y dos son de método
+>
+> · **Correr una suite ANTES de añadir un fichero no es correrla.** `ArchitectureTests` barre todo
+>   `tests/`, así que es quien LEE cualquier prueba nueva; se corrió antes de escribir una y CI se puso
+>   roja por un buscador de la raíz del repositorio duplicado. **La suite afectada es quien lee el
+>   archivo, incluso cuando el archivo es una prueba.**
+> · **Dos rojos seguidos significan parar de iterar.** El segundo se arregló corriendo `verify.ps1`
+>   entero aquí antes de empujar, que es para lo que existe.
+> · **Un recuento a ojo miente igual que un grep vacío.** El primer recuento de las decisiones no
+>   ejecutadas dio **116** y eran **30**: contaba todas las viñetas del relevo, porque el documento usa
+>   el mismo símbolo para las lecciones y para los cierres.
+> · **La previsualización de suelos no ve ficheros sin commitear.** Dijo «nada se queda corto» con tres
+>   nuevos en el árbol y dos estaban por debajo de 96/96. Es `ENG-016`.
+> · **Un valor por defecto no lo mira ninguna prueba que lo pase explícito.** Siete lo pasaban, así que
+>   voltearlo habría apagado la función para todo el mundo dejándolo todo verde.
+> · **`[ExcludeFromCodeCoverage]` tapaba cuatro decisiones** y su justificación escrita era falsa por
+>   las dos mitades. Una justificación no es una medición.
+>
+> ### Lo pendiente NO está aquí
+>
+> Está en `docs/FEATURES.md` (alcance) y `docs/TAREAS.md` (faenas), y el ritual de cierre ya manda
+> escribirlo allí. De esta tanda salieron `ENG-013` a `ENG-017`, y el hallazgo que más sorprende:
+> **el orden de portadas del `ADR-0009` no está construido y no tiene fila en la matriz** — cero
+> apariciones de `CoverOrigin`, `CoverOrder` ni `CoverPolicy` en `src/`, medido. Es `ENG-003`.
+>
+> ### Lo que espera al propietario
+>
+> · **El juicio visual final de `PLY-016`**, que su criterio pide por su nombre. La puerta mide la
+>   anchura de un borde; si un realce de 0,6 dibuja un contorno alrededor de todo, eso sólo se ve
+>   mirando material real. **Hay que abrir la aplicación**, y no se abre sin su sí.
+> · **La regla del orden del backlog propuesta para las reglas comunes**, porque vale para cualquiera
+>   de sus proyectos y en el cajón común nada entra sin permiso.
+
 > ## AVISO AL FRENTE — 2026-09-13, noche: el programa dejó de ser libre, y CI quedó corriendo
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

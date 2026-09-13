@@ -51,6 +51,20 @@ exactly what that row forbids. So `PLY-016` will only reach `VERIFIED` in two th
 spending decision is made: it is the owner's, it goes back to him once AMD's chain is written, and
 the recommendation is still yes — these are a few hours of a machine, not a purchase.
 
+**And on 2026-09-13 `PLY-016` stopped being only a measurement: its portable link draws.** A video
+below the box it is drawn in looks sharper **with nobody switching anything on**, and it is measured in
+ink: the ramp across a hard edge enlarged four times falls from **4 pixels to 2**. It runs on any card,
+so it is the part that reaches 100 % of whoever uses the program — which is what the owner asked for.
+Evidence: [PLY16-portable-upscaler.md](../evidence/stable/PLY16-portable-upscaler.md).
+
+**That reorders what is left, and it is worth saying precisely**: the row stays `IN_PROGRESS`, because
+its criterion also promises the on-screen indicator and the **vendor's** super resolution on all three
+makes. And that half **cannot reach a frame in today's architecture**, measured two ways: the compositor
+answers that it has no GPU interop, and the only remaining route — reading the texture back into memory
+— is 33 MB per frame at 4K. What unblocks it is building LibVLC without the copyleft option and then
+the RTX video kit, which runs inside the process and needs neither a shared texture nor a read-back. So
+**AMD's spending blocker is no longer first in the queue**: that build goes ahead of it.
+
 **And on 2026-09-12 `PLY-016` stopped being an intention: a third of it is verified.** The video
 processor probe measures that **Intel's super resolution works on this machine's own UHD 770** — it
 changes 54.6 % of the picture, with its negative control at zero and a positive control proving the
