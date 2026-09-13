@@ -205,9 +205,15 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
           It travels with the band into the small window and stands down with it there, and the
           player's model shuts the gear on the way, so nothing is left open with no button to close it.
+
+          Host and not Surface: until 2026-09-13 this Border and the StackPanel inside
+          PlayerSettingsMenuView both answered to PlayerSettingsSurface, and with the gear open both
+          were visible, one inside the other. Nothing resolved that name across the tree yet, but
+          Single(control => control.Name == ...) is how this tree reaches a control and it throws on
+          two matches — a defect waiting for whoever wrote the next test.
         -->
         <Border
-            x:Name="PlayerSettingsSurface"
+            x:Name="PlayerSettingsHostSurface"
             Classes="player-overlay"
             Width="380"
             HorizontalAlignment="Right"
