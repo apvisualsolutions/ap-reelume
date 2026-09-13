@@ -68,11 +68,21 @@ that depends on no vendor: the standard Direct3D video processor filters — noi
 enhancement — are declared by **both cards**, and the enhancement changes 8.08 million bytes on each,
 **NVIDIA included**. Intel's super resolution, which already works on its own, and the portable
 upscaler for everything else sit on top of that. **What cannot be done is switching RTX Video Super
-Resolution on from the application**: no such setting exists in NVIDIA's public settings header, it
-appears by name neither in this machine's registry nor in the NVIDIA app's configuration, and the SDK
-that would expose it is rejected on licence. **So the vendor's super resolution is an opportunistic
-bonus and never the promise**: what is promised always runs, and the vendor's switches itself on only
-if comparing it changes pixels.
+Resolution's global toggle on from the application**, and on 2026-09-13 the four routes were
+exhausted with controls beside each: writing the registry value that does exist —
+`_User_Global_VAL_SuperResolution`, 5 on and 0 off — moves no pixel even with administrator rights;
+restarting the driver service does not help; the driver's profile database does not change a single
+byte when the toggle moves; and NVIDIA's own app does not read that value. It tells the driver live,
+over a channel that leaves nothing writable behind.
+
+**What does exist, and changes the sentence that stood here**: the **RTX Video SDK** carries the
+super resolution in a component that runs inside the process, with no toggle and nothing for the user
+to touch, and its agreement permits shipping it inside an application. It is **no longer "rejected on
+licence"** as of `ADR-0013`: what blocks it now is VideoLAN's decoder built with the copyleft option,
+and it only runs on RTX cards.
+
+**So the vendor's super resolution is still a bonus and never the promise**: what is promised always
+runs, on any card, and the vendor's is taken advantage of only if comparing it changes pixels.
 
 **And `PRD-003` stopped being what this line said, on 2026-09-04.** It said it depended on «a
 Windows 11 ARM64 machine that does not exist here». There is one and it is free: GitHub offers

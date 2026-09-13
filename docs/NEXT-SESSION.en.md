@@ -1,5 +1,79 @@
 # Where to pick up
 
+> ## FRONT NOTICE — 2026-09-13, evening: the program stopped being free software, and CI was left running
+>
+> **Read the tree first; it outranks this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here.
+>
+> ### BEFORE ANYTHING ELSE, because this batch did NOT close the cycle
+>
+> **`main` was deliberately left behind.** The batch ended with CI **still running** on the branch, at
+> the owner's request, and there are **local commits not pushed**. So:
+>
+> · read the branch run's conclusion (`gh run view <id> --json conclusion`);
+> · if green, push what is local and fast-forward `main` as `/cerrar-tanda` requires;
+> · if red, the fix comes **before** any new work.
+>
+> ### What changed, and it is substantial
+>
+> · **AP Reelume is no longer free software.** It moved from `GPL-3.0-or-later` to a licence of its
+>   own: free of charge to use, with no right to modify, redistribute or sell. The reason is the
+>   owner's and it is commercial: the previous licence **granted in writing the three things he wants
+>   to keep**. It is all in `ADR-0013` and `docs/legal/LEGAL.en.md`.
+> · **The header identifier is `LicenseRef-APSolutions`, with no version and no product name.** Both
+>   absences are deliberate and reasoned in `.editorconfig`, beside the rule. **Neither the version
+>   nor "Reelume" goes back in.**
+> · **GitHub**: public description updated, pull requests limited to collaborators, "preserve this
+>   repository" off, release immutability on and commit comments off. The repository **stays public on
+>   purpose**: the free runners depend on it, the ARM64 one included. Forking **cannot be disabled**
+>   on a public repository, and section 5 of the licence acknowledges that rather than forbidding the
+>   impossible.
+>
+> ### Blocked by something that is not code
+>
+> · **The artifact cannot be released.** The package ships `libavcodec_plugin.dll` built with
+>   `--enable-gpl` — read inside the binary, with three control plugins that do not carry it — and a
+>   copyleft component inside a proprietary program is a breach. **The source may carry the new
+>   licence**; packaging is suspended.
+> · **The way out is measured and loses no formats**: the decoding library is permissive by default;
+>   what is copyleft are optional build pieces, and **no decoder is among them**. LibVLC and its
+>   dependencies have to be built without that option, for both architectures, and maintained. That is
+>   permanent infrastructure, not a loss of functionality.
+> · **A lawyer's opinion**, with seven points marked at the end of the licence draft.
+>
+> ### Decisions taken and NOT executed
+>
+> · **Build the video engine without the copyleft option.** This is the work that unblocks releasing.
+> · **NVIDIA's RTX Video SDK is no longer rejected on licence** (`ADR-0013`): it runs inside the
+>   process, with no global toggle, and its agreement permits shipping it inside an application. RTX
+>   cards only, so the own upscaler is still needed for everything else.
+> · **`PLY-016`'s own upscaler is still unbuilt.** It is the layer that improves the picture for 100 %
+>   of users without anybody doing anything, and it is what the owner asked for.
+>
+> ### Measured traps that cost time this round
+>
+> · **An empty sweep does not prove an absence.** "The registry does not change when NVIDIA's super
+>   resolution is switched on" was true and misleading: it had been searched under the vendor's name
+>   and the key hangs off **the device**, in the display-adapter class.
+> · **And even knowing where it is, it cannot be switched on from outside**: writing it with
+>   administrator rights moves no pixel, restarting the driver service does not help, the profile
+>   database does not change a byte when the toggle moves, and NVIDIA's own app does not read the
+>   value. Four routes exhausted, each with a positive control.
+> · **A string written into every file of the tree must ask WHICH GUARDS READ THE WHOLE TREE.**
+>   `LicenseRef-AP-Reelume` put "Reelume" into the five files where `SqliteIsolationTests` forbids it —
+>   because the user's library folder cannot depend on a marketing name. CI red with the whole tree
+>   already rewritten.
+> · **A test can be green here and red there forever.** The per-frame cost test demanded a timed
+>   adapter, and a hosted runner has no video processor. It now demands timing only from adapters that
+>   reached one, and when there are none it demands each declare why.
+> · **`git add -A` is not a diff review.** It swept in seven half-finished `PLY-016` files while "25
+>   files with real changes" was announced; there were 32.
+> · **New evidence is linked in the matrix AND the manifest**, or `EvidenceLinkTests` says
+>   "matrix has 5, manifest has 4".
+> · **Firecrawl reads PDFs and sites that reject the other tool.** NVIDIA's agreement is a PDF that
+>   could not be read any other way, and reading it corrected a claim already taken as settled.
+
+
 > ## FRONT NOTICE — 2026-09-13, afternoon: `UX-010` closed, and two of my own measurements were false
 >
 > **Read the tree first; it outranks this document**: `git log --oneline -1 main`,

@@ -68,12 +68,23 @@ quien usa la aplicación cambie nada.** Se investigó y **se cumple**, por una v
 ningún fabricante: los filtros estándar del procesador de vídeo de Direct3D —reducción de ruido y
 realce de bordes— los declaran **las dos tarjetas**, y el realce cambia 8,08 millones de bytes en
 ambas, **NVIDIA incluida**. A eso se suman la superresolución de Intel, que ya funciona sola, y el
-reescalador portátil para el resto. **Lo que no se puede es encender la Súper resolución RTX desde la
-aplicación**: no existe ese ajuste en la cabecera pública de NVIDIA, ni aparece por su nombre en el
-registro ni en la configuración de NVIDIA App de esta máquina, y el SDK que sí lo expondría está
-descartado por licencia. **Así que la superresolución del fabricante es un extra oportunista y nunca
-la promesa**: lo prometido corre siempre, y lo del fabricante se enciende solo si al compararlo
-cambia píxeles.
+reescalador portátil para el resto. **Lo que no se puede es encender el interruptor global de la
+Súper resolución RTX desde la aplicación**, y el 2026-09-13 se agotaron las cuatro vías con sus
+controles: escribir la clave del registro que sí existe —`_User_Global_VAL_SuperResolution`, 5
+encendido y 0 apagado— no mueve un píxel ni con permisos de administrador; reiniciar el servicio del
+controlador tampoco; la base de perfiles del controlador no cambia ni un byte al mover el
+interruptor; y la propia NVIDIA App no lee ese valor. Se lo dice al controlador en caliente, por un
+canal que no deja rastro escribible.
+
+**Lo que sí existe, y cambia la frase que había aquí**: el **kit de vídeo RTX** trae la
+superresolución en una pieza que corre dentro del proceso, sin interruptor y sin que el usuario toque
+nada, y su contrato permite repartirla dentro de una aplicación. Ya **no está «descartado por
+licencia»** desde el `ADR-0013`: lo que lo bloquea ahora es el decodificador de VideoLAN compilado
+con la opción contagiosa, y solo corre en tarjetas RTX.
+
+**Así que la superresolución del fabricante sigue siendo un extra y nunca la promesa**: lo prometido
+corre siempre y en cualquier tarjeta, y lo del fabricante se aprovecha solo si al compararlo cambia
+píxeles.
 
 **Y `PRD-003` dejó de ser lo que esta línea decía, el 2026-09-04.** Decía que dependía de «una
 máquina Windows 11 ARM64 que no hay». La hay y es gratis: GitHub ofrece runners hospedados de

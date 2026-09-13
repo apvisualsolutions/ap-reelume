@@ -1,5 +1,79 @@
 # Dónde retomar
 
+> ## AVISO AL FRENTE — 2026-09-13, noche: el programa dejó de ser libre, y CI quedó corriendo
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit.
+>
+> ### LO PRIMERO DE TODO, porque esta tanda NO cerró el ciclo
+>
+> **`main` se quedó atrás a propósito.** La tanda terminó con CI **todavía corriendo** sobre la rama,
+> por petición del propietario, y hay **commits en local sin empujar**. Antes de nada:
+>
+> · leer la conclusión del run de la rama (`gh run view <id> --json conclusion`);
+> · si es verde, empujar lo local y avanzar `main` por fast-forward, como manda `/cerrar-tanda`;
+> · si es rojo, la corrección va **antes** que cualquier trabajo nuevo.
+>
+> ### Lo que cambió, y es de calado
+>
+> · **AP Reelume ya no es software libre.** Pasó de `GPL-3.0-or-later` a una licencia propia,
+>   gratuita para quien la use, sin derecho a modificar, redistribuir ni vender. El motivo es de
+>   negocio y lo dio el propietario: la licencia anterior **concedía por escrito las tres cosas que
+>   quiere reservarse**. Está todo en el `ADR-0013` y en `docs/legal/LEGAL.es.md`.
+> · **El identificador de las cabeceras es `LicenseRef-APSolutions`, sin versión y sin el nombre del
+>   producto.** Las dos ausencias son deliberadas y están razonadas en `.editorconfig`, al lado de la
+>   regla. **No se le vuelve a poner ni la versión ni «Reelume».**
+> · **GitHub**: descripción pública actualizada, propuestas de cambio limitadas a colaboradores,
+>   «preservar el repositorio» apagado, inmutabilidad de versiones encendida y comentarios en commits
+>   apagados. El repositorio **sigue público a propósito**: de ello dependen los runners gratuitos,
+>   los ARM64 incluidos. La bifurcación **no se puede desactivar** en un repositorio público, y la
+>   sección 5 de la licencia lo reconoce en vez de prohibir lo imposible.
+>
+> ### Bloqueado por algo que no es código
+>
+> · **El artefacto NO se puede publicar.** El paquete lleva `libavcodec_plugin.dll` compilado con
+>   `--enable-gpl` —medido dentro del binario, con tres complementos de control que no la llevan—, y
+>   un componente contagioso dentro de un programa propietario es un incumplimiento. **El código
+>   fuente sí puede llevar la licencia nueva**; el empaquetado queda suspendido.
+> · **La salida está medida y no pierde formatos**: la biblioteca que descodifica es permisiva por
+>   defecto; lo contagioso son piezas opcionales de compilación, y **ningún decodificador está entre
+>   ellas**. Hay que compilar LibVLC y sus dependencias sin esa opción, en las dos arquitecturas, y
+>   mantener esa compilación. Es infraestructura permanente, no una renuncia de funcionalidad.
+> · **El dictamen de un abogado**, con siete puntos marcados al final del borrador de la licencia.
+>
+> ### Decisiones tomadas y NO ejecutadas
+>
+> · **Compilar el motor de vídeo sin la opción contagiosa.** Es el trabajo que desbloquea publicar.
+> · **El kit de vídeo RTX de NVIDIA deja de estar descartado por licencia** (`ADR-0013`): corre dentro
+>   del proceso, sin interruptor global, y su contrato permite repartirlo dentro de una aplicación.
+>   Solo en tarjetas RTX, así que el escalador propio sigue haciendo falta para todas las demás.
+> · **El escalador propio de `PLY-016` sigue sin construirse.** Es la capa que da imagen mejorada al
+>   100 % de quien use el programa sin que nadie mueva un dedo, y es lo que el propietario pidió.
+>
+> ### Las trampas medidas que costaron tiempo esta vez
+>
+> · **Un barrido vacío no prueba una ausencia.** «El registro no cambia al encender la superresolución
+>   de NVIDIA» era cierto y engañoso: se había mirado bajo el nombre del fabricante y la clave cuelga
+>   **del dispositivo**, en la clase de adaptadores de pantalla.
+> · **Y aun sabiendo dónde está, no se puede encender desde fuera**: escribirla con permisos de
+>   administrador no mueve un píxel, reiniciar el servicio del controlador tampoco, la base de perfiles
+>   no cambia ni un byte al mover el interruptor, y la propia NVIDIA App no lee ese valor. Cuatro vías
+>   agotadas, cada una con su control positivo.
+> · **Una cadena que se escribe en cada archivo del árbol tiene que preguntar QUÉ GUARDAS LEEN EL
+>   ÁRBOL ENTERO.** `LicenseRef-AP-Reelume` metía «Reelume» en los cinco archivos donde
+>   `SqliteIsolationTests` lo prohíbe — porque la carpeta de la biblioteca del usuario no puede
+>   depender de un nombre comercial. Rojo de CI con el árbol entero ya reescrito.
+> · **Una prueba puede ser verde aquí y roja siempre allí.** La del coste por fotograma exigía una
+>   tarjeta cronometrada, y un runner hospedado no tiene procesador de vídeo. Ahora solo se lo exige a
+>   las tarjetas que lo alcanzaron, y si no hay ninguna obliga a que cada una declare por qué.
+> · **`git add -A` no es una revisión del diff.** Arrastró siete archivos de `PLY-016` a medias y se
+>   anunciaron «25 archivos con cambios reales» cuando eran 32.
+> · **Una evidencia nueva se enlaza en la matriz Y en el manifiesto**, o `EvidenceLinkTests` dice
+>   «matrix has 5, manifest has 4».
+> · **Firecrawl lee PDFs y webs que rechazan a la otra herramienta.** El contrato de NVIDIA es un PDF
+>   que no se pudo leer de otra forma, y leerlo corrigió una afirmación ya dada por buena.
+
+
 > ## AVISO AL FRENTE — 2026-09-13, tarde: `UX-010` cerrada, y dos mediciones mías eran falsas
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
