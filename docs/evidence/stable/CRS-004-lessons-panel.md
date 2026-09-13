@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: 2026 AP Solutions
-SPDX-License-Identifier: LicenseRef-AP-Reelume
+SPDX-License-Identifier: LicenseRef-APSolutions
 -->
 # CRS-004 — el panel «Lecciones» y la lección siguiente / the "Lessons" panel and the next lesson
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SPDX-FileCopyrightText: 2026 AP Solutions
-# SPDX-License-Identifier: LicenseRef-AP-Reelume
+# SPDX-License-Identifier: LicenseRef-APSolutions
 #
 # PostToolUse de Bash y PowerShell: tras un `git push`, exige armar el Monitor.
 #

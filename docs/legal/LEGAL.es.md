@@ -9,7 +9,7 @@ utilidad es que nadie tenga que adivinar dónde están los bordes.
 ## Licencia del programa
 
 AP Reelume by AP Solutions se publica bajo **una licencia propia**, identificada como
-`LicenseRef-AP-Reelume`: gratuita para quien la use, sin derecho a modificar, redistribuir ni vender.
+`LicenseRef-APSolutions`: gratuita para quien la use, sin derecho a modificar, redistribuir ni vender.
 El texto íntegro está en [LICENSE](../../LICENSE) y la atribución del producto en
 [NOTICE](../../NOTICE).
 
@@ -27,7 +27,7 @@ hay que ir de todos modos para conocer las condiciones. Reescribir las condicion
 archivo de código.
 
 Desde la revisión de 2026-08-10, **cada archivo fuente lleva su cabecera SPDX**: 925 archivos `.cs`,
-71 `.axaml` y 29 `.ps1` declaran `SPDX-License-Identifier: LicenseRef-AP-Reelume` junto al titular del
+71 `.axaml` y 29 `.ps1` declaran `SPDX-License-Identifier: LicenseRef-APSolutions` junto al titular del
 copyright. (Las cifras anteriores —556, 51 y 17— llevaban tiempo desfasadas: **ninguna puerta las
 comprueba**, y eso sigue siendo cierto.) Una licencia que solo vive en `LICENSE` deja de estar unida al archivo en cuanto alguien
 lo copia fuera del árbol; la cabecera viaja con él. La regla `IDE0073` la exige en `.editorconfig`, de

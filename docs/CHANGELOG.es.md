@@ -21,7 +21,7 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 - **El identificador de licencia de las cabeceras ya no nombra una licencia: apunta a una.** Antes
   cada archivo declaraba `GPL-3.0-or-later`, así que cambiar de licencia obligó a tocar **1.033
-  archivos**. Ahora dicen `LicenseRef-AP-Reelume`, **sin versión**, y la versión y la fecha viven
+  archivos**. Ahora dicen `LicenseRef-APSolutions`, **sin versión**, y la versión y la fecha viven
   dentro de `LICENSE`. Reescribir las condiciones ya no toca ni un archivo de código, y el porqué
   está escrito junto a la regla para que nadie vuelva a meter la versión ahí.
 
@@ -4990,7 +4990,7 @@ evidencia, es [FEATURES.md](FEATURES.md).
 - **Cada archivo fuente dice bajo qué licencia está.** La licencia vivía solo en `LICENSE`, y una
   licencia que solo vive ahí deja de estar unida al archivo en cuanto alguien lo copia fuera del
   árbol. Los 556 archivos de código, los 51 de interfaz y los 17 de compilación llevan ahora su
-  cabecera `SPDX-License-Identifier: LicenseRef-AP-Reelume` junto al titular del copyright, y la puerta de
+  cabecera `SPDX-License-Identifier: LicenseRef-APSolutions` junto al titular del copyright, y la puerta de
   formato que ya se ejecutaba rechaza un archivo nuevo que llegue sin ella.
 - **Los avisos de terceros nombran lo que el paquete lleva de verdad.** Listaban ocho componentes —
   los que alguien recordaba haber pedido— mientras el artefacto transportaba treinta, entre ellos

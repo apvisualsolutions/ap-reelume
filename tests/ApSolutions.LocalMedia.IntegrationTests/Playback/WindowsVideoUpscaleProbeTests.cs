@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
-// SPDX-License-Identifier: LicenseRef-AP-Reelume
+// SPDX-License-Identifier: LicenseRef-APSolutions
 
 using System.Globalization;
 using System.Runtime.Versioning;
@@ -387,11 +387,36 @@ public sealed class WindowsVideoUpscaleProbeTests
         var probes = WindowsVideoUpscaleProbe.ProbeAll(
             SourceWidth, SourceHeight, decision.TargetWidth, decision.TargetHeight);
 
+        // An adapter that never reached a video processor cannot be timed, and a machine made only of
+        // those is a real machine rather than a failed measurement: every hosted runner is one, which
+        // is how this assertion was found — it demanded a timing from a machine that has no card to
+        // give it, and turned a green suite red on CI while passing on any desk (2026-09-13).
+        var capable = probes
+            .Where(probe => probe.Note?.Contains("ID3D11Video", StringComparison.Ordinal) != true)
+            .ToArray();
         var timed = probes.Where(probe => probe.Plain is not null).ToArray();
-        Assert.True(
-            timed.Length > 0,
-            $"none of the {probes.Count} adapters was timed, so this measured nothing rather than "
-                + "finding a machine without a video processor.");
+
+        // What IS a failed measurement: an adapter that reached its video processor and came back
+        // untimed anyway. That is the distinction the old message claimed to draw and did not.
+        Assert.All(
+            capable,
+            probe => Assert.True(
+                probe.Plain is not null,
+                $"{probe.Description} reached its video processor and was not timed, so this measured "
+                    + "nothing rather than finding a machine without one."));
+
+        // And the floor against going blind, because «nothing to measure» is the shape of a probe
+        // that stopped working: a machine that times nothing has to say, adapter by adapter, that it
+        // has no video processor. Passing in silence would look identical on a broken probe.
+        if (capable.Length == 0)
+        {
+            Assert.All(
+                probes,
+                probe => Assert.True(
+                    probe.Note?.Contains("ID3D11Video", StringComparison.Ordinal) == true,
+                    $"{probe.Description} was not timed and does not say it lacks a video processor, "
+                        + "so the probe answered nothing instead of answering «no card»."));
+        }
 
         foreach (var probe in timed)
         {

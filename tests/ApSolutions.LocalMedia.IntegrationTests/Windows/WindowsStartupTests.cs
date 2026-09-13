@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
-// SPDX-License-Identifier: LicenseRef-AP-Reelume
+// SPDX-License-Identifier: LicenseRef-APSolutions
 
 using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Windows;

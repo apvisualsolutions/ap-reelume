@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
-// SPDX-License-Identifier: LicenseRef-AP-Reelume
+// SPDX-License-Identifier: LicenseRef-APSolutions
 
 using System.Globalization;
 using System.Security.Cryptography;
@@ -141,6 +141,40 @@ public sealed class ArtifactContentsTests
                 File.Exists(Path.Combine(layout, required)),
                 $"{required} is not in the artifact, so the licence conditions do not travel with it.");
         }
+    }
+
+    /// <summary>
+    /// The program's own licence arrives whole, compared byte for byte against the versioned file.
+    /// </summary>
+    /// <remarks>
+    /// <b>This guard exists because its absence was measured on 2026-09-13, the day the licence
+    /// changed.</b> Third-party texts were already compared byte for byte by
+    /// <see cref="PackageEvidence.LicenceTextsMissingFrom"/>, and the program's own licence — the one
+    /// that states what anybody may do with this software — was only checked for existence. A copy
+    /// truncated by a failed write would have passed green, and the file it truncates is now the only
+    /// place the terms are written: the SPDX header in every source file names the licence without
+    /// reproducing it, deliberately, so that rewording the terms touches one file. That design makes
+    /// this comparison load-bearing rather than tidy.
+    /// </remarks>
+    [Fact]
+    public void The_licence_the_program_carries_is_the_one_this_repository_versions()
+    {
+        var shipped = Path.Combine(LayoutRoot(), "LICENSE");
+        var versioned = Path.Combine(RepositoryLayout.Root, "LICENSE");
+
+        Assert.True(File.Exists(shipped), "LICENSE is not in the artifact.");
+
+        var shippedBytes = File.ReadAllBytes(shipped);
+        var versionedBytes = File.ReadAllBytes(versioned);
+
+        // Length first, so a truncation reports how much is missing rather than «they differ».
+        Assert.True(
+            shippedBytes.Length == versionedBytes.Length,
+            $"The artifact's LICENSE is {shippedBytes.Length} bytes and the versioned one is "
+                + $"{versionedBytes.Length}, so what travels is not the licence this repository states.");
+        Assert.True(
+            shippedBytes.SequenceEqual(versionedBytes),
+            "The artifact's LICENSE is the same length as the versioned one and not the same bytes.");
     }
 
     /// <summary>

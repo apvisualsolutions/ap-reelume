@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 AP Solutions
-# SPDX-License-Identifier: LicenseRef-AP-Reelume
+# SPDX-License-Identifier: LicenseRef-APSolutions
 
 <#
 .SYNOPSIS
@@ -36,7 +36,7 @@ $commitDate = (git -C $repoRoot log -1 --format=%cI).Trim()
 # text of any it names; CycloneDX refuses one in `id` and takes it in `name`. Both are fed from here
 # so the two documents cannot drift apart, and the text is read from LICENSE rather than repeated,
 # because a licence quoted twice is a licence that will eventually say two things.
-$ownLicenceId = 'LicenseRef-AP-Reelume'
+$ownLicenceId = 'LicenseRef-APSolutions'
 $ownLicenceName = 'AP Reelume Licence'
 $ownLicencePath = Join-Path $repoRoot 'LICENSE'
 if (-not (Test-Path -LiteralPath $ownLicencePath)) { throw "LICENSE is missing, so the bill of materials cannot state the program's own licence." }

@@ -9,7 +9,7 @@ Last full review: 2026-08-10, over the public repository.
 ## The program's licence
 
 AP Reelume by AP Solutions is published under **a licence of its own**, identified as
-`LicenseRef-AP-Reelume`: free of charge for whoever uses it, with no right to modify, redistribute or
+`LicenseRef-APSolutions`: free of charge for whoever uses it, with no right to modify, redistribute or
 sell it. The full text is in [LICENSE](../../LICENSE) and the product attribution in
 [NOTICE](../../NOTICE).
 
@@ -26,7 +26,7 @@ licence" and points at the document; the version and the date live inside `LICEN
 reader has to go anyway to learn the terms. Rewording those terms now touches no source file at all.
 
 Since the 2026-08-10 review, **every source file carries its SPDX header**: 925 `.cs` files, 71
-`.axaml`, and 29 `.ps1` declare `SPDX-License-Identifier: LicenseRef-AP-Reelume` next to the copyright
+`.axaml`, and 29 `.ps1` declare `SPDX-License-Identifier: LicenseRef-APSolutions` next to the copyright
 holder. (The earlier figures — 556, 51 and 17 — had been stale for a long time: **no gate checks
 them**, and that is still true.) A licence that lives only in `LICENSE` stops being attached to a file the moment somebody
 copies it out of the tree; the header travels with it. The `IDE0073` rule demands it in

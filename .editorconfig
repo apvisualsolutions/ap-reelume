@@ -23,7 +23,7 @@ dotnet_diagnostic.IDE0005.severity = suggestion
 # `LicenseRef-` names the project's own licence and points at the document; the version and the date
 # live inside LICENSE, which is where a reader has to go anyway to learn the terms. Rewording the
 # licence now touches one file instead of a thousand, and this line never moves again.
-file_header_template = SPDX-FileCopyrightText: 2026 AP Solutions\nSPDX-License-Identifier: LicenseRef-AP-Reelume
+file_header_template = SPDX-FileCopyrightText: 2026 AP Solutions\nSPDX-License-Identifier: LicenseRef-APSolutions
 dotnet_diagnostic.IDE0073.severity = warning
 # QA-001: where a format is data rather than language, the culture has to be stated. These three are
 # off by default, so nothing was watching: CA1305 for a missing IFormatProvider, CA1304 and CA1310

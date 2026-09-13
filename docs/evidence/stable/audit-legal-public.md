@@ -125,7 +125,7 @@ valor es haber medido en vez de suponer. Los seis puntos de `docs/legal/LEGAL.es
 ## Enmienda del 2026-09-13 — el repositorio deja de ser libre, y las cifras de arriba caducaron
 
 El propietario cambió la licencia de `GPL-3.0-or-later` a una licencia propia,
-`LicenseRef-AP-Reelume`: gratuita para quien la use, sin derecho a modificar, redistribuir ni vender.
+`LicenseRef-APSolutions`: gratuita para quien la use, sin derecho a modificar, redistribuir ni vender.
 El motivo es de negocio y lo dejó dicho él: **la licencia anterior concedía por escrito las tres
 cosas que quiere reservarse**. / The owner moved the licence to one of its own; the previous licence
 granted in writing the three things he wants to keep.
@@ -151,7 +151,7 @@ documento legal en vez de arreglado en silencio, porque el hueco sigue abierto.
 
 Cada archivo declaraba `GPL-3.0-or-later`, así que cambiar de licencia obligó a reescribir **1 033
 archivos**. La corrección la propuso el propietario en mitad del barrido y se aplicó antes de
-terminarlo: el identificador es ahora `LicenseRef-AP-Reelume`, **sin versión**. Nombra «la licencia
+terminarlo: el identificador es ahora `LicenseRef-APSolutions`, **sin versión**. Nombra «la licencia
 propia de este proyecto» y apunta a `LICENSE`, que es donde viven la versión y la fecha y adonde hay
 que ir de todos modos para conocer las condiciones. **Reescribir las condiciones ya no toca ningún
 archivo de código.** El porqué está escrito en `.editorconfig`, junto a la regla, con la factura al

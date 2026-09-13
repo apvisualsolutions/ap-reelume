@@ -83,7 +83,7 @@ promises.
 ## Lo que la revisión va a mirar / What review will look at
 
 - **Cabecera de licencia.** Todo archivo fuente nuevo lleva `SPDX-License-Identifier:
-  LicenseRef-AP-Reelume`. La puerta de formato lo exige, así que lo verás antes que nadie.
+  LicenseRef-APSolutions`. La puerta de formato lo exige, así que lo verás antes que nadie.
   / **Licence header** on every new source file; the formatting gate demands it.
 - **Bilingüismo.** Cadenas de interfaz y documentos públicos, en español y en inglés. Una prueba
   compara la estructura de los dos. / **Both languages** for user-facing strings and public

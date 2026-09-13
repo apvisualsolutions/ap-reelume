@@ -21,7 +21,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 - **The licence identifier in the headers no longer names a licence: it points at one.** Each file
   used to declare `GPL-3.0-or-later`, so changing licence meant touching **1,033 files**. They now
-  say `LicenseRef-AP-Reelume`, **with no version**, and the version and date live inside `LICENSE`.
+  say `LicenseRef-APSolutions`, **with no version**, and the version and date live inside `LICENSE`.
   Rewording the terms now touches no source file at all, and the reason is written beside the rule so
   nobody puts the version back there.
 
@@ -4903,7 +4903,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - **Every source file states the licence it is under.** The licence lived only in `LICENSE`, and a
   licence that lives only there stops being attached to a file the moment somebody copies it out of
   the tree. All 556 code files, 51 interface files, and 17 build scripts now carry their
-  `SPDX-License-Identifier: LicenseRef-AP-Reelume` header next to the copyright holder, and the formatting
+  `SPDX-License-Identifier: LicenseRef-APSolutions` header next to the copyright holder, and the formatting
   gate that already ran rejects a new file that arrives without one.
 - **The third-party notices name what the package actually carries.** They listed eight components —
   the ones somebody remembered asking for — while the artifact carried thirty, among them ANGLE under

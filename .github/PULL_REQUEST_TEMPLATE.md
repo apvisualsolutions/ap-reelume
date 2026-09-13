@@ -27,7 +27,7 @@ test, say why.
 
 ## Lo que la revisión mira / What review looks at
 
-- [ ] Todo archivo fuente nuevo lleva su cabecera `SPDX-License-Identifier: LicenseRef-AP-Reelume`. / New source files carry the SPDX header.
+- [ ] Todo archivo fuente nuevo lleva su cabecera `SPDX-License-Identifier: LicenseRef-APSolutions`. / New source files carry the SPDX header.
 - [ ] Las cadenas visibles y los documentos públicos están en los dos idiomas. / User-facing strings and public documents exist in both languages.
 - [ ] Las superficies nuevas se recorren con teclado y tienen nombre accesible. / New surfaces are keyboard-reachable and named.
 - [ ] No añado ninguna conexión de red fuera de `NetworkPurposeRegistry`. / No network host outside the registry.
