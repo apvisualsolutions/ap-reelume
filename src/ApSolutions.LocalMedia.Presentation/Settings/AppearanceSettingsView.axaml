@@ -556,36 +556,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </Grid>
       </Border>
 
-      <Border Classes="row-box">
-        <StackPanel Spacing="{DynamicResource Space8}">
-          <TextBlock
-              Classes="setting-name"
-              FontSize="{DynamicResource FontSizeBody}"
-              Text="{DynamicResource LanguageTitle}"
-              automation:AutomationProperties.HeadingLevel="3" />
-          <TextBlock
-              Classes="setting-description"
-              Text="{DynamicResource LanguageDescription}" />
-          <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
-            <Button
-                Classes="theme-option"
-                Classes.selected="{Binding IsSpanish}"
-                automation:AutomationProperties.Name="{DynamicResource LanguageSpanish}"
-                Command="{Binding ApplyLanguageCommand}"
-                CommandParameter="es">
-              <TextBlock Text="{DynamicResource LanguageSpanish}" />
-            </Button>
-            <Button
-                Classes="theme-option"
-                Classes.selected="{Binding IsEnglish}"
-                automation:AutomationProperties.Name="{DynamicResource LanguageEnglish}"
-                Command="{Binding ApplyLanguageCommand}"
-                CommandParameter="en">
-              <TextBlock Text="{DynamicResource LanguageEnglish}" />
-            </Button>
-          </WrapPanel>
-        </StackPanel>
-      </Border>
+      <!--
+        The language used to be the twelfth row-card here, with a heading of its own. It left on
+        2026-09-13 for a destination of its own (UX-010): it is one choice that governs every screen
+        rather than part of dressing the library, and keeping it here would have put a second
+        «Restaurar valores por defecto» on this very screen — two controls answering to one name,
+        which the walk refuses to resolve and neither of which could then be clicked.
+      -->
       <!--
         Which of the two sentences this shows is a key the view model picks, the way the recommendation
         reasons travel, so the words follow the chosen language. It said the same thing either way

@@ -205,11 +205,33 @@ public sealed class ThemeTests
             .OfType<Button>()
             .Where(button => button.Classes.Contains("theme-option"))
             .ToArray();
-        // Five theme choices — both high contrasts became pickable on 2026-08-23 — plus the two
-        // language choices BUG-011 added, plus the three densities and the three roundings the
-        // Appearance page grew with the prototype's other nine rows. All thirteen share the option
-        // styling, which is what makes counting them mean anything.
-        Assert.Equal(13, themeButtons.Length);
+        // Five theme choices — both high contrasts became pickable on 2026-08-23 — plus the three
+        // densities and the three roundings the Appearance page grew with the prototype's other
+        // nine rows. All eleven share the option styling, which is what makes counting them mean
+        // anything.
+        //
+        // Eleven and not thirteen since 2026-09-13: the two language choices left for a destination
+        // of their own (UX-010), and only one settings section is on screen at a time. They are
+        // counted where they went rather than simply subtracted, because a count that only got
+        // smaller would read the same whether they moved or were deleted.
+        Assert.Equal(11, themeButtons.Length);
+
+        var sectionType = RequireType(presentation, "ApSolutions.LocalMedia.Presentation.Shell.SettingsSection");
+        var section = shellViewModelType.GetProperty("CurrentSettingsSection");
+        Assert.NotNull(section);
+        section!.SetValue(shellViewModel, Enum.Parse(sectionType, "Language"));
+        Dispatcher.UIThread.RunJobs();
+        // IsEffectivelyVisible and not the bare descendants: a section that has been shown once
+        // stays in the visual tree with its flag off, so counting everything built would find both
+        // sections and report thirteen — measured on 2026-09-13, which is what this line is for.
+        var languageButtons = shell.GetVisualDescendants()
+            .OfType<Button>()
+            .Where(button => button.Classes.Contains("theme-option") && button.IsEffectivelyVisible)
+            .ToArray();
+        Assert.Equal(2, languageButtons.Length);
+
+        section.SetValue(shellViewModel, Enum.Parse(sectionType, "Appearance"));
+        Dispatcher.UIThread.RunJobs();
 
         var dark = themeButtons.Single(button => button.CommandParameter?.ToString() == "Dark");
         Assert.NotNull(dark.Command);

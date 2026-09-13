@@ -442,6 +442,10 @@ SPDX-License-Identifier: GPL-3.0-or-later
               Tag="{x:Static shell:SettingsSection.Appearance}"
               automation:AutomationProperties.Name="{DynamicResource AppearanceTitle}" />
           <ListBoxItem
+              Content="{DynamicResource LanguageTitle}"
+              Tag="{x:Static shell:SettingsSection.Language}"
+              automation:AutomationProperties.Name="{DynamicResource LanguageTitle}" />
+          <ListBoxItem
               Content="{DynamicResource SettingsSectionLibrary}"
               IsVisible="{Binding HasLibrarySection}"
               Tag="{x:Static shell:SettingsSection.Library}"
@@ -499,6 +503,14 @@ SPDX-License-Identifier: GPL-3.0-or-later
           <StackPanel x:Name="SettingsSections" Margin="0,24,0,24" Spacing="{DynamicResource Space24}">
             <ContentControl Margin="48,0" IsVisible="{Binding IsAppearanceSection}">
               <settings:AppearanceSettingsView DataContext="{Binding AppearanceSettings}" />
+            </ContentControl>
+            <!--
+              The language, which shares Appearance's view model and nothing else: it is a group of
+              its own (UX-010) and a destination of its own, so only one «Restaurar valores por
+              defecto» is ever on screen.
+            -->
+            <ContentControl Margin="48,0" IsVisible="{Binding IsLanguageSection}">
+              <settings:LanguageSettingsView DataContext="{Binding AppearanceSettings}" />
             </ContentControl>
             <!--
               The folders ahead of the switches that govern scanning them, which is the prototype's

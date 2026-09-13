@@ -9,6 +9,12 @@ namespace ApSolutions.LocalMedia.Presentation.Language;
 /// <summary>The two languages this application speaks; everything else resolves to Spanish.</summary>
 public interface ILanguageService
 {
+    /// <summary>
+    /// What the application speaks with nothing stored, and what UX-010's reset puts back. Named
+    /// here rather than written twice, so the resolver and the reset cannot disagree.
+    /// </summary>
+    const string DefaultLanguage = "es";
+
     /// <summary>"es" or "en": the stored preference, or the system's language on first run.</summary>
     string Current { get; }
 

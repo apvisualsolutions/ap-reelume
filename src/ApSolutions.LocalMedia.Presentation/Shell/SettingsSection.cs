@@ -12,6 +12,14 @@ public enum SettingsSection
 {
     Appearance,
 
+    /// <summary>
+    /// Which language the interface speaks: «Idioma». A destination of its own since 2026-09-13
+    /// (UX-010), where it used to be a card inside Appearance. It is one choice that governs every
+    /// screen rather than part of dressing the library — and as a card it would have put a second
+    /// «Restaurar valores por defecto» on the same screen, which the walk refuses to click.
+    /// </summary>
+    Language,
+
     /// <summary>The library's folders and the scanning that watches them: «Biblioteca y escaneo».</summary>
     Library,
 

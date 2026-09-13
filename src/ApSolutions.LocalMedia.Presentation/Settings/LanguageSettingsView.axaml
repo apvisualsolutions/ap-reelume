@@ -1,0 +1,66 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<!--
+  The language, in a destination of its own since 2026-09-13 (UX-010). It lived as the twelfth
+  row-card of Appearance, and moving it is not tidying: it is one choice that governs every screen,
+  and a «Restaurar valores por defecto» for it beside Appearance's own would have put two controls
+  answering to one name on a single screen — which the walk refuses to resolve, and rightly, because
+  neither could be clicked.
+
+  The skeleton is the one every settings section shares: the padded surface and the 620 reading
+  column. Without it this one would start 158 px to the left of the others.
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.LanguageSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    x:DataType="settings:AppearanceSettingsViewModel">
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel x:Name="LanguageSettingsSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
+      <!-- UX-010: inside the group and in its heading row, never under the controls. -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource LanguageTitle}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <Button
+            x:Name="LanguageResetButton"
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+            Command="{Binding RestoreLanguageDefaultsCommand}"
+            Content="{DynamicResource RestoreDefaultsAction}" />
+      </Grid>
+      <TextBlock
+          Classes="setting-description"
+          Text="{DynamicResource LanguageDescription}"
+          TextWrapping="Wrap" />
+      <Border Classes="row-box">
+        <WrapPanel ItemSpacing="{DynamicResource Space12}" LineSpacing="{DynamicResource Space12}">
+          <Button
+              Classes="theme-option"
+              Classes.selected="{Binding IsSpanish}"
+              automation:AutomationProperties.Name="{DynamicResource LanguageSpanish}"
+              Command="{Binding ApplyLanguageCommand}"
+              CommandParameter="es">
+            <TextBlock Text="{DynamicResource LanguageSpanish}" />
+          </Button>
+          <Button
+              Classes="theme-option"
+              Classes.selected="{Binding IsEnglish}"
+              automation:AutomationProperties.Name="{DynamicResource LanguageEnglish}"
+              Command="{Binding ApplyLanguageCommand}"
+              CommandParameter="en">
+            <TextBlock Text="{DynamicResource LanguageEnglish}" />
+          </Button>
+        </WrapPanel>
+      </Border>
+    </StackPanel>
+  </Border>
+</UserControl>

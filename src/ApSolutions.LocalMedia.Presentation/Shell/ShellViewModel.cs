@@ -668,6 +668,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
             if (SetField(ref _settingsSection, value))
             {
                 OnPropertyChanged(nameof(IsAppearanceSection));
+                OnPropertyChanged(nameof(IsLanguageSection));
                 OnPropertyChanged(nameof(IsLibrarySection));
                 OnPropertyChanged(nameof(IsRecommendationsSection));
                 OnPropertyChanged(nameof(IsSubtitlesSection));
@@ -684,6 +685,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     }
 
     public bool IsAppearanceSection => CurrentSettingsSection == SettingsSection.Appearance;
+
+    public bool IsLanguageSection => CurrentSettingsSection == SettingsSection.Language;
 
     public bool IsLibrarySection => CurrentSettingsSection == SettingsSection.Library;
 
