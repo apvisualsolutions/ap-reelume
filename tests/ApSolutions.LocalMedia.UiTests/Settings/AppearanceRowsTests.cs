@@ -183,6 +183,73 @@ public sealed class AppearanceRowsTests
         page.IsSixthAccent,
     ];
 
+    /// <summary>
+    /// UX-010, asserted on what the service holds rather than on the page: a reset that only
+    /// refreshed the view model would leave every row as it was the moment anything re-read it.
+    /// </summary>
+    [Fact]
+    public void Restoring_the_defaults_puts_every_row_back_in_one_write()
+    {
+        var appearance = new RecordingAppearance();
+        var theme = new StubTheme();
+        var page = new AppearanceSettingsViewModel(theme, languageService: null, appearance)
+        {
+            FollowsWindowsTheme = false,
+            Mica = false,
+            TintPercent = 42,
+            CoverWidth = 199,
+            CoverTitles = false,
+            Animations = false,
+            Density = InterfaceDensity.Roomy,
+            Rounding = CornerRounding.Sharp,
+        };
+        var writes = appearance.Applied;
+
+        page.RestoreDefaultsCommand.Execute(null);
+
+        Assert.Equal(new AppearanceOptions(), appearance.Current);
+        Assert.Equal(writes + 1, appearance.Applied);
+    }
+
+    /// <summary>
+    /// The theme lives in its own service and not in the options record, so a reset that wrote only
+    /// the record would leave a dark application saying it had been put back to «Sistema».
+    /// </summary>
+    /// <remarks>
+    /// The double remembers, and that is the whole prerequisite: written against <c>StubTheme</c>,
+    /// whose <c>CurrentPreference</c> is the constant <c>System</c> and whose <c>Apply</c> does
+    /// nothing, this test passed with the theme line deleted from the reset. Measured on 2026-09-13
+    /// by mutation. A double that cannot hold what was written cannot witness that anything was.
+    /// </remarks>
+    [Fact]
+    public void Restoring_the_defaults_puts_the_theme_back_as_well()
+    {
+        var theme = new RecordingTheme();
+        var page = new AppearanceSettingsViewModel(theme, languageService: null, new RecordingAppearance());
+        page.ApplyThemeCommand.Execute(ThemePreference.Dark);
+        Assert.Equal(ThemePreference.Dark, theme.CurrentPreference);
+
+        page.RestoreDefaultsCommand.Execute(null);
+
+        Assert.Equal(ThemePreference.System, theme.CurrentPreference);
+    }
+
+    /// <summary>A theme service that remembers what it was told, which <c>StubTheme</c> does not.</summary>
+    private sealed class RecordingTheme : IThemeService
+    {
+        public ThemePreference CurrentPreference { get; private set; } = ThemePreference.System;
+
+        public ThemeVariant PlayerThemeVariant => ThemeVariant.Dark;
+
+        public bool AnimationsEnabled => true;
+
+        public TimeSpan MotionDuration => TimeSpan.FromMilliseconds(150);
+
+        public void Apply(ThemePreference preference) => CurrentPreference = preference;
+
+        public bool TryApplyBackdrop(Window window) => false;
+    }
+
     /// <summary>Holds the set and counts how often it was written, which is the whole contract.</summary>
     private sealed class RecordingAppearance : IAppearanceService
     {

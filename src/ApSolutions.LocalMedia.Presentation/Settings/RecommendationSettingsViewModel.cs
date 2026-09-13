@@ -34,9 +34,20 @@ public sealed class RecommendationSettingsViewModel : INotifyPropertyChanged
         _watchedThresholdPercent = Math.Round(
             (watchedThreshold?.Current ?? WatchStatePolicy.DefaultWatchedThreshold) * 100);
         ApplyWatchedThresholdCommand = new AsyncRelayCommand(ApplyWatchedThresholdAsync);
+        RestoreDefaultsCommand = new AsyncRelayCommand(RestoreDefaultsAsync);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <remarks>
+    /// It <b>applies</b> the threshold rather than only moving the slider, because in this group the
+    /// slider on its own changes nothing: what is in force is what the use case last wrote, and it
+    /// rewrites every title's watch state on the way. A reset that left the slider at 90 % with 60 %
+    /// still in force would be the one thing this row's criterion forbids — restored to look at, and
+    /// not restored at all.
+    /// </remarks>
+    public ICommand RestoreDefaultsCommand { get; }
 
     public bool IsEnabled
     {
@@ -103,6 +114,20 @@ public sealed class RecommendationSettingsViewModel : INotifyPropertyChanged
             _hasThresholdResult = value;
             OnPropertyChanged();
         }
+    }
+
+    private async Task RestoreDefaultsAsync()
+    {
+        IsEnabled = IRecommendationSettings.EnabledByDefault;
+
+        if (_watchedThreshold is null)
+        {
+            return;
+        }
+
+        _watchedThresholdPercent = Math.Round(WatchStatePolicy.DefaultWatchedThreshold * 100);
+        OnPropertyChanged(nameof(WatchedThresholdPercent));
+        await ApplyWatchedThresholdAsync().ConfigureAwait(true);
     }
 
     private async Task ApplyWatchedThresholdAsync()

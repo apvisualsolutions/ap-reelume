@@ -19,7 +19,7 @@ public sealed class StoredRecommendationSettings : IRecommendationSettings
     public StoredRecommendationSettings(ISettingsStore store) =>
         _store = store ?? throw new ArgumentNullException(nameof(store));
 
-    public bool IsEnabled => _store.Read<bool?>(Key) ?? true;
+    public bool IsEnabled => _store.Read<bool?>(Key) ?? IRecommendationSettings.EnabledByDefault;
 
     public void SetEnabled(bool isEnabled) => _store.Write(Key, isEnabled);
 }
