@@ -3,6 +3,9 @@
 
 using System.Globalization;
 using System.Text.RegularExpressions;
+
+using ApSolutions.LocalMedia.TestSupport;
+
 using Xunit;
 
 namespace ApSolutions.LocalMedia.DocumentationTests;
@@ -32,8 +35,17 @@ namespace ApSolutions.LocalMedia.DocumentationTests;
 /// </remarks>
 public sealed class TareasRegisterTests
 {
-    private static readonly string Register =
-        Path.Combine(RepositoryRoot(), "docs", "TAREAS.md");
+    /// <summary>
+    /// Through <see cref="RepositoryLayout"/>, which is the one place that knows where the root is.
+    /// </summary>
+    /// <remarks>
+    /// The first draft of this file walked up to the root itself, and
+    /// <c>RepositoryAnchorTests.The_repository_root_is_found_in_one_place</c> put CI red for it —
+    /// correctly. It was invisible here because the architecture suite had been run <b>before</b> this
+    /// file existed and not after: that suite sweeps all of <c>tests/</c>, so it is the suite that
+    /// reads any test file somebody adds.
+    /// </remarks>
+    private static readonly string Register = RepositoryLayout.PathFromRoot("docs/TAREAS.md");
 
     /// <summary>Ids are <c>ENG-</c> and three digits, and nothing else.</summary>
     private static readonly Regex Row = new(
@@ -223,18 +235,6 @@ public sealed class TareasRegisterTests
         }
 
         return (open, done);
-    }
-
-    private static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "global.json")))
-        {
-            directory = directory.Parent;
-        }
-
-        return directory?.FullName
-            ?? throw new InvalidOperationException("the repository root was not found.");
     }
 
     /// <summary>One row of the register.</summary>
