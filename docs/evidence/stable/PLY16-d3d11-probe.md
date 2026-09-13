@@ -323,3 +323,48 @@ En un runner hospedado sólo aparece el «Microsoft Basic Render Driver», que *
   (`LGPL-2.1-or-later`) y `ui/gl/swap_chain_presenter.cc` de Chromium (`BSD-3-Clause`).
 - Identificadores de fabricante: leídos del bus PCI de esta máquina (`VEN_10DE`, `VEN_8086`). El de
   AMD (`0x1002`) viene del registro PCI y de la fuente de VLC, y **no está medido aquí**.
+
+## La respuesta que faltaba, medida el 2026-09-13: NVIDIA FUNCIONA
+
+**El «NO CONCLUYENTE» de NVIDIA era el interruptor, y nada de este código.** Con la Super Resolución
+de Vídeo RTX encendida en NVIDIA App, la misma sonda, la misma máquina y el mismo código:
+
+| Adaptador | Antes | Después | Valores distintos | Coste base | Coste con la mejora |
+| --- | --- | --- | --- | --- | --- |
+| NVIDIA GeForce RTX 5070 | **0** bytes | **11 585 463** (34,9 %) | 6 → **256** | 0,064 ms | **1,623 ms** (3,9 % del fotograma) |
+| Intel UHD Graphics 770 | 18 109 378 | 18 109 378 (54,6 %) | 44 | 3,882 ms | 2,038 ms (4,9 %) |
+
+Control negativo en cero en las dos. Y el salto de **6 a 256 valores distintos** es el control
+positivo más fuerte de toda esta medición: la imagen dejó de ser tres negros y un patrón para tener
+la riqueza de una reconstrucción real.
+
+### Que el código era correcto está verificado contra dos implementaciones, no deducido
+
+`mpv` envía para NVIDIA el GUID `d43ce1b3-1f4b-48ac-baee-c3c25375e6f7` por
+`VideoProcessorSetStreamExtension` con `{version=1, method=2, enable=1}` — **idéntico, campo por
+campo, a lo que esta sonda enviaba desde el primer día**. Y el comentario de Chromium dice por qué el
+resultado era cero: «the feature is controlled by the NVIDIA Control Panel app and turned off by
+default, so calling VideoProcessorSetStreamExtension will be a no-op then».
+
+### Y NO se puede encender desde una aplicación, esta vez medido por diferencia
+
+La pregunta se había contestado buscando **por nombre**; esta vez se contestó comparando el sistema
+antes y después de encenderlo a mano: **272 valores de registro de NVIDIA y 1 221 ficheros con su
+huella SHA-256**.
+
+- **El registro no cambió: cero diferencias de 272.**
+- **`nvdrsdb0.bin` y `nvdrsdb1.bin` no cambiaron**, así que el ajuste **no vive en la base de perfiles
+  del controlador** — que era la única puerta que `NvAPI_DRS_SetSetting` podría abrir.
+- Lo único que cambió con contenido propio fue `Drs
+vAppTimestamps` (mismo tamaño, otra huella) y
+  `storage.json`, que resultó ser **la posición de la ventana de NVIDIA App** y nada más.
+
+**Corolario de diseño, y cambia el de arriba:** la superresolución del fabricante sigue siendo un
+extra oportunista, pero ahora se sabe **qué la enciende** y que **cuesta 1,6 ms en una RTX 5070**. Lo
+que esta aplicación puede hacer es **detectar si está activa** — comparando píxeles, que es lo que
+esta sonda ya hace — y decírselo a quien la usa, en vez de encenderla por su cuenta, que no se puede.
+
+**Y un aviso sobre lo que circula por internet**: los identificadores
+`NV_VPP_RTX_VIDEO_SUPER_RESOLUTION_ENB` y sus dos hermanos, que aparecen en el issue 396 de
+`nvidiaProfileInspector`, **se los inventó un modelo de lenguaje** — lo dice quien los publicó, que
+además no los encuentra ni añadiéndolos a mano. No se usaron aquí.
