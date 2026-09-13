@@ -352,7 +352,7 @@ src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorViewModel.cs        
 src/ApSolutions.LocalMedia.Presentation/Player/TransportControlsView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchDialog.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchViewModel.cs                      97  85
-src/ApSolutions.LocalMedia.Presentation/Player/VideoFrameView.cs                             100  89
+src/ApSolutions.LocalMedia.Presentation/Player/VideoFrameView.cs                             100  94
 src/ApSolutions.LocalMedia.Presentation/Player/VideoStatusOverlay.axaml                      100  50
 src/ApSolutions.LocalMedia.Presentation/Player/VideoStatusViewModel.cs                        96  87
 src/ApSolutions.LocalMedia.Presentation/Recovery/DatabaseRecoveryView.axaml                  100  50
@@ -367,8 +367,8 @@ src/ApSolutions.LocalMedia.Presentation/Review/DuplicatesOverviewView.axaml     
 src/ApSolutions.LocalMedia.Presentation/Review/ReviewInboxView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/DiagnosticsPreviewView.axaml                100  50
+src/ApSolutions.LocalMedia.Presentation/Settings/LanguageSettingsView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsView.axaml                 100  50
-src/ApSolutions.LocalMedia.Presentation/Settings/LanguageSettingsView.axaml               100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/PlaybackSettingsView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/PrivacySettingsView.axaml                   100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/PrivacySettingsViewModel.cs                  97  94
