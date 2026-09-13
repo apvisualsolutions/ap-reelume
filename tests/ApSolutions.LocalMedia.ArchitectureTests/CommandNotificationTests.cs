@@ -91,6 +91,18 @@ public sealed class CommandNotificationTests
                 ],
             ["src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsViewModel.cs"] =
                 ["public bool CanExecute(object? parameter) => true;"],
+            // UX-010's three first «Restaurar valores por defecto», and they ask nothing because
+            // there is nothing to ask: a group can always be put back, including when it is already
+            // where it started — restoring what is already the default writes nothing, which the
+            // setters see to. The alternative was hiding the button while a group sat at its
+            // defaults, and that was measured and rejected: it would leave these unpressable half
+            // the time, and an unpressable control raises the walk's ratchet, which only comes down.
+            ["src/ApSolutions.LocalMedia.Presentation/Settings/PlaybackSettingsViewModel.cs"] =
+                ["public bool CanExecute(object? parameter) => true;"],
+            ["src/ApSolutions.LocalMedia.Presentation/Settings/ScanSettingsViewModel.cs"] =
+                ["public bool CanExecute(object? parameter) => true;"],
+            ["src/ApSolutions.LocalMedia.Presentation/Settings/SegmentDetectionSettingsViewModel.cs"] =
+                ["public bool CanExecute(object? parameter) => true;"],
             // Two: the rail's routes and the player's five panel pills. A pill is drawn only when
             // its panel has something in it, so a pill that exists can always be pressed — the
             // command has nothing to change its mind about.
