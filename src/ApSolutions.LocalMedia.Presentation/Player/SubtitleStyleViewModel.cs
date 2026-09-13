@@ -3,8 +3,10 @@
 
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using ApSolutions.LocalMedia.Domain.Appearance;
 using ApSolutions.LocalMedia.Domain.Continuity;
+using ApSolutions.LocalMedia.Presentation.Commands;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -32,9 +34,17 @@ public sealed class SubtitleStyleViewModel : INotifyPropertyChanged
         _scopeKey = scopeKey ?? PlaybackPreference.GlobalKey;
         _applyForeground = new SwatchCommand(value => ForegroundHex = WithRgb(ForegroundHex, value));
         _applyBackground = new SwatchCommand(value => BackgroundHex = WithRgb(BackgroundHex, value));
+        RestoreDefaultsCommand = new AsyncRelayCommand(() => ResetAsync(CancellationToken.None));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <remarks>
+    /// <c>ResetAsync</c> had been here since the style was written and <b>nothing called it</b> —
+    /// the house defect, in the one method whose whole job is to undo. This button is what feeds it.
+    /// </remarks>
+    public ICommand RestoreDefaultsCommand { get; }
 
     /// <summary>Families that ship with Windows 11 and stay legible at every scaling.</summary>
     public static IReadOnlyList<string> SafeFontFamilies { get; } =

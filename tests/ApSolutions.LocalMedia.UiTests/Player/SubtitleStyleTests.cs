@@ -56,6 +56,45 @@ public sealed class SubtitleStyleTests
         Assert.Equal(SubtitleStyle.EngineDefault, afterReset.Style);
     }
 
+    /// <summary>
+    /// UX-010, and through the command rather than the method: <c>ResetAsync</c> had been here since
+    /// this view model was written and <b>nothing called it</b> — registered and never fed, in the
+    /// one method whose whole job is to undo. What this asserts is the wire, on the stored value.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task The_restore_button_is_what_puts_the_stored_style_back()
+    {
+        var repository = new InMemoryPreferenceRepository();
+        var viewModel = new SubtitleStyleViewModel(repository)
+        {
+            FontSizePercent = 175,
+            OutlineThickness = 3,
+        };
+        await viewModel.SaveAsync(TestContext.Current.CancellationToken);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+        await WaitForAsync(async () =>
+        {
+            var seen = new SubtitleStyleViewModel(repository);
+            await seen.LoadAsync(TestContext.Current.CancellationToken);
+            return seen.Style == SubtitleStyle.EngineDefault;
+        });
+
+        var afterReset = new SubtitleStyleViewModel(repository);
+        await afterReset.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(SubtitleStyle.EngineDefault, afterReset.Style);
+    }
+
+    private static async Task WaitForAsync(Func<Task<bool>> condition)
+    {
+        for (var attempt = 0; attempt < 100 && !await condition(); attempt++)
+        {
+            await Task.Delay(10, TestContext.Current.CancellationToken);
+        }
+
+        Assert.True(await condition());
+    }
+
     [AvaloniaFact]
     public async Task Out_of_range_values_are_clamped_before_they_can_hide_the_text()
     {

@@ -99,7 +99,7 @@ public sealed class OptionGroupTests
             OptionPlace.Player,
             "SettingsSection.Subtitles",
             "SubtitleStyleView",
-            null,
+            "SubtitleStyleResetButton",
             "The right font size is the one that reads over this film at this distance, which is "
                 + "not a question anybody can answer without something playing behind the text."),
         ["NextEpisodeCountdown"] = new(
@@ -225,7 +225,7 @@ public sealed class OptionGroupTests
     /// </remarks>
     private static readonly Dictionary<string, string> Pending = new(StringComparer.Ordinal)
     {
-        ["SubtitleStyle"] = "No button yet, and still reached through Settings: it moves into the gear.",
+        ["SubtitleStyle"] = "It has its button, and is still reached through Settings: it moves into the gear.",
         ["NextEpisodeCountdown"] = "It has its button, and is still reached through Settings: it "
             + "moves into the gear.",
         ["SegmentDetection"] = "It has its button, and is still reached through Settings: it moves "
@@ -266,6 +266,7 @@ public sealed class OptionGroupTests
         ["RecommendationSettingsView#RecommendationResetButton"] = GroupResetKey,
         ["AppearanceSettingsView#AppearanceResetButton"] = GroupResetKey,
         ["LanguageSettingsView#LanguageResetButton"] = GroupResetKey,
+        ["SubtitleStyleView#SubtitleStyleResetButton"] = GroupResetKey,
 
         // And the four that are NOT a group's reset, each with the reason it keeps a key of its own.
         // Three of these were invisible to the sweep by prose that this replaced, which is the
