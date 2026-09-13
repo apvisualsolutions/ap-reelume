@@ -1,6 +1,6 @@
 # Avisos de terceros
 
-AP Reelume by AP Solutions se publica bajo una licencia propia, `LicenseRef-AP-Reelume`, cuyo texto
+AP Reelume by AP Solutions se publica bajo una licencia propia, `LicenseRef-APSolutions`, cuyo texto
 está en `LICENSE`. Este documento recoge los componentes
 de terceros que el artefacto publicado transporta y la licencia que cada uno declara. Este archivo se
 actualiza en cada incremento que añade o retira una dependencia, y **viaja dentro del artefacto**, en

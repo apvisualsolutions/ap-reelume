@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
-// SPDX-License-Identifier: LicenseRef-AP-Reelume
+// SPDX-License-Identifier: LicenseRef-APSolutions
 
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -37,7 +37,7 @@ public sealed class LicenceTextTests
     /// The program's own licence. It travels as <c>LICENSE</c> at the root of the artifact, so it is
     /// the one identifier the notices may name without a file in this folder.
     /// </summary>
-    private const string OwnLicence = "LicenseRef-AP-Reelume";
+    private const string OwnLicence = "LicenseRef-APSolutions";
 
     /// <summary>
     /// Every licence this repository knows how to file, with the last line of its canonical text.

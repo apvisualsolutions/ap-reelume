@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: 2026 AP Solutions
-SPDX-License-Identifier: LicenseRef-AP-Reelume
+SPDX-License-Identifier: LicenseRef-APSolutions
 -->
 <Window
     x:Class="ApSolutions.LocalMedia.Presentation.Player.MiniPlayerWindow"

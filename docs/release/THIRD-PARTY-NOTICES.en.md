@@ -1,6 +1,6 @@
 # Third-party notices
 
-AP Reelume by AP Solutions is released under a licence of its own, `LicenseRef-AP-Reelume`,
+AP Reelume by AP Solutions is released under a licence of its own, `LicenseRef-APSolutions`,
 whose text is in `LICENSE`. This document records the
 third-party components the published artifact carries and the licence each one declares. This file is
 updated by every increment that adds or removes a dependency, and **travels inside the artifact**,
