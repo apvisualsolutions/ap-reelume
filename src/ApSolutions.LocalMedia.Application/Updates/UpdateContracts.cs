@@ -15,6 +15,12 @@ public sealed record InstalledRelease(string Version, string Runtime);
 /// <summary>Whether the application may look for updates nobody asked it to look for.</summary>
 public interface IUpdateSettings
 {
+    /// <summary>
+    /// Off until somebody says otherwise, and what UX-010's reset puts back. It is named on the port
+    /// so the store and the reset cannot disagree about which of them holds the default.
+    /// </summary>
+    const bool AutomaticCheckEnabledByDefault = false;
+
     bool AutomaticCheckEnabled { get; }
 
     void SetAutomaticCheckEnabled(bool enabled);

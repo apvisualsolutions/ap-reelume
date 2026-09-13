@@ -971,6 +971,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Equal(StartupEntryState.Present, startup.Inspect());
         Assert.True(lifecycle.StartWithWindows);
         Assert.False(lifecycle.IsStartupConsentPending);
+
+        // UX-010, and the probe is the registry rather than the screen for the same reason Grant's
+        // is: this reset has to reach outside the application's own settings, or the machine keeps
+        // starting it at sign-in while the switch says otherwise.
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => startup.Inspect(),
+            "clicking «restore default values» never removed the startup entry it had written");
+        Assert.Equal(StartupEntryState.Absent, startup.Inspect());
+        Assert.False(lifecycle.TrayEnabled);
+        Assert.False(lifecycle.StartWithWindows);
+        Assert.False(lifecycle.MinimizeToTrayOnClose);
     }
 
     /// <summary>
@@ -1053,6 +1066,20 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             Assert.Contains(
                 Directory.GetFiles(diagnostics),
                 file => Path.GetFileName(file) == privacy.ExportedFileName);
+
+            // UX-010, and this one only ever takes a consent away. It is pressed last because the
+            // two boxes above are what give it something to withdraw, and the probe is the consent
+            // the store holds rather than the box on screen.
+            var consent = host.Application.Services
+                .GetRequiredService<ApSolutions.LocalMedia.Application.Privacy.IPrivacySettings>();
+            Assert.True(consent.Current.IsGranted);
+            await PressAsync(
+                host,
+                "RestoreDefaultsAction",
+                () => consent.Current.IsGranted,
+                "clicking «restore default values» never withdrew the diagnostics consent");
+            Assert.False(consent.Current.IsGranted);
+            Assert.False(privacy.AutomaticRefreshEnabled);
         }
         finally
         {
@@ -5207,6 +5234,24 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             new AppDataPaths(_dataRoot).SettingsPath,
             TestContext.Current.CancellationToken);
         Assert.Contains("updates.automaticCheckEnabled", stored, StringComparison.Ordinal);
+
+        // UX-010, pressed after the box for the reason the whole batch shares: with nothing turned
+        // on, the reset answers with the value it already had. The probe is the stored setting, so
+        // a reset that only unchecked the box would not satisfy it.
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => settings.AutomaticCheckEnabled,
+            "clicking «restore default values» never stopped the application looking on its own");
+        Assert.False(settings.AutomaticCheckEnabled);
+
+        // And back on, because the rest of this scene measures what an installation that looks on
+        // its own does — the reset is a step inside it and not its end.
+        await PressAsync(
+            host,
+            "UpdateAutomaticCheckLabel",
+            () => settings.AutomaticCheckEnabled,
+            "turning the automatic check back on after the reset never took");
 
         // Now there is something to find. The version is far past anything this build could carry,
         // because what is being measured is the press and not the comparison — UpdatePolicy has its

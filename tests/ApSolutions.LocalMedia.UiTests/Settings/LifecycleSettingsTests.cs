@@ -249,4 +249,38 @@ public sealed class LifecycleSettingsTests
         Assert.Contains(nameof(viewModel.CanMinimizeToTray), announced);
     }
 
+    /// <summary>
+    /// UX-010, measured on what was saved: this group's values reach a registry key and a settings
+    /// file, so a reset that only moved the switches would leave the machine starting the
+    /// application at sign-in while the screen said it did not.
+    /// </summary>
+    [Fact]
+    public void Restoring_the_defaults_saves_the_quietest_state_and_stands_the_startup_down()
+    {
+        var settings = new InMemorySettings(LifecyclePreferences.Default);
+        var startup = new StubStartupService();
+        var viewModel = new LifecycleSettingsViewModel(settings, startup)
+        {
+            TrayEnabled = true,
+        };
+        viewModel.MinimizeToTrayOnClose = true;
+
+        // Asking and granting are two steps, and the second is what writes the registry key: this
+        // scene has to reach the state a real machine is in before the reset means anything.
+        viewModel.StartWithWindows = true;
+        viewModel.GrantStartupConsentCommand.Execute(null);
+        Assert.True(settings.Current.StartWithWindows);
+        Assert.Equal(StartupEntryState.Present, startup.State);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+
+        Assert.Equal(LifecyclePreferences.Default, settings.Current);
+        Assert.False(viewModel.TrayEnabled);
+        Assert.False(viewModel.StartWithWindows);
+        Assert.False(viewModel.MinimizeToTrayOnClose);
+
+        // The half that lives outside this application's settings: the key Windows reads at sign-in
+        // is gone too, so the machine is not left starting something the screen says it will not.
+        Assert.Equal(StartupEntryState.Absent, startup.State);
+    }
 }

@@ -31,6 +31,7 @@ public sealed class LifecycleSettingsViewModel : INotifyPropertyChanged
         _preferences = AppLifecyclePolicy.Normalize(_settings.Current);
         GrantStartupConsentCommand = new LifecycleCommand(GrantStartupConsent);
         DeclineStartupConsentCommand = new LifecycleCommand(DeclineStartupConsent);
+        RestoreDefaultsCommand = new LifecycleCommand(RestoreDefaults);
 
         // A registration that points somewhere else would start the wrong thing at sign-in, so it is
         // corrected as soon as the screen that owns it is built.
@@ -45,6 +46,9 @@ public sealed class LifecycleSettingsViewModel : INotifyPropertyChanged
     public ICommand GrantStartupConsentCommand { get; }
 
     public ICommand DeclineStartupConsentCommand { get; }
+
+    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    public ICommand RestoreDefaultsCommand { get; }
 
     public bool TrayEnabled
     {
@@ -137,6 +141,22 @@ public sealed class LifecycleSettingsViewModel : INotifyPropertyChanged
     {
         IsStartupConsentPending = false;
         OnPropertyChanged(nameof(StartWithWindows));
+    }
+
+    /// <summary>
+    /// Puts the whole group back to the state of a machine nobody has asked anything: no tray, no
+    /// automatic start, and a close button that closes.
+    /// </summary>
+    /// <remarks>
+    /// It goes through <see cref="StartWithWindows"/> rather than straight to <c>Apply</c>, because
+    /// the registration Windows reads at sign-in lives outside this application's own settings: a
+    /// reset that wrote the preference and left the key behind would show the switch off while the
+    /// machine kept starting the application.
+    /// </remarks>
+    private void RestoreDefaults()
+    {
+        StartWithWindows = LifecyclePreferences.Default.StartWithWindows;
+        Apply(LifecyclePreferences.Default);
     }
 
     private void Apply(LifecyclePreferences updated)

@@ -364,6 +364,46 @@ public sealed class PrivacyConsentTests
         Assert.True(viewModel.AutomaticRefreshEnabled);
     }
 
+    /// <summary>
+    /// UX-010, measured on what was saved. This group is two consents, so the factory value is the
+    /// state of a machine nobody has asked anything: both off.
+    /// </summary>
+    [Fact]
+    public void Restoring_the_defaults_withdraws_both_consents()
+    {
+        var settings = new InMemoryPrivacySettings();
+        var refresh = new InMemoryAutoRefresh();
+        var viewModel = CreateViewModel(settings, autoRefresh: refresh, hasConsentedConnection: true);
+        viewModel.DiagnosticsEnabled = true;
+        viewModel.AutomaticRefreshEnabled = true;
+        Assert.True(settings.Current.IsGranted);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+
+        Assert.False(settings.Current.IsGranted);
+        Assert.False(refresh.AutomaticRefreshEnabled);
+        Assert.False(viewModel.DiagnosticsEnabled);
+        Assert.False(viewModel.AutomaticRefreshEnabled);
+    }
+
+    /// <summary>
+    /// The half that matters more than the other: a restore is allowed to take a consent away and
+    /// never to give one. Somebody putting a group back is not somebody agreeing to anything.
+    /// </summary>
+    [Fact]
+    public void Restoring_the_defaults_never_grants_a_consent_that_was_not_there()
+    {
+        var settings = new InMemoryPrivacySettings();
+        var refresh = new InMemoryAutoRefresh();
+        var viewModel = CreateViewModel(settings, autoRefresh: refresh, hasConsentedConnection: true);
+
+        viewModel.RestoreDefaultsCommand.Execute(null);
+
+        Assert.False(settings.Current.IsGranted);
+        Assert.Null(settings.Current.GrantedUtc);
+        Assert.False(refresh.AutomaticRefreshEnabled);
+    }
+
     private sealed class InMemoryAutoRefresh : Application.Metadata.IAutoRefreshSettings
     {
         public bool AutomaticRefreshEnabled { get; private set; }

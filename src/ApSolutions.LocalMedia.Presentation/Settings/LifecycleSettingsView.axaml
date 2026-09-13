@@ -14,12 +14,22 @@ SPDX-License-Identifier: GPL-3.0-or-later
        section on this page shares. Without it this one started 158 px to the left of the others. -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
   <StackPanel x:Name="LifecycleSettingsSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
-    <TextBlock
-        FontSize="{DynamicResource FontSizeSubtitle}"
-        FontWeight="SemiBold"
-        Foreground="{DynamicResource TextPrimaryBrush}"
-        Text="{DynamicResource LifecycleSettingsTitle}"
-        automation:AutomationProperties.HeadingLevel="2" />
+    <!-- UX-010: inside the group and in its heading row, never under the controls. -->
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+      <TextBlock
+          FontSize="{DynamicResource FontSizeSubtitle}"
+          FontWeight="SemiBold"
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource LifecycleSettingsTitle}"
+          automation:AutomationProperties.HeadingLevel="2" />
+      <Button
+          x:Name="LifecycleResetButton"
+          Grid.Column="1"
+          VerticalAlignment="Center"
+          automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+          Command="{Binding RestoreDefaultsCommand}"
+          Content="{DynamicResource RestoreDefaultsAction}" />
+    </Grid>
     <TextBlock
         MaxWidth="640"
         Foreground="{DynamicResource TextPrimaryBrush}"
