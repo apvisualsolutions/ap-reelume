@@ -69,7 +69,7 @@ identical between builds — a package records the moment it was sealed — but 
 ## What the package contains
 
 - The SBOM travels inside the artifact, under `sbom/`, in CycloneDX and SPDX formats.
-- The GPL-3.0-or-later licence and the third-party notices travel in `LICENSE`, `NOTICE`, and
+- The AP Reelume Licence and the third-party notices travel in `LICENSE`, `NOTICE`, and
   `licenses/`.
 - The package declares **no** capability beyond `runFullTrust`, which any desktop application needs.
   It asks for no network, no location, and no access to system libraries.

@@ -1,6 +1,7 @@
 # Avisos de terceros
 
-AP Reelume by AP Solutions se publica bajo `GPL-3.0-or-later`. Este documento recoge los componentes
+AP Reelume by AP Solutions se publica bajo una licencia propia, `LicenseRef-AP-Reelume`, cuyo texto
+está en `LICENSE`. Este documento recoge los componentes
 de terceros que el artefacto publicado transporta y la licencia que cada uno declara. Este archivo se
 actualiza en cada incremento que añade o retira una dependencia, y **viaja dentro del artefacto**, en
 `licenses/`, junto a su versión inglesa.
@@ -52,7 +53,7 @@ el paquete se pidió directamente o llegó arrastrado.
 | Microsoft.Extensions.DependencyInjection | 10.0.10 | MIT |
 | Microsoft.Extensions.DependencyInjection.Abstractions | 10.0.10 | MIT |
 
-`GPL-3.0-or-later` es compatible con la incorporación de componentes `LGPL-2.1-or-later`, `MIT`,
+Una licencia propietaria es compatible con la incorporación de componentes `LGPL-2.1-or-later`, `MIT`,
 `Apache-2.0` y `BSD-3-Clause`. Las licencias MIT y BSD-3-Clause exigen que su aviso de copyright
 viaje con el binario, y para eso están este archivo y la carpeta `licenses/` dentro del artefacto.
 
@@ -78,12 +79,24 @@ paquete NuGet de VideoLAN **no trae ningún archivo `COPYING`**, así que nadie 
 este artefacto: lo lleva en `licenses/LGPL-2.1.txt`, `licenses/GPL-2.0.txt` y
 `licenses/NOTICE-VideoLAN.txt`.
 
-Para un programa publicado bajo `GPL-3.0-or-later`, un complemento `GPL-2.0-or-later` es compatible:
-el «o posterior» es lo que hace que ambos se encuentren en GPL-3.0. Uno licenciado `GPL-2.0-only` no
-lo sería. **Comprobado el 2026-08-10 y cerrado**: el `COPYING` del árbol de VLC lleva la GPL versión 2
-con la cláusula «either version 2 of the License, or (at your option) any later version», de modo que
-el conjunto es `GPL-2.0-or-later` y encaja bajo GPL-3.0. La palanca de recortar complementos queda
-disponible por si algún día conviene reducir la superficie, pero no hace falta por licencia.
+**Esto estuvo cerrado desde el 2026-08-10 y se reabrió el 2026-09-13, y el motivo no fue un error.**
+El razonamiento de entonces era: para un programa publicado bajo `GPL-3.0-or-later`, un complemento
+`GPL-2.0-or-later` es compatible, porque el «o posterior» hace que ambos se encuentren en GPL-3.0.
+Era correcto y lo sigue siendo. **Lo que cambió es el programa**: desde el 2026-09-13 lleva licencia
+propia, así que no hay ninguna versión común a la que llegar, y un complemento contagioso dentro de
+un programa propietario es un incumplimiento, no un encaje.
+
+**Y la palanca de recortar complementos ya no es opcional: es la única salida.** Medido el
+2026-09-13, el complemento contagioso que importa **no es el codificador x264** —un reproductor no
+codifica y ése se puede quitar—, sino **`libavcodec_plugin.dll`, el decodificador**: su línea de
+compilación empieza por `--enable-gpl`, leída dentro del propio binario, con tres complementos de
+control que no la llevan.
+
+**Mientras ese complemento viaje aquí, el artefacto no se puede distribuir.** La salida medida no
+pierde formatos: la biblioteca que descodifica es permisiva por defecto y lo contagioso son piezas
+opcionales que se activan al compilar —un filtro de posprocesado heredado y algunas optimizaciones—,
+**sin ningún decodificador entre ellas**. Hay que compilar LibVLC y sus dependencias sin esa opción,
+en las dos arquitecturas, y mantener esa compilación.
 
 **El texto de las licencias ya viaja.** La LGPL-2.1 (§6), la GPL-2.0 (§1) y la Apache-2.0 (§4a)
 exigen entregar una copia de la licencia con la distribución binaria, y MIT y BSD-3-Clause exigen
@@ -106,7 +119,7 @@ de menos. La obligación de la licencia es la misma.
 | VideoLAN / VLC | `modules/video_output/win32/d3d11_scaler.cpp` | `LGPL-2.1-or-later` | Los identificadores de las extensiones de superresolución de NVIDIA e Intel, sus cargas útiles y la secuencia de llamadas del procesador de vídeo de Direct3D 11, en `src/ApSolutions.LocalMedia.Windows/Playback/`. |
 | The Chromium Authors | `ui/gl/swap_chain_presenter.cc` | `BSD-3-Clause` | Por qué puerta va cada llamada de Intel —las dos primeras son extensiones de salida y sólo la tercera de flujo— y que el controlador de NVIDIA acepta la petición y la ignora mientras la función esté apagada. |
 
-`GPL-3.0-or-later` admite incorporar las dos. Los textos íntegros de `LGPL-2.1` y `BSD-3-Clause` ya
+Una licencia propietaria admite incorporar las dos. Los textos íntegros de `LGPL-2.1` y `BSD-3-Clause` ya
 viajan en `licenses/` por otras dependencias, así que no hace falta añadir ninguno.
 
 ## Componentes usados solo durante el desarrollo y las pruebas
@@ -154,7 +167,10 @@ se copia durante las pruebas.
 
 Este archivo dice qué declara cada componente y cómo encajan esas declaraciones entre sí. Lo escriben
 quienes ensamblaron el programa, no un abogado, y dos preguntas siguen abiertas hasta que el dictamen
-jurídico profesional de REL-004 las responda: si todos los complementos de VideoLAN que viajan en la
-compilación fijada son compatibles con `GPL-3.0-or-later`, y bajo qué apartado del §6 de la LGPL-2.1
-queda amparada la forma en que LibVLC viaja aquí. Ninguna de las dos frena el desarrollo; ambas se
-nombran aquí para que nadie confunda este documento con el dictamen.
+jurídico profesional de REL-004 las responda. **Desde el 2026-09-13 la primera ya no es una pregunta,
+es un hallazgo**: los complementos de VideoLAN que viajan en la compilación fijada **no** son
+compatibles con la licencia propia, porque al menos el decodificador es contagioso, y eso **sí frena
+la publicación** aunque no frene el desarrollo. La segunda sigue siendo pregunta: bajo qué apartado
+del §6 de la LGPL-2.1 queda amparada la forma en que LibVLC viaja aquí, ahora que la vía del §6(a)
+—publicar nuestro fuente bajo licencia libre— ya no está disponible. Ambas se nombran aquí para que
+nadie confunda este documento con el dictamen.

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: LicenseRef-AP-Reelume
 
 using System.IO.Compression;
 using System.Text.RegularExpressions;
@@ -109,7 +109,7 @@ public sealed class WingetManifestTests
         Assert.False(string.IsNullOrWhiteSpace(spanish));
         Assert.NotEqual(english, spanish);
         Assert.All([english, spanish], text => Assert.True(text.Length <= 256, "winget allows 256 characters."));
-        Assert.Equal("GPL-3.0-or-later", Value("locale.en-US", "License"));
+        Assert.Equal("AP Reelume Licence", Value("locale.en-US", "License"));
     }
 
     /// <summary>

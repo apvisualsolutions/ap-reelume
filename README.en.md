@@ -8,7 +8,7 @@ nothing sent anywhere.
 
 ![The home screen: what was left part-way through, what is in progress, and what arrived recently](docs/assets/home.png)
 
-**Windows 11 x64** · **GPL-3.0-or-later** · [Download the latest release](https://github.com/apvisualsolutions/ap-reelume/releases/latest)
+**Windows 11 x64** · **Gratis, licencia propia** · [Download the latest release](https://github.com/apvisualsolutions/ap-reelume/releases/latest)
 
 Every commit that reaches `main` has been through [the full
 verification](https://github.com/apvisualsolutions/ap-reelume/actions/workflows/ci.yml) on a hosted
@@ -107,7 +107,7 @@ was.
 
 ## Licence
 
-GPL-3.0-or-later. See [LICENSE](LICENSE), [NOTICE](NOTICE), and the
+AP Reelume Licence: free to use, with no right to modify or redistribute. See [LICENSE](LICENSE), [NOTICE](NOTICE), and the
 [third-party notices](docs/release/THIRD-PARTY-NOTICES.en.md). This product uses TMDB and the TMDB
 APIs but is not endorsed, certified, or otherwise approved by TMDB.
 

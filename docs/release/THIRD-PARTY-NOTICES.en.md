@@ -1,6 +1,7 @@
 # Third-party notices
 
-AP Reelume by AP Solutions is released under `GPL-3.0-or-later`. This document records the
+AP Reelume by AP Solutions is released under a licence of its own, `LicenseRef-AP-Reelume`,
+whose text is in `LICENSE`. This document records the
 third-party components the published artifact carries and the licence each one declares. This file is
 updated by every increment that adds or removes a dependency, and **travels inside the artifact**,
 under `licenses/`, alongside its Spanish version.
@@ -52,7 +53,7 @@ asked for directly.
 | Microsoft.Extensions.DependencyInjection | 10.0.10 | MIT |
 | Microsoft.Extensions.DependencyInjection.Abstractions | 10.0.10 | MIT |
 
-`GPL-3.0-or-later` is compatible with incorporating `LGPL-2.1-or-later`, `MIT`, `Apache-2.0`, and
+A proprietary licence is compatible with incorporating `LGPL-2.1-or-later`, `MIT`, `Apache-2.0`, and
 `BSD-3-Clause` components. The MIT and BSD-3-Clause licences require their copyright notice to travel
 with the binary, which is what this file and the `licenses/` folder inside the artifact are for.
 
@@ -77,12 +78,24 @@ own licences**, some of which are `GPL-2.0-or-later` rather than LGPL — the x2
 NuGet package carries **no `COPYING` file at all**, so nobody supplies the text but this artifact: it
 carries it as `licenses/LGPL-2.1.txt`, `licenses/GPL-2.0.txt` and `licenses/NOTICE-VideoLAN.txt`.
 
-For a program released under `GPL-3.0-or-later`, a `GPL-2.0-or-later` plugin is compatible: the
-"or later" is what makes the two meet at GPL-3.0. A plugin licensed `GPL-2.0-only` would not be.
-**Checked on 2026-08-10 and closed**: VLC's tree carries the GPL version 2 with the "either version 2
-of the License, or (at your option) any later version" clause, so the set is `GPL-2.0-or-later` and
-sits under GPL-3.0. Trimming the plugin set stays available as a way to reduce surface, but licensing
-does not require it.
+**This was closed on 2026-08-10 and reopened on 2026-09-13, and not because it was wrong.** The
+reasoning then was: for a program released under `GPL-3.0-or-later`, a `GPL-2.0-or-later` plugin is
+compatible, because the "or later" makes the two meet at GPL-3.0. That was correct and still is.
+**What changed is the program**: since 2026-09-13 it carries a licence of its own, so there is no
+common version to meet at, and a copyleft plugin inside a proprietary program is a breach rather than
+a fit.
+
+**And trimming the plugin set is no longer optional: it is the only way out.** Measured on
+2026-09-13, the copyleft plugin that matters is **not the x264 encoder** — a player does not encode
+and that one can go — but **`libavcodec_plugin.dll`, the decoder**: its build configuration line
+begins with `--enable-gpl`, read inside the binary itself, with three control plugins that do not
+carry it.
+
+**While that plugin travels here, the artifact cannot be distributed.** The measured way out costs no
+formats: the decoding library is permissive by default, and what is copyleft are optional pieces
+enabled at build time — a legacy post-processing filter and some optimisations — **with no decoder
+among them**. LibVLC and its dependencies have to be built without that option, for both
+architectures, and that build maintained.
 
 **The licence texts now travel.** LGPL-2.1 (§6), GPL-2.0 (§1), and Apache-2.0 (§4a) each require a
 copy of the licence to accompany a binary distribution, and MIT and BSD-3-Clause require their
@@ -105,7 +118,7 @@ is the same.
 | VideoLAN / VLC | `modules/video_output/win32/d3d11_scaler.cpp` | `LGPL-2.1-or-later` | The identifiers of NVIDIA's and Intel's super-resolution extensions, their payloads, and the Direct3D 11 video processor call sequence, in `src/ApSolutions.LocalMedia.Windows/Playback/`. |
 | The Chromium Authors | `ui/gl/swap_chain_presenter.cc` | `BSD-3-Clause` | Which door each Intel call goes through — the first two are output extensions and only the third is a stream one — and that NVIDIA's driver accepts the request and ignores it while the feature is switched off. |
 
-`GPL-3.0-or-later` admits incorporating both. The full texts of `LGPL-2.1` and `BSD-3-Clause`
+A proprietary licence admits incorporating both. The full texts of `LGPL-2.1` and `BSD-3-Clause`
 already travel in `licenses/` for other dependencies, so neither needs adding.
 
 ## Components used only during development and testing
@@ -152,7 +165,10 @@ copied during the tests.
 
 This file states what each component declares and how those declarations fit together. It is written
 by the people who assembled the software, not by a lawyer, and two questions stay open until the
-professional legal opinion under REL-004 answers them: whether every VideoLAN plugin shipped in the
-pinned build is compatible with `GPL-3.0-or-later`, and which subsection of LGPL-2.1 §6 covers the way
-LibVLC travels here. Neither question blocks development; both are named here so nobody mistakes this
-document for the opinion.
+professional legal opinion under REL-004 answers them. **Since 2026-09-13 the first is no longer a
+question but a finding**: the VideoLAN plugins shipped in the pinned build are **not** compatible with
+the program's own licence, because at least the decoder is copyleft, and that **does block release**
+even though it does not block development. The second is still a question: which subsection of
+LGPL-2.1 §6 covers the way LibVLC travels here, now that the §6(a) route — publishing our source under
+a free licence — is no longer available. Both are named here so nobody mistakes this document for the
+opinion.

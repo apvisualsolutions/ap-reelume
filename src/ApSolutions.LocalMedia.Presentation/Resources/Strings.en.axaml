@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: 2026 AP Solutions
-SPDX-License-Identifier: GPL-3.0-or-later
+SPDX-License-Identifier: LicenseRef-AP-Reelume
 -->
 <ResourceDictionary
     xmlns="https://github.com/avaloniaui"
@@ -679,7 +679,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <x:String x:Key="DiagnosticsPreviewTitle">This is exactly what would be saved</x:String>
   <x:String x:Key="DiagnosticsPreviewDescription">The report is this text and nothing else. You can read all of it before saving.</x:String>
   <x:String x:Key="AboutCreditsAccessibleName">Credits and attribution</x:String>
-  <x:String x:Key="AboutLicenseNotice">AP Reelume is free software published under the GPL-3.0-or-later licence.</x:String>
+  <x:String x:Key="AboutLicenseNotice">AP Reelume is free of charge and its source is public. It is published under the AP Reelume Licence, whose text travels in the LICENSE file.</x:String>
   <x:String x:Key="TitleActionsAccessibleName">Actions for the open title</x:String>
   <x:String x:Key="TitleEditMetadataAction">Edit metadata</x:String>
   <x:String x:Key="TitlePreviewRenameAction">Preview rename</x:String>
