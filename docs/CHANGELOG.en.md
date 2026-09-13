@@ -67,6 +67,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **A video smaller than the window it is watched in now looks sharper, and nobody has to switch
+  anything on.** Until today a 720p or 1080p film on a large screen was stretched by the filter the
+  renderer ships with, and that filter spreads a hard edge over four pixels — measured. Now the
+  program redraws it itself and the same edge takes **two**: half. It arrives switched on, it works on
+  any graphics card, and switching it off gives the frame back **byte for byte** as it came out
+  before, so there are not two behaviours to keep in step.
+
+  **It uses nobody's code.** Porting AMD's upscaler was the obvious move and its licence permits it,
+  but it requires crediting it in the third-party notices — and the gate that watches those notices
+  reads the package list, so a piece of code pasted into the source would carry an obligation no check
+  in this repository can see. With the program's own licence three days old and its release already
+  blocked by somebody else's component, this was not the moment to take on another.
+
+  **And it never leaves the screen black.** All three ways the redrawing can fail end up drawing
+  exactly what was drawn before, and all three are tested by counting pixels rather than by reading a
+  return value: «it moved on to the next method» is only worth anything if a picture came out.
+
+  Still open: the on-screen note saying which method is in force, the switch to turn it off per video
+  and have that remembered per series or per course, and the graphics card's own super resolution —
+  which cannot reach a frame with today's architecture, measured two different ways.
+
 - **Every group of options sits where it is decided and can be returned to its factory values from
   within.** All twelve carry their «Restore default values» inside the group itself, in the heading
   row — never under the controls, because a button that appears and disappears there moves the very

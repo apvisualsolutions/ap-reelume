@@ -68,6 +68,28 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **Un vídeo más pequeño que la ventana en la que se ve ahora se ve más nítido, y nadie tiene que
+  encender nada.** Hasta hoy, una película de 720p o 1080p en una pantalla grande se estiraba con el
+  filtro que el dibujado trae de serie, y ese filtro reparte un borde duro sobre cuatro píxeles
+  —medido—. Ahora el propio programa lo redibuja y ese mismo borde ocupa **dos**: la mitad. Viene
+  encendido, funciona en cualquier tarjeta gráfica, y apagarlo devuelve el fotograma **byte a byte**
+  como salía antes, así que no hay dos comportamientos que mantener al día.
+
+  **No usa código de nadie.** Portar el escalador de AMD era lo obvio y su licencia lo permite, pero
+  obliga a citarlo en los avisos de terceros — y la puerta que vigila esos avisos lee la lista de
+  paquetes, así que un trozo de código pegado en el fuente traería una obligación que ninguna
+  comprobación de este repositorio puede ver. Con la licencia propia recién estrenada y la
+  publicación ya bloqueada por un complemento ajeno, no era el momento de asumir otra.
+
+  **Y nunca deja la pantalla negra.** Las tres formas en que el redibujado puede fallar acaban
+  dibujando exactamente lo que se dibujaba antes, y las tres están probadas contando píxeles, no
+  mirando un valor de retorno: «se pasó al método siguiente» sólo vale algo si salió una imagen.
+
+  Lo que sigue pendiente: el aviso en pantalla que diga qué método está en uso, el interruptor para
+  apagarlo por vídeo y que se recuerde por serie o por curso, y la superresolución de la propia
+  tarjeta — que no puede llegar a un fotograma con la arquitectura de hoy, medido por dos caminos
+  distintos.
+
 - **Cada grupo de opciones está donde se decide y se puede devolver a sus valores de fábrica desde
   dentro.** Los doce llevan su botón «Restaurar valores por defecto» dentro del propio grupo, en la
   fila del título — nunca bajo los mandos, porque un botón que aparece y desaparece ahí mueve el

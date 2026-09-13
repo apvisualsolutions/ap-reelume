@@ -9,6 +9,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using SkiaSharp;
 
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
@@ -21,13 +22,62 @@ public sealed class VideoFrameView : Control, IDisposable
     public static readonly StyledProperty<IVideoFrameSource?> FrameSourceProperty =
         AvaloniaProperty.Register<VideoFrameView, IVideoFrameSource?>(nameof(FrameSource));
 
+    /// <summary>
+    /// Whether a picture smaller than the box it is drawn in is enhanced on its way there (PLY-016).
+    /// </summary>
+    /// <remarks>
+    /// <b>It ships on</b>, which is what the owner asked for: the improvement reaches everybody
+    /// without anybody finding a switch. Off is not a second code path — it lands on
+    /// <see cref="UpscaleLink.CompositionBilinear"/>, which is the drawing this surface did before
+    /// PLY-016 existed, so «off» and «today» are the same pixels rather than two things that have to
+    /// be kept in step.
+    /// </remarks>
+    public static readonly StyledProperty<bool> IsUpscaleEnabledProperty =
+        AvaloniaProperty.Register<VideoFrameView, bool>(nameof(IsUpscaleEnabled), defaultValue: true);
+
     private readonly Lock _sync = new();
     private WriteableBitmap? _bitmap;
+
+    /// <summary>
+    /// The frame the enhancement draws from, which is the array <see cref="OnFrameRendered"/> was
+    /// already making and discarding. Keeping it adds no copying, and being a fresh array each frame
+    /// is what makes it safe to read on the render thread while the next one is decoded.
+    /// </summary>
+    private byte[]? _lastFrame;
+    private int _lastStride;
+
+    /// <summary>
+    /// The compiled shader, or null if it would not compile here. Compiled once for the life of the
+    /// surface: compiling per frame would spend the budget the enhancement is measured against.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Deliberately not disposed.</b> A drawing operation that has already been handed to the
+    /// scene graph runs on the render thread, and <see cref="Dispose"/> runs on the UI thread, so
+    /// disposing this could free a native object while a frame in flight is still using it — a native
+    /// crash, which is the worst failure class this application has. SkiaSharp's own finalizer
+    /// releases it instead, and what is at stake is a few hundred bytes once per film.
+    /// </para>
+    /// <para>
+    /// <b>That «once» is not guarded, and the gate auditor said so on 2026-09-13.</b> Deleting
+    /// <c>_effectAsked</c> compiles the shader on every frame — about 173,000 of them in a two-hour
+    /// film — and no test notices, because nothing outside this class can count compilations. It has
+    /// a task of its own; what it needs is a seam, not a louder comment.
+    /// </para>
+    /// </remarks>
+    private SKRuntimeEffect? _effect;
+    private bool _effectAsked;
 
     public IVideoFrameSource? FrameSource
     {
         get => GetValue(FrameSourceProperty);
         set => SetValue(FrameSourceProperty, value);
+    }
+
+    public bool IsUpscaleEnabled
+    {
+        get => GetValue(IsUpscaleEnabledProperty);
+        set => SetValue(IsUpscaleEnabledProperty, value);
     }
 
     public void Dispose()
@@ -41,6 +91,7 @@ public sealed class VideoFrameView : Control, IDisposable
         {
             _bitmap?.Dispose();
             _bitmap = null;
+            _lastFrame = null;
         }
     }
 
@@ -68,8 +119,75 @@ public sealed class VideoFrameView : Control, IDisposable
                 return;
             }
 
-            context.DrawImage(_bitmap, new Rect(box.X, box.Y, box.Width, box.Height));
+            var destination = new Rect(box.X, box.Y, box.Width, box.Height);
+            var link = ChooseLink(_bitmap);
+            if (link == UpscaleLink.CompositionBilinear || _lastFrame is null)
+            {
+                context.DrawImage(_bitmap, destination);
+                return;
+            }
+
+            context.Custom(new SkiaUpscaleDrawOperation(
+                _lastFrame,
+                _bitmap.PixelSize.Width,
+                _bitmap.PixelSize.Height,
+                _lastStride,
+                destination,
+                link,
+                _effect,
+                _bitmap));
         }
+    }
+
+    /// <summary>
+    /// Which link of PLY-016's chain draws this frame. Held under <c>_sync</c> by its only caller.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Both of the rules that switch the chain off live in the policy and not here.</b> An earlier
+    /// draft repeated them — an early return for the switch and another for a picture that is not
+    /// being enlarged — and a mutation showed why that is wrong: inverting the local guard changed
+    /// nothing, because <see cref="UpscaleChainPolicy.Choose"/> already answered the same question.
+    /// A guard no test can tell apart from its own absence is not a guard.
+    /// </para>
+    /// <para>
+    /// Two of the four capabilities are reported absent, and the reason is measured rather than
+    /// unfinished: the card makers' own super resolution and the driver's edge enhancement both live
+    /// behind the Direct3D video processor, and <b>there is no way to hand its result to the
+    /// composition</b> — the compositor answers that it has no GPU interop. The remaining route is to
+    /// read the texture back into system memory, which is 33 MB a frame at 4K; <i>that</i> figure is
+    /// the size and not a timing — the probe's per-frame costs subtract the read-back on purpose, so
+    /// nobody has clocked it. They stay in the chain because the chain is the chain; what unblocks
+    /// them is a decoder that is not copyleft and then the RTX video kit, which runs inside the
+    /// process and needs neither a shared texture nor a read-back.
+    /// </para>
+    /// <para>
+    /// Cubic resampling is reported present without asking, because whether this renderer is Skia is
+    /// only knowable on the render thread. The operation degrades to exactly today's drawing when it
+    /// is not, so claiming it here costs a frame nothing and saves asking a question on the wrong
+    /// thread.
+    /// </para>
+    /// </remarks>
+    private UpscaleLink ChooseLink(WriteableBitmap bitmap)
+    {
+        if (!_effectAsked)
+        {
+            _effectAsked = true;
+            _effect = UpscaleShaderSource.TryCompile(out _);
+        }
+
+        return UpscaleChainPolicy.Choose(
+            IsUpscaleEnabled,
+            UpscalePolicy.Decide(
+                bitmap.PixelSize.Width,
+                bitmap.PixelSize.Height,
+                (int)Bounds.Width,
+                (int)Bounds.Height),
+            new UpscaleCapabilities(
+                VendorSuperResolution: false,
+                VideoProcessorEnhancement: false,
+                RuntimeShader: _effect is not null,
+                CubicResampler: true));
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -116,6 +234,10 @@ public sealed class VideoFrameView : Control, IDisposable
             using var buffer = _bitmap.Lock();
             var pixels = frame.Pixels.ToArray();
             Marshal.Copy(pixels, 0, buffer.Address, Math.Min(pixels.Length, buffer.RowBytes * frame.Height));
+
+            // Kept rather than discarded, which is what makes the enhancement free of extra copying.
+            _lastFrame = pixels;
+            _lastStride = frame.Stride;
         }
 
         Dispatcher.UIThread.Post(InvalidateVisual, DispatcherPriority.Render);
