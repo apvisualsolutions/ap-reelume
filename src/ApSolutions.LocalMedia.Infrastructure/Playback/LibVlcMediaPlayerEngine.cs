@@ -67,7 +67,7 @@ public sealed class LibVlcMediaPlayerEngine
     private int _frameStride;
     private YuvColourMatrix _frameMatrix;
     private PictureAdjustment _pictureAdjustment = PictureAdjustment.Neutral;
-    private byte[]? _lumaLookup;
+    private int[]? _lumaLookup;
     private object? _formatCallback;
     private object? _cleanupCallback;
     private object? _lockCallback;
@@ -574,7 +574,7 @@ public sealed class LibVlcMediaPlayerEngine
                 _packedStride,
                 _frameStride,
                 _frameMatrix,
-                lookup ?? ReadOnlySpan<byte>.Empty);
+                lookup ?? ReadOnlySpan<int>.Empty);
             handler(this, new VideoFrameEventArgs(managed, _visibleWidth, _visibleHeight, _frameStride));
         });
 
