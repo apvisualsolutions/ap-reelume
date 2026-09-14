@@ -16,6 +16,68 @@
 > deleted from here, because this document is the record of what happened, and rewriting what happened
 > is a different kind of mistake.
 
+> ## FRONT NOTICE — 2026-09-14: the engine DOES build without GPL, and a blocker about to be reported was false
+>
+> **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here. The
+> fast-forward to `main` was made with CI's conclusion read, as always. **But this handover may sit one
+> commit ahead of `main`**, and if so it is not an oversight: it is documentation only, and the owner's
+> rule is not to spend a forty-minute CI round on markdown — it ships with the next real code change.
+> The commands above answer this; this line does not.
+>
+> ### What was closed
+>
+> · **`ENG-014`**: the legal documents named the GPL plugins wrongly. Recounted across **all ~300 in the
+>   package, not a sample**: there are **three, for two different reasons** the wording had merged —
+>   `libavcodec_plugin.dll` and `libswscale_plugin.dll` carry `--enable-gpl` because they come from the
+>   **same FFmpeg build**, and `libx26410b_plugin.dll` is GPL **by x264's own licence**, without that
+>   string. `LEGAL`, `THIRD-PARTY-NOTICES`, `NOTICE-VideoLAN` and the changelog are corrected, with the
+>   command and output archived this time. Evidence `audit-eng014-plugin-gpl-scan.md`.
+> · **`ENG-013`, the x64 spike, and the answer is YES.** VLC 3.0.23 ships the lever already —
+>   `contrib/bootstrap --disable-gpl --disable-x264 --disable-x265`, no patching: 330 plugins with
+>   **zero** occurrences of the string, no x264/x265/postproc `.dll`, and **real** decoding of H.264,
+>   MPEG-2 and MPEG-4 through the engine's callback path, with a fake `.mp4` returning zero as the
+>   negative control. Under an hour of machine time on 28 cores.
+>   Evidence `ENG013-nogpl-build-spike.md`.
+>
+> ### The finding that paid most, and it is about method
+>
+> **It was about to be reported that subtitles were lost, and that was false.** VLC's recipe says
+> `freetype2` "requires the GPL", and that sentence alone closed the door. Reading FreeType 2.13.1's
+> **actual licence** opened it in one lookup: it is **dual**, and its own `LICENSE.TXT` says the FTL
+> route "is suited to products which don't use the GNU General Public License". Verified by effect with
+> `--enable-ad-clauses`: it builds and installs without GPL. **A tool's message is not its licence**,
+> and reasoning about the message would have cost an invented blocker — rule 0 again, this time about
+> something with no MCP.
+>
+> ### The traps, and seven are about building old code with new tools
+>
+> · **CMake from both sides**: the 3.17.0 VLC builds does not pass gcc 16, and the system's **4.4.3
+>   breaks** projects with an old `cmake_minimum_required`. The way out was an isolated **3.31.10**.
+>   **Newer is not better.**
+> · **A shortcut that lies upstream is paid downstream with a message that does not point at its
+>   cause**: marking `yasm` as built without building it broke `vpx` with a "more than one input file
+>   specified" that never mentions yasm.
+> · **`-std=gnu17`** fixed eight packages at once: gcc 16 treats K&R prototypes as errors.
+> · The rest — `help2man` and Windows symlinks, `BUILDCC`, the `--enable-update-check` that
+>   `configure.sh` forces, and that `schroedinger` and `goom` **abort** configure while twenty missing
+>   libraries only warn — are in the evidence with their commands.
+>
+> ### What is pending is NOT here
+>
+> It is in `docs/FEATURES.md` (scope) and `docs/TAREAS.md` (chores). From this batch: **`ENG-013` moved
+> to `EN CURSO`** with what it still needs written inside — ARM64, eight contribs failing on old tools,
+> and where the build lives in CI —, **`ENG-014` closed**, and **`ENG-025`** was born.
+>
+> ### What waits on the owner
+>
+> · **`ENG-025`, the new decision from this batch**: accepting FreeType's advertising clause — citing
+>   the project in the product's documentation — so subtitles keep being drawn without GPL. The
+>   recommendation is written in its row: accept it, because the price is already paid.
+> · **The visual judgement on `PLY-016`** is still his, and he has not yet given it on a version
+>   without compression noise on top.
+> · **The backlog ordering rule proposed for the shared rules**, still waiting on his yes.
+
 > ## FRONT NOTICE — 2026-09-13, close: the yardstick for sharpness was backwards, and two diagnoses were false
 >
 > **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,
