@@ -73,7 +73,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   GPL by its own licence rather than by that string. **While they travel there the artifact cannot be
   distributed**, and that is recorded as an open finding rather than a pending question. The measured
   way out costs no formats: the decoding library is permissive by default and what is copyleft are
-  optional pieces enabled at build time.
+  optional pieces enabled at build time. **And that way out is now proven rather than assumed**: on
+  2026-09-14 the whole engine was built without those pieces and played real video, with the same
+  formats as before. It still has to be done for ARM machines, and where that build is maintained is
+  still undecided, so it keeps blocking release — but it is no longer an unknown.
 
 - **A gate would have gone blind and stayed green.** The check that stops an unfiled licence reaching
   the artifact recognises identifiers shaped like a published licence, and a `LicenseRef-` is not

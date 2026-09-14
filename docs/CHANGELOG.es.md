@@ -73,7 +73,10 @@ evidencia, es [FEATURES.md](FEATURES.md).
   el propio codificador x264, que es GPL por licencia propia y no por esa cadena. **Mientras viajen
   ahí, el artefacto no se puede distribuir**, y queda escrito como hallazgo abierto en vez de como
   pregunta pendiente. La salida medida no pierde formatos: la biblioteca que descodifica es permisiva
-  por defecto y lo contagioso son piezas opcionales que se activan al compilar.
+  por defecto y lo contagioso son piezas opcionales que se activan al compilar. **Y esa salida ya está
+  probada, no supuesta**: el 2026-09-14 se compiló el motor entero sin esas piezas y reprodujo vídeo
+  real, con los mismos formatos de siempre. Falta hacerlo también para los equipos ARM y decidir dónde
+  se mantiene esa compilación, así que sigue bloqueando la publicación, pero ya no es una incógnita.
 
 - **Una puerta se habría quedado ciega y en verde.** La comprobación que impide que una licencia sin
   archivar llegue al artefacto reconoce identificadores con forma de licencia publicada, y un
