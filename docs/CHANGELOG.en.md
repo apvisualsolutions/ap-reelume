@@ -38,6 +38,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   not accepted, and in exchange the document says what does help — a bug report with steps to
   reproduce is worth more than a patch, because the patch cannot be accepted.
 
+- **The program now acknowledges FreeType, which is what draws the lettering, and that was an
+  obligation going unmet.** FreeType ships under two licences and one must be chosen; the one suited
+  to a program like this asks in return that it be cited in the documentation. That is the one chosen,
+  and the citation is in the third-party notices. **This is not paperwork for the future**: FreeType
+  already travelled inside the program with the graphics engine, so the mention was missing beforehand
+  and nobody was counting it.
+
 ### Fixed
 
 - **A small video's picture looks considerably sharper, and the yardstick that said otherwise was the

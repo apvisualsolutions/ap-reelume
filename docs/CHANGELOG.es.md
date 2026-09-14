@@ -38,6 +38,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
   código, y a cambio se dice lo que sí sirve — un informe de error con pasos para reproducirlo vale
   más que un parche, porque el parche no se puede aceptar.
 
+- **El programa reconoce ahora a FreeType, que es quien dibuja las letras, y eso era una obligación
+  que no se cumplía.** FreeType se entrega bajo dos licencias y hay que elegir una; la que sirve para
+  un programa como éste pide a cambio citarlo en la documentación. Se elige esa, y la cita está en los
+  avisos de terceros. **No es papeleo para el futuro**: FreeType ya viajaba dentro del programa con el
+  motor gráfico, así que la mención faltaba desde antes y nadie lo estaba contando.
+
 ### Corregido
 
 - **La imagen de un vídeo pequeño se ve bastante más nítida, y la medida que decía lo contrario era

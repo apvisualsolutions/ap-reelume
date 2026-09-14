@@ -61,6 +61,26 @@ That folder also carries **the full text of every licence** and the copyright no
 publishes. What is in it and where each text came from is in
 [licenses/README.en.md](licenses/README.en.md), which travels with them.
 
+### FreeType, and why it carries its own acknowledgement
+
+> Portions of this software are copyright © The FreeType Project (www.freetype.org).
+> All rights reserved.
+
+**That sentence is an obligation, not a courtesy**, and this section exists to meet it. FreeType is
+distributed under **two mutually exclusive licences** and one must be chosen: the **FreeType License**
+(FTL), BSD-like, or the **GPL-2.0**. AP Solutions chooses the **FTL**, decided by the owner on
+2026-09-14, because the other route is incompatible with a proprietary licence — and FreeType's own
+`LICENSE.TXT` says the FTL "is suited to products which don't use the GNU General Public License".
+
+The price of that route is its advertising clause, which asks literally to "acknowledge somewhere in
+your documentation that you have used the FreeType code". That is what the box above does.
+
+**And it arrives by two paths, one of them from before this decision**: today it comes inside Skia's
+native assets — its full text is in
+[`licenses/NOTICE-Skia-HarfBuzz-natives.txt`](licenses/NOTICE-Skia-HarfBuzz-natives.txt) — and it will
+also come inside LibVLC once the engine is built without GPL (`ENG-013`), because it is what draws
+subtitle text. The acknowledgement is written once and covers both.
+
 ### The .NET runtime
 
 The artifact is self-contained: it carries its own copy of the .NET 10 runtime and base class

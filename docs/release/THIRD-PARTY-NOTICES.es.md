@@ -61,6 +61,26 @@ Esa carpeta lleva además **el texto íntegro de cada licencia** y los avisos de
 paquete publica. Qué contiene y de dónde salió cada texto está en
 [licenses/README.es.md](licenses/README.es.md), que viaja con ellos.
 
+### FreeType, y por qué lleva su propio reconocimiento
+
+> Portions of this software are copyright © The FreeType Project (www.freetype.org).
+> All rights reserved.
+
+**Esta frase es una obligación, no una cortesía**, y esta sección existe para cumplirla. FreeType se
+distribuye bajo **dos licencias mutuamente excluyentes** y hay que elegir una: la **FreeType License**
+(FTL), parecida a BSD, o la **GPL-2.0**. AP Solutions elige la **FTL**, decidido por el propietario el
+2026-09-14, porque la otra vía es incompatible con una licencia propia — y el propio `LICENSE.TXT` de
+FreeType dice que la FTL «is suited to products which don't use the GNU General Public License».
+
+El precio de esa vía es su cláusula de publicidad, que pide literalmente «acknowledge somewhere in
+your documentation that you have used the FreeType code». Eso es lo que hace el recuadro de arriba.
+
+**Y viaja por dos caminos, uno de ellos desde antes de esta decisión**: hoy llega dentro de los
+recursos nativos de Skia —su texto completo está en
+[`licenses/NOTICE-Skia-HarfBuzz-natives.txt`](licenses/NOTICE-Skia-HarfBuzz-natives.txt)—, y llegará
+también dentro de LibVLC el día que el motor se compile sin GPL (`ENG-013`), porque es quien dibuja el
+texto de los subtítulos. El reconocimiento se escribe una vez y cubre los dos.
+
 ### El motor de ejecución de .NET
 
 El artefacto es autocontenido: lleva su propia copia del motor de ejecución de .NET 10 y de su

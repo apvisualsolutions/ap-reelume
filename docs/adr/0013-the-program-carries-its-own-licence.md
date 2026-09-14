@@ -169,3 +169,29 @@ single author: there is no third-party copyright to relicense.
 - **If the program is ever charged for**, TMDB's terms must be read again first: they reserve
   commercial use for a separate written agreement. The licence change does not trigger it — charging
   does — but it brings the day closer.
+
+---
+
+## Enmienda del 2026-09-14 — la decisión 5 tiene una condición que no se había visto / Amendment of 2026-09-14 — decision 5 carries a condition nobody had seen
+
+**La decisión 5 no cambia y sigue vigente**: la publicación está bloqueada hasta que el motor se
+compile sin `--enable-gpl`. Lo que esta enmienda añade es **una condición que aparece al ejecutarla** y
+que el ADR no podía prever, porque sólo se ve compilando. / Decision 5 stands unchanged; this
+amendment adds a condition that only appears when carrying it out.
+
+**Medido el 2026-09-14** (`docs/evidence/stable/ENG013-nogpl-build-spike.md`): compilar sin GPL es
+viable y no pierde formatos —330 complementos, cero con la cadena contagiosa, decodificación real
+comprobada—, **pero `freetype2` se queda fuera**. Su receta en el árbol de VLC exige GPL salvo que se
+acepten cláusulas de publicidad, y `freetype2` es quien dibuja el texto de los subtítulos.
+
+**La licencia de FreeType es dual y eso lo resuelve**: la FTL —tipo BSD, con cláusula de publicidad— o
+la GPL-2.0, a elección de quien la usa, y su propio `LICENSE.TXT` dice que la primera «is suited to
+products which don't use the GNU General Public License». **El propietario eligió la FTL el
+2026-09-14.** El precio es reconocer el uso de FreeType en la documentación del producto, que es lo que
+hace ahora la sección propia de `docs/release/THIRD-PARTY-NOTICES.{es,en}.md`.
+
+**Y la obligación no nacía con LibVLC: ya existía.** FreeType viaja hoy dentro de los recursos nativos
+de Skia, y su reconocimiento **faltaba** — medido al escribir esta enmienda. Así que la elección de la
+FTL cubre dos caminos, no uno, y cierra un incumplimiento que estaba abierto sin que nadie lo contara.
+/ The obligation predates LibVLC: FreeType already travels inside Skia's native assets and its
+acknowledgement was missing. Choosing the FTL covers both paths and closes a breach nobody was counting.
