@@ -454,27 +454,22 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             [0x89, (byte)'P', (byte)'N', (byte)'G', 0x0D, 0x0A, 0x1A, 0x0A],
             TestContext.Current.CancellationToken);
 
-        // The poster's own lock was set by the loop above, so what is read back here is the
-        // path rather than the lock: choosing a cover after locking the field still has to fill
-        // it, because the lock protects it from the PROVIDER rather than from its owner.
+        // Since LIB-021 the choice has a field of its own, so what is read back is that field and not
+        // the provider's poster: until 2026-09-18 this scene asserted that the chosen path landed in
+        // the poster field and stayed locked, which was the defect ADR-0009 closes.
+        var providerPoster = editor.PosterPath;
         await PressAsync(
             host,
             "CoverChooseAction",
-            () => editor.PosterPath,
-            "clicking Elegir una imagen never put a cover into the poster field");
+            () => editor.PersonalCover,
+            "clicking Elegir una imagen never filed a cover in its own field");
 
-        // The path it stored is the application's own copy rather than the file that was picked:
-        // choosing a cover copies it in, so a poster still pointing at the handover folder would
-        // mean the copy never happened and the picture would vanish with that folder.
-        Assert.NotNull(editor.PosterPath);
-        Assert.NotEqual(chosenCover, editor.PosterPath);
-        Assert.True(
-            File.Exists(editor.PosterPath),
-            $"the poster field points at {editor.PosterPath}, which is not on this disk.");
-
-        // And the lock is still on. Without it the next provider refresh would put the provider's
-        // artwork back over the cover somebody chose, days later, with nothing to connect the two.
-        Assert.True(editor.LockPosterPath, "choosing a cover left the poster field unlocked.");
+        // What it stored is the name of the application's own copy, not the file that was picked:
+        // choosing a cover copies it in, and a name that is not a copy's would mean the copy never
+        // happened and the picture would vanish with the handover folder.
+        Assert.NotNull(editor.PersonalCover);
+        Assert.NotEqual(Path.GetFileName(chosenCover), editor.PersonalCover);
+        Assert.Equal(providerPoster, editor.PosterPath);
 
 
         // Save is the one whose effect is not on screen: it writes a row. Asserting on the editor
@@ -504,19 +499,30 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.True(
             library.MovieDetails.HasPoster,
             "the card behind the editor has no poster after a cover was chosen and saved.");
-        Assert.Equal(editor.PosterPath, library.MovieDetails.PosterFile);
+        Assert.Equal(editor.PersonalCover, Path.GetFileName(library.MovieDetails.PosterFile));
         Assert.True(
             File.Exists(library.MovieDetails.PosterFile),
             $"the card points at {library.MovieDetails.PosterFile}, which is not on this disk.");
 
         // And Restore puts the provider's answer back over it, which is the whole point of having
         // edited by hand being reversible.
+        var picked = editor.PersonalCover;
         await PressAsync(
             host,
             "MetadataRestoreAction",
             () => editor.Title,
             "clicking Restore never brought the provider's title back over the edited one");
         Assert.Equal("La llegada", editor.Title);
+
+        // ...except the cover somebody picked, which is not a provider field and has nothing to be
+        // restored from. Restoring clears every lock, and until LIB-021 that is what erased the choice
+        // and orphaned its file (ADR-0009). Read from the stored row and from the editor as it was
+        // reloaded, not from the editor's memory: a first version of this line asserted the editor's
+        // own property, and it stayed green with the reload removed because the property still held
+        // what the picker had put there.
+        var restoredRow = await metadata.GetAsync(new TitleId(fileId), TestContext.Current.CancellationToken);
+        Assert.Equal(picked, restoredRow?.Metadata.PersonalCover);
+        Assert.Equal(picked, editor.PersonalCover);
 
         // The page's own three controls, which arrived with it on 2026-08-28. The rename preview is
         // opened first because a pill is only drawn when its surface exists: with one tool open

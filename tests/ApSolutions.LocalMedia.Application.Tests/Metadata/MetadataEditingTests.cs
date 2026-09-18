@@ -78,6 +78,53 @@ public sealed class MetadataEditingTests
         Assert.Empty(restored.Catalog?.Metadata.LockedFields ?? new HashSet<MetadataField> { MetadataField.Title });
     }
 
+    /// <summary>
+    /// The defect ADR-0009 closes, reproduced: restoring the provider's fields clears every lock, and
+    /// while the picked cover shared the provider's field that erased it and orphaned its file. Apart,
+    /// the provider's poster comes back and the picked cover stays.
+    /// </summary>
+    [Fact]
+    public async Task Restoring_the_provider_fields_keeps_the_hand_picked_cover()
+    {
+        var titleId = new TitleId(Guid.Parse("60000000-0000-0000-0000-000000000001"));
+        var chosen = new string('c', 64) + ".png";
+        var stored = Catalog(revision: 4, locked: [MetadataField.PosterPath]);
+        var repository = new MemoryMetadataRepository(stored with
+        {
+            Provider = "tmdb",
+            ProviderKey = ProviderKey,
+            Metadata = stored.Metadata with { PersonalCover = chosen },
+        });
+        var refresh = Refresh(repository, RemoteDetails(titleId, "La llegada", "/remote-poster.jpg"));
+
+        var restored = await refresh.ExecuteAsync(
+            new RefreshMetadataCommand(titleId, ExpectedRevision: 4, RestoreProviderFields: true),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("/remote-poster.jpg", restored.Catalog?.Metadata.PosterPath);
+        Assert.Equal(chosen, restored.Catalog?.Metadata.PersonalCover);
+    }
+
+    /// <summary>Saving a picked cover writes its own field and leaves the provider's poster alone.</summary>
+    [Fact]
+    public async Task Saving_a_picked_cover_leaves_the_provider_poster_where_it_was()
+    {
+        var stored = Catalog(revision: 0, locked: []);
+        var repository = new MemoryMetadataRepository(stored);
+        var chosen = new string('d', 64) + ".jpg";
+
+        var saved = await new UpdateMetadata(repository).ExecuteAsync(
+            new UpdateMetadataCommand(
+                stored.TitleId,
+                new MetadataFieldChanges(Title: "Mi llegada") { PersonalCover = chosen },
+                new HashSet<MetadataField>(),
+                ExpectedRevision: 0),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(chosen, saved.Catalog?.Metadata.PersonalCover);
+        Assert.Equal(stored.Metadata.PosterPath, saved.Catalog?.Metadata.PosterPath);
+    }
+
     [Fact]
     public async Task Stale_edit_conflicts_and_three_edit_refresh_restart_cycles_keep_manual_fields()
     {
