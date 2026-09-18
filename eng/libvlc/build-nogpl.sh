@@ -86,12 +86,21 @@ cd "$SRC"
 # in contrib/tarballs, which is where build.sh's own fetch looks, so it finds them and only checks
 # their sums. The folder is not named contrib-* on purpose: verify-nogpl.ps1 expects exactly one
 # of those, the one build.sh configures.
+#
+# The retries were not the cure. The second run failed five times in a row on the same host:
+# contrib/src/main.mak pins SourceForge to one mirror, `SF := https://netcologne.dl.sourceforge.net/`,
+# and that name does not resolve from GitHub's runners. Twelve contribs download through $(SF),
+# mingw-w64 (winpthreads, x86_64 only) among them. SourceForge's own entry point redirects to a
+# mirror that answers; a command-line variable overrides the makefile's, and the contrib's
+# SHA512SUMS still checks every tarball, so the bytes cannot change with the mirror. Measured the
+# same day: mingw-w64-v10.0.0.tar.bz2 from that URL has the SHA-512 the contrib pins.
+SF_ENTRY=https://downloads.sourceforge.net/project/
 mkdir -p contrib/prefetch
 (
     cd contrib/prefetch
     ../bootstrap --host="$ARCH-w64-mingw32" $CONTRIBFLAGS >/dev/null
     for attempt in 1 2 3 4 5; do
-        if make -j4 fetch; then exit 0; fi
+        if make -j4 fetch SF="$SF_ENTRY"; then exit 0; fi
         echo "contrib fetch failed (attempt $attempt), retrying in 30 s" >&2
         sleep 30
     done
