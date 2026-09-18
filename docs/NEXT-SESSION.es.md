@@ -30,7 +30,7 @@
 >   propietario—, fijado por SHA-512 en `eng/libvlc/libvlc.lock.json` y descargado por
 >   `eng/libvlc/LibVlc.targets`, que rechaza cualquier otro byte. Las diez suites pasan contra él y el
 >   MSIX lleva exactamente el árbol verificado. `releases/latest` sigue en 404: el actualizador no la ve.
->   Se cierra con el CI del commit en verde. Evidencia `ENG013-app-on-own-engine.md`.
+>   **Cerrada** con el CI en verde y `main` al día. Evidencia `ENG013-app-on-own-engine.md`.
 > · **Los parches llevan el aviso con fecha que pide la LGPL-2.1 §2(b)**; dos de los cuatro ficheros
 >   no lo tenían, y obligó a recompilar el motor.
 > · **El código fuente de cada versión suma el paquete de fuentes del motor** (parches, guiones y los
@@ -58,7 +58,7 @@
 >
 > ### Lo pendiente NO está aquí
 >
-> Está en `docs/FEATURES.md` y `docs/TAREAS.md`. De esta tanda: **`ENG-013`** se cierra con el CI;
+> Está en `docs/FEATURES.md` y `docs/TAREAS.md`. De esta tanda: **`ENG-013` cerrada**;
 > **`ENG-028`** —la LGPL-3.0 de gmp, nettle y live555— es ahora lo único legal abierto del motor.
 >
 > ### Lo que espera al propietario

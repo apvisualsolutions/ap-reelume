@@ -30,7 +30,7 @@
 >   decision —, pinned by SHA-512 in `eng/libvlc/libvlc.lock.json` and downloaded by
 >   `eng/libvlc/LibVlc.targets`, which refuses any other byte. All ten suites pass against it and the
 >   MSIX carries exactly the verified tree. `releases/latest` still answers 404: the updater cannot see
->   it. It closes with the commit's CI green. Evidence `ENG013-app-on-own-engine.md`.
+>   it. **Closed** with CI green and `main` level. Evidence `ENG013-app-on-own-engine.md`.
 > · **The patches carry the dated notice LGPL-2.1 §2(b) asks for**; two of the four files lacked it,
 >   and it forced a rebuild of the engine.
 > · **Each release's corresponding source gains the engine's source archive** (patches, scripts and
@@ -58,7 +58,7 @@
 >
 > ### What is pending is NOT here
 >
-> It is in `docs/FEATURES.md` and `docs/TAREAS.md`. From this batch: **`ENG-013`** closes with CI;
+> It is in `docs/FEATURES.md` and `docs/TAREAS.md`. From this batch: **`ENG-013` closed**;
 > **`ENG-028`** — the LGPL-3.0 of gmp, nettle and live555 — is now the engine's only open legal point.
 >
 > ### What waits on the owner

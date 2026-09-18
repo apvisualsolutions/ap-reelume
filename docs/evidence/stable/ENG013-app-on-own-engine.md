@@ -7,7 +7,7 @@
   —compilar, verificar y decodificar, en x64 y ARM64— terminaron en `success`
 - Entorno / Environment: Windows 11 x64 para las suites y el empaquetado; GitHub Actions para compilar
   y publicar el motor
-- IDs: `ENG-013` (se cierra con el CI de este cambio en verde), `ENG-028` (sigue abierta)
+- IDs: `ENG-013` (cerrada: CI verde en `cd813b3c`, run `35344667881`), `ENG-028` (sigue abierta)
 
 ## Veredicto / Verdict
 
