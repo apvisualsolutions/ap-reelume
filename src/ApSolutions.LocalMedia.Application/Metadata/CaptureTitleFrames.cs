@@ -43,6 +43,11 @@ public sealed class CaptureTitleFrames
     private readonly IPlaybackActivity _playback;
     private readonly IScanActivity _scans;
 
+    // Launch and the end of a scan can both ask for a pass; a second one while the first runs does
+    // nothing, rather than two passes decoding the same files side by side. That is why this class
+    // is registered once and not per request.
+    private int _running;
+
     public CaptureTitleFrames(
         ITitleFrameSources sources,
         IVideoFrameGrabber grabber,
@@ -65,6 +70,23 @@ public sealed class CaptureTitleFrames
     /// for the remainder, so whoever draws the grid can redraw it.
     /// </param>
     public async Task<int> ExecuteAsync(Func<Task>? afterBatch = null, CancellationToken cancellationToken = default)
+    {
+        if (Interlocked.Exchange(ref _running, 1) == 1)
+        {
+            return 0;
+        }
+
+        try
+        {
+            return await WalkAsync(afterBatch, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _ = Interlocked.Exchange(ref _running, 0);
+        }
+    }
+
+    private async Task<int> WalkAsync(Func<Task>? afterBatch, CancellationToken cancellationToken)
     {
         var sources = await _sources.ListWithoutCoverAsync(cancellationToken).ConfigureAwait(false);
         var taken = 0;

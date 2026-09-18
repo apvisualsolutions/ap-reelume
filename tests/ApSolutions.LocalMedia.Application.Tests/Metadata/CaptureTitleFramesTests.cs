@@ -135,6 +135,32 @@ public sealed class CaptureTitleFramesTests : IDisposable
         Assert.Equal(0, told);
     }
 
+    /// <summary>
+    /// Launch and the end of a scan can both ask for a pass. A second one while the first runs does
+    /// nothing, rather than two passes decoding the same files side by side.
+    /// </summary>
+    [Fact]
+    public async Task A_pass_asked_for_while_one_runs_does_nothing()
+    {
+        var release = new TaskCompletionSource();
+        var grabber = new RecordingGrabber { Gate = release.Task };
+        var subject = Subject([Source(1, TimeSpan.FromMinutes(1))], grabber);
+
+        // The second is started and read without awaiting, so a regression fails here instead of
+        // hanging the run: without the guard it would wait on the same gate as the first, forever.
+        // The first version of this test awaited it and did exactly that.
+        var first = subject.ExecuteAsync(cancellationToken: TestContext.Current.CancellationToken);
+        var second = subject.ExecuteAsync(cancellationToken: TestContext.Current.CancellationToken);
+        var secondFinishedAtOnce = second.IsCompleted;
+        release.SetResult();
+
+        Assert.True(secondFinishedAtOnce, "a second pass started while the first was still decoding.");
+        Assert.Equal(0, await second);
+        Assert.Equal(1, await first);
+        Assert.Equal(1, grabber.Calls);
+        Assert.Equal(0, await subject.ExecuteAsync(cancellationToken: TestContext.Current.CancellationToken));
+    }
+
     [Fact]
     public void What_it_cannot_work_without_is_refused_where_it_is_built()
     {
@@ -196,9 +222,16 @@ public sealed class CaptureTitleFramesTests : IDisposable
 
         public Action? AfterCapture { get; init; }
 
-        public Task<bool> TryCaptureAsync(string videoPath, TimeSpan at, string destinationPath, CancellationToken cancellationToken = default)
+        public Task? Gate { get; init; }
+
+        public async Task<bool> TryCaptureAsync(string videoPath, TimeSpan at, string destinationPath, CancellationToken cancellationToken = default)
         {
             Calls++;
+            if (Gate is not null)
+            {
+                await Gate;
+            }
+
             LastVideo = videoPath;
             LastAt = at;
             LastDestination = destinationPath;
@@ -209,7 +242,7 @@ public sealed class CaptureTitleFramesTests : IDisposable
             }
 
             AfterCapture?.Invoke();
-            return Task.FromResult(succeeds);
+            return succeeds;
         }
     }
 
