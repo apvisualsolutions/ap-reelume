@@ -38,8 +38,9 @@
     The patched VLC tree the plugins were built from (build-nogpl.sh leaves it next to install/).
 
 .PARAMETER Reference
-    VideoLAN.LibVLC.Windows for the same version and architecture, e.g.
-    ~/.nuget/packages/videolan.libvlc.windows/3.0.23.1/build/x64.
+    VideoLAN.LibVLC.Windows for the same version and architecture, as fetch-reference.ps1 expands
+    it, e.g. ref/build/x64. The application no longer ships that package (ENG-013); it stays the
+    reference because it is built as GPL, which is what proves every check here can see.
 
 .PARAMETER Destination
     Where to assemble the tree: libvlc.dll, libvlccore.dll, plugins/, hrtfs/ and manifest.json.
