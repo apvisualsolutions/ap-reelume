@@ -11,9 +11,13 @@
     on the right package. Measured on 2026-09-18: nuget.org, the local NuGet cache and its
     .nupkg.sha512 all agree byte for byte, and the lock file does not, because for a SIGNED package
     NuGet's content hash leaves the signature file out. So the pin is the SHA-512 of the .nupkg as
-    served, which is what the cache records next to it; and the lock file is still read, for the
-    version, so the day the application moves to another LibVLC this refuses to compare against
-    the old one instead of doing it quietly.
+    served, which is what the cache records next to it.
+
+    Until 2026-09-18 it also read the application's packages.lock.json for the version. That stops
+    being possible the day the application ships the rebuilt tree instead of this package, which is
+    the whole point of ENG-013, so the version is now held against the VLC tag build-nogpl.sh builds:
+    the day the build moves to another VLC, this refuses to compare against the old reference
+    instead of doing it quietly.
 
 .PARAMETER Destination
     The folder to expand the package into; the trees are under build/x64 and build/arm64.
@@ -27,14 +31,12 @@ $ErrorActionPreference = 'Stop'
 $pinnedVersion = '3.0.23.1'
 $pinnedSha512 = 'Ji3p6cv6bn9FFgXS+M35nzWEvjzpZ5Kig/AvMl5iRAGv4z0QbeMDX+Knuoh2hStsVLb8AATig+LX2HLVey50/A=='
 
-$lockPath = Join-Path $PSScriptRoot '../../src/ApSolutions.LocalMedia.Infrastructure/packages.lock.json'
-$lock = Get-Content $lockPath -Raw | ConvertFrom-Json
-$locked = @($lock.dependencies.PSObject.Properties.Value | ForEach-Object { $_.'VideoLAN.LibVLC.Windows' } | Where-Object { $_ })
-if ($locked.Count -eq 0) { throw "packages.lock.json does not reference VideoLAN.LibVLC.Windows." }
-foreach ($entry in $locked) {
-    if ($entry.resolved -ne $pinnedVersion) {
-        throw "The application now uses VideoLAN.LibVLC.Windows $($entry.resolved) and this reference is pinned to ${pinnedVersion}: re-pin it, and rebuild against the matching VLC tag."
-    }
+$buildScript = Get-Content (Join-Path $PSScriptRoot 'build-nogpl.sh') -Raw
+if ($buildScript -notmatch '(?m)^VLC_TAG=(\S+)$') { throw "build-nogpl.sh does not declare VLC_TAG=." }
+$vlcTag = $Matches[1]
+# The package's fourth digit is its own packaging revision: 3.0.23.1 is VLC 3.0.23.
+if (-not $pinnedVersion.StartsWith("$vlcTag.")) {
+    throw "build-nogpl.sh builds VLC $vlcTag and this reference is VideoLAN.LibVLC.Windows ${pinnedVersion}: re-pin it to the package of the same VLC."
 }
 
 New-Item -ItemType Directory -Force $Destination | Out-Null
