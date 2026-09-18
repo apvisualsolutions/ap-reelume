@@ -49,11 +49,13 @@ public sealed class ResolveTitlePosterTests
     }
 
     /// <summary>
-    /// The order, asserted rather than assumed: a title carrying a provider address gets the
-    /// provider's picture even when the store would have answered for a personal one too.
+    /// A provider address is never mistaken for a personal cover. Until 2026-09-18 this test was
+    /// called «the provider is asked first», because both lived in one field and that was the order;
+    /// since LIB-021 the picked cover has its own field and wins, and what survives of the old
+    /// assertion is that a provider address alone never reaches the personal store.
     /// </summary>
     [Fact]
-    public void The_provider_is_asked_first_when_the_stored_value_is_one_of_its_addresses()
+    public void A_provider_address_alone_never_reaches_the_personal_store()
     {
         var store = new StubStore
         {
@@ -64,6 +66,56 @@ public sealed class ResolveTitlePosterTests
         var found = new ResolveTitlePoster(store).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
 
         Assert.Equal("cache/artwork/abc/poster.jpg", found);
+        Assert.Equal(0, store.PersonalCalls);
+    }
+
+    /// <summary>ADR-0009's order: the cover somebody picked wins over the provider's.</summary>
+    [Fact]
+    public void The_hand_picked_cover_wins_over_the_provider_when_both_are_on_disk()
+    {
+        var store = new StubStore
+        {
+            RemoteAnswer = "cache/artwork/abc/poster.jpg",
+            PersonalAnswer = "personal-artwork/abc/cover.png",
+        };
+
+        var found = new ResolveTitlePoster(store).Find(
+            Title,
+            "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg",
+            new string('a', 64) + ".png");
+
+        Assert.Equal("personal-artwork/abc/cover.png", found);
+        Assert.Equal(0, store.RemoteCalls);
+    }
+
+    /// <summary>
+    /// A picked file that is no longer on disk falls through to the provider rather than leaving an
+    /// empty card: the order is a preference, not a single answer.
+    /// </summary>
+    [Fact]
+    public void The_provider_draws_when_the_hand_picked_file_is_gone()
+    {
+        var store = new StubStore { RemoteAnswer = "cache/artwork/abc/poster.jpg" };
+
+        var found = new ResolveTitlePoster(store).Find(
+            Title,
+            "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg",
+            new string('a', 64) + ".png");
+
+        Assert.Equal("cache/artwork/abc/poster.jpg", found);
+        Assert.Equal(1, store.PersonalCalls);
+    }
+
+    /// <summary>
+    /// The personal field is read with the same guard as the old shared one: anything but a cover
+    /// name draws nothing and asks the store nothing, so it cannot become a reader of any file.
+    /// </summary>
+    [Fact]
+    public void A_personal_field_that_is_not_a_cover_name_is_never_read_as_a_path()
+    {
+        var store = new StubStore { PersonalAnswer = "personal-artwork/abc/cover.png" };
+
+        Assert.Null(new ResolveTitlePoster(store).Find(Title, posterPath: null, @"C:\Windows\win.ini"));
         Assert.Equal(0, store.PersonalCalls);
     }
 
