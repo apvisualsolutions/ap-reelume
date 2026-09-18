@@ -1,0 +1,145 @@
+name: LibVLC without GPL - publish
+
+# ENG-013: promotes the trees ONE run of libvlc-nogpl.yml built, verified and decoded to a GitHub
+# prerelease, which is where eng/libvlc/libvlc.lock.json pins them by SHA-512 and where the
+# application's build downloads them from.
+#
+# It publishes what was verified, never a rebuild. The build is not reproducible byte for byte
+# (ENG013-reproducible-build.md says so), so a second compilation would be a different tree that no
+# check has seen. That is why it takes a run id and refuses one that did not end in success.
+#
+# A prerelease on purpose, decided by the owner on 2026-09-18: the updater asks for
+# /releases/latest (GitHubReleaseUpdateProvider), and GitHub documents that endpoint as "the most
+# recent non-prerelease, non-draft release", so this can never be offered as an application update.
+# The tag does not match v*, so it does not start release.yml either.
+#
+# Beside the binaries goes their corresponding source, which is what makes shipping them lawful
+# (LGPL-2.1 6(d)): VLC at the tag, the patches and scripts that built it, and every contrib tarball
+# the build fetched.
+
+on:
+  workflow_dispatch:
+    inputs:
+      run-id:
+        description: The libvlc-nogpl.yml run whose trees are published
+        required: true
+      tag:
+        description: Release tag, e.g. libvlc-3.0.23-nogpl.1
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      actions: read
+      id-token: write
+      attestations: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_ID: ${{ inputs.run-id }}
+      TAG: ${{ inputs.tag }}
+    steps:
+      # Every property is asked for by name, and anything else is a refusal: the workflow, the
+      # outcome, and a tag in the only shape the lock file accepts.
+      - name: Check the run
+        id: run
+        run: |
+          set -eu
+          case "$TAG" in
+            libvlc-[0-9]*.[0-9]*.[0-9]*-nogpl.[0-9]*) ;;
+            *) echo "tag '$TAG' is not libvlc-<vlc version>-nogpl.<n>" >&2; exit 1 ;;
+          esac
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "release $TAG already exists: a published tree is never replaced" >&2; exit 1
+          fi
+          info=$(gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --json workflowName,status,conclusion,headSha)
+          echo "$info"
+          [ "$(echo "$info" | jq -r .workflowName)" = "LibVLC without GPL" ] || { echo "run $RUN_ID is not libvlc-nogpl.yml" >&2; exit 1; }
+          [ "$(echo "$info" | jq -r .status)" = "completed" ] || { echo "run $RUN_ID has not finished" >&2; exit 1; }
+          [ "$(echo "$info" | jq -r .conclusion)" = "success" ] || { echo "run $RUN_ID did not succeed" >&2; exit 1; }
+          echo "sha=$(echo "$info" | jq -r .headSha)" >> "$GITHUB_OUTPUT"
+
+      # The scripts and patches as they were at the commit that built the trees, not as they are now.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.run.outputs.sha }}
+
+      - name: Download the trees and their sources
+        run: |
+          set -eu
+          for a in x64 arm64; do
+            gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" -n "libvlc-nogpl-$a" -D "tree/$a"
+            failures=$(jq '.failures | length' "tree/$a/manifest.json")
+            [ "$failures" = "0" ] || { echo "the $a manifest records $failures failure(s)" >&2; exit 1; }
+          done
+          for a in x86_64 aarch64; do
+            gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" -n "libvlc-source-$a" -D "contrib/$a"
+          done
+
+      - name: Assemble the release
+        run: |
+          set -eu
+          mkdir -p dist src/contrib-tarballs
+          for a in x64 arm64; do
+            (cd "tree/$a" && zip -X -r -q "$GITHUB_WORKSPACE/dist/libvlc-nogpl-$a.zip" .)
+            cp "tree/$a/manifest.json" "dist/libvlc-nogpl-$a.manifest.json"
+          done
+
+          # The two architectures fetch mostly the same tarballs. Same name must mean same bytes,
+          # which contrib's SHA512SUMS already guarantees; a difference here is a finding, not a merge.
+          for f in contrib/*/*; do
+            name=$(basename "$f")
+            if [ -e "src/contrib-tarballs/$name" ]; then
+              cmp -s "$f" "src/contrib-tarballs/$name" || { echo "$name differs between architectures" >&2; exit 1; }
+            else
+              cp -r "$f" "src/contrib-tarballs/$name"
+            fi
+          done
+
+          url=$(jq -r '.sources[] | select(.name=="vlc") | .url' eng/corresponding-source.json)
+          sum=$(jq -r '.sources[] | select(.name=="vlc") | .sha256' eng/corresponding-source.json)
+          curl -fsSL --retry 3 -o "src/$(basename "$url")" "$url"
+          echo "$sum  src/$(basename "$url")" | sha256sum -c --ignore-case -
+
+          git archive --format=tar --prefix=build/ HEAD eng/libvlc .github/workflows/libvlc-nogpl.yml | tar -x -C src
+          cat > src/README.txt <<EOF
+          Corresponding source of the LibVLC trees in release $TAG.
+
+          $(basename "$url")   VLC $(jq -r '.sources[] | select(.name=="vlc") | .version' eng/corresponding-source.json), as VideoLAN publishes it (SHA-256 $sum).
+          build/               The scripts and patches that built the trees, at commit ${{ steps.run.outputs.sha }}.
+                               build/eng/libvlc/build-nogpl.sh is the entry point; it applies build/eng/libvlc/patches.
+          contrib-tarballs/    Every third-party source the build fetched, each checked against the
+                               SHA512SUMS in VLC's contrib/src. Copy them into contrib/tarballs and the
+                               build uses them instead of downloading.
+
+          Built with GitHub Actions run $RUN_ID inside VideoLAN's CI images named in build/.github/workflows/libvlc-nogpl.yml.
+          EOF
+          tar -cf "dist/$TAG-source.tar" -C src .
+
+          (cd dist && sha512sum * > SHA512SUMS.txt && cat SHA512SUMS.txt)
+
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            dist/libvlc-nogpl-x64.zip
+            dist/libvlc-nogpl-arm64.zip
+            dist/${{ inputs.tag }}-source.tar
+
+      - name: Publish the prerelease
+        run: |
+          set -eu
+          cat > notes.md <<EOF
+          LibVLC $TAG for Windows x64 and ARM64, built without GPL code (ENG-013). Not an application release.
+
+          Built, verified (eng/libvlc/verify-nogpl.ps1) and decoded (eng/libvlc/decode-probe.ps1) by run
+          https://github.com/$GITHUB_REPOSITORY/actions/runs/$RUN_ID at ${{ steps.run.outputs.sha }}.
+          Its corresponding source is $TAG-source.tar. SHA-512 of every asset in SHA512SUMS.txt.
+          EOF
+          gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" \
+            --target "${{ steps.run.outputs.sha }}" --title "$TAG" --notes-file notes.md \
+            --prerelease --latest=false

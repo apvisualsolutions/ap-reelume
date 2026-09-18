@@ -68,6 +68,17 @@ jobs:
           path: out/libvlc-build.tar.gz
           retention-days: 7
 
+      # The corresponding source of every third-party library linked into the tree (FFmpeg and the
+      # rest, LGPL): the exact tarballs this build fetched, each already checked by contrib's own
+      # SHA512SUMS. libvlc-publish.yml attaches them to the release beside the binaries, so they
+      # must outlive the build: 30 days, like the tree they belong to.
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: libvlc-source-${{ matrix.arch }}
+          path: out/vlc-src/contrib/tarballs
+          if-no-files-found: error
+          retention-days: 30
+
   verify:
     name: verify ${{ matrix.arch }}
     needs: build
