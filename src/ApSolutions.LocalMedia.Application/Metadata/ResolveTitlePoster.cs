@@ -1,6 +1,8 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
+using System.Globalization;
+using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Metadata;
 
@@ -31,9 +33,20 @@ namespace ApSolutions.LocalMedia.Application.Metadata;
 /// disk draws, so a picked file that went missing falls through to the provider's.
 /// </para>
 /// </remarks>
-public sealed class ResolveTitlePoster(IArtworkStore artwork)
+public sealed class ResolveTitlePoster(IArtworkStore artwork, IAppDataPaths paths)
 {
     private readonly IArtworkStore _artwork = artwork ?? throw new ArgumentNullException(nameof(artwork));
+    private readonly IAppDataPaths _paths = paths ?? throw new ArgumentNullException(nameof(paths));
+
+    /// <summary>
+    /// Where the frame taken from <paramref name="titleId"/>'s own video lives, whether or not it has
+    /// been taken yet. Named by the title's id, so a renamed file keeps its picture.
+    /// </summary>
+    public static string FrameFileFor(IAppDataPaths paths, TitleId titleId)
+    {
+        ArgumentNullException.ThrowIfNull(paths);
+        return Path.Combine(paths.TitleFrameDirectory, titleId.Value.ToString("N", CultureInfo.InvariantCulture) + ".png");
+    }
 
     /// <summary>
     /// The file drawing <paramref name="titleId"/>'s cover, or <see langword="null"/> when the
@@ -53,9 +66,12 @@ public sealed class ResolveTitlePoster(IArtworkStore artwork)
     {
         foreach (var origin in CoverOrderPolicy.Default)
         {
-            var file = origin == CoverOrigin.Personal
-                ? FindPersonal(titleId, personalCover) ?? FindPersonal(titleId, posterPath)
-                : FindProvider(titleId, posterPath);
+            var file = origin switch
+            {
+                CoverOrigin.Personal => FindPersonal(titleId, personalCover) ?? FindPersonal(titleId, posterPath),
+                CoverOrigin.Provider => FindProvider(titleId, posterPath),
+                _ => FindFrame(titleId),
+            };
             if (file is not null)
             {
                 return file;
@@ -69,6 +85,11 @@ public sealed class ResolveTitlePoster(IArtworkStore artwork)
         PersonalCoverPathPolicy.TryGetCoverFileName(value) is { } cover
             ? _artwork.FindPersonal(titleId, cover)
             : null;
+
+    // Finding, never taking: a frame that is not on disk yet is no picture. Taking it is the
+    // background pass's work, because decoding can take seconds and this is asked while a grid paints.
+    private string? FindFrame(TitleId titleId) =>
+        FrameFileFor(_paths, titleId) is var frame && File.Exists(frame) ? frame : null;
 
     private string? FindProvider(TitleId titleId, string? posterPath) =>
         PosterAddressPolicy.TryBuildPosterAddress(posterPath) is { } address

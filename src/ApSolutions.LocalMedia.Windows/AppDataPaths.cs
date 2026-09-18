@@ -30,6 +30,7 @@ public sealed class AppDataPaths : IAppDataPaths
         PersonalArtworkDirectory = Path.Combine(DataRoot, "personal-artwork");
         RemoteCacheDirectory = Path.Combine(DataRoot, "cache", "artwork");
         CourseThumbnailDirectory = Path.Combine(DataRoot, "cache", "course-thumbnails");
+        TitleFrameDirectory = Path.Combine(DataRoot, "cache", "title-frames");
         DiagnosticsDirectory = Path.Combine(DataRoot, "diagnostics");
         var ownsProfile = OwnsProfile(DataRoot);
         StartupRegistrySubKey = ownsProfile
@@ -51,6 +52,8 @@ public sealed class AppDataPaths : IAppDataPaths
     public string RemoteCacheDirectory { get; }
 
     public string CourseThumbnailDirectory { get; }
+
+    public string TitleFrameDirectory { get; }
 
     public string DiagnosticsDirectory { get; }
 

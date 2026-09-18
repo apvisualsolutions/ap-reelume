@@ -798,6 +798,8 @@ internal sealed class RestoreFixture : IDisposable
 
         public string CourseThumbnailDirectory { get; } = Path.Combine(dataRoot, "cache", "course-thumbnails");
 
+        public string TitleFrameDirectory { get; } = Path.Combine(dataRoot, "cache", "title-frames");
+
         public string DiagnosticsDirectory { get; } = Path.Combine(dataRoot, "diagnostics");
 
         // Never the key Windows reads at sign-in: a suite leaves nothing behind there.
