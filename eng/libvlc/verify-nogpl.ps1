@@ -16,9 +16,12 @@
          second pass must name nothing. Control: the reference must have plugins named by it.
       2. FFmpeg compiled as GPL. The same scan reads `--enable-gpl` inside each binary. Control:
          the reference's libavcodec carries it.
-      3. GPL third-party libraries. contrib/bootstrap writes `GPL := 1` into the contrib
-         config.mak when GPL is on; it must be absent, and `AD_CLAUSES := 1` present (FreeType
-         under the FTL, ENG-025). Canary for the one such library the shipped package was found
+      3. GPL third-party libraries. contrib/bootstrap writes `GPL := 1` into the Makefile it
+         generates in contrib/contrib-<arch> when GPL is on; it must be absent, and
+         `AD_CLAUSES := 1` present (FreeType under the FTL, ENG-025). The presence is also the
+         control: this check read config.mak until 2026-09-18 — build.sh's compiler flags, where
+         bootstrap writes nothing — and "GPL absent" passed on a file that could never contain it.
+         Only the AD_CLAUSES half, which demands something, gave it away. Canary for the one such library the shipped package was found
          carrying (aribb24 inside libts, 2026-09-18): its log string must be in the reference and
          absent here.
       4. Subtitles still render: the FreeType text renderer must be in the tree, because the whole
@@ -111,13 +114,13 @@ if ($secondScan.gplCount -ne 0) {
 
 # --- 3: third-party libraries -------------------------------------------------------------------
 $configs = @(Get-ChildItem (Join-Path $VlcSource 'contrib') -Directory -Filter 'contrib-*' |
-    ForEach-Object { Join-Path $_.FullName 'config.mak' } | Where-Object { Test-Path $_ })
+    ForEach-Object { Join-Path $_.FullName 'Makefile' } | Where-Object { Test-Path $_ })
 if ($configs.Count -ne 1) {
-    $failures.Add("Expected one contrib config.mak under $VlcSource/contrib, found $($configs.Count).")
+    $failures.Add("Expected one contrib Makefile under $VlcSource/contrib/contrib-*, found $($configs.Count).")
 } else {
     $config = Get-Content $configs[0]
-    if ($config -match '^GPL\s*:=\s*1') { $failures.Add("contrib config.mak enables GPL: $($configs[0])") }
-    if (-not ($config -match '^AD_CLAUSES\s*:=\s*1')) { $failures.Add("contrib config.mak lacks AD_CLAUSES: FreeType would have been refused.") }
+    if ($config -match '^GPL\s*:=\s*1') { $failures.Add("the contrib Makefile enables GPL: $($configs[0])") }
+    if (-not ($config -match '^AD_CLAUSES\s*:=\s*1')) { $failures.Add("the contrib Makefile lacks AD_CLAUSES: either FreeType was refused or this is not bootstrap's Makefile.") }
 }
 $aribCanary = 'arib parser was created'
 $referenceTs = Get-ChildItem $Reference -Recurse -Filter 'libts_plugin.dll' | Select-Object -First 1
