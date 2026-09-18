@@ -14,14 +14,28 @@
     {
       "name": "vlc",
       "version": "3.0.23",
-      "carriedBy": "VideoLAN.LibVLC.Windows 3.0.23.1",
-      "note": "The NuGet package's fourth digit is its own packaging revision. libvlc.dll declares file version 3.0.23, and 3.0.23 is what VideoLAN publishes source for; there is no vlc-3.0.23.1.",
+      "carriedBy": "libvlc-3.0.23-nogpl.1 (eng/libvlc/libvlc.lock.json)",
+      "note": "The engine is built from the 3.0.23 tag by eng/libvlc/build-nogpl.sh, with the two patches in eng/libvlc/patches (ENG-013). This archive is VLC as VideoLAN publishes it; the libvlc-build entry below is everything this repository added to build it.",
       "url": "https://download.videolan.org/vlc/3.0.23/vlc-3.0.23.tar.xz",
       "fileName": "vlc-3.0.23.tar.xz",
       "sizeBytes": 26486988,
       "sha256": "E891CAE6AA3CCDA69BF94173D5105CBC55C7A7D9B1D21B9B21666E69EFF3E7E0",
       "sha256Source": "https://download.videolan.org/vlc/3.0.23/vlc-3.0.23.tar.xz.sha256",
       "magic": "FD377A585A00",
+      "minimumSizeBytes": 20971520
+    },
+    {
+      "name": "libvlc-build",
+      "version": "3.0.23-nogpl.1",
+      "carriedBy": "libvlc-3.0.23-nogpl.1 (eng/libvlc/libvlc.lock.json)",
+      "note": "The rest of the engine's corresponding source, published with the engine by libvlc-publish.yml: the patches and scripts at the commit that built it, VLC at the tag, and every third-party contrib tarball the build fetched (FFmpeg among them). Pinned by the SHA-512 in eng/libvlc/libvlc.lock.json. A tar whose first entry is ./, hence the magic.",
+      "url": "https://github.com/apvisualsolutions/ap-reelume/releases/download/libvlc-3.0.23-nogpl.1/libvlc-3.0.23-nogpl.1-source.tar",
+      "fileName": "libvlc-3.0.23-nogpl.1-source.tar",
+      "sizeBytes": 381112320,
+      "sha256": null,
+      "sha512": "76c136190cb760d11f1b09053d411575adec9eb0987b186df55f6faec37c55e350c8996e660678f598ff456574b6525e83c620b7369119b1c01aefb6ad42ebd7",
+      "sha256Source": null,
+      "magic": "2E2F",
       "minimumSizeBytes": 20971520
     },
     {

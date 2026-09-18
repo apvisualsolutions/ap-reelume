@@ -43,7 +43,7 @@ asked for directly.
 | Tmds.DBus.Protocol | 0.94.1 | MIT |
 | BouncyCastle.Cryptography | 2.7.0 | MIT |
 | LibVLCSharp | 3.10.0 | LGPL-2.1-or-later |
-| VideoLAN.LibVLC.Windows | 3.0.23.1 | LGPL-2.1-or-later for the core; see the plugins below |
+| LibVLC, built by AP Solutions without GPL | 3.0.23-nogpl.1 | LGPL-2.1-or-later |
 | Microsoft.Data.Sqlite | 10.0.10 | MIT |
 | Microsoft.Data.Sqlite.Core | 10.0.10 | MIT |
 | SQLitePCLRaw.bundle_e_sqlite3 | 2.1.11 | Apache-2.0 |
@@ -77,9 +77,9 @@ your documentation that you have used the FreeType code". That is what the box a
 
 **And it arrives by two paths, one of them from before this decision**: today it comes inside Skia's
 native assets — its full text is in
-[`licenses/NOTICE-Skia-HarfBuzz-natives.txt`](licenses/NOTICE-Skia-HarfBuzz-natives.txt) — and it will
-also come inside LibVLC once the engine is built without GPL (`ENG-013`), because it is what draws
-subtitle text. The acknowledgement is written once and covers both.
+[`licenses/NOTICE-Skia-HarfBuzz-natives.txt`](licenses/NOTICE-Skia-HarfBuzz-natives.txt) — and since
+2026-09-18 also inside LibVLC, which is built without GPL (`ENG-013`) and uses it to draw subtitle
+text. The acknowledgement is written once and covers both.
 
 ### The .NET runtime
 
@@ -91,17 +91,31 @@ what puts several hundred Microsoft-licensed files inside the package.
 
 ### LibVLC, its core and its plugins
 
-The `VideoLAN.LibVLC.Windows` package declares `LGPL-2.1-or-later`, which covers `libvlc.dll` and
-`libvlccore.dll`. It also ships roughly three hundred plugins in `plugins/`, and **those carry their
-own licences**, some of them GPL rather than LGPL: fourteen on x64 and eleven on ARM64.
-`libavcodec_plugin.dll` and `libswscale_plugin.dll` are GPL because their FFmpeg build was compiled
-with `--enable-gpl`; `libx26410b`, `liblua`, `libdeinterlace`, `libhqdn3d`,
-`libheadphone_channel_mixer`, `libdolby_surround_decoder`, `libvisual`, `libremoteosd` and, on x64,
-`libglspectrum`, `libi420_rgb_mmx` and `libi420_rgb_sse2`, because their sources are; and
-`libts_plugin.dll` because it links the aribb24 library. The list comes from
-`eng/libvlc/scan-plugin-licenses.ps1` (evidence `audit-eng027-plugin-gpl-sources.md`). The library is distributed unmodified. VideoLAN's
-NuGet package carries **no `COPYING` file at all**, so nobody supplies the text but this artifact: it
-carries it as `licenses/LGPL-2.1.txt`, `licenses/GPL-2.0.txt` and `licenses/NOTICE-VideoLAN.txt`.
+**Since 2026-09-18 the engine is not VideoLAN's package but a build of our own without GPL**
+(`ENG-013`). It is built from the same VLC release, 3.0.23, with VideoLAN's build script and build
+images, third-party libraries configured with `--disable-gpl`, and FreeType under its FTL. Every plugin
+whose source code is GPL is then removed, and a gate demands that none is left. This repository
+publishes it as `libvlc-3.0.23-nogpl.1`, pinned by the hash of each file. **It is modified**, and both
+modifications take GPL pieces out: the yadif deinterlacing algorithm from the `libdeinterlace` plugin,
+and the libdvdread library from the build script. The files touched say so in their header, with a
+date, as LGPL-2.1 §2(b) asks.
+
+Everything that travels — `libvlc.dll`, `libvlccore.dll` and the plugins in `plugins/` — is
+`LGPL-2.1-or-later`. The text travels as `licenses/LGPL-2.1.txt`, and `licenses/NOTICE-VideoLAN.txt`
+details the build and where its source code is. Which plugins are missing compared with VideoLAN's
+package, and why, is recorded in the `manifest.json` published with the engine: the ones that were GPL,
+and the ones neither that package nor this build uses.
+
+**Three libraries remain under `LGPL-3.0`** — gmp, nettle and live555 — which VideoLAN's package
+carried too. How that licence reads against a proprietary program is not written yet, and is
+`ENG-028`.
+
+**What was there before, and why it had to change.** The `VideoLAN.LibVLC.Windows` 3.0.23.1 package
+carried fourteen GPL plugins on x64 and eleven on ARM64. `libavcodec_plugin.dll` and
+`libswscale_plugin.dll` were GPL because their FFmpeg was built with `--enable-gpl`. Eleven more were
+because their source code is GPL, among them `liblua`, `libdeinterlace` and `libhqdn3d`, and
+`libts_plugin.dll` because it links aribb24. The list comes from `eng/libvlc/scan-plugin-licenses.ps1`
+(evidence `audit-eng027-plugin-gpl-sources.md`).
 
 **This was closed on 2026-08-10 and reopened on 2026-09-13, and not because it was wrong.** The
 reasoning then was: for a program released under `GPL-3.0-or-later`, a `GPL-2.0-or-later` plugin is
@@ -117,11 +131,12 @@ begins with `--enable-gpl`, read inside both binaries. VLC's GPL modules are fea
 does not offer, a deinterlacing algorithm that is not the default and a colour conversion
 `libswscale` also does; `libts` without aribb24 still reads `.ts`.
 
-**While that plugin travels here, the artifact cannot be distributed.** The measured way out costs no
-formats: the decoding library is permissive by default, and what is copyleft are optional pieces
-enabled at build time — a legacy post-processing filter and some optimisations — **with no decoder
-among them**. LibVLC and its dependencies have to be built without that option, for both
-architectures, and that build maintained.
+**While those plugins travelled here the artifact could not be distributed, and that is what the build
+of our own closed.** It costs no formats: the decoding library is permissive by default, and what was
+copyleft were optional pieces enabled at build time — a legacy post-processing filter and some
+optimisations — **with no decoder among them**. Measured on real Windows x64 and ARM64: the fourteen
+promised codecs decode with the same figures as VideoLAN's package, subtitles included (evidence
+`ENG013-reproducible-build.md`).
 
 **The licence texts now travel.** LGPL-2.1 (§6), GPL-2.0 (§1), and Apache-2.0 (§4a) each require a
 copy of the licence to accompany a binary distribution, and MIT and BSD-3-Clause require their
@@ -191,10 +206,11 @@ copied during the tests.
 
 This file states what each component declares and how those declarations fit together. It is written
 by the people who assembled the software, not by a lawyer, and two questions stay open until the
-professional legal opinion under REL-004 answers them. **Since 2026-09-13 the first is no longer a
-question but a finding**: the VideoLAN plugins shipped in the pinned build are **not** compatible with
-the program's own licence, because at least the decoder is copyleft, and that **does block release**
-even though it does not block development. The second is still a question: which subsection of
+professional legal opinion under REL-004 answers them. **The first was closed by engineering on
+2026-09-18**: since 2026-09-13 it had been a finding — the GPL plugins in VideoLAN's package were not
+compatible with the program's own licence and blocked release — and since 2026-09-18 the engine is
+built without them. What remains of that question is the `LGPL-3.0` of three libraries, `ENG-028`. The
+second is still a question: which subsection of
 LGPL-2.1 §6 covers the way LibVLC travels here, now that the §6(a) route — publishing our source under
 a free licence — is no longer available. Both are named here so nobody mistakes this document for the
 opinion.
