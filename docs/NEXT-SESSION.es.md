@@ -56,8 +56,18 @@
 >   `IsCompleted` antes de liberar.
 > · **Una afirmación sobre el estado del editor puede seguir verde sin recarga**: se lee la fila guardada.
 >
+> ### Añadido el 2026-09-19, al cerrar
+>
+> · **`/cerrar-tanda` pasa a llamarse `/cierre`** y gana, con la sesión de IT, un paso 0 —esperar al CI
+>   en marcha y desde ahí sólo el relevo, con el hook `pre-push-closing.sh`—, un acta propia y tres
+>   comprobaciones de IT invocadas por la variable de usuario `AP_SHARED_TOOLS`.
+> · **El CI de la punta se canceló al cerrar**, por orden del propietario: `main` se queda en el último
+>   commit verde y la rama va por delante con el skill sin verificar. **Relanzarlo es lo primero.**
+>
 > ### Lo que espera al propietario
 >
+> · **Su sí para crear la variable de usuario `AP_SHARED_TOOLS`** (sin ella, las comprobaciones de IT
+>   dicen «no se pudo medir»).
 > · **Un rato sin usar el ordenador (unos 15 min) para medir `ENG-002` con el Narrador.**
 > · MSYS2 en `C:\msys64` (1,8 GB), el juicio visual de `PLY-016` y la regla del orden del backlog para
 >   las reglas comunes, como estaban.

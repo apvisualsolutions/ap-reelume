@@ -55,8 +55,18 @@
 >   before releasing.
 > · **An assertion on the editor's state can stay green without a reload**: read the stored row.
 >
+> ### Added on 2026-09-19, at closing
+>
+> · **`/cerrar-tanda` is renamed `/cierre`** and gains, with the IT session, a step 0 — wait for the
+>   running CI and from then on only the handover, enforced by the `pre-push-closing.sh` hook —, an
+>   acta of its own and three IT checks invoked through the user variable `AP_SHARED_TOOLS`.
+> · **The tip's CI was cancelled at closing**, on the owner's order: `main` stays on the last green
+>   commit and the branch runs ahead with the unverified skill. **Re-running it comes first.**
+>
 > ### What waits for the owner
 >
+> · **His yes to create the user variable `AP_SHARED_TOOLS`** (without it, the IT checks say «could
+>   not measure»).
 > · **A spell away from the computer (about 15 min) to measure `ENG-002` with Narrator.**
 > · MSYS2 in `C:\msys64` (1.8 GB), `PLY-016`'s visual judgement and the backlog-order rule for the
 >   common rules, as they were.
