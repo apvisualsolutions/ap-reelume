@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using Xunit;
 
@@ -21,12 +22,48 @@ public sealed class ResolveTitlePosterTests
 {
     private static readonly TitleId Title = new(Guid.Parse("11111111-1111-1111-1111-111111111111"));
 
+    /// <summary>A frames folder nobody ever wrote into.</summary>
+    private static readonly FramePaths NoFrames = new(Path.Combine(Path.GetTempPath(), "no-title-frames-" + Guid.NewGuid().ToString("N")));
+
+    /// <summary>
+    /// ADR-0009's third origin: with nothing picked and nothing from the provider, the frame taken
+    /// from the title's own video draws.
+    /// </summary>
+    [Fact]
+    public void The_frame_draws_when_there_is_no_other_cover()
+    {
+        using var frames = FramePaths.WithFrameFor(Title);
+
+        var found = new ResolveTitlePoster(new StubStore(), frames).Find(Title, posterPath: null);
+
+        Assert.Equal(ResolveTitlePoster.FrameFileFor(frames, Title), found);
+    }
+
+    /// <summary>The frame is last: a provider poster on disk wins over it.</summary>
+    [Fact]
+    public void The_provider_wins_over_a_frame()
+    {
+        using var frames = FramePaths.WithFrameFor(Title);
+        var store = new StubStore { RemoteAnswer = "cache/artwork/abc/poster.jpg" };
+
+        var found = new ResolveTitlePoster(store, frames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
+
+        Assert.Equal("cache/artwork/abc/poster.jpg", found);
+    }
+
+    /// <summary>A frame nobody took yet is no picture: resolving never decodes anything.</summary>
+    [Fact]
+    public void A_frame_not_taken_yet_is_no_picture()
+    {
+        Assert.Null(new ResolveTitlePoster(new StubStore(), NoFrames).Find(Title, posterPath: null));
+    }
+
     [Fact]
     public void A_provider_address_is_looked_up_where_downloaded_artwork_lives()
     {
         var store = new StubStore { RemoteAnswer = "cache/artwork/abc/poster.jpg" };
 
-        var found = new ResolveTitlePoster(store).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
+        var found = new ResolveTitlePoster(store, NoFrames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
 
         Assert.Equal("cache/artwork/abc/poster.jpg", found);
         Assert.Equal(Title, store.LastRemoteTitle);
@@ -39,7 +76,7 @@ public sealed class ResolveTitlePosterTests
         var store = new StubStore { PersonalAnswer = "personal-artwork/abc/cover.png" };
         var chosen = new string('a', 64) + ".png";
 
-        var found = new ResolveTitlePoster(store).Find(
+        var found = new ResolveTitlePoster(store, NoFrames).Find(
             Title,
             Path.Combine("C:", "anywhere", "personal-artwork", chosen));
 
@@ -63,7 +100,7 @@ public sealed class ResolveTitlePosterTests
             PersonalAnswer = "personal-artwork/abc/cover.png",
         };
 
-        var found = new ResolveTitlePoster(store).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
+        var found = new ResolveTitlePoster(store, NoFrames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
 
         Assert.Equal("cache/artwork/abc/poster.jpg", found);
         Assert.Equal(0, store.PersonalCalls);
@@ -79,7 +116,7 @@ public sealed class ResolveTitlePosterTests
             PersonalAnswer = "personal-artwork/abc/cover.png",
         };
 
-        var found = new ResolveTitlePoster(store).Find(
+        var found = new ResolveTitlePoster(store, NoFrames).Find(
             Title,
             "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg",
             new string('a', 64) + ".png");
@@ -97,7 +134,7 @@ public sealed class ResolveTitlePosterTests
     {
         var store = new StubStore { RemoteAnswer = "cache/artwork/abc/poster.jpg" };
 
-        var found = new ResolveTitlePoster(store).Find(
+        var found = new ResolveTitlePoster(store, NoFrames).Find(
             Title,
             "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg",
             new string('a', 64) + ".png");
@@ -115,7 +152,7 @@ public sealed class ResolveTitlePosterTests
     {
         var store = new StubStore { PersonalAnswer = "personal-artwork/abc/cover.png" };
 
-        Assert.Null(new ResolveTitlePoster(store).Find(Title, posterPath: null, @"C:\Windows\win.ini"));
+        Assert.Null(new ResolveTitlePoster(store, NoFrames).Find(Title, posterPath: null, @"C:\Windows\win.ini"));
         Assert.Equal(0, store.PersonalCalls);
     }
 
@@ -141,7 +178,7 @@ public sealed class ResolveTitlePosterTests
             PersonalAnswer = "personal-artwork/abc/cover.png",
         };
 
-        Assert.Null(new ResolveTitlePoster(store).Find(Title, stored));
+        Assert.Null(new ResolveTitlePoster(store, NoFrames).Find(Title, stored));
         Assert.Equal(0, store.RemoteCalls);
         Assert.Equal(0, store.PersonalCalls);
     }
@@ -154,14 +191,15 @@ public sealed class ResolveTitlePosterTests
     {
         var store = new StubStore();
 
-        Assert.Null(new ResolveTitlePoster(store).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg"));
+        Assert.Null(new ResolveTitlePoster(store, NoFrames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg"));
         Assert.Equal(1, store.RemoteCalls);
     }
 
     [Fact]
     public void A_resolver_without_a_store_is_refused_where_it_is_built()
     {
-        _ = Assert.Throws<ArgumentNullException>(() => new ResolveTitlePoster(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => new ResolveTitlePoster(null!, NoFrames));
+        _ = Assert.Throws<ArgumentNullException>(() => new ResolveTitlePoster(new StubStore(), null!));
     }
 
     private sealed class StubStore : IArtworkStore
@@ -208,5 +246,49 @@ public sealed class ResolveTitlePosterTests
 
         public Task RemoveTitleAsync(TitleId titleId, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;
+    }
+
+    /// <summary>Somewhere of its own for frames, so a test never reads the real application's data.</summary>
+    private sealed class FramePaths(string root) : IAppDataPaths, IDisposable
+    {
+        public string DataRoot { get; } = root;
+
+        public string DatabasePath => Path.Combine(DataRoot, "library.db");
+
+        public string SettingsPath => Path.Combine(DataRoot, "settings.json");
+
+        public string BackupsDirectory => Path.Combine(DataRoot, "backups");
+
+        public string PersonalArtworkDirectory => Path.Combine(DataRoot, "personal-artwork");
+
+        public string RemoteCacheDirectory => Path.Combine(DataRoot, "cache", "artwork");
+
+        public string CourseThumbnailDirectory => Path.Combine(DataRoot, "cache", "course-thumbnails");
+
+        public string TitleFrameDirectory => Path.Combine(DataRoot, "cache", "title-frames");
+
+        public string DiagnosticsDirectory => Path.Combine(DataRoot, "diagnostics");
+
+        public string StartupRegistrySubKey => @"Software\Test";
+
+        public string? SystemHandoffDirectory => null;
+
+        /// <summary>A fresh root with a frame already taken for <paramref name="title"/>.</summary>
+        public static FramePaths WithFrameFor(TitleId title)
+        {
+            var paths = new FramePaths(Path.Combine(Path.GetTempPath(), "title-frames-" + Guid.NewGuid().ToString("N")));
+            var file = ResolveTitlePoster.FrameFileFor(paths, title);
+            Directory.CreateDirectory(Path.GetDirectoryName(file)!);
+            File.WriteAllBytes(file, [0x89, (byte)'P', (byte)'N', (byte)'G']);
+            return paths;
+        }
+
+        public void Dispose()
+        {
+            if (Directory.Exists(DataRoot))
+            {
+                Directory.Delete(DataRoot, recursive: true);
+            }
+        }
     }
 }

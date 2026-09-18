@@ -39,6 +39,16 @@ public interface IAppDataPaths
     /// </remarks>
     string CourseThumbnailDirectory { get; }
 
+    /// <summary>
+    /// Where a frame taken from a film's or series' own video is kept, for a title with no other
+    /// cover (LIB-021, ADR-0009).
+    /// </summary>
+    /// <remarks>
+    /// Beside the course thumbnails and for their reason: the application took these, every one can be
+    /// taken again from a file still on the disk, so they regenerate and never travel in a backup.
+    /// </remarks>
+    string TitleFrameDirectory { get; }
+
     /// <summary>Where an exported diagnostic report is written, and nowhere a backup ever looks.</summary>
     string DiagnosticsDirectory { get; }
 

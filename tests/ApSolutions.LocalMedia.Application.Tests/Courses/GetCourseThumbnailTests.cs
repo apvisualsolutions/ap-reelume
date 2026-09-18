@@ -336,6 +336,8 @@ public sealed class GetCourseThumbnailTests : IDisposable
 
         public string CourseThumbnailDirectory { get; } = Path.Combine(root, "cache", "course-thumbnails");
 
+        public string TitleFrameDirectory { get; } = Path.Combine(root, "cache", "title-frames");
+
         public string DiagnosticsDirectory { get; } = Path.Combine(root, "diagnostics");
 
         public string StartupRegistrySubKey { get; } = @"Software\ApReelumeTests\Run";

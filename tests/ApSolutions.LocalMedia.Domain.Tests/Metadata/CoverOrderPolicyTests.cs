@@ -13,8 +13,8 @@ namespace ApSolutions.LocalMedia.Domain.Tests.Metadata;
 public sealed class CoverOrderPolicyTests
 {
     [Fact]
-    public void The_hand_picked_cover_wins_and_the_provider_follows() =>
-        Assert.Equal([CoverOrigin.Personal, CoverOrigin.Provider], CoverOrderPolicy.Default);
+    public void The_hand_picked_cover_wins_the_provider_follows_and_the_frame_comes_last() =>
+        Assert.Equal([CoverOrigin.Personal, CoverOrigin.Provider, CoverOrigin.Frame], CoverOrderPolicy.Default);
 
     /// <summary>
     /// An origin missing from the order is an origin no title can ever draw, and one listed twice is a

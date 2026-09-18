@@ -3,10 +3,7 @@
 
 namespace ApSolutions.LocalMedia.Domain.Metadata;
 
-/// <summary>
-/// Where a title's cover came from (ADR-0009, LIB-021). The frame taken from the video itself is the
-/// third origin, and joins when its capture is wired for films and series.
-/// </summary>
+/// <summary>Where a title's cover came from (ADR-0009, LIB-021).</summary>
 public enum CoverOrigin
 {
     /// <summary>A file somebody picked from their own disk.</summary>
@@ -14,6 +11,11 @@ public enum CoverOrigin
 
     /// <summary>The artwork the metadata provider offered.</summary>
     Provider,
+
+    /// <summary>
+    /// A frame of the title's own video, taken by the application when there is no other cover.
+    /// </summary>
+    Frame,
 }
 
 /// <summary>
@@ -26,6 +28,7 @@ public enum CoverOrigin
 /// </remarks>
 public static class CoverOrderPolicy
 {
-    /// <summary>The picked cover wins; the provider's follows.</summary>
-    public static IReadOnlyList<CoverOrigin> Default { get; } = [CoverOrigin.Personal, CoverOrigin.Provider];
+    /// <summary>The picked cover wins; the provider's follows; the frame is last.</summary>
+    public static IReadOnlyList<CoverOrigin> Default { get; } =
+        [CoverOrigin.Personal, CoverOrigin.Provider, CoverOrigin.Frame];
 }
