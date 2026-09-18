@@ -190,6 +190,8 @@ public static class VlcProbe
 
 $failures = [System.Collections.Generic.List[string]]::new()
 $rows = foreach ($case in $cases) {
+    # LibVLC writes its own errors straight to stderr; the marker says which sample they belong to.
+    [Console]::Error.WriteLine("== decode-probe: $($case.Id)")
     $r = [VlcProbe]::Play($case.Path, $true, 10)
     $delivered = if ($case.Kind -eq 'video') { $r[0] } else { $r[1] }
     if ($delivered -le 0) { $failures.Add("$($case.Id): delivered no $($case.Kind)") }

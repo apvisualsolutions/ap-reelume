@@ -89,18 +89,12 @@ jobs:
           name: libvlc-build-${{ matrix.arch }}
 
       # The reference is the package the application ships today, which is built as GPL: it is what
-      # every check in verify-nogpl.ps1 uses to prove it can see. It is fetched from nuget.org and
-      # accepted only if its SHA-512 is the contentHash the repository's lock file pins.
+      # every check in verify-nogpl.ps1 uses to prove it can see. fetch-reference.ps1 accepts it
+      # only by its pinned SHA-512, and only while the lock file still names that version.
       - name: Fetch the reference package
         shell: pwsh
         run: |
-          $lock = Get-Content src/ApSolutions.LocalMedia.Infrastructure/packages.lock.json -Raw | ConvertFrom-Json
-          $entry = $lock.dependencies.PSObject.Properties.Value.'VideoLAN.LibVLC.Windows'
-          $version = $entry.resolved
-          Invoke-WebRequest "https://www.nuget.org/api/v2/package/VideoLAN.LibVLC.Windows/$version" -OutFile ref.nupkg
-          $actual = [Convert]::ToBase64String([Security.Cryptography.SHA512]::HashData([IO.File]::ReadAllBytes("$PWD/ref.nupkg")))
-          if ($actual -ne $entry.contentHash) { throw "VideoLAN.LibVLC.Windows $version does not match the lock file: $actual" }
-          Expand-Archive ref.nupkg ref
+          pwsh -NoProfile -File eng/libvlc/fetch-reference.ps1 -Destination ref
 
       - name: Verify
         shell: pwsh
@@ -158,12 +152,7 @@ jobs:
       - name: Fetch the reference package
         shell: pwsh
         run: |
-          $lock = Get-Content src/ApSolutions.LocalMedia.Infrastructure/packages.lock.json -Raw | ConvertFrom-Json
-          $entry = $lock.dependencies.PSObject.Properties.Value.'VideoLAN.LibVLC.Windows'
-          Invoke-WebRequest "https://www.nuget.org/api/v2/package/VideoLAN.LibVLC.Windows/$($entry.resolved)" -OutFile ref.nupkg
-          $actual = [Convert]::ToBase64String([Security.Cryptography.SHA512]::HashData([IO.File]::ReadAllBytes("$PWD/ref.nupkg")))
-          if ($actual -ne $entry.contentHash) { throw "the reference package does not match the lock file: $actual" }
-          Expand-Archive ref.nupkg ref
+          pwsh -NoProfile -File eng/libvlc/fetch-reference.ps1 -Destination ref
 
       - name: Decode through the reference
         shell: pwsh
