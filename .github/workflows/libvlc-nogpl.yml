@@ -53,13 +53,14 @@ jobs:
           sh eng/libvlc/build-nogpl.sh "${{ matrix.arch }}" "$GITHUB_WORKSPACE/out"
 
       # The verify job needs the tree the plugins were built from, to read their licences, and the
-      # contrib config.mak, to see that GPL was off. Not the multi-gigabyte contrib build itself.
+      # Makefile contrib/bootstrap generated, to see that GPL was off. Not the multi-gigabyte
+      # contrib build itself.
       - name: Pack what the verification reads
         run: |
           cd "$GITHUB_WORKSPACE/out"
           tar -czf libvlc-build.tar.gz install \
             vlc-src/.git vlc-src/modules vlc-src/include vlc-src/src vlc-src/lib vlc-src/configure.ac \
-            vlc-src/contrib/contrib-*/config.mak
+            vlc-src/contrib/contrib-*/Makefile
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
