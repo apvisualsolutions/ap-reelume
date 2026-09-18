@@ -24,10 +24,11 @@ namespace ApSolutions.LocalMedia.Application.Metadata;
 /// person sees their own cover was carried by a private method no test could reach.
 /// </para>
 /// <para>
-/// <b>The provider is asked first,</b> and that order is deliberate rather than incidental: a title
-/// holding both draws today what it drew yesterday. A personal cover only ever reaches the field
-/// with the lock set, and a locked field is one no refresh overwrites — so in practice the two never
-/// compete. The day that stops being true, this is the one place that decides it.
+/// <b>The order is <see cref="CoverOrderPolicy"/>'s, and since 2026-09-18 the picked cover wins</b>
+/// (LIB-021, ADR-0009). Until then the provider was asked first and the two shared one field, which
+/// is how choosing a cover overwrote the provider's and restoring the provider's fields overwrote the
+/// choice. Now each has its own field, and this walks the order: the first origin with a file on
+/// disk draws, so a picked file that went missing falls through to the provider's.
 /// </para>
 /// </remarks>
 public sealed class ResolveTitlePoster(IArtworkStore artwork)
@@ -44,15 +45,33 @@ public sealed class ResolveTitlePoster(IArtworkStore artwork)
     /// reading an arbitrary path out of it would turn a metadata editor into a reader of any file on
     /// the machine.
     /// </remarks>
-    public string? Find(TitleId titleId, string? posterPath)
+    /// <param name="personalCover">
+    /// The picked cover's own field (LIB-021). <paramref name="posterPath"/> is still read as a
+    /// personal cover too, for a row stored before the field existed that nothing has re-saved yet.
+    /// </param>
+    public string? Find(TitleId titleId, string? posterPath, string? personalCover = null)
     {
-        if (PosterAddressPolicy.TryBuildPosterAddress(posterPath) is { } address)
+        foreach (var origin in CoverOrderPolicy.Default)
         {
-            return _artwork.Find(titleId, new Uri(address, UriKind.Absolute));
+            var file = origin == CoverOrigin.Personal
+                ? FindPersonal(titleId, personalCover) ?? FindPersonal(titleId, posterPath)
+                : FindProvider(titleId, posterPath);
+            if (file is not null)
+            {
+                return file;
+            }
         }
 
-        return PersonalCoverPathPolicy.TryGetCoverFileName(posterPath) is { } cover
+        return null;
+    }
+
+    private string? FindPersonal(TitleId titleId, string? value) =>
+        PersonalCoverPathPolicy.TryGetCoverFileName(value) is { } cover
             ? _artwork.FindPersonal(titleId, cover)
             : null;
-    }
+
+    private string? FindProvider(TitleId titleId, string? posterPath) =>
+        PosterAddressPolicy.TryBuildPosterAddress(posterPath) is { } address
+            ? _artwork.Find(titleId, new Uri(address, UriKind.Absolute))
+            : null;
 }
