@@ -29,7 +29,17 @@ public sealed record EditableMetadata(
     string? PosterPath,
     string? BackdropPath,
     string? TrailerKey,
-    IReadOnlySet<MetadataField> LockedFields);
+    IReadOnlySet<MetadataField> LockedFields)
+{
+    /// <summary>
+    /// The file name of the cover somebody picked from their own disk, kept apart from the provider's
+    /// <see cref="PosterPath"/> (ADR-0009, LIB-021). <see cref="MetadataMergePolicy"/> never assigns
+    /// it, and that is the whole fix: until 2026-09-18 both lived in <see cref="PosterPath"/>, so
+    /// choosing a cover overwrote the provider's and restoring the provider's fields overwrote the
+    /// choice and orphaned its file.
+    /// </summary>
+    public string? PersonalCover { get; init; }
+}
 
 public sealed class MetadataMergePolicy
 {

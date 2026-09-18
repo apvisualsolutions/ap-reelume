@@ -38,6 +38,41 @@ public sealed class MetadataMergePolicyTests
         Assert.Equal(current.LockedFields, merged.LockedFields);
     }
 
+    /// <summary>
+    /// ADR-0009: the cover somebody picked lives apart from the provider's, so a refresh has no field
+    /// to overwrite it through — not even one with every lock cleared, which is what restoring the
+    /// provider's fields does, and what used to orphan the chosen file.
+    /// </summary>
+    [Fact]
+    public void A_refresh_never_touches_the_hand_picked_cover_even_with_nothing_locked()
+    {
+        var chosen = new string('a', 64) + ".png";
+        var current = new EditableMetadata(
+            "Arrival",
+            "Arrival",
+            "Local overview",
+            2016,
+            ["Drama"],
+            "/poster.jpg",
+            "/backdrop.jpg",
+            null,
+            new HashSet<MetadataField>())
+        {
+            PersonalCover = chosen,
+        };
+        var remote = Details(
+            title: "La llegada",
+            overview: "Nuevo resumen",
+            genres: [],
+            poster: "/remote-poster.jpg",
+            backdrop: null);
+
+        var merged = new MetadataMergePolicy().Merge(current, remote);
+
+        Assert.Equal(chosen, merged.PersonalCover);
+        Assert.Equal("/remote-poster.jpg", merged.PosterPath);
+    }
+
     [Fact]
     public void Missing_remote_optional_values_do_not_erase_local_metadata()
     {
