@@ -13,9 +13,11 @@ This product uses TMDB and the TMDB APIs but is not endorsed, certified, or
 otherwise approved by TMDB. The attribution is readable in the application,
 under Settings.
 
-Video playback is done by LibVLC, from VideoLAN, unmodified and under
-LGPL-2.1-or-later; some of its plugins carry their own licences. That
-attribution is readable in the application too, under Settings.
+Video playback is done by LibVLC, from VideoLAN, under LGPL-2.1-or-later, in a
+build by AP Solutions without GPL code: its GPL plugins and two GPL parts of its
+source were taken out. licenses/NOTICE-VideoLAN.txt says what changed and where
+its source is. That attribution is readable in the application too, under
+Settings.
 
 AP Reelume usa componentes de terceros. Los avisos del artefacto exacto están en
 licenses/THIRD-PARTY-NOTICES.es.md y licenses/THIRD-PARTY-NOTICES.en.md, que
@@ -26,6 +28,8 @@ Este producto usa TMDB y las API de TMDB, pero no está avalado, certificado ni
 aprobado de ningún otro modo por TMDB. La atribución se lee en la aplicación, en
 Ajustes.
 
-La reproducción de vídeo la hace LibVLC, de VideoLAN, sin modificar y bajo
-LGPL-2.1-or-later; algunos de sus complementos llevan licencias propias. Esa
-atribución también se lee en la aplicación, en Ajustes.
+La reproducción de vídeo la hace LibVLC, de VideoLAN, bajo LGPL-2.1-or-later, en
+una compilación de AP Solutions sin código GPL: se le quitaron los complementos
+GPL y dos piezas GPL de su código. licenses/NOTICE-VideoLAN.txt dice qué cambió y
+dónde está su código fuente. Esa atribución también se lee en la aplicación, en
+Ajustes.

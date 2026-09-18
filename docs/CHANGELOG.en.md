@@ -10,6 +10,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The video engine no longer carries GPL code, and that removes what stopped the program from being
+  released.** Until now the application used VideoLAN's package, with fourteen GPL plugins inside a
+  program under a licence of its own. It now carries LibVLC built by AP Solutions from the same VLC
+  release, without those pieces, and **plays the same**: all ten test suites pass against it, including
+  the ones that decode real video, and the fourteen promised codecs give the same figures as the
+  previous package. The engine is published as a prerelease of this repository, pinned by the hash of
+  each file; the build downloads that one and only that one, and checks that what reaches the package
+  is exactly the verified tree. Because it is modified, the files that were touched say so with a date,
+  and its source code — patches, scripts and that of every third-party library it uses — travels with
+  every release. The application's credits and the legal notices say so. The LGPL-3.0 of three
+  libraries the engine already carried is still to be read (`ENG-028`).
+
 - **AP Reelume stops being free software and moves to a licence of its own, free of charge for
   whoever uses it.** The owner decided it for a business reason: the previous licence granted anyone
   the right to modify the program, redistribute it and sell it, which are the three things he wants

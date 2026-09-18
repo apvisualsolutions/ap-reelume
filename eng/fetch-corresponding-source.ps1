@@ -48,8 +48,12 @@ foreach ($source in $registry.sources) {
     # HTML, saved under the archive's name, on its way to being attached to a release as source
     # code. The name of a file proves nothing about it, so the format and a floor on the size are
     # checked before anything downstream believes it.
-    $magic = [System.IO.File]::ReadAllBytes($destination)
-    $prefix = -join ($magic | Select-Object -First ($source.magic.Length / 2) | ForEach-Object { $_.ToString('X2') })
+    # Only the prefix is read: the engine's build source is hundreds of megabytes, and ReadAllBytes
+    # stops working past two gigabytes.
+    $magic = [byte[]]::new($source.magic.Length / 2)
+    $stream = [System.IO.File]::OpenRead($destination)
+    try { [void]$stream.Read($magic, 0, $magic.Length) } finally { $stream.Dispose() }
+    $prefix = -join ($magic | ForEach-Object { $_.ToString('X2') })
     if ($prefix -ne $source.magic) {
         throw "$($source.fileName) starts with $prefix, not $($source.magic): what came back is not the archive."
     }
@@ -69,6 +73,16 @@ foreach ($source in $registry.sources) {
 
         Write-Output "  verified against the digest $($source.name) publishes"
     }
+    elseif ($source.PSObject.Properties['sha512'] -and $null -ne $source.sha512) {
+        # The engine's build source is ours: eng/libvlc/libvlc.lock.json pins it by the SHA-512 its
+        # release published, the same digest the release's SHA512SUMS.txt lists.
+        $actual512 = (Get-FileHash -LiteralPath $destination -Algorithm SHA512).Hash.ToLowerInvariant()
+        if ($actual512 -cne $source.sha512) {
+            throw "$($source.fileName) hashes to SHA-512 $actual512; the manifest records $($source.sha512)."
+        }
+
+        Write-Output "  verified against the SHA-512 the engine release pins"
+    }
     else {
         # Not a weaker promise about what is distributed, only about what it can be compared with:
         # the file attached to the release is the one this digest belongs to, and SHA256SUMS.txt
@@ -84,7 +98,7 @@ foreach ($source in $registry.sources) {
         url = $source.url
         sizeBytes = $actualSize
         sha256 = $actualHash
-        verifiedAgainstPublishedDigest = $null -ne $source.sha256
+        verifiedAgainstPublishedDigest = $null -ne $source.sha256 -or ($source.PSObject.Properties['sha512'] -and $null -ne $source.sha512)
     })
 }
 

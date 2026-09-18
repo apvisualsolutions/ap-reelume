@@ -84,9 +84,29 @@ foreach ($lockFile in $lockFiles) {
                 version     = [string]$entry.resolved
                 contentHash = [string]$entry.contentHash
                 licence     = Get-DeclaredLicence -Id $dependency.Name -PackageVersion ([string]$entry.resolved)
+                purl        = "pkg:nuget/$($dependency.Name)@$($entry.resolved)"
+                download    = "https://www.nuget.org/api/v2/package/$($dependency.Name)/$($entry.resolved)"
+                # NuGet publishes the content hash as base64 SHA-512; both formats want it in hex.
+                sha512      = if ($entry.contentHash) { [BitConverter]::ToString([Convert]::FromBase64String([string]$entry.contentHash)).Replace('-', '').ToLowerInvariant() } else { $null }
             }
         }
     }
+}
+
+# LibVLC is not a package since ENG-013, so no lock file above names it: it is the tree
+# eng/libvlc/libvlc.lock.json pins, built from VLC without GPL code and published by this
+# repository. Without this entry the bill of materials would lose the largest native component the
+# artifact carries on the very day it changed.
+$engineLock = Get-Content -LiteralPath (Join-Path $repoRoot 'eng/libvlc/libvlc.lock.json') -Raw | ConvertFrom-Json
+$engineAsset = $engineLock.assets.x64
+$engineVersion = $engineLock.tag -replace '^libvlc-', ''
+$resolved["LibVLC/$engineVersion"] = [pscustomobject]@{
+    name     = 'LibVLC'
+    version  = $engineVersion
+    licence  = 'LGPL-2.1-or-later'
+    purl     = "pkg:generic/libvlc@$engineVersion"
+    download = "https://github.com/$($engineLock.repository)/releases/download/$($engineLock.tag)/$($engineAsset.fileName)"
+    sha512   = $engineAsset.sha512
 }
 
 $components = @($resolved.Values | Sort-Object name, version)
@@ -120,13 +140,12 @@ $cyclone = [ordered]@{
                 type    = 'library'
                 name    = $_.name
                 version = $_.version
-                purl    = "pkg:nuget/$($_.name)@$($_.version)"
+                purl    = $_.purl
             }
-            if ($_.contentHash) {
-                # NuGet publishes the content hash as base64 SHA-512; CycloneDX wants it in hex.
+            if ($_.sha512) {
                 $component['hashes'] = @(@{
                         alg     = 'SHA-512'
-                        content = [BitConverter]::ToString([Convert]::FromBase64String($_.contentHash)).Replace('-', '').ToLowerInvariant()
+                        content = $_.sha512
                     })
             }
             $component['licenses'] = @(
@@ -163,15 +182,15 @@ $spdx = [ordered]@{
                 SPDXID           = "SPDXRef-Package-$($_.name -replace '[^A-Za-z0-9.\-]', '-')-$($_.version -replace '[^A-Za-z0-9.\-]', '-')"
                 name             = $_.name
                 versionInfo      = $_.version
-                downloadLocation = "https://www.nuget.org/api/v2/package/$($_.name)/$($_.version)"
+                downloadLocation = $_.download
                 filesAnalyzed    = $false
                 licenseConcluded = 'NOASSERTION'
                 licenseDeclared  = $_.licence
             }
-            if ($_.contentHash) {
+            if ($_.sha512) {
                 $package['checksums'] = @(@{
                         algorithm     = 'SHA512'
-                        checksumValue = [BitConverter]::ToString([Convert]::FromBase64String($_.contentHash)).Replace('-', '').ToLowerInvariant()
+                        checksumValue = $_.sha512
                     })
             }
             $package

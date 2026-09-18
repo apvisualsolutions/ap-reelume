@@ -198,19 +198,21 @@ public sealed class LicenceTextTests
 
     /// <summary>
     /// LibVLC is the one component whose licence obligation reaches past a copyright line: LGPL-2.1 §6
-    /// is met by naming the unmodified upstream build the binaries came from, so the notice states the
-    /// resolved versions rather than the package name alone.
+    /// is met by naming the exact build the binaries came from, so the notice states the pinned engine
+    /// release and the resolved LibVLCSharp version rather than names alone.
     /// </summary>
+    /// <remarks>
+    /// Until 2026-09-18 the engine was VideoLAN's NuGet package and its version came from the lock
+    /// file. Since ENG-013 it is a tree this repository builds and publishes, and the only statement
+    /// of which one ships is <c>eng/libvlc/libvlc.lock.json</c>.
+    /// </remarks>
     [Fact]
     public void The_videolan_notice_names_the_exact_build_its_binaries_came_from()
     {
         var notice = File.ReadAllText(LicencePath("NOTICE-VideoLAN.txt"));
-        var resolved = ResolvedPackages();
 
-        foreach (var package in new[] { "VideoLAN.LibVLC.Windows", "LibVLCSharp" })
-        {
-            Assert.Contains($"{package} {resolved[package]}", notice, StringComparison.Ordinal);
-        }
+        Assert.Contains(EngineTag(), notice, StringComparison.Ordinal);
+        Assert.Contains($"LibVLCSharp {ResolvedPackages()["LibVLCSharp"]}", notice, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -223,19 +225,46 @@ public sealed class LicenceTextTests
     /// the source of something else, quietly, so the registry names the package each entry belongs
     /// to and this compares it against what the build resolved.
     /// </remarks>
-    [Theory]
-    [InlineData("VideoLAN.LibVLC.Windows")]
-    [InlineData("LibVLCSharp")]
-    public void The_corresponding_source_registry_belongs_to_the_binaries_that_travel(string package)
+    [Fact]
+    public void The_corresponding_source_registry_belongs_to_the_binaries_that_travel()
     {
         using var registry = JsonDocument.Parse(
             File.ReadAllText(RepositoryLayout.PathFromRoot("eng/corresponding-source.json")));
-        var expected = $"{package} {ResolvedPackages()[package]}";
+        var carriedBy = registry.RootElement.GetProperty("sources").EnumerateArray()
+            .ToDictionary(
+                source => source.GetProperty("name").GetString()!,
+                source => source.GetProperty("carriedBy").GetString() ?? string.Empty,
+                StringComparer.Ordinal);
 
-        Assert.Contains(
-            registry.RootElement.GetProperty("sources").EnumerateArray(),
-            source => (source.GetProperty("carriedBy").GetString() ?? string.Empty)
-                .Contains(expected, StringComparison.Ordinal));
+        Assert.Contains($"LibVLCSharp {ResolvedPackages()["LibVLCSharp"]}", carriedBy["LibVLCSharp"], StringComparison.Ordinal);
+
+        // The engine's source is two archives: VLC as VideoLAN publishes it, and what this repository
+        // added to build it — the patches, the scripts and every contrib tarball. Both belong to the
+        // pinned engine release, and naming anything else would offer the source of another build.
+        Assert.Contains(EngineTag(), carriedBy["vlc"], StringComparison.Ordinal);
+        Assert.Contains(EngineTag(), carriedBy["libvlc-build"], StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The engine's own source archive in the registry is the one the lock file pins, byte for byte.
+    /// </summary>
+    [Fact]
+    public void The_engine_build_source_is_the_pinned_archive()
+    {
+        using var registry = JsonDocument.Parse(
+            File.ReadAllText(RepositoryLayout.PathFromRoot("eng/corresponding-source.json")));
+        using var lockFile = JsonDocument.Parse(
+            File.ReadAllText(RepositoryLayout.PathFromRoot("eng/libvlc/libvlc.lock.json")));
+        var build = registry.RootElement.GetProperty("sources").EnumerateArray()
+            .Single(source => source.GetProperty("name").GetString() == "libvlc-build");
+        var pinned = lockFile.RootElement.GetProperty("sourceAsset");
+
+        Assert.Equal(pinned.GetProperty("fileName").GetString(), build.GetProperty("fileName").GetString());
+        Assert.Equal(pinned.GetProperty("sha512").GetString(), build.GetProperty("sha512").GetString());
+        Assert.EndsWith(
+            $"/releases/download/{EngineTag()}/{pinned.GetProperty("fileName").GetString()}",
+            build.GetProperty("url").GetString(),
+            StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -276,6 +305,14 @@ public sealed class LicenceTextTests
             LicenceDirectory,
             File.ReadAllText(RepositoryLayout.PathFromRoot(script)),
             StringComparison.Ordinal);
+    }
+
+    /// <summary>The engine release the build pins, e.g. <c>libvlc-3.0.23-nogpl.1</c>.</summary>
+    private static string EngineTag()
+    {
+        using var lockFile = JsonDocument.Parse(
+            File.ReadAllText(RepositoryLayout.PathFromRoot("eng/libvlc/libvlc.lock.json")));
+        return lockFile.RootElement.GetProperty("tag").GetString()!;
     }
 
     private static string LicencePath(string fileName) =>

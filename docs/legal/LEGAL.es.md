@@ -60,7 +60,17 @@ Compatibilidad: una licencia propietaria admite incorporar `LGPL-2.1-or-later`, 
 porque las bibliotecas viajan como archivos separados que quien quiera puede sustituir—. **Lo que no
 admite es código GPL.**
 
-**Complementos GPL de VideoLAN — ABIERTO desde el 2026-09-13, y bloquea la publicación.** Este punto
+**Complementos GPL de VideoLAN — CERRADO por ingeniería el 2026-09-18 (`ENG-013`).** La aplicación ya
+no lleva el paquete de VideoLAN: lleva LibVLC compilado por este repositorio desde la misma versión de
+VLC, sin código GPL, verificado por una puerta que lee la licencia de cada complemento en sus fuentes
+y fijado por hash (`eng/libvlc/libvlc.lock.json`). Está **modificado** —se le quitaron el algoritmo
+yadif y libdvdread, las dos piezas GPL que no eran un complemento entero—, y los ficheros tocados lo
+dicen con fecha, como pide el §2(b) de la LGPL-2.1. Su código fuente correspondiente viaja con cada
+versión (ver más abajo). **Lo que queda abierto de este punto es la `LGPL-3.0`** de gmp, nettle y
+live555, que ese paquete ya llevaba y nadie ha leído contra un programa propietario (`ENG-028`).
+
+Lo que sigue es la historia de cómo se abrió, y se conserva porque es el ejemplo de que una
+conclusión correcta puede dejar de serlo sin que nadie toque el código. Este punto
 estuvo cerrado desde el 2026-08-10 **con el razonamiento contrario**, y conviene leer cómo se
 invirtió, porque es el ejemplo de que una conclusión correcta puede dejar de serlo sin que nadie
 toque el código. Entonces el argumento era: el `COPYING` del árbol de VLC lleva la GPL versión 2
@@ -86,20 +96,21 @@ cifras salían de buscar `--enable-gpl` en los binarios, y esa cadena sólo la e
 **El núcleo, `libvlc.dll` y `libvlccore.dll`, está limpio.** No se ha distribuido ningún artefacto:
 el repositorio no tiene releases.
 
-**Consecuencia práctica, y es dura**: mientras ese complemento viaje dentro del paquete, **el
-artefacto no se puede distribuir** bajo la licencia propia. El código fuente de este repositorio sí
-puede llevarla —el árbol solo contiene código de AP Solutions—, pero el empaquetado queda suspendido.
+**La consecuencia práctica fue dura mientras duró**: con esos complementos dentro del paquete, **el
+artefacto no se podía distribuir** bajo la licencia propia, y el empaquetado quedó suspendido del
+2026-09-13 al 2026-09-18.
 
-**La salida está medida y no quita nada de lo que el programa reproduce hoy.** La biblioteca que
+**La salida se midió y no quita nada de lo que el programa reproduce.** La biblioteca que
 descodifica es `LGPL` por defecto, y en FFmpeg lo contagioso son piezas **opcionales** que se activan
 al compilar —un filtro de posprocesado heredado y algunas optimizaciones—; **ningún decodificador está
 entre ellas**. Los módulos GPL de VLC son funciones que la aplicación no ofrece (listas de
 reproducción web, visualizaciones, VNC, filtros de auriculares), un algoritmo de desentrelazado que no
 es el que se usa por defecto y se quita con un parche, y la conversión de color por MMX/SSE2, que
 `libswscale` también hace. `libts` sin aribb24 sigue leyendo `.ts`; pierde los subtítulos de la
-televisión japonesa. La vía es compilar LibVLC y sus dependencias sin GPL, en las dos arquitecturas,
-quitar esos módulos, y mantener esa compilación (`ENG-013`). Es trabajo de infraestructura
-permanente, no una renuncia de formatos.
+televisión japonesa. La vía fue compilar LibVLC y sus dependencias sin GPL, en las dos arquitecturas,
+quitar esos módulos, y mantener esa compilación (`ENG-013`): los catorce códecs prometidos decodifican
+con las mismas cifras que el paquete de VideoLAN en Windows x64 y ARM64 reales, subtítulos incluidos.
+Es trabajo de infraestructura permanente, no una renuncia de formatos.
 
 **Los textos de las licencias ya viajan — cerrado el 2026-08-10.** Era el incumplimiento abierto: el
 artefacto llevaba la `LICENSE` de AP Reelume y los avisos de terceros, pero **no el texto de las
@@ -127,7 +138,9 @@ condiciones: si el ejecutable se ofrece para descarga desde un lugar designado, 
 **desde ese mismo lugar** es distribuirlo.
 
 Eso es lo que hace ahora la versión: `eng/fetch-corresponding-source.ps1` trae `vlc-3.0.23.tar.xz`
-—verificado contra la huella que VideoLAN publica— y el archivo de `LibVLCSharp 3.10.0`, y los adjunta
+—verificado contra la huella que VideoLAN publica—, el archivo de `LibVLCSharp 3.10.0` y, desde el
+2026-09-18, el código fuente de la compilación propia del motor —parches, guiones y el tarball de cada
+biblioteca de terceros que usó, verificado contra el SHA-512 que este repositorio fija—, y los adjunta
 junto a los binarios. La oferta escrita se queda para los canales donde «el mismo sitio» no significa
 nada, como una tienda, y ahora vale explícitamente para cualquier tercero. De paso se corrigieron dos
 cosas: el aviso nombraba `libvlc 3.0.23.1` —una versión cuyo fuente **no existe**, porque ese cuarto

@@ -59,9 +59,18 @@ and `BSD-3-Clause` while meeting their conditions — which for the LGPL are tho
 met because the libraries travel as separate files anyone may replace. **What it does not allow is
 GPL code.**
 
-**VideoLAN's GPL plugins — OPEN since 2026-09-13, and it blocks release.** This point was closed on
-2026-08-10 **with the opposite reasoning**, and how it inverted is worth reading, because it is the
-example of a correct conclusion ceasing to be one without anybody touching the code. The argument
+**VideoLAN's GPL plugins — CLOSED by engineering on 2026-09-18 (`ENG-013`).** The application no
+longer carries VideoLAN's package: it carries LibVLC built by this repository from the same VLC
+release, without GPL code, verified by a gate that reads each plugin's licence in its sources, and
+pinned by hash (`eng/libvlc/libvlc.lock.json`). It is **modified** — the yadif algorithm and
+libdvdread, the two GPL pieces that were not a whole plugin, were taken out — and the files touched
+say so with a date, as LGPL-2.1 §2(b) asks. Its corresponding source travels with every release (see
+below). **What stays open from this point is the `LGPL-3.0`** of gmp, nettle and live555, which that
+package already carried and nobody has read against a proprietary program (`ENG-028`).
+
+What follows is how it opened, and it is kept because it is the example of a correct conclusion
+ceasing to be one without anybody touching the code. This point was closed on 2026-08-10 **with the
+opposite reasoning**, and how it inverted is worth reading. The argument
 then was: VLC's tree carries the GPL version 2 **with** the "either version 2 of the License, or (at
 your option) any later version" clause, so a `GPL-2.0-or-later` plugin rises to GPL-3.0 and **sits
 inside a GPL-3.0 program**. The reasoning was valid and still is; what changed is the premise — **the
@@ -84,19 +93,20 @@ both figures came from searching the binaries for `--enable-gpl`, and only FFmpe
 **The core, `libvlc.dll` and `libvlccore.dll`, is clean.** No artifact has been distributed: the
 repository has no releases.
 
-**The practical consequence is hard**: while that plugin travels inside the package, **the artifact
-cannot be distributed** under the proprietary licence. This repository's source can carry it — the
-tree holds only AP Solutions' code — but packaging is suspended.
+**The practical consequence was hard while it lasted**: with those plugins inside the package, **the
+artifact could not be distributed** under the proprietary licence, and packaging was suspended from
+2026-09-13 to 2026-09-18.
 
-**The way out is measured and removes nothing the program plays today.** The decoding library is
+**The way out was measured and removes nothing the program plays.** The decoding library is
 `LGPL` by default, and in FFmpeg what is copyleft are **optional** pieces enabled at build time — a
 legacy post-processing filter and some optimisations; **no decoder is among them**. VLC's GPL modules
 are features the application does not offer (web playlists, visualisations, VNC, headphone filters),
 a deinterlacing algorithm that is not the default and is removed with a patch, and MMX/SSE2 colour
 conversion that `libswscale` also does. `libts` without aribb24 still reads `.ts`; it loses Japanese
-broadcast subtitles. The route is to build LibVLC and its dependencies without GPL, for both
-architectures, drop those modules, and maintain that build (`ENG-013`). That is permanent
-infrastructure work, not a loss of formats.
+broadcast subtitles. The route was to build LibVLC and its dependencies without GPL, for both
+architectures, drop those modules, and maintain that build (`ENG-013`): the fourteen promised codecs
+decode with the same figures as VideoLAN's package on real Windows x64 and ARM64, subtitles included.
+That is permanent infrastructure work, not a loss of formats.
 
 **The licence texts now travel — closed on 2026-08-10.** This was the open breach: the artifact
 carried AP Reelume's `LICENSE` and the third-party notices, but **not the text of the other
@@ -123,8 +133,10 @@ it unconditionally: where the executable is offered for download from a designat
 source from that same place is distributing it.
 
 That is what the release does now: `eng/fetch-corresponding-source.ps1` fetches `vlc-3.0.23.tar.xz` —
-verified against the digest VideoLAN publishes — and the `LibVLCSharp 3.10.0` archive, and attaches
-them beside the binaries. The written offer stays for channels where "the same place" means nothing,
+verified against the digest VideoLAN publishes — along with the `LibVLCSharp 3.10.0` archive and, since
+2026-09-18, the source of the engine's own build — patches, scripts and the tarball of every
+third-party library it used, verified against the SHA-512 this repository pins — and attaches them
+beside the binaries. The written offer stays for channels where "the same place" means nothing,
 such as a store, and it now explicitly stands for any third party. Two things were corrected along the
 way: the notice named `libvlc 3.0.23.1` — a version whose source **does not exist**, that fourth digit
 belonging to the NuGet package — and it did not mention that the work using the library is this

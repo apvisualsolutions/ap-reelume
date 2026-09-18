@@ -15,7 +15,7 @@ copyright. Nombrar el componente en una tabla no es ninguna de las dos cosas.
 |---|---|---|
 | `Apache-2.0.txt` | Texto canónico | SQLitePCLRaw (§4a) |
 | `BSD-3-Clause.txt` | Texto canónico | ANGLE y Skia |
-| `GPL-2.0.txt` | Texto canónico | Complementos de VLC (§1) |
+| `GPL-2.0.txt` | Texto canónico | Ningún complemento desde el 2026-09-18; es la licencia de VLC como programa, que `libvlc` muestra de sí mismo |
 | `LGPL-2.1.txt` | Texto canónico | LibVLC, libvlccore y LibVLCSharp (§6) |
 | `MIT.txt` | Texto canónico y los avisos de quienes no publican el suyo | Avalonia, MicroCom, Tmds.DBus.Protocol, Microsoft y el motor de .NET |
 | `NOTICE-ANGLE.txt` | Copia literal del paquete | Avalonia.Angle.Windows.Natives |
@@ -61,7 +61,8 @@ distribuyendo el aviso de la versión anterior.
 ## Lo que sigue abierto
 
 El paquete lleva las licencias; el dictamen jurídico de `REL-004` sigue pendiente y es de quien
-publica, no de quien programa. Dos puntos concretos le tocan: bajo qué apartado del §6 de la LGPL-2.1
-queda amparada la forma en que LibVLC viaja aquí —biblioteca dinámica sin modificar y sustituible— y
-si la oferta escrita de código correspondiente que `NOTICE-VideoLAN.txt` recoge basta como la
-acompaña el §3 de la GPL-2.0 para los complementos.
+publica, no de quien programa. Desde el 2026-09-18 el motor es una compilación propia sin GPL, así
+que ningún complemento necesita ya la oferta del §3 de la GPL-2.0. El punto que le queda es bajo qué
+apartado del §6 de la LGPL-2.1 queda amparada la forma en que LibVLC viaja aquí —biblioteca dinámica
+modificada, con su código fuente adjunto, y sustituible—, y la `LGPL-3.0` de gmp, nettle y live555,
+que es `ENG-028`.

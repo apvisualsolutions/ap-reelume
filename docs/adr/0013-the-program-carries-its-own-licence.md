@@ -226,3 +226,30 @@ modules are dropped by reading their sources, never from a hand list. MSYS2 is r
 LGPL-3.0 de tres bibliotecas que el motor ya lleva). / What remains is ENG-013's (bringing the tree
 into the application) and ENG-028's (reading the LGPL-3.0 of three libraries the engine already
 carries).
+
+---
+
+## Enmienda del 2026-09-18, segunda — la aplicación lleva el motor propio, y dónde vive / Second amendment of 2026-09-18 — the application ships the engine of its own, and where it lives
+
+**La aplicación deja de referenciar `VideoLAN.LibVLC.Windows`.** El motor llega del árbol que
+`libvlc-nogpl.yml` compila y verifica, **promovido sin recompilar** por `libvlc-publish.yml` a una
+**prerelease de este mismo repositorio** y fijado por el SHA-512 de cada archivo en
+`eng/libvlc/libvlc.lock.json`. `eng/libvlc/LibVlc.targets` lo descarga, rechaza cualquier otro byte y lo
+copia con la misma forma que tenía el paquete. El sitio lo eligió el propietario el mismo día: es
+permanente, se descarga sin credenciales y el actualizador no puede confundirlo con una versión de la
+aplicación, porque sólo pregunta por `releases/latest`, que por documentación de GitHub excluye las
+prereleases. / The application stops referencing the NuGet package. The engine comes from the tree
+the no-GPL workflow built and verified, promoted without rebuilding to a prerelease of this
+repository and pinned by SHA-512; the owner chose the place the same day.
+
+**Descartado**: guardar los binarios en el repositorio con Git LFS (cuota y peso sin ganar nada) y
+recompilar el motor en cada run de CI (media hora por arquitectura y un binario distinto cada vez, sin
+nada fijo que auditar). / Rejected: Git LFS, and rebuilding the engine on every CI run.
+
+**El motor está modificado**, y por eso los ficheros que tocan los dos parches llevan un aviso con
+fecha, como pide el §2(b) de la LGPL-2.1. Su código fuente correspondiente —VLC en el tag, los parches
+y guiones en el commit que compiló, y cada tarball de terceros que usó— se publica con el motor y
+viaja con cada versión de la aplicación. / The engine is modified, the patched files say so with a
+date (LGPL-2.1 §2(b)), and its corresponding source travels with every release.
+
+**Lo que queda abierto** es `ENG-028`. / What remains open is ENG-028.

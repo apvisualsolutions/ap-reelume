@@ -1,0 +1,58 @@
+<!--
+  SPDX-FileCopyrightText: 2026 AP Solutions
+  SPDX-License-Identifier: LicenseRef-APSolutions
+
+  Copies the LibVLC tree libvlc.lock.json pins into the output, in place of the
+  VideoLAN.LibVLC.Windows NuGet package (ENG-013). The shape is that package's on purpose: the
+  same libvlc\win-<arch>\ folders, chosen by $(Platform) the same way, as Content with
+  PreserveNewest. So LibVLCSharp's Core.Initialize() finds the engine where it always did, the
+  content flows to every project that references Infrastructure as it always did, and the
+  packaging scripts, which delete the foreign architecture from a layout, keep working unchanged.
+
+  What changed is where the tree comes from: fetch-libvlc.ps1 downloads it and refuses any bytes
+  that are not the pinned ones. It is skipped when neither the lock file nor the script changed
+  since the markers were written, which is what keeps it off the cost of an ordinary build.
+-->
+<Project>
+  <PropertyGroup>
+    <LibVlcDirectory>$([MSBuild]::NormalizeDirectory($(MSBuildThisFileDirectory)..\..\artifacts\libvlc))</LibVlcDirectory>
+    <LibVlcX64Enabled Condition="'$(LibVlcX64Enabled)' == '' AND ('$(Platform)' == 'x64' OR '$(Platform)' == 'AnyCPU')">true</LibVlcX64Enabled>
+    <LibVlcArm64Enabled Condition="'$(LibVlcArm64Enabled)' == '' AND ('$(Platform)' == 'ARM64' OR '$(Platform)' == 'AnyCPU')">true</LibVlcArm64Enabled>
+    <LibVlcArchitectures Condition="'$(LibVlcX64Enabled)' == 'true'">x64</LibVlcArchitectures>
+    <LibVlcArchitectures Condition="'$(LibVlcArm64Enabled)' == 'true'">$(LibVlcArchitectures),arm64</LibVlcArchitectures>
+    <LibVlcArchitectures>$(LibVlcArchitectures.TrimStart(','))</LibVlcArchitectures>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <LibVlcMarker Include="$(LibVlcDirectory)win-x64.sha512" Condition="'$(LibVlcX64Enabled)' == 'true'" />
+    <LibVlcMarker Include="$(LibVlcDirectory)win-arm64.sha512" Condition="'$(LibVlcArm64Enabled)' == 'true'" />
+  </ItemGroup>
+
+  <Target Name="FetchLibVlc"
+          BeforeTargets="BeforeBuild"
+          Condition="'$(LibVlcArchitectures)' != ''"
+          Inputs="$(MSBuildThisFileDirectory)libvlc.lock.json;$(MSBuildThisFileDirectory)fetch-libvlc.ps1"
+          Outputs="@(LibVlcMarker)">
+    <Exec Command="pwsh -NoProfile -NonInteractive -File &quot;$(MSBuildThisFileDirectory)fetch-libvlc.ps1&quot; -Architecture $(LibVlcArchitectures)" />
+  </Target>
+
+  <!-- A target and not a static ItemGroup: the tree does not exist until FetchLibVlc has run. -->
+  <Target Name="CollectLibVlcFiles" AfterTargets="FetchLibVlc" BeforeTargets="BeforeBuild">
+    <ItemGroup Condition="'$(LibVlcX64Enabled)' == 'true'">
+      <LibVlcX64File Include="$(LibVlcDirectory)win-x64\libvlc.dll;$(LibVlcDirectory)win-x64\libvlccore.dll;$(LibVlcDirectory)win-x64\hrtfs\**;$(LibVlcDirectory)win-x64\plugins\**" />
+      <Content Include="@(LibVlcX64File)">
+        <Link>libvlc\win-x64\$([MSBuild]::MakeRelative($(LibVlcDirectory)win-x64\, %(FullPath)))</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+    <ItemGroup Condition="'$(LibVlcArm64Enabled)' == 'true'">
+      <LibVlcArm64File Include="$(LibVlcDirectory)win-arm64\libvlc.dll;$(LibVlcDirectory)win-arm64\libvlccore.dll;$(LibVlcDirectory)win-arm64\hrtfs\**;$(LibVlcDirectory)win-arm64\plugins\**" />
+      <Content Include="@(LibVlcArm64File)">
+        <Link>libvlc\win-arm64\$([MSBuild]::MakeRelative($(LibVlcDirectory)win-arm64\, %(FullPath)))</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+    <Error Condition="'$(LibVlcX64Enabled)' == 'true' AND !Exists('$(LibVlcDirectory)win-x64\libvlc.dll')" Text="The pinned LibVLC x64 tree is not in $(LibVlcDirectory)win-x64: run eng/libvlc/fetch-libvlc.ps1." />
+    <Error Condition="'$(LibVlcArm64Enabled)' == 'true' AND !Exists('$(LibVlcDirectory)win-arm64\libvlc.dll')" Text="The pinned LibVLC arm64 tree is not in $(LibVlcDirectory)win-arm64: run eng/libvlc/fetch-libvlc.ps1." />
+  </Target>
+</Project>

@@ -209,8 +209,7 @@
           "ApSolutions.LocalMedia.Domain": "[0.1.0, )",
           "BouncyCastle.Cryptography": "[2.7.0, )",
           "LibVLCSharp": "[3.10.0, )",
-          "Microsoft.Data.Sqlite": "[10.0.10, )",
-          "VideoLAN.LibVLC.Windows": "[3.0.23.1, )"
+          "Microsoft.Data.Sqlite": "[10.0.10, )"
         }
       },
       "BouncyCastle.Cryptography": {
@@ -241,12 +240,6 @@
         "requested": "[3.53.3, )",
         "resolved": "3.53.3",
         "contentHash": "ZXiSbBkrlw2Of/dBqny/qtQol7dlThrUD8zH/jkQicCFm2yn2BbhKsQW0+YHAzhANWz4ZJCz7gvo88BwluVhkA=="
-      },
-      "VideoLAN.LibVLC.Windows": {
-        "type": "CentralTransitive",
-        "requested": "[3.0.23.1, )",
-        "resolved": "3.0.23.1",
-        "contentHash": "yTGNrzj+Q/t72VNKK0d64jZ+8BGu5Vcp2nxpZ2ll350LkRWKSwqShGpZWcVxXVP8TiMbeGML09+Jzz3hNsIcqA=="
       }
     }
   }

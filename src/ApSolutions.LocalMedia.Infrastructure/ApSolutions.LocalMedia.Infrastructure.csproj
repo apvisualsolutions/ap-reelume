@@ -15,8 +15,12 @@
     <PackageReference Include="BouncyCastle.Cryptography" />
     <PackageReference Include="LibVLCSharp" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
-    <PackageReference Include="VideoLAN.LibVLC.Windows" />
   </ItemGroup>
+  <!--
+    The native engine is not a NuGet package any more: VideoLAN.LibVLC.Windows carries GPL plugins,
+    and this is the tree built without them, pinned by hash (ENG-013).
+  -->
+  <Import Project="..\..\eng\libvlc\LibVlc.targets" />
   <ItemGroup>
     <EmbeddedResource Include="Data\Migrations\*.sql" />
     <EmbeddedResource Include="Data\Migrations\Manifest.json" />

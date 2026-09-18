@@ -25,12 +25,6 @@
           "SQLitePCLRaw.core": "2.1.11"
         }
       },
-      "VideoLAN.LibVLC.Windows": {
-        "type": "Direct",
-        "requested": "[3.0.23.1, )",
-        "resolved": "3.0.23.1",
-        "contentHash": "yTGNrzj+Q/t72VNKK0d64jZ+8BGu5Vcp2nxpZ2ll350LkRWKSwqShGpZWcVxXVP8TiMbeGML09+Jzz3hNsIcqA=="
-      },
       "Microsoft.Data.Sqlite.Core": {
         "type": "Transitive",
         "resolved": "10.0.10",

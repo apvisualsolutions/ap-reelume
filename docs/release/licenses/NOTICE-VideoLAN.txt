@@ -1,41 +1,47 @@
 VideoLAN — LibVLC, its core and its plugins
 ===========================================
 
-AP Reelume decodes and plays video through LibVLC. Two packages published by VideoLAN bring it in,
-and both travel in this artifact unmodified:
+AP Reelume decodes and plays video through LibVLC, the engine of the VLC media player by VideoLAN.
+Two pieces of it travel in this artifact:
 
-    LibVLCSharp 3.10.0                  the managed binding                LGPL-2.1-or-later
-    VideoLAN.LibVLC.Windows 3.0.23.1    libvlc.dll, libvlccore.dll,        LGPL-2.1-or-later for the
-                                        and the plugins under plugins/     core; see the plugins below
+    LibVLCSharp 3.10.0              the managed binding, as VideoLAN            LGPL-2.1-or-later
+                                    publishes it on NuGet, unmodified
+    LibVLC libvlc-3.0.23-nogpl.1    libvlc.dll, libvlccore.dll and the          LGPL-2.1-or-later
+                                    plugins under plugins/, built by
+                                    AP Solutions from vlc 3.0.23 without
+                                    GPL code
 
 Copyright © the VideoLAN project and its contributors.
 
-Neither package carries a COPYING file, so nothing upstream supplies the texts and they are supplied
-here: LGPL-2.1.txt covers the binding and the core, and GPL-2.0.txt covers the plugins that are
-licensed GPL rather than LGPL. Read from the VLC 3.0.23 sources for every plugin under plugins/
-(2026-09-18): fourteen are GPL on x64 and eleven on ARM64, for three reasons.
-libavcodec_plugin.dll and libswscale_plugin.dll, because their FFmpeg build was compiled with
---enable-gpl. libx26410b, liblua, libdeinterlace, libhqdn3d, libheadphone_channel_mixer,
-libdolby_surround_decoder, libvisual, libremoteosd and, on x64, libglspectrum, libi420_rgb_mmx and
-libi420_rgb_sse2, because their own source files are. And libts_plugin.dll, because it links the
-aribb24 library. The core, libvlc.dll and libvlccore.dll, is not.
+Why the engine is not VideoLAN's own build. VideoLAN's Windows package is compiled with GPL code in
+it: read from the VLC 3.0.23 sources, fourteen of its plugins are GPL on x64 and eleven on ARM64 —
+FFmpeg built with --enable-gpl, VLC modules whose own sources are GPL, and a demuxer linking the
+aribb24 library. A GPL plugin cannot ship inside a program under a licence of its own, so the engine
+this artifact carries is built from the same VLC release with GPL switched off, and every plugin
+whose sources are GPL is left out. What was built, how, and why each plugin is absent is recorded in
+the manifest.json published with the engine.
 
-The GPL-2.0 text in this folder was taken from VLC's own tree rather than from a third party: the
-package ships it as the string vlc_about.h compiles into libvlc, which is the licence VLC displays
-for itself. It carries the "either version 2 of the License, or (at your option) any later version"
-clause. Until 2026-09-13 that clause was what let a GPL-2.0-or-later plugin sit inside this program,
-which was then GPL-3.0-or-later; the program now carries a licence of its own, so the clause no longer
-resolves the question and the copyleft plugins are an open point recorded in the third-party notices.
+It is modified, and these are the modifications:
 
-Nothing in these binaries has been modified. They are the files VideoLAN publishes, placed in the
-payload as separate dynamic libraries that the program loads at run time; replacing them with another
-build of the same library is a matter of overwriting the files, and the program will use the
-replacement as long as it is interface-compatible.
+    0001-deinterlace-drop-yadif.patch    removes the yadif deinterlacing algorithm, which is GPL, from
+                                         the deinterlace plugin; the other algorithms remain
+    0002-build-sh-no-dvdread.patch       removes libdvdread, which is GPL, from VideoLAN's build script
 
-A note on the version numbers, because they are not the same number. The NuGet package is
-VideoLAN.LibVLC.Windows 3.0.23.1, whose fourth digit is that package's own packaging revision.
-libvlc.dll declares file version 3.0.23, and vlc 3.0.23 is the tree VideoLAN publishes source for;
-there is no vlc-3.0.23.1. The corresponding source is therefore the 3.0.23 one.
+Nothing else in VLC's source was changed. The build runs VideoLAN's own script
+(extras/package/win32/build.sh) inside VideoLAN's own build images, with third-party libraries
+configured by contrib/bootstrap --disable-gpl, and FreeType under its FreeType Licence rather than
+the GPL (see the third-party notices).
+
+LGPL-2.1.txt covers the binding, the core and the plugins. GPL-2.0.txt is in this folder because it is
+VLC's licence for the VLC media player as a whole, which vlc_about.h compiles into libvlc as the text
+the player displays for itself; no plugin this artifact carries is under it. Some third-party libraries
+linked into the plugins (gmp, nettle and live555) are under LGPL-3.0; how that licence reads against
+this program is an open point recorded in the third-party notices.
+
+The libraries are separate dynamic libraries that the program loads at run time. Replacing them with
+another build of the same library — VideoLAN's own, or one built from the source below — is a matter
+of overwriting the files, and the program will use the replacement as long as it is
+interface-compatible.
 
 
 Where to get the corresponding source
@@ -44,25 +50,32 @@ Where to get the corresponding source
 It travels with the release. Every release that carries these binaries also carries, as attachments
 alongside them, the corresponding source archives:
 
-    vlc-3.0.23.tar.xz           https://download.videolan.org/vlc/3.0.23/vlc-3.0.23.tar.xz
-    LibVLCSharp-3.10.0.tar.gz   https://code.videolan.org/videolan/LibVLCSharp/-/archive/3.10.0/LibVLCSharp-3.10.0.tar.gz
+    vlc-3.0.23.tar.xz                     https://download.videolan.org/vlc/3.0.23/vlc-3.0.23.tar.xz
+    libvlc-3.0.23-nogpl.1-source.tar      https://github.com/apvisualsolutions/ap-reelume/releases/download/libvlc-3.0.23-nogpl.1/libvlc-3.0.23-nogpl.1-source.tar
+    LibVLCSharp-3.10.0.tar.gz             https://codeload.github.com/videolan/libvlcsharp/tar.gz/refs/tags/3.10.0
 
-That is the point of section 6(d) of the LGPL-2.1 and of the last paragraph of section 3 of the
-GPL-2.0: where an executable is offered for download from a designated place, offering equivalent
-access to copy the source from that same place is distribution of the source. The archives are
-fetched during the release with their digests recorded in SHA256SUMS.txt, which the release signs, and
-the digest of the VLC archive is checked against the one VideoLAN publishes for it.
+The second archive is everything needed on top of the first to rebuild these exact binaries: the two
+patches and the scripts that built them, and the source tarball of every third-party library the build
+fetched (FFmpeg among them), each checked against the digest VLC's own contrib system pins. The engine
+release it belongs to, libvlc-3.0.23-nogpl.1, publishes it beside the binaries.
+
+That is the point of section 6(d) of the LGPL-2.1: where an executable is offered for download from a
+designated place, offering equivalent access to copy the source from that same place is distribution
+of the source. The archives are fetched during the release with their digests recorded in
+SHA256SUMS.txt, which the release signs; the VLC archive is checked against the digest VideoLAN
+publishes for it, and the engine archive against the SHA-512 this repository pins for it.
 
 The work that uses the library is this program itself. Its source is public at
 https://github.com/apvisualsolutions/ap-reelume, though since 2026-09-13 under a licence of its own
-rather than a free one, so LGPL-2.1 §6(a) is no longer the route. The route is the one that was
-already true in fact: anyone who wants to modify LibVLC and use the result has the library's source
-above, and does not have to relink anything, because the libraries are separate files this program
-loads at run time and anybody may replace.
+rather than a free one, so LGPL-2.1 §6(a) is not the route. The route is the one that is true in fact:
+anyone who wants to modify LibVLC and use the result has the library's source above, and does not have
+to relink anything, because the libraries are separate files this program loads at run time and
+anybody may replace.
 
 For any channel where "the same place" means nothing — a store, a mirror, a copy passed on by hand —
 this offer stands instead, and it stands for any third party, not only for whoever received the
 binary: valid for three years from the date of the release this artifact belongs to, AP Solutions
-will supply the complete corresponding machine-readable source code of LibVLC, of its plugins and of
-LibVLCSharp as distributed here, on a medium customarily used for software interchange, for no more
-than the cost of performing the distribution. Write to the address in SECURITY.md.
+will supply the complete corresponding machine-readable source code of LibVLC, of its plugins, of the
+third-party libraries linked into them and of LibVLCSharp as distributed here, on a medium customarily
+used for software interchange, for no more than the cost of performing the distribution. Write to the
+address in SECURITY.md.

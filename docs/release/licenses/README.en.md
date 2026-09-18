@@ -15,7 +15,7 @@ reproduced. Naming the component in a table is neither of those.
 |---|---|---|
 | `Apache-2.0.txt` | Canonical text | SQLitePCLRaw (§4a) |
 | `BSD-3-Clause.txt` | Canonical text | ANGLE and Skia |
-| `GPL-2.0.txt` | Canonical text | VLC plugins (§1) |
+| `GPL-2.0.txt` | Canonical text | No plugin since 2026-09-18; it is VLC's licence as a program, which `libvlc` displays for itself |
 | `LGPL-2.1.txt` | Canonical text | LibVLC, libvlccore and LibVLCSharp (§6) |
 | `MIT.txt` | Canonical text plus the notices of those who publish none | Avalonia, MicroCom, Tmds.DBus.Protocol, Microsoft and the .NET runtime |
 | `NOTICE-ANGLE.txt` | Verbatim copy from the package | Avalonia.Angle.Windows.Natives |
@@ -61,7 +61,7 @@ notice turns the test red instead of leaving the artifact distributing the previ
 ## What is still open
 
 The package carries the licences; the `REL-004` legal opinion is still pending and belongs to
-whoever publishes, not to whoever writes code. Two concrete points are for it: which subsection of
-LGPL-2.1 §6 covers the way LibVLC travels here — an unmodified, replaceable dynamic library — and
-whether the written offer of corresponding source recorded in `NOTICE-VideoLAN.txt` is enough as the
-accompaniment GPL-2.0 §3 asks for on behalf of the plugins.
+whoever publishes, not to whoever writes code. Since 2026-09-18 the engine is a build of our own
+without GPL, so no plugin needs the GPL-2.0 §3 offer any more. The point left for it is which
+subsection of LGPL-2.1 §6 covers the way LibVLC travels here — a modified dynamic library, with its
+source attached, and replaceable — and the `LGPL-3.0` of gmp, nettle and live555, which is `ENG-028`.

@@ -10,6 +10,18 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El motor de vídeo ya no lleva código GPL, y eso quita lo que impedía publicar el programa.** Hasta
+  ahora la aplicación usaba el paquete de VideoLAN, con catorce complementos GPL dentro de un programa
+  de licencia propia. Ahora lleva LibVLC compilado por AP Solutions desde la misma versión de VLC, sin
+  esas piezas, y **reproduce lo mismo**: las diez baterías de pruebas pasan contra él, incluidas las
+  que decodifican vídeo real, y los catorce códecs prometidos dan las mismas cifras que el paquete
+  anterior. El motor se publica como versión previa de este repositorio, fijado por el hash de cada
+  archivo; la compilación descarga ese y sólo ese, y comprueba que lo que llega al paquete es
+  exactamente el árbol verificado. Como está modificado, los ficheros que se tocaron lo dicen con fecha,
+  y su código fuente —parches, guiones y el de cada biblioteca de terceros que usa— viaja con cada
+  versión. Los créditos de la aplicación y los avisos legales lo cuentan así. Queda por leer la
+  LGPL-3.0 de tres bibliotecas que el motor ya llevaba antes (`ENG-028`).
+
 - **AP Reelume deja de ser software libre y pasa a una licencia propia, gratuita para quien la
   use.** Lo decidió el propietario por un motivo de negocio: la licencia anterior concedía a
   cualquiera el derecho a modificar el programa, redistribuirlo y venderlo, que son las tres cosas
