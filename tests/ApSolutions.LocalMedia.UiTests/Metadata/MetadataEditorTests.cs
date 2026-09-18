@@ -215,22 +215,26 @@ public sealed class MetadataEditorTests
     private static readonly MetadataLanguage Language = new("es-ES", "en-US");
 
     /// <summary>The refresh as the composition root builds it: resolving through the provider.</summary>
-    /// <summary>The editor takes an imported cover and locks the field it went into (LIB-018).</summary>
+    /// <summary>
+    /// The editor files an imported cover in its own field and saves it there, leaving the provider's
+    /// poster and its lock exactly as they were (LIB-021, ADR-0009).
+    /// </summary>
     /// <remarks>
-    /// <b>The lock is the half that is easy to leave out and impossible to notice.</b> Without it the
-    /// next provider refresh puts the provider's artwork back over the cover somebody chose, and the
-    /// only symptom is a cover that reverts days later — which nobody would connect to the button
-    /// that set it. It is asserted from a state where both are unset, so a fixture that happened to
-    /// arrive locked could not satisfy it.
+    /// <b>Until 2026-09-18 this test asserted the defect.</b> It was called «an imported cover reaches
+    /// the poster field and locks it»: the chosen path overwrote the provider's field and set its lock,
+    /// because that lock was the only thing standing between the choice and the next refresh — and
+    /// «restore the provider's fields» clears every lock, so the choice was lost and its file orphaned.
+    /// With its own field nothing needs locking, and the provider's poster is never touched.
     /// </remarks>
     [AvaloniaFact]
-    public async Task An_imported_cover_reaches_the_poster_field_and_locks_it()
+    public async Task An_imported_cover_is_saved_apart_and_leaves_the_provider_poster_alone()
     {
+        var chosen = new string('e', 64) + ".png";
         var catalog = Unidentified() with
         {
             Metadata = Catalog().Metadata with
             {
-                PosterPath = null,
+                PosterPath = "/provider-poster.jpg",
                 LockedFields = new HashSet<MetadataField>(),
             },
         };
@@ -240,7 +244,7 @@ public sealed class MetadataEditorTests
             _ => Task.FromResult<string?>(Path.Combine("C:", "arte", "portada.png")),
             (_, _, _, _) => Task.FromResult(new PersonalCoverResult(
                 CoverImageVerdict.Approved,
-                Path.Combine("C:", "datos", "personal-artwork", "abc", "1.png"))));
+                Path.Combine("C:", "datos", "personal-artwork", "abc", chosen))));
 
         var viewModel = new MetadataEditorViewModel(
             catalog,
@@ -248,8 +252,7 @@ public sealed class MetadataEditorTests
             Refresh(repository),
             picker);
 
-        Assert.Null(viewModel.PosterPath);
-        Assert.False(viewModel.LockPosterPath);
+        Assert.Null(viewModel.PersonalCover);
 
         picker.ChooseCoverCommand.Execute(null);
         for (var i = 0; i < 200 && picker.IsChoosing; i++)
@@ -257,10 +260,18 @@ public sealed class MetadataEditorTests
             await Task.Delay(5, TestContext.Current.CancellationToken);
         }
 
-        Assert.Equal(Path.Combine("C:", "datos", "personal-artwork", "abc", "1.png"), viewModel.PosterPath);
-        Assert.True(
-            viewModel.LockPosterPath,
-            "the poster field was left unlocked, so the next provider refresh overwrites the chosen cover.");
+        Assert.Equal(chosen, viewModel.PersonalCover);
+        Assert.Equal("/provider-poster.jpg", viewModel.PosterPath);
+        Assert.False(viewModel.LockPosterPath);
+
+        viewModel.SaveCommand.Execute(null);
+        for (var i = 0; i < 200 && repository.Value.Metadata.PersonalCover is null; i++)
+        {
+            await Task.Delay(5, TestContext.Current.CancellationToken);
+        }
+
+        Assert.Equal(chosen, repository.Value.Metadata.PersonalCover);
+        Assert.Equal("/provider-poster.jpg", repository.Value.Metadata.PosterPath);
     }
 
     private static RefreshMetadata Refresh(ICatalogMetadataRepository repository) => new(

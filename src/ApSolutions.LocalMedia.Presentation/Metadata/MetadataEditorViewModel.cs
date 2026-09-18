@@ -24,6 +24,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
     private string? _genres;
     private string? _posterPath;
     private string? _backdropPath;
+    private string? _personalCover;
     private bool _lockTitle;
     private bool _lockOriginalTitle;
     private bool _lockOverview;
@@ -95,6 +96,13 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
 
     public string? BackdropPath { get => _backdropPath; set => SetField(ref _backdropPath, value); }
 
+    /// <summary>
+    /// The picked cover's file name, kept apart from <see cref="PosterPath"/> (LIB-021, ADR-0009).
+    /// Choosing a cover fills this and nothing else, so the provider's poster and its lock stay as
+    /// they were.
+    /// </summary>
+    public string? PersonalCover { get => _personalCover; private set => SetField(ref _personalCover, value); }
+
     public bool LockTitle { get => _lockTitle; set => SetField(ref _lockTitle, value); }
 
     public bool LockOriginalTitle { get => _lockOriginalTitle; set => SetField(ref _lockOriginalTitle, value); }
@@ -137,7 +145,10 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
                 releaseYear,
                 genres,
                 PosterPath,
-                BackdropPath),
+                BackdropPath)
+            {
+                PersonalCover = PersonalCover,
+            },
             GetLockedFields(),
             _catalog.Revision)).ConfigureAwait(true);
         await ApplyResultAsync(result).ConfigureAwait(true);
@@ -206,8 +217,10 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
             return;
         }
 
-        PosterPath = ArtworkPicker.SelectedPersonalPath;
-        LockPosterPath = true;
+        // Its own field and nothing else (LIB-021). Until 2026-09-18 this wrote the chosen path into
+        // PosterPath and set its lock, because the lock was all that kept the next refresh from
+        // overwriting the choice — and restoring the provider's fields clears every lock.
+        PersonalCover = PersonalCoverPathPolicy.TryGetCoverFileName(ArtworkPicker.SelectedPersonalPath);
     }
 
     private void ApplyCatalog(CatalogMetadata catalog)
@@ -226,6 +239,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
         Genres = string.Join(", ", catalog.Metadata.Genres);
         PosterPath = catalog.Metadata.PosterPath;
         BackdropPath = catalog.Metadata.BackdropPath;
+        PersonalCover = catalog.Metadata.PersonalCover;
         LockTitle = catalog.Metadata.LockedFields.Contains(MetadataField.Title);
         LockOriginalTitle = catalog.Metadata.LockedFields.Contains(MetadataField.OriginalTitle);
         LockOverview = catalog.Metadata.LockedFields.Contains(MetadataField.Overview);

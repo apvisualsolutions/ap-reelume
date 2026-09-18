@@ -13,7 +13,14 @@ public sealed record MetadataFieldChanges(
     int? ReleaseYear = null,
     IReadOnlyList<string>? Genres = null,
     string? PosterPath = null,
-    string? BackdropPath = null);
+    string? BackdropPath = null)
+{
+    /// <summary>
+    /// The picked cover's file name (LIB-021), or <see langword="null"/> to leave it as it is. It has
+    /// no lock because nothing but its owner ever writes it: a refresh has no field to reach it by.
+    /// </summary>
+    public string? PersonalCover { get; init; }
+}
 
 /// <param name="Provider">
 /// Which provider identified this title, or nothing when nobody has. Stored beside its key rather
@@ -127,6 +134,7 @@ public sealed class UpdateMetadata
             PosterPath = changes.PosterPath ?? current.Metadata.PosterPath,
             BackdropPath = changes.BackdropPath ?? current.Metadata.BackdropPath,
             LockedFields = command.LockedFields.ToHashSet(),
+            PersonalCover = changes.PersonalCover ?? current.Metadata.PersonalCover,
         };
 
         return await _repository.TrySaveAsync(
