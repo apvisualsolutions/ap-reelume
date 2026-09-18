@@ -1,8 +1,16 @@
 diff --git a/extras/package/win32/build.sh b/extras/package/win32/build.sh
-index e974d3d..fbb26f9 100755
+index e974d3d..16b7507 100755
 --- a/extras/package/win32/build.sh
 +++ b/extras/package/win32/build.sh
-@@ -505,7 +505,9 @@ if [ -n "$WINSTORE" ]; then
+@@ -1,4 +1,7 @@
+ #!/bin/sh
++#
++# Modified by AP Solutions on 2026-09-18: --enable-dvdread was removed, because
++# libdvdread is GPL.
+ 
+ set -e
+ set -x
+@@ -505,7 +508,9 @@ if [ -n "$WINSTORE" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-crystalhd --disable-dxva2"
  
  else
