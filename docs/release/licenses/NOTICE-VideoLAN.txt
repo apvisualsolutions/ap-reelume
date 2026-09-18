@@ -12,10 +12,13 @@ Copyright © the VideoLAN project and its contributors.
 
 Neither package carries a COPYING file, so nothing upstream supplies the texts and they are supplied
 here: LGPL-2.1.txt covers the binding and the core, and GPL-2.0.txt covers the plugins that are
-licensed GPL-2.0-or-later rather than LGPL. Measured across the roughly three hundred plugins under
-plugins/ (2026-09-14): the x264 encoder behind libx26410b_plugin.dll is GPL-2.0-or-later by the
-library's own licence, and libavcodec_plugin.dll and libswscale_plugin.dll are GPL-2.0-or-later
-because their FFmpeg build was compiled with --enable-gpl; no other plugin in the package is.
+licensed GPL rather than LGPL. Read from the VLC 3.0.23 sources for every plugin under plugins/
+(2026-09-18): fourteen are GPL on x64 and eleven on ARM64, for three reasons.
+libavcodec_plugin.dll and libswscale_plugin.dll, because their FFmpeg build was compiled with
+--enable-gpl. libx26410b, liblua, libdeinterlace, libhqdn3d, libheadphone_channel_mixer,
+libdolby_surround_decoder, libvisual, libremoteosd and, on x64, libglspectrum, libi420_rgb_mmx and
+libi420_rgb_sse2, because their own source files are. And libts_plugin.dll, because it links the
+aribb24 library. The core, libvlc.dll and libvlccore.dll, is not.
 
 The GPL-2.0 text in this folder was taken from VLC's own tree rather than from a third party: the
 package ships it as the string vlc_about.h compiles into libvlc, which is the licence VLC displays
