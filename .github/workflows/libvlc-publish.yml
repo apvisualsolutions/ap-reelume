@@ -16,6 +16,12 @@ name: LibVLC without GPL - publish
 # Beside the binaries goes their corresponding source, which is what makes shipping them lawful
 # (LGPL-2.1 6(d)): VLC at the tag, the patches and scripts that built it, and every contrib tarball
 # the build fetched.
+#
+# Everything is assembled under $RUNNER_TEMP, never inside the checkout. The first version staged the
+# source archive in a folder called src/ inside the checkout, which is where this repository keeps
+# the application's own code, and a local rehearsal on 2026-09-18 found the whole of it inside the
+# archive about to be published. Two defences since: nothing is staged next to the repository, and
+# the archive's contents are checked against the four entries it may have before anything is uploaded.
 
 on:
   workflow_dispatch:
@@ -72,22 +78,28 @@ jobs:
       - name: Download the trees and their sources
         run: |
           set -eu
+          P="$RUNNER_TEMP/libvlc-publish"
           for a in x64 arm64; do
-            gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" -n "libvlc-nogpl-$a" -D "tree/$a"
-            failures=$(jq '.failures | length' "tree/$a/manifest.json")
+            gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" -n "libvlc-nogpl-$a" -D "$P/tree/$a"
+            failures=$(jq '.failures | length' "$P/tree/$a/manifest.json")
             [ "$failures" = "0" ] || { echo "the $a manifest records $failures failure(s)" >&2; exit 1; }
           done
           for a in x86_64 aarch64; do
-            gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" -n "libvlc-source-$a" -D "contrib/$a"
+            gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" -n "libvlc-source-$a" -D "$P/contrib/$a"
           done
 
       - name: Assemble the release
+        env:
+          BUILD_SHA: ${{ steps.run.outputs.sha }}
         run: |
           set -eu
-          mkdir -p dist src/contrib-tarballs
+          P="$RUNNER_TEMP/libvlc-publish"
+          S="$P/source"
+          D="$P/dist"
+          mkdir -p "$D" "$S/contrib-tarballs"
           for a in x64 arm64; do
-            (cd "tree/$a" && zip -X -r -q "$GITHUB_WORKSPACE/dist/libvlc-nogpl-$a.zip" .)
-            cp "tree/$a/manifest.json" "dist/libvlc-nogpl-$a.manifest.json"
+            (cd "$P/tree/$a" && zip -X -r -q "$D/libvlc-nogpl-$a.zip" .)
+            cp "$P/tree/$a/manifest.json" "$D/libvlc-nogpl-$a.manifest.json"
           done
 
           # The two architectures fetch mostly the same tarballs, and a tarball both fetched with the
@@ -97,31 +109,34 @@ jobs:
           # its own architecture's binaries, so both are kept, under contrib-tarballs/<arch>/, rather
           # than one chosen: offering one build's archive as the other's source would be offering the
           # source of something else.
-          for f in contrib/*/*; do
+          for f in "$P"/contrib/*/*; do
             name=$(basename "$f")
             arch=$(basename "$(dirname "$f")")
             other=$([ "$arch" = x86_64 ] && echo aarch64 || echo x86_64)
-            if [ -e "contrib/$other/$name" ] && ! cmp -s "$f" "contrib/$other/$name"; then
-              mkdir -p "src/contrib-tarballs/$arch"
-              cp "$f" "src/contrib-tarballs/$arch/$name"
+            if [ -e "$P/contrib/$other/$name" ] && ! cmp -s "$f" "$P/contrib/$other/$name"; then
+              mkdir -p "$S/contrib-tarballs/$arch"
+              cp "$f" "$S/contrib-tarballs/$arch/$name"
               echo "$name differs between architectures: kept under contrib-tarballs/$arch"
             else
               # Not cp -n: whether it fails when it skips changed between coreutils releases.
-              [ -e "src/contrib-tarballs/$name" ] || cp "$f" "src/contrib-tarballs/$name"
+              [ -e "$S/contrib-tarballs/$name" ] || cp "$f" "$S/contrib-tarballs/$name"
             fi
           done
 
           url=$(jq -r '.sources[] | select(.name=="vlc") | .url' eng/corresponding-source.json)
           sum=$(jq -r '.sources[] | select(.name=="vlc") | .sha256' eng/corresponding-source.json)
-          curl -fsSL --retry 3 -o "src/$(basename "$url")" "$url"
-          echo "$sum  src/$(basename "$url")" | sha256sum -c --ignore-case -
+          vlc=$(basename "$url")
+          curl -fsSL --retry 3 -o "$S/$vlc" "$url"
+          # The registry writes the digest in upper case, as VideoLAN's .sha256 file does, and
+          # sha256sum -c only reads lower case (and has no option to ignore it).
+          (cd "$S" && echo "$(echo "$sum" | tr 'A-F' 'a-f')  $vlc" | sha256sum -c -)
 
-          git archive --format=tar --prefix=build/ HEAD eng/libvlc .github/workflows/libvlc-nogpl.yml | tar -x -C src
-          cat > src/README.txt <<EOF
+          git archive --format=tar --prefix=build/ HEAD eng/libvlc .github/workflows/libvlc-nogpl.yml | tar -x -C "$S"
+          cat > "$S/README.txt" <<EOF
           Corresponding source of the LibVLC trees in release $TAG.
 
-          $(basename "$url")   VLC $(jq -r '.sources[] | select(.name=="vlc") | .version' eng/corresponding-source.json), as VideoLAN publishes it (SHA-256 $sum).
-          build/               The scripts and patches that built the trees, at commit ${{ steps.run.outputs.sha }}.
+          $vlc   VLC $(jq -r '.sources[] | select(.name=="vlc") | .version' eng/corresponding-source.json), as VideoLAN publishes it (SHA-256 $sum).
+          build/               The scripts and patches that built the trees, at commit $BUILD_SHA.
                                build/eng/libvlc/build-nogpl.sh is the entry point; it applies build/eng/libvlc/patches.
           contrib-tarballs/    Every third-party source the build fetched, each checked against the
                                SHA512SUMS in VLC's contrib/src. Copy them into contrib/tarballs and the
@@ -131,27 +146,39 @@ jobs:
 
           Built with GitHub Actions run $RUN_ID inside VideoLAN's CI images named in build/.github/workflows/libvlc-nogpl.yml.
           EOF
-          tar -cf "dist/$TAG-source.tar" -C src .
+          tar -cf "$D/$TAG-source.tar" -C "$S" .
 
-          (cd dist && sha512sum * > SHA512SUMS.txt && cat SHA512SUMS.txt)
+          # The archive may hold these four things and nothing else. Anything outside them — this
+          # repository's own code first of all — is refused before a byte is uploaded.
+          unexpected=$(tar -tf "$D/$TAG-source.tar" | grep -v -E "^\./(\$|README\.txt\$|$vlc\$|contrib-tarballs/|build/(\$|eng/(\$|libvlc/)|\.github/(\$|workflows/(\$|libvlc-nogpl\.yml\$))))" || true)
+          if [ -n "$unexpected" ]; then
+            echo "the source archive holds entries it must not:" >&2
+            echo "$unexpected" | head -20 >&2
+            exit 1
+          fi
+
+          (cd "$D" && sha512sum * > SHA512SUMS.txt && cat SHA512SUMS.txt)
 
       - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: |
-            dist/libvlc-nogpl-x64.zip
-            dist/libvlc-nogpl-arm64.zip
-            dist/${{ inputs.tag }}-source.tar
+            ${{ runner.temp }}/libvlc-publish/dist/libvlc-nogpl-x64.zip
+            ${{ runner.temp }}/libvlc-publish/dist/libvlc-nogpl-arm64.zip
+            ${{ runner.temp }}/libvlc-publish/dist/${{ inputs.tag }}-source.tar
 
       - name: Publish the prerelease
+        env:
+          BUILD_SHA: ${{ steps.run.outputs.sha }}
         run: |
           set -eu
-          cat > notes.md <<EOF
+          D="$RUNNER_TEMP/libvlc-publish/dist"
+          cat > "$RUNNER_TEMP/notes.md" <<EOF
           LibVLC $TAG for Windows x64 and ARM64, built without GPL code (ENG-013). Not an application release.
 
           Built, verified (eng/libvlc/verify-nogpl.ps1) and decoded (eng/libvlc/decode-probe.ps1) by run
-          https://github.com/$GITHUB_REPOSITORY/actions/runs/$RUN_ID at ${{ steps.run.outputs.sha }}.
+          https://github.com/$GITHUB_REPOSITORY/actions/runs/$RUN_ID at $BUILD_SHA.
           Its corresponding source is $TAG-source.tar. SHA-512 of every asset in SHA512SUMS.txt.
           EOF
-          gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" \
-            --target "${{ steps.run.outputs.sha }}" --title "$TAG" --notes-file notes.md \
+          gh release create "$TAG" "$D"/* --repo "$GITHUB_REPOSITORY" \
+            --target "$BUILD_SHA" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" \
             --prerelease --latest=false
