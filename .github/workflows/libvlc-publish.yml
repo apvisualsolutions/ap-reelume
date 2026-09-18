@@ -90,14 +90,24 @@ jobs:
             cp "tree/$a/manifest.json" "dist/libvlc-nogpl-$a.manifest.json"
           done
 
-          # The two architectures fetch mostly the same tarballs. Same name must mean same bytes,
-          # which contrib's SHA512SUMS already guarantees; a difference here is a finding, not a merge.
+          # The two architectures fetch mostly the same tarballs, and a tarball both fetched with the
+          # same bytes is kept once. Same name does NOT always mean same bytes, measured on the first
+          # run of this job (2026-09-18): contribs fetched from git — fluidlite — are archived at fetch
+          # time, so the two builds made two different files under one name. Each is the source of
+          # its own architecture's binaries, so both are kept, under contrib-tarballs/<arch>/, rather
+          # than one chosen: offering one build's archive as the other's source would be offering the
+          # source of something else.
           for f in contrib/*/*; do
             name=$(basename "$f")
-            if [ -e "src/contrib-tarballs/$name" ]; then
-              cmp -s "$f" "src/contrib-tarballs/$name" || { echo "$name differs between architectures" >&2; exit 1; }
+            arch=$(basename "$(dirname "$f")")
+            other=$([ "$arch" = x86_64 ] && echo aarch64 || echo x86_64)
+            if [ -e "contrib/$other/$name" ] && ! cmp -s "$f" "contrib/$other/$name"; then
+              mkdir -p "src/contrib-tarballs/$arch"
+              cp "$f" "src/contrib-tarballs/$arch/$name"
+              echo "$name differs between architectures: kept under contrib-tarballs/$arch"
             else
-              cp -r "$f" "src/contrib-tarballs/$name"
+              # Not cp -n: whether it fails when it skips changed between coreutils releases.
+              [ -e "src/contrib-tarballs/$name" ] || cp "$f" "src/contrib-tarballs/$name"
             fi
           done
 
@@ -115,7 +125,9 @@ jobs:
                                build/eng/libvlc/build-nogpl.sh is the entry point; it applies build/eng/libvlc/patches.
           contrib-tarballs/    Every third-party source the build fetched, each checked against the
                                SHA512SUMS in VLC's contrib/src. Copy them into contrib/tarballs and the
-                               build uses them instead of downloading.
+                               build uses them instead of downloading. A tarball the two builds made
+                               with different bytes (archived from git at fetch time) is under
+                               contrib-tarballs/<arch>/ instead, one per architecture.
 
           Built with GitHub Actions run $RUN_ID inside VideoLAN's CI images named in build/.github/workflows/libvlc-nogpl.yml.
           EOF
