@@ -252,10 +252,10 @@
       "audioTracks": 0,
       "hdr": true,
       "requiredEncoders": [ "libx265" ],
-      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -an -c:v libx265 -preset ultrafast -pix_fmt yuv420p10le -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -x265-params \"log-level=error:hdr-opt=1:repeat-headers=1:colorprim=bt2020:transfer=smpte2084:colormatrix=bt2020nc:master-display=G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,1):max-cll=1000,400\"",
+      "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -an -vf setparams=color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc -c:v libx265 -preset ultrafast -pix_fmt yuv420p10le -color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -x265-params \"log-level=error:hdr-opt=1:repeat-headers=1:colorprim=bt2020:transfer=smpte2084:colormatrix=bt2020nc:master-display=G(13250,34500)B(7500,3000)R(34000,16000)WP(15635,16450)L(10000000,1):max-cll=1000,400\"",
       "expectedOutcome": "Playable",
       "expectedFailureCode": null,
-      "notes": "HDR10: BT.2020 primaries with the SMPTE ST 2084 perceptual quantiser and mastering display metadata."
+      "notes": "HDR10: BT.2020 primaries with the SMPTE ST 2084 perceptual quantiser and mastering display metadata. The frames are tagged with setparams because, measured on ffmpeg 9.0, the Matroska track comes out with no transfer curve or primaries without it although the HEVC stream carries both; testsrc2 leaves its frames untagged."
     },
     {
       "id": "mkv-hevc-sdr",

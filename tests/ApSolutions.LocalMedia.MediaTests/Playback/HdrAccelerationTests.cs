@@ -26,12 +26,8 @@ public sealed class HdrAccelerationTests
 
         var transfer = await ReadColourTransferAsync(path);
 
-        // Some ffmpeg builds mux the sample without its colour-transfer metadata; a sample that does
-        // not carry what the recipe asked for cannot exercise the recognition path.
-        Assert.SkipWhen(
-            string.IsNullOrEmpty(transfer) || transfer == "unknown",
-            "The generated HDR sample carries no colour-transfer metadata on this encoder build.");
-
+        // No skip on a missing curve: it skipped on the server for months because ffmpeg 9.0 left it out
+        // of the container, and the recipe now tags the frames. A build that loses it again is red.
         Assert.Equal("smpte2084", transfer);
         var described = LibVlcVideoCapabilities.WithColourTransfer(
             new VideoSourceCapabilities(HdrFormat.None, 320, 240),
