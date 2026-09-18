@@ -322,7 +322,7 @@ try {
     Copy-Item -Path (Join-Path $repoRoot 'docs/release/licenses/*') -Destination $licenceRoot -Recurse -Force
 
     Write-Output 'Writing the bill of materials …'
-    & (Join-Path $PSScriptRoot 'generate-sbom.ps1') -Output (Join-Path $outputRoot 'sbom') -Version $version
+    & (Join-Path $PSScriptRoot 'generate-sbom.ps1') -Output (Join-Path $outputRoot 'sbom') -Version $version -Architecture arm64
     if ($LASTEXITCODE -ne 0) { throw 'SBOM generation failed.' }
     Copy-Item -Path (Join-Path $outputRoot 'sbom') -Destination (Join-Path $layoutRoot 'sbom') -Recurse -Force
 
