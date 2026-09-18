@@ -69,26 +69,37 @@ que un complemento `GPL-2.0-or-later` sube a GPL-3.0 y **encaja dentro de un pro
 razonamiento era válido y sigue siéndolo; lo que cambió es la premisa: **el programa ya no es GPL**,
 así que no hay ninguna versión a la que subir.
 
-Medido el 2026-09-13 y recontado entero el 2026-09-14 —sobre los trescientos complementos, no sobre
-una muestra—: **dos llevan `--enable-gpl` en su línea de compilación, `libavcodec_plugin.dll` y
-`libswscale_plugin.dll`**, ninguno más. Comparten el mismo build de FFmpeg, por eso son los dos y no
-uno. Ninguno es el codificador x264, que se podría quitar por ser un codificador que un reproductor no
-usa.
+**Son catorce complementos en x64 y once en ARM64, por tres causas distintas**, leídas el 2026-09-18
+en las fuentes de VLC 3.0.23 con `eng/libvlc/scan-plugin-licenses.ps1` (evidencia
+`audit-eng027-plugin-gpl-sources.md`). Hasta ese día este párrafo decía «dos», y luego «tres»: las dos
+cifras salían de buscar `--enable-gpl` en los binarios, y esa cadena sólo la escribe FFmpeg.
 
-**Y son dos pruebas de naturaleza distinta, que conviene no confundir.** Esa cadena de compilación
-sólo certifica FFmpeg. `libx26410b_plugin.dll` —el x264 de 10 bits— es `GPL-2.0-or-later` por licencia
-propia de la librería, no por ninguna opción de compilación: grep-earlo buscando `--enable-gpl` da,
-correctamente, cero coincidencias, y eso no lo hace menos GPL.
+- **FFmpeg compilado como GPL**: `libavcodec_plugin.dll` y `libswscale_plugin.dll`, que comparten el
+  mismo build y llevan la cadena dentro.
+- **Módulos del propio VLC con fuentes GPL**, que no llevan ninguna cadena que lo diga:
+  `libx26410b` (x264), `liblua`, `libdeinterlace` (por su algoritmo yadif), `libhqdn3d`,
+  `libheadphone_channel_mixer`, `libdolby_surround_decoder`, `libvisual` y `libremoteosd`; en x64
+  además `libglspectrum`, `libi420_rgb_mmx` y `libi420_rgb_sse2`.
+- **Una biblioteca GPL enlazada dentro de un módulo LGPL**: `libts_plugin.dll`, el demultiplexor de
+  `.ts`, lleva aribb24, reconocible por sus propios mensajes dentro del binario.
+
+**El núcleo, `libvlc.dll` y `libvlccore.dll`, está limpio.** No se ha distribuido ningún artefacto:
+el repositorio no tiene releases.
 
 **Consecuencia práctica, y es dura**: mientras ese complemento viaje dentro del paquete, **el
 artefacto no se puede distribuir** bajo la licencia propia. El código fuente de este repositorio sí
 puede llevarla —el árbol solo contiene código de AP Solutions—, pero el empaquetado queda suspendido.
 
-**La salida está medida y no implica perder nada de funcionalidad**: la biblioteca que descodifica es
-`LGPL` por defecto, y lo contagioso son piezas **opcionales** que se activan al compilar —un filtro
-de posprocesado heredado y algunas optimizaciones—; **ningún decodificador está entre ellas**. La vía
-es compilar LibVLC y sus dependencias sin esa opción, en las dos arquitecturas, y mantener esa
-compilación. Es trabajo de infraestructura permanente, no una renuncia de formatos.
+**La salida está medida y no quita nada de lo que el programa reproduce hoy.** La biblioteca que
+descodifica es `LGPL` por defecto, y en FFmpeg lo contagioso son piezas **opcionales** que se activan
+al compilar —un filtro de posprocesado heredado y algunas optimizaciones—; **ningún decodificador está
+entre ellas**. Los módulos GPL de VLC son funciones que la aplicación no ofrece (listas de
+reproducción web, visualizaciones, VNC, filtros de auriculares), un algoritmo de desentrelazado que no
+es el que se usa por defecto y se quita con un parche, y la conversión de color por MMX/SSE2, que
+`libswscale` también hace. `libts` sin aribb24 sigue leyendo `.ts`; pierde los subtítulos de la
+televisión japonesa. La vía es compilar LibVLC y sus dependencias sin GPL, en las dos arquitecturas,
+quitar esos módulos, y mantener esa compilación (`ENG-013`). Es trabajo de infraestructura
+permanente, no una renuncia de formatos.
 
 **Los textos de las licencias ya viajan — cerrado el 2026-08-10.** Era el incumplimiento abierto: el
 artefacto llevaba la `LICENSE` de AP Reelume y los avisos de terceros, pero **no el texto de las

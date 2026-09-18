@@ -46,6 +46,17 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Los documentos legales nombraban tres complementos GPL del motor de vídeo, y son catorce en x64
+  y once en ARM64.** Las cifras anteriores salían de buscar en los binarios la cadena que FFmpeg
+  escribe al compilarse como GPL, y esa cadena sólo la escribe FFmpeg. Los que faltaban son módulos
+  del propio VLC cuyo código fuente es GPL, entre ellos Lua, el algoritmo de desentrelazado yadif y
+  el reductor de ruido `hqdn3d`, y el lector de `.ts`, que lleva enlazada una biblioteca GPL. Ahora la
+  lista sale de un guion que lee la licencia en cada fichero fuente, sigue sus `#include` y falla
+  antes que dar una lista corta. No se había distribuido nada: el repositorio no tiene releases. Y
+  cambia el trabajo pendiente: compilar el motor sin GPL no basta con la opción de VLC, porque su
+  configure no tiene ninguna para sus propios módulos; hay que quitarlos. Nada de lo que el programa
+  reproduce hoy depende de ellos. Evidencia `audit-eng027-plugin-gpl-sources.md`.
+
 - **La imagen de un vídeo pequeño se ve bastante más nítida, y la medida que decía lo contrario era
   la culpable.** El propietario dijo dos veces el mismo día que seguía medio borrosa, y tenía razón:
   la única medida que había premiaba justo lo que el ojo rechaza. Contaba lo abrupto de un canto, así

@@ -67,24 +67,35 @@ your option) any later version" clause, so a `GPL-2.0-or-later` plugin rises to 
 inside a GPL-3.0 program**. The reasoning was valid and still is; what changed is the premise — **the
 program is no longer GPL**, so there is no version to rise to.
 
-Measured on 2026-09-13 and recounted in full on 2026-09-14 — across all three hundred plugins, not a
-sample —: **two carry `--enable-gpl` in their build configuration line, `libavcodec_plugin.dll` and
-`libswscale_plugin.dll`**, none of the rest. They share the same FFmpeg build, which is why it is two
-and not one. Neither is the x264 encoder, which could be dropped because a player does not encode.
+**It is fourteen plugins on x64 and eleven on ARM64, for three different reasons**, read on 2026-09-18
+from the VLC 3.0.23 sources with `eng/libvlc/scan-plugin-licenses.ps1` (evidence
+`audit-eng027-plugin-gpl-sources.md`). Until that day this paragraph said "two", and then "three":
+both figures came from searching the binaries for `--enable-gpl`, and only FFmpeg writes that string.
 
-**And these are two different kinds of evidence, worth keeping apart.** That build string only
-certifies FFmpeg. `libx26410b_plugin.dll` — the 10-bit x264 — is `GPL-2.0-or-later` by the library's
-own licence, not by any build option: grepping it for `--enable-gpl` correctly returns zero matches,
-and that does not make it any less GPL.
+- **FFmpeg built as GPL**: `libavcodec_plugin.dll` and `libswscale_plugin.dll`, which share one build
+  and carry the string inside.
+- **VLC's own modules with GPL source files**, which carry no string that says so: `libx26410b`
+  (x264), `liblua`, `libdeinterlace` (for its yadif algorithm), `libhqdn3d`,
+  `libheadphone_channel_mixer`, `libdolby_surround_decoder`, `libvisual` and `libremoteosd`; on x64
+  also `libglspectrum`, `libi420_rgb_mmx` and `libi420_rgb_sse2`.
+- **A GPL library linked into an LGPL module**: `libts_plugin.dll`, the `.ts` demuxer, carries
+  aribb24, recognisable by its own log messages inside the binary.
+
+**The core, `libvlc.dll` and `libvlccore.dll`, is clean.** No artifact has been distributed: the
+repository has no releases.
 
 **The practical consequence is hard**: while that plugin travels inside the package, **the artifact
 cannot be distributed** under the proprietary licence. This repository's source can carry it — the
 tree holds only AP Solutions' code — but packaging is suspended.
 
-**The way out is measured and costs no functionality**: the decoding library is `LGPL` by default, and
-what is copyleft are **optional** pieces enabled at build time — a legacy post-processing filter and
-some optimisations; **no decoder is among them**. The route is to build LibVLC and its dependencies
-without that option, for both architectures, and to maintain that build. That is permanent
+**The way out is measured and removes nothing the program plays today.** The decoding library is
+`LGPL` by default, and in FFmpeg what is copyleft are **optional** pieces enabled at build time — a
+legacy post-processing filter and some optimisations; **no decoder is among them**. VLC's GPL modules
+are features the application does not offer (web playlists, visualisations, VNC, headphone filters),
+a deinterlacing algorithm that is not the default and is removed with a patch, and MMX/SSE2 colour
+conversion that `libswscale` also does. `libts` without aribb24 still reads `.ts`; it loses Japanese
+broadcast subtitles. The route is to build LibVLC and its dependencies without GPL, for both
+architectures, drop those modules, and maintain that build (`ENG-013`). That is permanent
 infrastructure work, not a loss of formats.
 
 **The licence texts now travel — closed on 2026-08-10.** This was the open breach: the artifact

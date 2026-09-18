@@ -47,6 +47,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The legal documents named three GPL plugins in the video engine, and there are fourteen on x64
+  and eleven on ARM64.** The earlier figures came from searching the binaries for the string FFmpeg
+  writes when built as GPL, and only FFmpeg writes it. The missing ones are VLC's own modules whose
+  source is GPL, among them Lua, the yadif deinterlacing algorithm and the `hqdn3d` denoiser, plus
+  the `.ts` reader, which links a GPL library. The list now comes from a script that reads the
+  licence in every source file, follows its `#include`s and fails rather than print a short list.
+  Nothing had been distributed: the repository has no releases. It also changes the pending work:
+  building the engine without GPL is not just VLC's option, because its configure has none for its
+  own modules; they have to be dropped. Nothing the program plays today depends on them. Evidence
+  `audit-eng027-plugin-gpl-sources.md`.
+
 - **A small video's picture looks considerably sharper, and the yardstick that said otherwise was the
   culprit.** The owner said twice in one day that it was still soft, and he was right: the only
   measurement in place rewarded exactly what the eye rejects. It counted how abrupt an edge was, so

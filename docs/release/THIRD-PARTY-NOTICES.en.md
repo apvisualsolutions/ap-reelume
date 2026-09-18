@@ -93,9 +93,13 @@ what puts several hundred Microsoft-licensed files inside the package.
 
 The `VideoLAN.LibVLC.Windows` package declares `LGPL-2.1-or-later`, which covers `libvlc.dll` and
 `libvlccore.dll`. It also ships roughly three hundred plugins in `plugins/`, and **those carry their
-own licences**, some of which are `GPL-2.0-or-later` rather than LGPL — the x264 encoder behind
-`libx26410b_plugin.dll` is GPL by the library's own licence, and `libavcodec_plugin.dll` and
-`libswscale_plugin.dll` are GPL because their FFmpeg build was compiled with `--enable-gpl`. The library is distributed unmodified. VideoLAN's
+own licences**, some of them GPL rather than LGPL: fourteen on x64 and eleven on ARM64.
+`libavcodec_plugin.dll` and `libswscale_plugin.dll` are GPL because their FFmpeg build was compiled
+with `--enable-gpl`; `libx26410b`, `liblua`, `libdeinterlace`, `libhqdn3d`,
+`libheadphone_channel_mixer`, `libdolby_surround_decoder`, `libvisual`, `libremoteosd` and, on x64,
+`libglspectrum`, `libi420_rgb_mmx` and `libi420_rgb_sse2`, because their sources are; and
+`libts_plugin.dll` because it links the aribb24 library. The list comes from
+`eng/libvlc/scan-plugin-licenses.ps1` (evidence `audit-eng027-plugin-gpl-sources.md`). The library is distributed unmodified. VideoLAN's
 NuGet package carries **no `COPYING` file at all**, so nobody supplies the text but this artifact: it
 carries it as `licenses/LGPL-2.1.txt`, `licenses/GPL-2.0.txt` and `licenses/NOTICE-VideoLAN.txt`.
 
@@ -106,11 +110,12 @@ compatible, because the "or later" makes the two meet at GPL-3.0. That was corre
 common version to meet at, and a copyleft plugin inside a proprietary program is a breach rather than
 a fit.
 
-**And trimming the plugin set is no longer optional: it is the only way out.** Measured on 2026-09-13
-and recounted in full on 2026-09-14 — across all three hundred plugins, not a sample —, the copyleft
-plugins that matter are **not the x264 encoder** — a player does not encode and that one can go — but
+**And trimming the plugin set is no longer optional: it is the only way out.** Of the fourteen, the
+ones that matter are **not the x264 encoder** — a player does not encode and that one can go — but
 **`libavcodec_plugin.dll` and `libswscale_plugin.dll`, the decoders**: their build configuration line
-begins with `--enable-gpl`, read inside both binaries, and in none of the other three hundred.
+begins with `--enable-gpl`, read inside both binaries. VLC's GPL modules are features the application
+does not offer, a deinterlacing algorithm that is not the default and a colour conversion
+`libswscale` also does; `libts` without aribb24 still reads `.ts`.
 
 **While that plugin travels here, the artifact cannot be distributed.** The measured way out costs no
 formats: the decoding library is permissive by default, and what is copyleft are optional pieces
