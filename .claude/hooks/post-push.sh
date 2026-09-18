@@ -36,6 +36,11 @@
 # commit, asi que se pregunta por el commit y no queda nada que adivinar.
 set -u
 
+# Desde el 2026-09-19 la deteccion vive en lib-git-push.sh, compartida con
+# pre-push-closing.sh. Los once casos de abajo se midieron otra vez tras moverla,
+# con el mismo resultado caso a caso.
+. "$(dirname "$0")/lib-git-push.sh"
+
 cmd=$(jq -r '.tool_input.command // empty' | tr -d '\r')
 [ -z "$cmd" ] && exit 0
 
@@ -54,20 +59,9 @@ cmd=$(jq -r '.tool_input.command // empty' | tr -d '\r')
 # Reproducido por tuberia con un documento que citaba una orden de push dentro
 # de uno: sono. El defecto que el parrafo de arriba dice haber corregido seguia
 # aqui, escondido en un espacio.
-stripped=$(printf '%s\n' "$cmd" | awk '
-  /^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*$/ && skip && $1 == delim { skip = 0; next }
-  skip { next }
-  {
-    if (match($0, /<<-?[[:space:]]*[\047"]?[A-Za-z_][A-Za-z0-9_]*[\047"]?/)) {
-      d = substr($0, RSTART, RLENGTH)
-      gsub(/^<<-?[[:space:]]*[\047"]?|[\047"]?$/, "", d)
-      delim = d
-      skip = 1
-    }
-    print
-  }')
+stripped=$(strip_heredocs "$cmd")
 
-printf '%s\n' "$stripped" | grep -Eq '(^|[;&|(]|&&|\|\|)[[:space:]]*git[[:space:]]+push([[:space:]]|$)' || exit 0
+is_git_push "$stripped" || exit 0
 
 sha=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse HEAD 2>/dev/null || printf '<sha>')
 
@@ -98,15 +92,7 @@ sha=$(git -C "${CLAUDE_PROJECT_DIR:-.}" rev-parse HEAD 2>/dev/null || printf '<s
 # &&—, tres suenan sin el —`git push` a secas, `git push origin` y `HEAD:rama`,
 # que son los tres en los que HEAD SI es lo que sale— y tres callan: el heredoc
 # que cita una orden de push, `git pushd` y un push dentro de un echo.
-refspec=$(printf '%s\n' "$stripped" \
-  | sed -n 's/.*git[[:space:]][[:space:]]*push[[:space:]]*//p' \
-  | sed 's/[;&|].*//' \
-  | tr -d '\042\047' \
-  | tr ' \t' '\n\n' \
-  | grep -v '^-' \
-  | grep -v '^$' \
-  | tail -n +2 \
-  | head -1)
+refspec=$(push_refspec "$stripped")
 
 printf 'EL PUSH NO FALLO. Falta el vigia: CI se mira con Monitor y eng/watch-ci.ps1, nunca con un bucle a mano, ni con gh run list repetido, ni esperando a que salga solo (CLAUDE.md).\n' >&2
 printf 'Armalo ahora, antes de seguir:\n' >&2

@@ -48,6 +48,18 @@
             "statusMessage": "Comprobando la cabecera SPDX antes de escribir"
           }
         ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pre-push-closing.sh\"",
+            "shell": "bash",
+            "timeout": 10,
+            "statusMessage": "Comprobando si un cierre deja subir este push"
+          }
+        ]
       }
     ],
     "PostToolUse": [

@@ -664,7 +664,7 @@ rechaza aunque esté bien implementada.
   Se deniegan **en el proyecto y no se borran de la máquina**, porque son de quien programa y se usan
   fuera de aquí. A diferencia de la clave de arriba, **ésta sí se midió en el acto**: `claude mcp
   list` enseñaba tres servidores antes y enseña sólo `avalonia-docs` después.
-- **Cuatro hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
+- **Cinco hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
   `eng/coverage-debt.txt` y `eng/walk-pending.txt`, y un `.cs` o `.axaml` de `src/` o `tests/`
   **cuyo contenido no lleve la cabecera SPDX**. **Los dos primeros se rechazan por motivos
   distintos, y confundirlos costó una corrección el 2026-08-29**: `coverage-debt.txt` **lo produce
@@ -711,6 +711,16 @@ rechaza aunque esté bien implementada.
   fast-forward a `main`, que no dispara el flujo, y eso es deliberado: distinguirlo pedía adivinar la
   rama de destino, y una guarda que se equivoca **callando** es indistinguible de una que no corrió.
 
+  **El quinto, desde el 2026-09-19, frena el cierre.** `pre-push-closing.sh` corre en `PreToolUse`
+  sobre `Bash|PowerShell` y **sólo actúa si existe la marca de cierre** que `/cierre` crea en su paso 0
+  dentro del directorio de git —no en el árbol, para que ningún `git add -A` se la lleve—. Con ella,
+  deniega el push de la rama si sus commits sin subir tocan algo fuera de `docs/` o de un `.md` de la
+  raíz, y deja pasar el relevo y el fast-forward de `main`. Probado por tubería en un clon desechable
+  con nueve casos: dos deniegan y siete pasan, incluidos la marca retirada y un heredoc que cita un
+  push. La detección de «esto es un push» es la de `post-push.sh`, sacada a
+  `.claude/hooks/lib-git-push.sh` para no tener dos copias; los once casos de ese hook dieron lo mismo
+  caso a caso antes y después, con un control que rompe la función común y cambia la salida.
+
   **Y sonó en su propio commit, que es el defecto que enseñó a escribirlo bien**: buscaba la cadena
   suelta, y el mensaje del commit —escrito con un heredoc— hablaba de «after any git push». Ahora
   **tira los heredocs primero** y exige que `git push` esté en **posición de comando** —inicio de
@@ -743,7 +753,11 @@ rechaza aunque esté bien implementada.
   salida. Un silencio observado en la aplicación no prueba que la guarda corriera —puede que ni
   siquiera la enrutaran—, así que el caso que **debe** callar se mide ejecutando el comando literal
   del `settings.json` por tubería, con un caso que sí debe sonar al lado.
-- **`/cerrar-tanda`** ejecuta el ciclo de más abajo, con los fallos que ya ha cometido cada paso.
+- **`/cierre`** ejecuta el ciclo de más abajo, con los fallos que ya ha cometido cada paso. Se
+  llamaba `/cerrar-tanda` hasta el 2026-09-19. **Su paso 0 es regla del propietario**: si hay un CI
+  en marcha se espera a que acabe, y desde ahí no se escribe código ni se sube nada que no sea el
+  relevo; lo pendiente va al prompt. Lo hace cumplir `.claude/hooks/pre-push-closing.sh`, que durante
+  el cierre deniega el push de la rama si lleva algo fuera de `docs/`.
 - **`/medir-pixeles`** trae el arnés de rasterización con sus cinco trampas medidas.
 - **`gate-auditor`** busca puertas que pasan sin medir nada; **`prototype-fidelity`** compara la
   aplicación con `design/`.

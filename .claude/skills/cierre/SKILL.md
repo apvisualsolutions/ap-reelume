@@ -1,12 +1,46 @@
 ---
-name: cerrar-tanda
-description: Cierra una tanda de trabajo entera — verificar que nada quedó roto, un commit, push solo a la rama, CI verifica, fast-forward a main con la conclusion leida, documentos en dos idiomas, decisiones abiertas cerradas, tareas de fondo al dia, y el prompt de la siguiente sesion listo para copiar. Usar cuando el trabajo esta terminado y hay que publicarlo y dejarlo recogido.
+name: cierre
+description: Cierra una tanda de trabajo — espera al CI que este en marcha, y desde ahi ni codigo ni pushes salvo el relevo; fast-forward a main con la conclusion leida, documentos en dos idiomas, decisiones abiertas escritas, y el prompt de la siguiente sesion listo para copiar. Usar cuando el propietario manda cerrar, o cuando el trabajo esta terminado y hay que dejarlo recogido.
 ---
 
-# Cerrar una tanda
+# Cierre
 
 El ciclo de `CLAUDE.md`, ejecutado en orden, y lo que hay que dejar recogido después. **Cada paso
 tiene un fallo que ya ha ocurrido**, y por eso está aquí en vez de en la memoria de alguien.
+
+**Se llamaba `/cerrar-tanda` hasta el 2026-09-19**, y lo renombró el propietario al añadir el paso 0.
+
+## 0. La orden de cierre: esperar al CI que corre, y desde ahí parar
+
+**Regla del propietario, 2026-09-19.** Cuando manda cerrar:
+
+1. **Si hay un CI en marcha, se espera a que acabe**, con el vigía (`eng/watch-ci.ps1`). **El cierre
+   empieza justo ahí**, no antes: un run a medias no dice nada.
+2. **Con su conclusión**: verde, el fast-forward de `main` a ese SHA (paso 6); rojo, `main` no se
+   toca y **el rojo va al prompt de la sesión siguiente**, con el run y lo que dice su registro. No se
+   arregla aquí.
+3. **Desde ese momento no se escribe código, no se cambian pruebas y no se sube nada que no sea el
+   relevo.** Lo que aparezca —un hallazgo, una puerta que falla, algo a medias— se escribe en
+   `docs/TAREAS.md` o en el relevo, y va al prompt. El relevo sale en **un solo push** de
+   documentación y **no se espera su CI**: lo lee la sesión siguiente al empezar.
+
+**Por qué.** Se manda cerrar porque el contexto está lleno y las respuestas empeoran. El 2026-09-18
+el agente siguió arreglando lo que salía tras la orden —un rojo de cobertura, las puertas que encontró
+el auditor—, con tres pushes y tres CI de unos cuarenta minutos, y era la segunda vez que el
+propietario se quejaba de lo mismo.
+
+**Y un hook lo hace cumplir.** Al empezar este paso se crea la marca de cierre, y
+`.claude/hooks/pre-push-closing.sh` deniega mientras exista cualquier push de la rama que lleve algo
+fuera de `docs/` o de un `.md` de la raíz; el fast-forward de `main` pasa, porque sólo lleva lo ya
+verificado. **Se retira al terminar el paso 10**, o la sesión siguiente se encontraría bloqueada:
+
+```powershell
+New-Item -ItemType File -Force (Join-Path (git rev-parse --absolute-git-dir) 'ap-closing') | Out-Null   # al empezar
+Remove-Item (Join-Path (git rev-parse --absolute-git-dir) 'ap-closing')                               # al terminar
+```
+
+**El auditor de puertas va ANTES de la orden de cierre, no después.** Si la tanda añadió pruebas y no
+se lanzó, no se lanza ahora: va al prompt como primer paso de la sesión siguiente.
 
 **No se cierra a medias.** Los pasos 1 a 6 publican; los pasos 7 a 10 son los que hacen que la
 sesión siguiente no empiece preguntando. Saltarse los segundos deja el trabajo hecho y el contexto
@@ -47,8 +81,11 @@ estás pagando el ciclo de empaquetado, y esa suite es la única que mide lo que
 2026-08-31. Los «30 rojos» son **artefactos ausentes**, no esta máquina — y uno de ellos llevaba
 nueve días señalando un artefacto ARM64 anterior a un cambio del manifiesto.
 
-**Si la tanda añadió o cambió pruebas, el agente `gate-auditor` va AQUÍ, antes del commit, y en una
-copia aislada** (`isolation: "worktree"`), porque aplica mutaciones para medir. No es opcional ni un
+**Si la tanda añadió o cambió pruebas, el agente `gate-auditor` va antes del último commit de
+código, y en una copia aislada** (`isolation: "worktree"`), porque aplica mutaciones para medir.
+**Cuando el cierre lo ordena el propietario, eso ya pasó o va al prompt** (paso 0): lo que encuentre
+se corrige con código y pruebas, y eso ya no cabe en un cierre. El 2026-09-18 se lanzó tras la orden,
+encontró dos puertas ciegas, y corregirlas fue uno de los pushes de más que motivaron el paso 0. No es opcional ni un
 remate: el 2026-09-02 encontró **siete** puertas de esa tanda que no medían lo que decían, y el
 2026-09-11 **ocho** más un defecto real de contraste, las dos veces lanzado al cerrar y no antes. Lo
 que convence es la mutación medida, y cada puerta corregida se vuelve a mutar: la corrección también
@@ -264,3 +301,6 @@ El relevo (`NEXT-SESSION`) tiene que llevar, además del trabajo hecho:
 adjunto ni como ruta a un documento.** Debe abrir mandando leer el árbol —`git log --oneline -1` y
 `gh run list --limit 3`— antes que ninguna otra cosa, porque **el árbol manda sobre el relevo**: un
 relevo se escribe una vez y el árbol cambia después.
+
+**Y al final, con el prompt ya en el chat, se retira la marca de cierre del paso 0**: mientras exista,
+el hook deniega el push de código, y la sesión siguiente se encontraría bloqueada sin saber por qué.

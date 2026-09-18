@@ -168,7 +168,7 @@ public sealed class RunDurationFigureTests
             IsInsideAnotherCheckout(RepositoryLayout.PathFromRoot(".claude/worktrees/other/CLAUDE.md")),
             "A path inside .claude/worktrees is another session's copy of this repository and must be skipped.");
         Assert.False(
-            IsInsideAnotherCheckout(RepositoryLayout.PathFromRoot(".claude/skills/cerrar-tanda/SKILL.md")),
+            IsInsideAnotherCheckout(RepositoryLayout.PathFromRoot(".claude/skills/cierre/SKILL.md")),
             "The exclusion has grown wide enough to skip this repository's own files.");
 
         var trespassing = Documents()
