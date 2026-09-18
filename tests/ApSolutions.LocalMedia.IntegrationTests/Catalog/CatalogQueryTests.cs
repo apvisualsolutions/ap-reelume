@@ -119,7 +119,10 @@ public sealed class CatalogQueryTests
                     "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg",
                     null,
                     null,
-                    new HashSet<MetadataField>()),
+                    new HashSet<MetadataField>())
+                {
+                    PersonalCover = new string('f', 64) + ".png",
+                },
                 Revision: 1),
             expectedRevision: 0,
             TestContext.Current.CancellationToken);
@@ -132,8 +135,11 @@ public sealed class CatalogQueryTests
         var arrival = Assert.Single(page.Items, item => item.Title == "Arrival");
         var dune = Assert.Single(page.Items, item => item.Title == "Dune");
 
+        // Both fields, and which one draws is ResolveTitlePoster's answer (LIB-021), not the query's.
         Assert.Equal("/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg", arrival.PosterPath);
+        Assert.Equal(new string('f', 64) + ".png", arrival.PersonalCover);
         Assert.Null(dune.PosterPath);
+        Assert.Null(dune.PersonalCover);
     }
 
     [Fact]
