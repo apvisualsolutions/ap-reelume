@@ -150,6 +150,74 @@ public sealed class CatalogMetadataRepositoryTests
         Assert.Empty(stored!.Metadata.LockedFields);
     }
 
+    /// <summary>
+    /// LIB-021: the picked cover has its own column, so writing the provider's poster again — which
+    /// is what every refresh does — leaves it where it was.
+    /// </summary>
+    [Fact]
+    public async Task A_hand_picked_cover_survives_a_new_provider_poster()
+    {
+        await using var fixture = await MetadataFixture.CreateAsync();
+        var chosen = new string('a', 64) + ".png";
+        var first = Catalog("Título", 1) with
+        {
+            Metadata = Catalog("Título", 1).Metadata with { PosterPath = "/a.jpg", PersonalCover = chosen },
+        };
+        _ = await fixture.Repository.TrySaveAsync(first, 0, TestContext.Current.CancellationToken);
+        var stored = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+
+        _ = await fixture.Repository.TrySaveAsync(
+            stored! with { Metadata = stored.Metadata with { PosterPath = "/b.jpg" } },
+            stored.Revision,
+            TestContext.Current.CancellationToken);
+        var again = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+
+        Assert.Equal(chosen, again!.Metadata.PersonalCover);
+        Assert.Equal("/b.jpg", again.Metadata.PosterPath);
+    }
+
+    /// <summary>
+    /// Before LIB-021 a picked cover was stored in <c>poster_path</c> as an absolute path. Such a row
+    /// is read as a picked cover and the provider field comes back empty, so the next save writes the
+    /// two apart — the move happens on read, with the one rule that knows what a cover name is.
+    /// </summary>
+    [Fact]
+    public async Task A_cover_stored_the_old_way_is_read_as_hand_picked()
+    {
+        await using var fixture = await MetadataFixture.CreateAsync();
+        var chosen = new string('b', 64) + ".jpg";
+        _ = await fixture.Repository.TrySaveAsync(Catalog("Título", 1), 0, TestContext.Current.CancellationToken);
+        await using (var connection = await fixture.Factory.OpenAsync(TestContext.Current.CancellationToken))
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = "UPDATE catalog_metadata SET poster_path = $old, personal_cover = NULL;";
+            _ = command.Parameters.AddWithValue("$old", Path.Combine("C:", "anywhere", "personal-artwork", chosen));
+            _ = await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        }
+
+        var stored = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+
+        Assert.Equal(chosen, stored!.Metadata.PersonalCover);
+        Assert.Null(stored.Metadata.PosterPath);
+    }
+
+    /// <summary>The control beside the move: a provider address in the old field stays a provider address.</summary>
+    [Fact]
+    public async Task A_provider_poster_is_never_moved_to_the_hand_picked_field()
+    {
+        await using var fixture = await MetadataFixture.CreateAsync();
+        var catalog = Catalog("Título", 1);
+        _ = await fixture.Repository.TrySaveAsync(
+            catalog with { Metadata = catalog.Metadata with { PosterPath = "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg" } },
+            0,
+            TestContext.Current.CancellationToken);
+
+        var stored = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+
+        Assert.Null(stored!.Metadata.PersonalCover);
+        Assert.Equal("/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg", stored.Metadata.PosterPath);
+    }
+
     [Fact]
     public async Task Saving_nothing_is_refused_before_it_reaches_the_database()
     {

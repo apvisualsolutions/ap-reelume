@@ -649,7 +649,7 @@ public static partial class CompositionRoot
                     overview: overview,
                     trailerKey: trailerKey,
                     renameWouldChangeTheName: showRename,
-                    posterFile: FindCachedPoster(provider, item.Item.Id, stored?.Metadata.PosterPath));
+                    posterFile: FindCachedPoster(provider, item.Item.Id, stored?.Metadata.PosterPath, stored?.Metadata.PersonalCover));
             }
             else
             {
@@ -684,7 +684,7 @@ public static partial class CompositionRoot
                     trailerKey: trailerKey,
                     file: file,
                     renameWouldChangeTheName: movieRename,
-                    posterFile: FindCachedPoster(provider, item.Item.Id, stored?.Metadata.PosterPath));
+                    posterFile: FindCachedPoster(provider, item.Item.Id, stored?.Metadata.PosterPath, stored?.Metadata.PersonalCover));
             }
         };
         return library;
@@ -712,8 +712,12 @@ public static partial class CompositionRoot
     /// library grid needs the same answer these cards need, and the one thing worse than a rule with
     /// no test is two copies of it. What stays here is the lookup.
     /// </para>
-    private static string? FindCachedPoster(IServiceProvider provider, TitleId titleId, string? posterPath) =>
-        provider.GetRequiredService<ResolveTitlePoster>().Find(titleId, posterPath);
+    private static string? FindCachedPoster(
+        IServiceProvider provider,
+        TitleId titleId,
+        string? posterPath,
+        string? personalCover) =>
+        provider.GetRequiredService<ResolveTitlePoster>().Find(titleId, posterPath, personalCover);
 
     /// <summary>
     /// Everything the shell is handed. The long-lived surfaces arrive built; the ones that describe

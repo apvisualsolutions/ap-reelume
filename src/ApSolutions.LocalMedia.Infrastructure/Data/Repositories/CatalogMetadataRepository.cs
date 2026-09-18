@@ -22,7 +22,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
 {
     private const string Columns =
         "title_id, title, original_title, overview, release_year, genres, poster_path, backdrop_path, "
-        + "trailer_key, locked_fields, revision, provider, provider_key, refreshed_utc";
+        + "trailer_key, locked_fields, revision, provider, provider_key, refreshed_utc, personal_cover";
 
     // A unit separator cannot occur inside a genre name or a field name, so no stored value can be
     // cut in half by the character that joins them.
@@ -101,7 +101,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
         command.CommandText = $"""
             INSERT INTO catalog_metadata ({Columns})
             VALUES ($id, $title, $originalTitle, $overview, $year, $genres, $poster, $backdrop, $trailer, $locked,
-                    $revision, $provider, $providerKey, $refreshedUtc)
+                    $revision, $provider, $providerKey, $refreshedUtc, $personal)
             ON CONFLICT (title_id) DO UPDATE SET
                 title = excluded.title,
                 original_title = excluded.original_title,
@@ -115,7 +115,8 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
                 revision = excluded.revision,
                 provider = excluded.provider,
                 provider_key = excluded.provider_key,
-                refreshed_utc = excluded.refreshed_utc
+                refreshed_utc = excluded.refreshed_utc,
+                personal_cover = excluded.personal_cover
             WHERE catalog_metadata.revision = $expected;
             """;
         // The next revision is computed here rather than taken from the caller. Every caller used to
@@ -144,6 +145,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
             catalog.RefreshedUtc is { } refreshed
                 ? refreshed.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture)
                 : DBNull.Value);
+        _ = command.Parameters.AddWithValue("$personal", (object?)metadata.PersonalCover ?? DBNull.Value);
         _ = command.Parameters.AddWithValue("$expected", expectedRevision);
         var written = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         return written == 0
@@ -155,24 +157,42 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
                 catalog with { Revision = nextRevision });
     }
 
-    private static CatalogMetadata Read(SqliteDataReader reader) => new(
-        new TitleId(Guid.Parse(reader.GetString(0), CultureInfo.InvariantCulture)),
-        new EditableMetadata(
-            reader.GetString(1),
-            reader.IsDBNull(2) ? null : reader.GetString(2),
-            reader.IsDBNull(3) ? null : reader.GetString(3),
-            reader.IsDBNull(4) ? null : reader.GetInt32(4),
-            Split(reader.GetString(5)),
-            reader.IsDBNull(6) ? null : reader.GetString(6),
-            reader.IsDBNull(7) ? null : reader.GetString(7),
-            reader.IsDBNull(8) ? null : reader.GetString(8),
-            ReadLockedFields(reader.GetString(9))),
-        reader.GetInt32(10),
-        reader.IsDBNull(11) ? null : reader.GetString(11),
-        reader.IsDBNull(12) ? null : reader.GetString(12),
-        reader.IsDBNull(13)
-            ? null
-            : DateTimeOffset.Parse(reader.GetString(13), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
+    private static CatalogMetadata Read(SqliteDataReader reader)
+    {
+        var poster = reader.IsDBNull(6) ? null : reader.GetString(6);
+        var personal = reader.IsDBNull(14) ? null : reader.GetString(14);
+
+        // Stored the old way (before LIB-021): the picked cover lived in poster_path, as an absolute
+        // path. It is read as what it is, so the next save writes the two apart; the rule that knows
+        // what a picked cover's name looks like is PersonalCoverPathPolicy, not a copy of it in SQL.
+        if (personal is null && PersonalCoverPathPolicy.TryGetCoverFileName(poster) is { } legacy)
+        {
+            personal = legacy;
+            poster = null;
+        }
+
+        return new(
+            new TitleId(Guid.Parse(reader.GetString(0), CultureInfo.InvariantCulture)),
+            new EditableMetadata(
+                reader.GetString(1),
+                reader.IsDBNull(2) ? null : reader.GetString(2),
+                reader.IsDBNull(3) ? null : reader.GetString(3),
+                reader.IsDBNull(4) ? null : reader.GetInt32(4),
+                Split(reader.GetString(5)),
+                poster,
+                reader.IsDBNull(7) ? null : reader.GetString(7),
+                reader.IsDBNull(8) ? null : reader.GetString(8),
+                ReadLockedFields(reader.GetString(9)))
+            {
+                PersonalCover = personal,
+            },
+            reader.GetInt32(10),
+            reader.IsDBNull(11) ? null : reader.GetString(11),
+            reader.IsDBNull(12) ? null : reader.GetString(12),
+            reader.IsDBNull(13)
+                ? null
+                : DateTimeOffset.Parse(reader.GetString(13), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
+    }
 
     private static string Join(IReadOnlyList<string> values) => string.Join(FieldSeparator, values);
 

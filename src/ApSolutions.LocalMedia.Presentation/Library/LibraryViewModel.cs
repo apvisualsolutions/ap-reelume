@@ -22,7 +22,7 @@ public enum LibrarySurface
 public sealed class LibraryViewModel : INotifyPropertyChanged
 {
     private readonly ICatalogQueryService _queryService;
-    private readonly Func<TitleId, string?, string?> _findPoster;
+    private readonly Func<TitleId, string?, string?, string?> _findPoster;
     private readonly RelayCommand _back;
     private readonly AsyncRelayCommand _clearSearch;
     private readonly AsyncRelayCommand _clearFilters;
@@ -44,18 +44,19 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     /// Turns what a title stores about its cover into the file that draws it. A delegate rather than
     /// the use case itself, for the same reason the detail cards take one: the presentation layer
     /// does not get to know what an artwork store is. Absent, every card draws the generated art it
-    /// drew before, which is what keeps every existing test of this view model standing.
+    /// drew before, which is what keeps every existing test of this view model standing. It takes the
+    /// provider's field and the picked cover's field (LIB-021), and which one draws is its answer.
     /// </param>
     public LibraryViewModel(
         ICatalogQueryService queryService,
         MovieDetailsViewModel? movieDetails = null,
         ShowDetailsViewModel? showDetails = null,
         ScanProgressViewModel? scanProgress = null,
-        Func<TitleId, string?, string?>? findPoster = null,
+        Func<TitleId, string?, string?, string?>? findPoster = null,
         RootNoticeViewModel? rootNotices = null)
     {
         _queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
-        _findPoster = findPoster ?? ((_, _) => null);
+        _findPoster = findPoster ?? ((_, _, _) => null);
         MovieDetails = movieDetails ?? new MovieDetailsViewModel();
         ShowDetails = showDetails ?? new ShowDetailsViewModel();
         ScanProgress = scanProgress ?? new ScanProgressViewModel();
@@ -517,7 +518,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     /// page and the ones scrolled after it cannot come to differ.
     /// </summary>
     private CatalogItemViewModel Card(CatalogItem item) =>
-        new(item, _findPoster(item.Id, item.PosterPath));
+        new(item, _findPoster(item.Id, item.PosterPath, item.PersonalCover));
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
