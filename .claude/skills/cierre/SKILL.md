@@ -42,6 +42,34 @@ Remove-Item (Join-Path (git rev-parse --absolute-git-dir) 'ap-closing')         
 **El auditor de puertas va ANTES de la orden de cierre, no después.** Si la tanda añadió pruebas y no
 se lanzó, no se lanza ahora: va al prompt como primer paso de la sesión siguiente.
 
+## Cómo se ejecuta: la lista a la vista, las salidas a un archivo, y el acta
+
+Tres normas traídas del `/cierre` de la sesión de IT el 2026-09-19, que el propietario pidió
+incorporar. Allí se aprendió que **un skill con la instrucción delante se ejecuta a medias igual**:
+dos veces seguidas, con fases despachadas en una frase.
+
+1. **Al invocarlo, escribir en el mensaje la lista de los pasos 0 a 10** y no dar ninguno por hecho
+   sin su evidencia. Una lista visible es lo que impide saltarse un paso «porque ya estaba cubierto».
+2. **Las salidas de las comprobaciones van a un archivo del scratchpad, y a la conversación sólo su
+   código de salida y las líneas que casan** (`Select-String`, `tail`). El 2026-09-18 una sesión de
+   IT entró en bucle de autocompactado al lanzar varias con el contexto ya lleno, y se cierra
+   justamente cuando el contexto está lleno. **El contrato de salida es el de la casa: 0 limpio,
+   1 hallazgos, 2 NO SE PUDO MEDIR, que nunca es un verde.**
+3. **El acta, antes del commit del relevo** (paso 10), porque mira el stage:
+
+   ```powershell
+   pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-acta.ps1
+   ```
+
+   Comprueba en el transcript de **esta** sesión que cada paso usó su instrumento de verdad
+   —el vigía de CI, las puertas, la previsión de suelos si hubo código, las tres comprobaciones de
+   IT, la lista de pendientes— y en git que el relevo se tocó en los dos idiomas. Sale 1 nombrando
+   lo que falta y 2 si no pudo leer el transcript. **Con el acta en rojo no se hace el commit del
+   relevo.** Es el mecanismo del acta de IT con nuestras fases; su batería está en
+   `scripts/tests/test-cierre-acta.ps1`, con control de mutación por `-Script`. Localiza el
+   transcript con la librería de IT (`cierre-transcript.ps1`), que nunca coge «el más reciente»: si
+   no sabe cuál es el de esta sesión, sale 2.
+
 **No se cierra a medias.** Los pasos 1 a 6 publican; los pasos 7 a 10 son los que hacen que la
 sesión siguiente no empiece preguntando. Saltarse los segundos deja el trabajo hecho y el contexto
 perdido, que es la forma cara de terminar.
@@ -254,6 +282,38 @@ contradice sin enterarse.** Barre la tanda buscándolas y escribe cada una donde
 - **Lo que es del propietario y no tuyo** —copia visible, dinero, hardware, alcance— se deja
   **nombrado como suyo** con una recomendación y listo para un sí o un no. No se decide por él, y
   tampoco se le devuelve la pregunta en crudo: se le da la opción recomendada y el motivo.
+
+### Tres comprobaciones que hace la sesión de IT, invocadas donde viven
+
+No se copian: se llaman donde viven, para que no diverjan. **Su carpeta no se escribe aquí**: este
+repositorio es público, y una ruta de la red de la casa en el árbol la publicaría —lo señaló la
+propia sesión de IT al revisar esta sección el 2026-09-19—. Sale de la variable de entorno de
+usuario `AP_SHARED_TOOLS`, que no se versiona; sin ella, o sin la unidad montada, se dice y cuenta
+como «no se pudo medir», nunca como un verde. Salidas al scratchpad, como manda la norma de arriba:
+
+```powershell
+$it = $env:AP_SHARED_TOOLS; $s = '<scratchpad>'; $repo = (Get-Location).Path
+$memoria = Join-Path $env:USERPROFILE ('.claude\projects\' + ($repo -replace '[:\\/]', '-') + '\memory')
+pwsh -NoProfile -File "$it\cierre-contexto.ps1" -Repo $repo > "$s\contexto.txt"; $LASTEXITCODE
+pwsh -NoProfile -File "$it\cierre-lenguaje.ps1" -RepoRuta $repo > "$s\lenguaje.txt"; $LASTEXITCODE
+pwsh -NoProfile -File "$it\cierre-memorias.ps1" -Memorias $memoria > "$s\memorias.txt"; $LASTEXITCODE
+```
+
+La carpeta de memoria se calcula igual que la nombra Claude Code —la ruta del repositorio con `:` y
+las barras cambiadas por guiones—, así que tampoco se escribe. La de memorias encuentra sola su
+barrido de credenciales cuando se la llama donde vive.
+
+- **Contexto** lista tus peticiones que no dejan rastro ni en `docs/TAREAS.md` ni en los commits del
+  día: la petición que más se pierde es la última antes de cerrar. **Señala, no decide**: cada una se
+  registra o se descarta con su motivo. El 2026-09-19 señaló las dos últimas del propietario, que era
+  lo correcto.
+- **Lenguaje** busca sinónimos inventados —«guía» por skill, «ayudante» por agente, «complemento» por
+  plugin— en lo dicho al propietario y en los archivos tocados. Lo dicho no se corrige, se aprende; lo
+  escrito en archivos vivos se corrige antes del commit. **Señala, no decide**: las «guía» de
+  `CLAUDE.md` son legítimas, porque el archivo se llama así.
+- **Memorias** mide el índice contra sus dos límites de carga, los ganchos de más de 80 caracteres,
+  las notas huérfanas y los enlaces rotos, y barre credenciales. Lo que sobra del límite no se carga
+  y no avisa.
 
 ## 9. Poner al día las tareas de fondo
 
