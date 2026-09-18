@@ -119,7 +119,10 @@ if ($configs.Count -ne 1) {
     $failures.Add("Expected one contrib Makefile under $VlcSource/contrib/contrib-*, found $($configs.Count).")
 } else {
     $config = Get-Content $configs[0]
-    if ($config -match '^GPL\s*:=\s*1') { $failures.Add("the contrib Makefile enables GPL: $($configs[0])") }
+    # The absence below can only mean something if the pattern can match what bootstrap writes.
+    $gplLine = '^GPL\s*:=\s*1'
+    if (-not ('GPL := 1' -match $gplLine)) { $failures.Add('Control failed: the GPL pattern does not match the line bootstrap writes.') }
+    if ($config -match $gplLine) { $failures.Add("the contrib Makefile enables GPL: $($configs[0])") }
     if (-not ($config -match '^AD_CLAUSES\s*:=\s*1')) { $failures.Add("the contrib Makefile lacks AD_CLAUSES: either FreeType was refused or this is not bootstrap's Makefile.") }
 }
 $aribCanary = 'arib parser was created'
