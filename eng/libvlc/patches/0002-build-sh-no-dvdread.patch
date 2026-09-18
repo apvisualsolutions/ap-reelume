@@ -1,0 +1,15 @@
+diff --git a/extras/package/win32/build.sh b/extras/package/win32/build.sh
+index e974d3d..fbb26f9 100755
+--- a/extras/package/win32/build.sh
++++ b/extras/package/win32/build.sh
+@@ -505,7 +505,9 @@ if [ -n "$WINSTORE" ]; then
+     CONFIGFLAGS="$CONFIGFLAGS --disable-crystalhd --disable-dxva2"
+ 
+ else
+-    CONFIGFLAGS="$CONFIGFLAGS --enable-dvdread --enable-caca"
++    # libdvdread is GPL and is not built with contrib/bootstrap --disable-gpl, so asking for it
++    # here would abort configure.
++    CONFIGFLAGS="$CONFIGFLAGS --enable-caca"
+ fi
+ if [ -n "$INSTALL_PATH" ]; then
+     CONFIGFLAGS="$CONFIGFLAGS --prefix=$INSTALL_PATH"
