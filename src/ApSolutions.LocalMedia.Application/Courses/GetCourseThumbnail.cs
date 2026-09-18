@@ -68,7 +68,7 @@ public sealed class GetCourseThumbnail(
             ? new CourseThumbnailStamp(onDisk.Length, onDisk.LastWriteTimeUtc)
             : (CourseThumbnailStamp?)null;
 
-        var stored = Stored(destination);
+        var stored = FrameStampFile.Read(destination);
         var action = CourseThumbnailPolicy.Decide(source is not null, stored, current);
 
         if (action == CourseThumbnailAction.Impossible)
@@ -98,39 +98,7 @@ public sealed class GetCourseThumbnail(
             return null;
         }
 
-        Remember(destination, current.Value);
+        FrameStampFile.Write(destination, current.Value);
         return destination;
     }
-
-    /// <summary>
-    /// The stamp of the file a stored picture was taken from, or nothing when there is no picture.
-    /// </summary>
-    /// <remarks>
-    /// Kept in a small file beside the picture rather than in the database. It describes a cache
-    /// entry, and a cache entry that outlived its own record would be worse than one with no record
-    /// at all: the two would be deleted separately and disagree. Beside it, they are deleted
-    /// together by anything that clears the folder.
-    /// </remarks>
-    private static CourseThumbnailStamp? Stored(string destination)
-    {
-        var marker = destination + ".from";
-        if (!File.Exists(destination) || !File.Exists(marker))
-        {
-            return null;
-        }
-
-        var parts = File.ReadAllText(marker).Split('|');
-        return parts.Length == 2
-            && long.TryParse(parts[0], System.Globalization.CultureInfo.InvariantCulture, out var length)
-            && DateTimeOffset.TryParse(parts[1], System.Globalization.CultureInfo.InvariantCulture, out var modified)
-                ? new CourseThumbnailStamp(length, modified)
-                : null;
-    }
-
-    private static void Remember(string destination, CourseThumbnailStamp stamp) =>
-        File.WriteAllText(
-            destination + ".from",
-            string.Create(
-                System.Globalization.CultureInfo.InvariantCulture,
-                $"{stamp.Length}|{stamp.ModifiedUtc:O}"));
 }
