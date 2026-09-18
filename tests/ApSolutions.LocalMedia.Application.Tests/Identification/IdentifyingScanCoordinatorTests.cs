@@ -77,6 +77,50 @@ public sealed class IdentifyingScanCoordinatorTests
         Assert.Equal([rootId, rootId, rootId, rootId], roots.Asked);
     }
 
+    /// <summary>
+    /// With nobody listening for the end of a scan, the scan finishes exactly as it did before the
+    /// notice existed. Asserted here because the coverage gate's own pass never ran a coordinator built
+    /// without a listener, and the run of c9c37acd measured that branch as untaken.
+    /// </summary>
+    [Fact]
+    public async Task A_scan_nobody_listens_to_finishes_as_before()
+    {
+        var rootId = new LibraryRootId(Guid.NewGuid());
+        var summary = new ScanSummary(rootId, 0, 0, 0, 0, 0, false, null, [], TimeSpan.Zero);
+        var roots = new RecordingRoots();
+        var candidates = new NullCandidates();
+        var coordinator = new IdentifyingScanCoordinator(
+            new FixedScanCoordinator(summary),
+            () => new ReconcileScannedFiles(
+                new UntouchedMediaFiles(),
+                new ReconcileScanResults(new UntouchedMediaFiles(), new FileReconciliationPolicy()),
+                new UnreadIdentity(),
+                new FileReconciliationPolicy(),
+                new PendingReassignments()),
+            () => new IdentifyScannedFiles(
+                roots,
+                new UntouchedMediaFiles(),
+                candidates,
+                new IdentifyMediaFile(new MediaNameParser(), new CandidateScorer(), new EmptySource(), candidates),
+                TestIdentification.Silent()),
+            () => new GroupScannedVersions(
+                roots,
+                new UntouchedMediaFiles(),
+                new EmptyGroups(),
+                new MediaNameParser(),
+                new DuplicateGroupingPolicy(),
+                new GroupMediaVersions(new EmptyGroups())),
+            () => new GroupScannedEpisodes(roots, new UntouchedMediaFiles(), new UnwrittenCatalog(), new MediaNameParser()),
+            () => new NameScannedTitles(roots, new UntouchedMediaFiles(), new MediaNameParser()));
+
+        var returned = await coordinator.StartAsync(
+            new StartScanCommand(rootId, ScanTrigger.Manual),
+            TestContext.Current.CancellationToken);
+
+        Assert.Same(summary, returned);
+        Assert.Equal(4, roots.Asked.Count);
+    }
+
     private sealed class UnreadIdentity : IFileIdentityProvider
     {
         public Task<FileIdentity> GetAsync(
