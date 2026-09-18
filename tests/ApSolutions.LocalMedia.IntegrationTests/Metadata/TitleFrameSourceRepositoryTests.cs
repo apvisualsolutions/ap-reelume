@@ -109,6 +109,24 @@ public sealed class TitleFrameSourceRepositoryTests
         Assert.Single(sources, source => source.VideoPath == @"D:\shows\s01e01.mkv");
     }
 
+    /// <summary>
+    /// Identifying a film does not delete its scanned row, so the same file is both a title and a
+    /// scanned entry; it is asked for once. gate-auditor measured on 2026-09-18 that no test held this:
+    /// the scanned branch's «no title claims it» condition could be removed and all seven stayed green.
+    /// </summary>
+    [Fact]
+    public async Task An_identified_film_that_still_has_its_scanned_row_is_asked_for_once()
+    {
+        await using var fixture = await Fixture.CreateAsync();
+        await fixture.ExecuteAsync(MediaFile(Film, @"D:\films\arrival.mkv", size: 1, available: 1));
+        await fixture.ExecuteAsync(Title(Film, kind: 0));
+        await fixture.ExecuteAsync(ScannedTitle(Film));
+
+        var source = Assert.Single(await fixture.Sources.ListWithoutCoverAsync(TestContext.Current.CancellationToken));
+
+        Assert.Equal(@"D:\films\arrival.mkv", source.VideoPath);
+    }
+
     [Fact]
     public async Task A_film_on_a_missing_disk_is_not_asked_for()
     {

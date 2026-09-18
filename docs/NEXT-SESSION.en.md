@@ -43,6 +43,9 @@
 > · **`ENG-029`**: the legal notices do not name every library the engine carries inside.
 > · **`ENG-030`**: with an HDR10 the player says «SDR»; the recognition is not wired, and the `PLY-003`
 >   row counts it as verified. It needs revising with what gets measured.
+> · **`ENG-031`**: nothing caps how many video tests CI skips, so `ENG-001` can come back in silence.
+>   `gate-auditor` found it at closing, along with two blind gates in the frame pass, now fixed and seen
+>   failing against their mutants.
 >
 > ### The measured traps
 >

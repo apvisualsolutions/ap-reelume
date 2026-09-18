@@ -109,6 +109,26 @@ public sealed class CaptureTitleFramesTests : IDisposable
         Assert.Equal(1, grabber.Calls);
     }
 
+    /// <summary>
+    /// Busy before the first title decodes nothing at all. The theory above only turns busy after a
+    /// capture, so it could not tell «checked before every title» from «checked after»; gate-auditor
+    /// measured that on 2026-09-18 with the check moved behind the first title, and it stayed green.
+    /// </summary>
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public async Task Busy_from_the_start_decodes_nothing(bool playing, bool scanning)
+    {
+        var activity = new Activity { Playing = playing, Scanning = scanning };
+        var grabber = new RecordingGrabber();
+
+        var taken = await Subject([Source(1, TimeSpan.FromMinutes(1))], grabber, activity)
+            .ExecuteAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        Assert.Equal(0, taken);
+        Assert.Equal(0, grabber.Calls);
+    }
+
     [Fact]
     public async Task The_grid_is_told_once_per_batch_that_took_something_and_once_for_the_remainder()
     {

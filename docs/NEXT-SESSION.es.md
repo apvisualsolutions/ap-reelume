@@ -44,6 +44,9 @@
 > · **`ENG-029`**: los avisos legales no nombran todas las bibliotecas que el motor lleva dentro.
 > · **`ENG-030`**: con un HDR10 el reproductor dice «SDR»; el reconocimiento no está conectado, y la
 >   fila `PLY-003` lo da por verificado. Hay que revisarla con lo que se mida.
+> · **`ENG-031`**: nada limita cuántas pruebas de vídeo se omiten en CI, así que `ENG-001` puede volver
+>   en silencio. Lo encontró `gate-auditor` al cerrar, junto con dos puertas ciegas de la pasada de
+>   fotogramas, ya corregidas y vistas fallar contra su mutante.
 >
 > ### Las trampas medidas
 >

@@ -177,6 +177,31 @@ public sealed class CatalogMetadataRepositoryTests
     }
 
     /// <summary>
+    /// Picking another cover replaces the first one. The test above only shows the field stays; with
+    /// the upsert's personal_cover assignment removed it stayed green, and only the five-minute walk
+    /// noticed (gate-auditor, 2026-09-18).
+    /// </summary>
+    [Fact]
+    public async Task Picking_another_cover_replaces_the_first()
+    {
+        await using var fixture = await MetadataFixture.CreateAsync();
+        var first = Catalog("Título", 1);
+        _ = await fixture.Repository.TrySaveAsync(
+            first with { Metadata = first.Metadata with { PersonalCover = new string('a', 64) + ".png" } },
+            0,
+            TestContext.Current.CancellationToken);
+        var stored = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+
+        _ = await fixture.Repository.TrySaveAsync(
+            stored! with { Metadata = stored.Metadata with { PersonalCover = new string('b', 64) + ".jpg" } },
+            stored.Revision,
+            TestContext.Current.CancellationToken);
+        var again = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+
+        Assert.Equal(new string('b', 64) + ".jpg", again!.Metadata.PersonalCover);
+    }
+
+    /// <summary>
     /// Before LIB-021 a picked cover was stored in <c>poster_path</c> as an absolute path. Such a row
     /// is read as a picked cover and the provider field comes back empty, so the next save writes the
     /// two apart — the move happens on read, with the one rule that knows what a cover name is.
