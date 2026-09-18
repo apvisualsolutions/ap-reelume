@@ -82,6 +82,27 @@ Tras borrar las copias del motor de todas las carpetas de salida —ver la prime
   publicado con un hash cambiado en una sola cifra, **rechazado sin dejar árbol instalado**. La segunda
   llamada con todo en su sitio tarda 0,4 s y no descarga.
 
+## Lo que encontró `gate-auditor` / What gate-auditor found
+
+Lanzado antes de empujar, en una copia aislada, con mutaciones sobre las cuatro puertas. / Run before
+pushing, in an isolated copy, mutating the four gates.
+
+- **Un defecto real: el SBOM del paquete ARM64 nombraba el motor con el hash del zip x64.**
+  `generate-sbom.ps1` tomaba siempre `assets.x64` —y escribía `win-x64` en el nombre y en las
+  propiedades del documento ARM64 desde antes—, y la prueba sólo leía el SBOM x64: con el hash del
+  ARM64 puesto a ceros pasaba seis de seis. Ahora el guion recibe la arquitectura, los dos guiones de
+  empaquetado se la pasan, y la prueba tiene las filas ARM64; se vio fallar antes de la corrección.
+- **Un aviso mudo**: con un árbol instalado a mano y el lock fijado, la compilación no decía nada,
+  porque la descarga se salta cuando sus marcas son recientes. Ahora una pieza que corre siempre lee
+  las marcas: con «unpinned» sale el aviso, y con la marca buena calla (los dos casos medidos).
+- **Una comprobación en vacío**: con los dos SHA-512 del paquete de fuentes a `null`,
+  `The_engine_build_source_is_the_pinned_archive` pasaba comparando nada con nada (la otra suite sí
+  caía). Ahora exige la forma del hash antes de comparar.
+- **Lo que midió bien**: un `PackageReference` al paquete de VideoLAN reaparece en los ficheros de
+  bloqueo y la prueba cae; un hash en mayúsculas, truncado o repetido, cae; un plugin añadido, borrado
+  o con un byte alterado en el paquete, cae; y el zip con una cifra del hash cambiada hace fallar la
+  compilación sin tocar el árbol instalado.
+
 ## Las trampas, y tres las cazó un ensayo antes de publicar / The traps, three caught by a rehearsal
 
 1. **`PreserveNewest` copia y nunca borra.** Al cambiar de motor, las veinte carpetas de salida del

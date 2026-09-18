@@ -16,6 +16,56 @@
 > se borraron de aquí porque este documento es el registro de lo que pasó, y reescribir lo que pasó es
 > otra clase de error.
 
+> ## AVISO AL FRENTE — 2026-09-18, segunda tanda: la aplicación ya lleva el motor sin GPL, y un ensayo evitó publicar el código propio
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit. Cada
+> fast-forward a `main` se hizo con la conclusión de CI leída; este relevo puede ir un commit por
+> delante, por ser sólo documentación.
+>
+> ### Lo que se hizo
+>
+> · **`ENG-013`: la aplicación y los dos paquetes dejan el NuGet de VideoLAN y llevan el motor propio
+>   sin GPL.** Publicado como prerelease `libvlc-3.0.23-nogpl.1` de este repositorio —decisión del
+>   propietario—, fijado por SHA-512 en `eng/libvlc/libvlc.lock.json` y descargado por
+>   `eng/libvlc/LibVlc.targets`, que rechaza cualquier otro byte. Las diez suites pasan contra él y el
+>   MSIX lleva exactamente el árbol verificado. `releases/latest` sigue en 404: el actualizador no la ve.
+>   Se cierra con el CI del commit en verde. Evidencia `ENG013-app-on-own-engine.md`.
+> · **Los parches llevan el aviso con fecha que pide la LGPL-2.1 §2(b)**; dos de los cuatro ficheros
+>   no lo tenían, y obligó a recompilar el motor.
+> · **El código fuente de cada versión suma el paquete de fuentes del motor** (parches, guiones y los
+>   80 tarballs de terceros), verificado por SHA-512.
+>
+> ### El hallazgo que más valió, y es de método
+>
+> **Tras dos fallos seguidos del flujo que publica, se paró de iterar contra el servidor y se ensayó el
+> paso entero en local con los artefactos reales — y el ensayo encontró el código de la aplicación
+> dentro del paquete de fuentes a publicar.** Se montaba en `src/` dentro del checkout. Ningún fallo lo
+> habría delatado: el flujo habría terminado en verde. Ahora se monta fuera del repositorio y el
+> archivo se abre antes de subir, con control negativo ensayado.
+>
+> ### Las trampas medidas
+>
+> · **`PreserveNewest` copia y nunca borra**: al cambiar de motor, las veinte carpetas de salida
+>   seguían con el de VideoLAN. Hay que borrarlas antes de medir; `LibVlcPayloadTests` impide que un
+>   paquete construido encima pase.
+> · **Un tarball de contrib archivado desde git (fluidlite) difiere entre arquitecturas**: se
+>   conservan los dos.
+> · **`verify-package.ps1` exige los ficheros nuevos preparados en git** antes de su comparación de
+>   dos compilaciones limpias; sin eso se para, y dice por qué.
+> · **Un runner local guarda en `.runner/_work` una copia vieja del repositorio**, y las pruebas que
+>   recorren el disco la leen.
+>
+> ### Lo pendiente NO está aquí
+>
+> Está en `docs/FEATURES.md` y `docs/TAREAS.md`. De esta tanda: **`ENG-013`** se cierra con el CI;
+> **`ENG-028`** —la LGPL-3.0 de gmp, nettle y live555— es ahora lo único legal abierto del motor.
+>
+> ### Lo que espera al propietario
+>
+> · **MSYS2 en `C:\msys64` (1,8 GB)**, **el juicio visual de `PLY-016`** y **la regla del orden del
+>   backlog para las reglas comunes**, como estaban.
+
 > ## AVISO AL FRENTE — 2026-09-18: el motor compila sin GPL en CI y reproduce lo prometido, y la GPL eran catorce complementos y no tres
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

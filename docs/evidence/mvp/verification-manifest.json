@@ -103,7 +103,8 @@
         "docs/evidence/mvp/T40-x64-packaging.md",
         "docs/evidence/stable/audit-legal-public.md",
         "docs/evidence/stable/audit-eng027-plugin-gpl-sources.md",
-        "docs/evidence/stable/ENG013-reproducible-build.md"
+        "docs/evidence/stable/ENG013-reproducible-build.md",
+        "docs/evidence/stable/ENG013-app-on-own-engine.md"
       ]
     },
     {

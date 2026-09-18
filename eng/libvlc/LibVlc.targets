@@ -36,6 +36,19 @@
     <Exec Command="pwsh -NoProfile -NonInteractive -File &quot;$(MSBuildThisFileDirectory)fetch-libvlc.ps1&quot; -Architecture $(LibVlcArchitectures)" />
   </Target>
 
+  <!--
+    Every build, not only the ones that fetch. FetchLibVlc is skipped whenever its markers are newer
+    than the lock file, so the "unpinned" warning fetch-libvlc.ps1 prints could not be relied on to
+    reach anyone: gate-auditor set a marker to unpinned with the lock pinned, built, and got silence.
+    This reads the markers themselves.
+  -->
+  <Target Name="WarnOnUnpinnedLibVlc" AfterTargets="FetchLibVlc" BeforeTargets="BeforeBuild" Condition="'$(LibVlcArchitectures)' != ''">
+    <ReadLinesFromFile File="%(LibVlcMarker.Identity)" Condition="Exists('%(LibVlcMarker.Identity)')">
+      <Output TaskParameter="Lines" ItemName="LibVlcMarkerLine" />
+    </ReadLinesFromFile>
+    <Warning Condition="'%(LibVlcMarkerLine.Identity)' == 'unpinned'" Text="LibVLC: this build copies a tree installed with fetch-libvlc.ps1 -FromTree, not the one libvlc.lock.json pins. Only for testing before publication." />
+  </Target>
+
   <!-- A target and not a static ItemGroup: the tree does not exist until FetchLibVlc has run. -->
   <Target Name="CollectLibVlcFiles" AfterTargets="FetchLibVlc" BeforeTargets="BeforeBuild">
     <ItemGroup Condition="'$(LibVlcX64Enabled)' == 'true'">

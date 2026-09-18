@@ -259,6 +259,9 @@ public sealed class LicenceTextTests
             .Single(source => source.GetProperty("name").GetString() == "libvlc-build");
         var pinned = lockFile.RootElement.GetProperty("sourceAsset");
 
+        // Two nulls are equal, and gate-auditor measured it: with both hashes emptied every test here
+        // passed. The shape is asserted first, so an unpinned archive cannot compare equal to nothing.
+        Assert.Matches("^[0-9a-f]{128}$", build.GetProperty("sha512").GetString() ?? string.Empty);
         Assert.Equal(pinned.GetProperty("fileName").GetString(), build.GetProperty("fileName").GetString());
         Assert.Equal(pinned.GetProperty("sha512").GetString(), build.GetProperty("sha512").GetString());
         Assert.EndsWith(

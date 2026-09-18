@@ -83,18 +83,29 @@ public sealed class LibVlcPayloadTests
     /// The bill of materials names the engine with the hash it is pinned by. It is built from the lock
     /// files, and since ENG-013 no lock file names LibVLC: without its own entry the largest native
     /// component of the artifact would drop out of the list on the day it changed.
+    /// <para>
+    /// Each package against its OWN architecture's tree. The first version read the x64 SBOM only, and
+    /// gate-auditor found the ARM64 package naming the x64 zip — the script always took the x64 asset
+    /// — with zeroed hashes in the ARM64 SBOM passing six of six.
+    /// </para>
     /// </summary>
     [Theory]
-    [InlineData("sbom/sbom.cyclonedx.json", "components", "hashes", "content")]
-    [InlineData("sbom/sbom.spdx.json", "packages", "checksums", "checksumValue")]
-    public void The_sbom_names_the_engine_by_its_pinned_hash(string relativePath, string collection, string hashes, string value)
+    [InlineData("x64", "sbom/sbom.cyclonedx.json", "components", "hashes", "content")]
+    [InlineData("x64", "sbom/sbom.spdx.json", "packages", "checksums", "checksumValue")]
+    [InlineData("arm64", "sbom/sbom.cyclonedx.json", "components", "hashes", "content")]
+    [InlineData("arm64", "sbom/sbom.spdx.json", "packages", "checksums", "checksumValue")]
+    public void The_sbom_names_the_engine_by_its_pinned_hash(string architecture, string relativePath, string collection, string hashes, string value)
     {
-        var path = Path.Combine(PackageEvidence.PackageRoot(), relativePath.Replace('/', Path.DirectorySeparatorChar));
-        Assert.True(File.Exists(path), $"{relativePath} is missing. {PackageEvidence.HowToProduce}");
+        var packageRoot = architecture == "x64" ? PackageEvidence.PackageRoot() : PackageEvidence.Arm64PackageRoot();
+        var path = Path.Combine(packageRoot, relativePath.Replace('/', Path.DirectorySeparatorChar));
+        Assert.True(
+            File.Exists(path),
+            $"{relativePath} is missing from the {architecture} package. "
+                + (architecture == "x64" ? PackageEvidence.HowToProduce : PackageEvidence.HowToProduceArm64));
 
         using var lockFile = JsonDocument.Parse(File.ReadAllText(RepositoryLayout.PathFromRoot("eng/libvlc/libvlc.lock.json")));
-        var pinned = lockFile.RootElement.GetProperty("assets").GetProperty("x64").GetProperty("sha512").GetString();
-        Assert.False(string.IsNullOrEmpty(pinned), "libvlc.lock.json pins no x64 tree.");
+        var pinned = lockFile.RootElement.GetProperty("assets").GetProperty(architecture).GetProperty("sha512").GetString();
+        Assert.False(string.IsNullOrEmpty(pinned), $"libvlc.lock.json pins no {architecture} tree.");
 
         using var sbom = JsonDocument.Parse(File.ReadAllText(path));
         var engine = sbom.RootElement.GetProperty(collection).EnumerateArray()

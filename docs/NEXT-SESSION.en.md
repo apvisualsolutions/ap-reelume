@@ -16,6 +16,56 @@
 > deleted from here, because this document is the record of what happened, and rewriting what happened
 > is a different kind of mistake.
 
+> ## FRONT NOTICE — 2026-09-18, second batch: the application now ships the GPL-free engine, and a rehearsal stopped our own code being published
+>
+> **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here. Every
+> fast-forward to `main` was made with CI's conclusion read; this handover may sit one commit ahead,
+> being documentation only.
+>
+> ### What was done
+>
+> · **`ENG-013`: the application and both packages drop VideoLAN's NuGet and ship our own GPL-free
+>   engine.** Published as the prerelease `libvlc-3.0.23-nogpl.1` of this repository — the owner's
+>   decision —, pinned by SHA-512 in `eng/libvlc/libvlc.lock.json` and downloaded by
+>   `eng/libvlc/LibVlc.targets`, which refuses any other byte. All ten suites pass against it and the
+>   MSIX carries exactly the verified tree. `releases/latest` still answers 404: the updater cannot see
+>   it. It closes with the commit's CI green. Evidence `ENG013-app-on-own-engine.md`.
+> · **The patches carry the dated notice LGPL-2.1 §2(b) asks for**; two of the four files lacked it,
+>   and it forced a rebuild of the engine.
+> · **Each release's corresponding source gains the engine's source archive** (patches, scripts and
+>   the 80 third-party tarballs), verified by SHA-512.
+>
+> ### The finding that paid most, and it is about method
+>
+> **After two failures in a row of the publishing workflow, iteration against the server stopped and
+> the whole step was rehearsed locally with the real artifacts — and the rehearsal found the
+> application's code inside the source archive about to be published.** It was staged in `src/` inside
+> the checkout. No failure would have given it away: the workflow would have finished green. It is now
+> staged outside the repository and the archive is opened before upload, with a rehearsed negative
+> control.
+>
+> ### The traps measured
+>
+> · **`PreserveNewest` copies and never deletes**: after the engine changed, all twenty output folders
+>   still held VideoLAN's. They must be cleared before measuring; `LibVlcPayloadTests` stops a package
+>   built on top of them from passing.
+> · **A contrib tarball archived from git (fluidlite) differs between architectures**: both are kept.
+> · **`verify-package.ps1` demands new files staged in git** before its two-clean-builds comparison;
+>   without that it stops, and says why.
+> · **A local runner keeps an old copy of the repository in `.runner/_work`**, and tests that walk the
+>   disk read it.
+>
+> ### What is pending is NOT here
+>
+> It is in `docs/FEATURES.md` and `docs/TAREAS.md`. From this batch: **`ENG-013`** closes with CI;
+> **`ENG-028`** — the LGPL-3.0 of gmp, nettle and live555 — is now the engine's only open legal point.
+>
+> ### What waits on the owner
+>
+> · **MSYS2 in `C:\msys64` (1.8 GB)**, **the visual judgement on `PLY-016`** and **the backlog
+>   ordering rule for the shared rules**, as they were.
+
 > ## FRONT NOTICE — 2026-09-18: the engine builds without GPL in CI and plays what is promised, and the GPL was fourteen plugins, not three
 >
 > **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,

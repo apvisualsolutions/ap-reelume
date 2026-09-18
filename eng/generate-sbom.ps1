@@ -20,7 +20,13 @@ param(
     [string]$Output = 'artifacts/package/sbom',
 
     [Parameter(Mandatory)]
-    [string]$Version
+    [string]$Version,
+
+    # The package this bill describes. Until 2026-09-18 there was no parameter and every SBOM said
+    # win-x64; the day the engine became a pinned tree per architecture, gate-auditor found the ARM64
+    # package naming the x64 engine's hash. Both packaging scripts pass it.
+    [ValidateSet('x64', 'arm64')]
+    [string]$Architecture = 'x64'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -98,7 +104,7 @@ foreach ($lockFile in $lockFiles) {
 # repository. Without this entry the bill of materials would lose the largest native component the
 # artifact carries on the very day it changed.
 $engineLock = Get-Content -LiteralPath (Join-Path $repoRoot 'eng/libvlc/libvlc.lock.json') -Raw | ConvertFrom-Json
-$engineAsset = $engineLock.assets.x64
+$engineAsset = $engineLock.assets.$Architecture
 $engineVersion = $engineLock.tag -replace '^libvlc-', ''
 $resolved["LibVLC/$engineVersion"] = [pscustomobject]@{
     name     = 'LibVLC'
@@ -131,7 +137,7 @@ $cyclone = [ordered]@{
         }
         properties = @(
             [ordered]@{ name = 'apsolutions:commit'; value = $commit },
-            [ordered]@{ name = 'apsolutions:runtime'; value = 'win-x64' },
+            [ordered]@{ name = 'apsolutions:runtime'; value = "win-$Architecture" },
             [ordered]@{ name = 'apsolutions:signed'; value = 'false' }
         )
     }
@@ -161,7 +167,7 @@ $spdx = [ordered]@{
     spdxVersion       = 'SPDX-2.3'
     dataLicense       = 'CC0-1.0'
     SPDXID            = 'SPDXRef-DOCUMENT'
-    name              = "APSolutions.LocalMedia-$Version-win-x64"
+    name              = "APSolutions.LocalMedia-$Version-win-$Architecture"
     documentNamespace = "https://github.com/apsolutions/localmedia/sbom/$commit"
     creationInfo      = [ordered]@{
         created  = $commitDate
