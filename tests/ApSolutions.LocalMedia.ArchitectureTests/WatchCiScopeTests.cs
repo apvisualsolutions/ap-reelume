@@ -61,6 +61,10 @@ public sealed class WatchCiScene : IDisposable
                 // to the run list, so it is answered first.
                 "echo %*| findstr /C:\"--json jobs\" >nul",
                 "if %errorlevel%==0 (type \"%GH_STUB_JOBS%\" & exit /b 0)",
+                // A second workflow on the same commit, as libvlc-nogpl.yml is since 2026-09-18. It
+                // is what gh returns to a run list that does not name the workflow, and it is red.
+                "echo %*| findstr /C:\"--workflow CI\" >nul",
+                "if not %errorlevel%==0 (type \"%GH_STUB_OTHER%\" & exit /b 0)",
                 "echo %*| findstr /C:\"--commit %GH_STUB_SHA%\" >nul",
                 "if %errorlevel%==0 (type \"%GH_STUB_RUNS%\" & exit /b 0)",
                 "echo %*| findstr /C:\"--commit \" >nul",
@@ -117,6 +121,10 @@ public sealed class WatchCiScene : IDisposable
         var logPath = Path.Combine(_root, "gh-calls.log");
         File.WriteAllText(runsPath, runsJson + Environment.NewLine);
         File.WriteAllText(jobsPath, (jobsJson ?? "{\"jobs\":[]}") + Environment.NewLine);
+        var otherPath = Path.Combine(_root, "other-workflow.json");
+        File.WriteAllText(
+            otherPath,
+            $"[{{\"conclusion\":\"failure\",\"databaseId\":7,\"headSha\":\"{FullSha}\",\"status\":\"completed\"}}]" + Environment.NewLine);
         File.Delete(logPath);
 
         var start = new ProcessStartInfo("pwsh")
@@ -158,6 +166,7 @@ public sealed class WatchCiScene : IDisposable
         start.Environment["GH_STUB_LOG"] = logPath;
         start.Environment["GH_STUB_RUNS"] = runsPath;
         start.Environment["GH_STUB_JOBS"] = jobsPath;
+        start.Environment["GH_STUB_OTHER"] = otherPath;
         start.Environment["GH_STUB_SHA"] = FullSha;
         start.Environment["GH_STUB_BRANCH"] = PushedBranch;
 
@@ -424,6 +433,23 @@ public sealed class WatchCiScopeTests(WatchCiScene scene) : IClassFixture<WatchC
                 $"The watcher asked gh for '--commit {sha}', which gh answers [] and exit 0 to. "
                 + "A prefix has to be resolved through git before it is asked about.");
         }
+    }
+
+    /// <summary>
+    /// A commit can have more than one run since 2026-09-18: a change under eng/libvlc triggers
+    /// libvlc-nogpl.yml next to ci.yml. The watcher took the first run gh listed for the commit, so
+    /// the engine build — hours long, red for reasons of its own — could be read out as CI's verdict,
+    /// and main advanced or held on the wrong one.
+    /// </summary>
+    [Fact]
+    public void A_run_of_another_workflow_on_the_same_commit_is_not_read_as_CI()
+    {
+        var result = scene.Watch(scene.ShortSha, branch: null, scene.CompletedRun("success"));
+
+        Assert.True(
+            result.ExitCode == 0,
+            $"The watcher read another workflow's red run as CI's verdict: {result.Output}");
+        Assert.Contains("success", result.Output, StringComparison.Ordinal);
     }
 
     /// <summary>

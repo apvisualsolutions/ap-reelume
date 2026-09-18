@@ -1,0 +1,116 @@
+name: LibVLC without GPL
+
+# ENG-013: builds LibVLC for Windows without GPL code, for both architectures, and refuses the
+# result unless eng/libvlc/verify-nogpl.ps1 finds nothing GPL in it.
+#
+# A workflow of its own and not a step of ci.yml, for two measured reasons. The engine is built once
+# per VLC version, not per commit: its inputs are the tag, the patches and these scripts, and
+# nothing in src/ changes them. And ci.yml's single Windows job already runs close enough to its
+# ceiling that eng/measure-ci-time.ps1 exists to watch the margin; hours of contrib builds do not
+# belong inside it.
+#
+# It runs where VideoLAN runs it: their CI images, named in extras/ci/gitlab-ci.yml at the tag.
+# The dates in the image tags are theirs and are pinned on purpose — a newer image is a newer
+# toolchain, and that is a change to review, not to receive.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - codex/**
+    paths:
+      - eng/libvlc/**
+      - .github/workflows/libvlc-nogpl.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build ${{ matrix.arch }}
+    runs-on: ubuntu-24.04
+    # The contribs are the bulk. Measure it (eng/measure-ci-time.ps1) rather than trust this number;
+    # it is a hang ceiling, not an estimate. Hosted jobs stop at 360.
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            image: registry.videolan.org/vlc-debian-win64-3.0:20251208092116
+          - arch: aarch64
+            image: registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032
+    container:
+      image: ${{ matrix.image }}
+      # The images default to an unprivileged user that cannot write the workspace GitHub mounts.
+      options: --user 0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build
+        run: |
+          git config --global --add safe.directory '*'
+          sh eng/libvlc/build-nogpl.sh "${{ matrix.arch }}" "$GITHUB_WORKSPACE/out"
+
+      # The verify job needs the tree the plugins were built from, to read their licences, and the
+      # contrib config.mak, to see that GPL was off. Not the multi-gigabyte contrib build itself.
+      - name: Pack what the verification reads
+        run: |
+          cd "$GITHUB_WORKSPACE/out"
+          tar -czf libvlc-build.tar.gz install \
+            vlc-src/.git vlc-src/modules vlc-src/include vlc-src/src vlc-src/lib vlc-src/configure.ac \
+            vlc-src/contrib/contrib-*/config.mak
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: libvlc-build-${{ matrix.arch }}
+          path: out/libvlc-build.tar.gz
+          retention-days: 7
+
+  verify:
+    name: verify ${{ matrix.arch }}
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            nuget: x64
+          - arch: aarch64
+            nuget: arm64
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: libvlc-build-${{ matrix.arch }}
+
+      # The reference is the package the application ships today, which is built as GPL: it is what
+      # every check in verify-nogpl.ps1 uses to prove it can see. It is fetched from nuget.org and
+      # accepted only if its SHA-512 is the contentHash the repository's lock file pins.
+      - name: Fetch the reference package
+        shell: pwsh
+        run: |
+          $lock = Get-Content src/ApSolutions.LocalMedia.Infrastructure/packages.lock.json -Raw | ConvertFrom-Json
+          $entry = $lock.dependencies.PSObject.Properties.Value.'VideoLAN.LibVLC.Windows'
+          $version = $entry.resolved
+          Invoke-WebRequest "https://www.nuget.org/api/v2/package/VideoLAN.LibVLC.Windows/$version" -OutFile ref.nupkg
+          $actual = [Convert]::ToBase64String([Security.Cryptography.SHA512]::HashData([IO.File]::ReadAllBytes("$PWD/ref.nupkg")))
+          if ($actual -ne $entry.contentHash) { throw "VideoLAN.LibVLC.Windows $version does not match the lock file: $actual" }
+          Expand-Archive ref.nupkg ref
+
+      - name: Verify
+        shell: pwsh
+        run: |
+          tar -xzf libvlc-build.tar.gz
+          pwsh -NoProfile -File eng/libvlc/verify-nogpl.ps1 -Install install -VlcSource vlc-src `
+            -Reference "ref/build/${{ matrix.nuget }}" -Destination "libvlc-nogpl-${{ matrix.nuget }}"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: libvlc-nogpl-${{ matrix.nuget }}
+          path: libvlc-nogpl-${{ matrix.nuget }}
+          retention-days: 30

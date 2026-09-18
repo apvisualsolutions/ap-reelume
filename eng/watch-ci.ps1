@@ -90,6 +90,10 @@
     about a failure when it happens is the point; the switch is for a reader who wants the verdict
     and nothing else.
 
+.PARAMETER Workflow
+    The workflow to watch, `CI` by default. A commit can carry runs of more than one workflow, and
+    only this one's is the verdict main waits for.
+
 .PARAMETER Branch
     Restricts the search to one branch's runs. Empty by default, and deliberately: the local
     branch is not necessarily the branch the commit was pushed to.
@@ -104,6 +108,11 @@ param(
     [string]$Sha,
 
     [string]$Branch,
+
+    # The workflow whose run is the verdict. Since 2026-09-18 a commit under eng/libvlc also
+    # triggers libvlc-nogpl.yml, and without this the first run gh listed for the commit won —
+    # whichever workflow it belonged to.
+    [string]$Workflow = 'CI',
 
     [int]$PollSeconds = 60,
 
@@ -255,7 +264,7 @@ while ($true) {
     $raw = $null
     $problem = $null
     try {
-        $raw = & gh run list @filter --limit $limit --json databaseId,headSha,status,conclusion 2>&1
+        $raw = & gh run list --workflow $Workflow @filter --limit $limit --json databaseId,headSha,status,conclusion 2>&1
         if ($LASTEXITCODE -ne 0) {
             $problem = ($raw | Out-String).Trim()
         }
