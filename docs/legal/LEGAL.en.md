@@ -65,8 +65,36 @@ release, without GPL code, verified by a gate that reads each plugin's licence i
 pinned by hash (`eng/libvlc/libvlc.lock.json`). It is **modified** — the yadif algorithm and
 libdvdread, the two GPL pieces that were not a whole plugin, were taken out — and the files touched
 say so with a date, as LGPL-2.1 §2(b) asks. Its corresponding source travels with every release (see
-below). **What stays open from this point is the `LGPL-3.0`** of gmp, nettle and live555, which that
-package already carried and nobody has read against a proprietary program (`ENG-028`).
+below).
+
+**The `LGPL-3.0` of gmp, nettle and live555 — read on 2026-09-18 (`ENG-028`), with one condition
+pending on the owner.** The three are linked statically inside five plugins, measured in the binaries
+of both architectures: gmp and nettle in `libgnutls`, in the two SRT ones and in `libdcp`; live555 in
+`liblive555`. `libvlc.dll` and `libvlccore.dll` carry none of them. gmp and nettle are dual-licensed —
+LGPL-3.0-or-later or GPL-2.0-or-later, read in their own sources — and the LGPL is the one used;
+live555 is LGPL-3.0-or-later. Against LGPL-3.0 §4:
+
+- **The combined work is each plugin**, and all of its code is open; its complete source, with the
+  scripts that link it, travels with every release. That is §4(d)(0). The plugins are separate files
+  the program loads at start-up and anybody may replace.
+- **Notice and texts (§4a and §4b)**: the third-party notices name them with their plugins and their
+  copyrights, and `licenses/` carries `LGPL-3.0.txt` and `GPL-3.0.txt`, because the LGPL-3.0 is written
+  on top of the GPL-3.0 and asks for both. They were missing until this day; `LicenceTextTests` keeps
+  them from going missing again.
+- **Installation Information (§4e)**: not owed. It comes from GPL-3.0 §6 and only reaches a «User
+  Product», a tangible consumer device, which a downloaded program is not.
+- **What remains, and it is not only the LGPL-3.0's**: §4 asks that the terms of the whole do not
+  restrict modifying the library's portions nor «reverse engineering for debugging such
+  modifications». LGPL-2.1 §6 asks the same for LibVLC, and more plainly, because the program is the
+  work that uses that library: its terms must permit «modification of the work for the customer's own
+  use and reverse engineering for debugging such modifications». **`LICENSE` 2.1 and 2.4 forbid both.**
+  Clause 4 preserves the rights third-party licences grant over their components, but grants nothing
+  over the program, which is what is asked for. The way out is an express exception in `LICENSE`,
+  which is the owner's decision and is pending. Until it goes in, **releasing would breach the
+  LGPL-2.1**, with or without these three libraries.
+
+`--disable-gnuv3` is not the way out: it would remove the three libraries — and, presumably with
+nettle, access to encrypted streams, which is not measured — and leave the LGPL-2.1 problem untouched.
 
 What follows is how it opened, and it is kept because it is the example of a correct conclusion
 ceasing to be one without anybody touching the code. This point was closed on 2026-08-10 **with the

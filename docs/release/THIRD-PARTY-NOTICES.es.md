@@ -44,6 +44,9 @@ el paquete se pidió directamente o llegó arrastrado.
 | BouncyCastle.Cryptography | 2.7.0 | MIT |
 | LibVLCSharp | 3.10.0 | LGPL-2.1-or-later |
 | LibVLC, compilado por AP Solutions sin GPL | 3.0.23-nogpl.1 | LGPL-2.1-or-later |
+| GNU MP (GMP), dentro de cuatro complementos de LibVLC | 6.3.0 | LGPL-3.0-or-later, elegida de su doble licencia con GPL-2.0-or-later |
+| GNU Nettle, dentro de cuatro complementos de LibVLC | 3.7.3 | LGPL-3.0-or-later, elegida de su doble licencia con GPL-2.0-or-later |
+| LIVE555 Streaming Media, dentro de un complemento de LibVLC | 2016.11.28 | LGPL-3.0-or-later |
 | Microsoft.Data.Sqlite | 10.0.10 | MIT |
 | Microsoft.Data.Sqlite.Core | 10.0.10 | MIT |
 | SQLitePCLRaw.bundle_e_sqlite3 | 2.1.11 | Apache-2.0 |
@@ -106,8 +109,18 @@ detalle de la compilación y dónde está su código fuente. Qué complementos f
 VideoLAN, y por qué, lo registra el `manifest.json` que se publica con el motor: los que eran GPL y
 los que ni ese paquete ni esta compilación usan.
 
-**Quedan tres bibliotecas bajo `LGPL-3.0`** —gmp, nettle y live555—, que el paquete de VideoLAN también
-llevaba. Cómo se lee esa licencia frente a un programa propietario está sin escribir y es `ENG-028`.
+**Tres bibliotecas de terceros van enlazadas dentro de cinco complementos bajo `LGPL-3.0-or-later`**,
+y el paquete de VideoLAN también las llevaba: GNU MP y GNU Nettle dentro de `libgnutls`,
+`libaccess_srt`, `libaccess_output_srt` y `libdcp`, y LIVE555 dentro de `liblive555`, en las dos
+arquitecturas. GMP y Nettle se ofrecen con doble licencia, LGPL-3.0 o GPL-2.0, y se usa la LGPL. Sus
+avisos de copyright y el detalle están en `licenses/NOTICE-VideoLAN.txt`, y los textos en
+`licenses/LGPL-3.0.txt` y `licenses/GPL-3.0.txt`, porque la LGPL-3.0 está escrita sobre la GPL-3.0 y
+pide las dos. Cómo encaja esa licencia con un programa propietario se leyó el 2026-09-18 (`ENG-028`) y
+está en `LEGAL`.
+
+**Y «todo es LGPL-2.1» es la licencia de VLC, no el inventario de lo que llevan dentro sus
+complementos.** Además de esas tres, van enlazadas otras bibliotecas de terceros con sus propias
+licencias —SRT, por ejemplo, es MPL-2.0—, y ese inventario completo está sin hacer (`ENG-029`).
 
 **Lo que había antes, y por qué hubo que cambiarlo.** El paquete `VideoLAN.LibVLC.Windows` 3.0.23.1
 llevaba catorce complementos GPL en x64 y once en ARM64. `libavcodec_plugin.dll` y
@@ -209,7 +222,9 @@ quienes ensamblaron el programa, no un abogado, y dos preguntas siguen abiertas 
 jurídico profesional de REL-004 las responda. **La primera se cerró por ingeniería el 2026-09-18**:
 desde el 2026-09-13 era un hallazgo —los complementos GPL del paquete de VideoLAN no eran compatibles
 con la licencia propia y frenaban la publicación—, y desde el 2026-09-18 el motor se compila sin ellos.
-Lo que queda de esa pregunta es la `LGPL-3.0` de tres bibliotecas, `ENG-028`. La segunda sigue siendo
+La `LGPL-3.0` de tres bibliotecas se leyó el mismo día (`ENG-028`), y lo que dejó abierto es de
+`LICENSE`: tanto esa licencia como la LGPL-2.1 piden que el programa se pueda modificar para uso
+propio y depurar con ingeniería inversa, y hoy lo prohíbe. La segunda sigue siendo
 pregunta: bajo qué apartado
 del §6 de la LGPL-2.1 queda amparada la forma en que LibVLC viaja aquí, ahora que la vía del §6(a)
 —publicar nuestro fuente bajo licencia libre— ya no está disponible. Ambas se nombran aquí para que

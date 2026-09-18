@@ -156,6 +156,14 @@ antes de cada pasada (la caché sólo mira si el fichero existe):
 Con esto `ENG-001` se cierra: las cinco omisiones que dejaba el paquete reducido corren en el
 servidor. El número que lo confirma es el del run de este cambio, no esta tabla.
 
+**Y lo que esa prueba NO dice, medido en el mismo run.** El run `35362996825` de `cfec2dec` se puso
+rojo por la puerta de cobertura, no por la prueba: al correr, recorrió más de
+`LibVlcVideoCapabilities.cs` y su suelo tuvo que subir de 77/61 a 77/66, copiado del artefacto
+`coverage-debt`. Buscando qué ramas faltaban salió que la función que la prueba ejercita,
+`WithColourTransfer`, **no la llama ningún código del programa**: el reproductor recibe siempre
+`SourceHdr` en `None`. La prueba verde demuestra que la clasificación es correcta, no que el
+reproductor reconozca un HDR10. Registrado como `ENG-030`.
+
 ---
 
 ## English
@@ -301,3 +309,10 @@ before every pass (the cache only checks that the file exists):
 
 With this `ENG-001` closes: the five skips the reduced package left behind run on the server. The
 number that confirms it is this change's run, not this table.
+
+**And what that test does NOT say, measured in the same run.** Run `35362996825` of `cfec2dec` went red
+on the coverage gate, not on the test: by running, it walked more of `LibVlcVideoCapabilities.cs` and
+that file's floor had to rise from 77/61 to 77/66, copied from the `coverage-debt` artifact. Looking
+for the missing branches showed that the function the test exercises, `WithColourTransfer`, **is
+called by no code in the program**: the player always receives `SourceHdr` as `None`. The green test
+proves the classification is right, not that the player recognises an HDR10. Filed as `ENG-030`.

@@ -16,7 +16,9 @@ reproduced. Naming the component in a table is neither of those.
 | `Apache-2.0.txt` | Canonical text | SQLitePCLRaw (§4a) |
 | `BSD-3-Clause.txt` | Canonical text | ANGLE and Skia |
 | `GPL-2.0.txt` | Canonical text | No plugin since 2026-09-18; it is VLC's licence as a program, which `libvlc` displays for itself |
+| `GPL-3.0.txt` | Canonical text | Travels with the LGPL-3.0, which is written on it and asks for both (§4b) |
 | `LGPL-2.1.txt` | Canonical text | LibVLC, libvlccore and LibVLCSharp (§6) |
+| `LGPL-3.0.txt` | Canonical text | GMP, Nettle and LIVE555, inside five LibVLC plugins (§4) |
 | `MIT.txt` | Canonical text plus the notices of those who publish none | Avalonia, MicroCom, Tmds.DBus.Protocol, Microsoft and the .NET runtime |
 | `NOTICE-ANGLE.txt` | Verbatim copy from the package | Avalonia.Angle.Windows.Natives |
 | `NOTICE-BouncyCastle.txt` | Verbatim copy from the package | BouncyCastle.Cryptography |
@@ -43,6 +45,9 @@ that already distributed it and contrasted with a second, independent copy befor
   compiles into `libvlc`; it was extracted from there and contrasted with the copy HandBrake
   distributes, and they agree apart from one trailing blank line. It is the licence VLC displays for
   itself, which is exactly the one binding its plugins.
+- **LGPL-3.0** and **GPL-3.0**: GMP 6.3.0's `COPYING.LESSERv3` and `COPYINGv3`, as they travel in the
+  engine's source archive, checked against Nettle 3.7.3's: identical byte for byte. They are the texts
+  those libraries deliver with their code, which is what binds them.
 - **BSD-3-Clause**: from the same SPDX directory. Its reproduction with a concrete holder is
   `NOTICE-ANGLE.txt`, which is the file ANGLE's own package publishes.
 - **MIT**: the canonical text, with the copyright notice each package declares in its metadata.
@@ -54,7 +59,8 @@ notice turns the test red instead of leaving the artifact distributing the previ
 ## What holds this in place
 
 - `LicenceTextTests` — every licence the notices declare has its text here, every text is whole,
-  every verbatim copy matches its package, and no new identifier passes unfiled.
+  every verbatim copy matches its package, no new identifier passes unfiled, and the LGPL-3.0 never
+  travels without the GPL-3.0.
 - `ArtifactContentsTests` and `Arm64PackageTests` — everything in this folder reaches `licenses/`
   inside both artifacts, with the same contents.
 
@@ -64,4 +70,5 @@ The package carries the licences; the `REL-004` legal opinion is still pending a
 whoever publishes, not to whoever writes code. Since 2026-09-18 the engine is a build of our own
 without GPL, so no plugin needs the GPL-2.0 §3 offer any more. The point left for it is which
 subsection of LGPL-2.1 §6 covers the way LibVLC travels here — a modified dynamic library, with its
-source attached, and replaceable — and the `LGPL-3.0` of gmp, nettle and live555, which is `ENG-028`.
+source attached, and replaceable. The `LGPL-3.0` of gmp, nettle and live555 was read on 2026-09-18
+(`ENG-028`) and the conclusion is in `LEGAL`.

@@ -54,6 +54,7 @@ public sealed class LicenceTextTests
         ("BSD-3-Clause", "BSD-3-Clause.txt", "POSSIBILITY OF SUCH DAMAGE."),
         ("GPL-2.0-or-later", "GPL-2.0.txt", "Public License instead of this License."),
         ("LGPL-2.1-or-later", "LGPL-2.1.txt", "That's all there is to it!"),
+        ("LGPL-3.0-or-later", "LGPL-3.0.txt", "permanent authorization for you to choose that version for the Library."),
         ("MIT", "MIT.txt", "IN THE SOFTWARE."),
     ];
 
@@ -118,6 +119,23 @@ public sealed class LicenceTextTests
         Assert.True(
             missing.Length == 0,
             $"The notices declare licences whose text the artifact would not carry: {string.Join(", ", missing)}.");
+    }
+
+    /// <summary>
+    /// LGPL-3.0 is written as additional permissions on top of GPL-3.0, and its §4(b) asks for a copy
+    /// of both. Filing only the LGPL text would satisfy the table and still leave half the licence out.
+    /// </summary>
+    [Fact]
+    public void The_lgpl3_travels_with_the_gpl3_it_is_written_on()
+    {
+        Assert.Contains("LGPL-3.0-or-later", DistributedSection(), StringComparison.Ordinal);
+
+        var gpl3 = LicencePath("GPL-3.0.txt");
+        Assert.True(File.Exists(gpl3), $"LGPL-3.0 §4(b) asks for the GNU GPL beside it, and {gpl3} is missing.");
+        Assert.EndsWith(
+            "Public License instead of this License. But first, please read <https://www.gnu.org/philosophy/why-not-lgpl.html>.",
+            Collapsed(File.ReadAllText(gpl3)),
+            StringComparison.Ordinal);
     }
 
     /// <summary>

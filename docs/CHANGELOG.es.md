@@ -58,13 +58,21 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
-- **La comprobación de que el reproductor reconoce un vídeo HDR10 no se ejecutaba nunca en el
-  servidor, y ahora sí.** La versión de ffmpeg con la que CI fabrica las muestras de prueba dejó de
+- **La comprobación de que se sabe reconocer un vídeo HDR10 por su curva de brillo no se ejecutaba
+  nunca en el servidor, y ahora sí.** Al hacerla correr salió que el reproductor no usa ese
+  reconocimiento: con un HDR10 sigue indicando SDR, y queda registrado para arreglarlo (`ENG-030`). La versión de ffmpeg con la que CI fabrica las muestras de prueba dejó de
   escribir en el contenedor la curva de brillo HDR, así que la muestra llegaba sin ella y la prueba se
   saltaba sola, en verde, en cada run. La receta etiqueta ahora cada fotograma, que funciona con la
   versión del servidor y con la anterior, y la prueba ya no se salta: si una versión futura vuelve a
   perder ese dato, sale en rojo. Cierra el hueco de las pruebas de vídeo que no corrían en el
   servidor (`ENG-001`).
+
+- **El paquete no llevaba los textos de dos licencias que tiene que acompañar.** Tres bibliotecas
+  que van dentro de cinco complementos del motor de vídeo —GNU MP, GNU Nettle y LIVE555— están bajo
+  la LGPL-3.0, que pide entregar su texto y el de la GPL-3.0 sobre la que se escribe. Ahora viajan
+  los dos, junto con sus avisos de copyright, y una prueba falla si faltan. Al leer esa licencia salió
+  que la del programa tiene que permitir modificarlo para uso propio y depurar esas modificaciones,
+  cosa que hoy prohíbe; está pendiente de decisión (`ENG-028`).
 
 - **Los documentos legales nombraban tres complementos GPL del motor de vídeo, y son catorce en x64
   y once en ARM64.** Las cifras anteriores salían de buscar en los binarios la cadena que FFmpeg

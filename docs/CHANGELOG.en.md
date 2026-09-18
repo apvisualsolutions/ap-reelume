@@ -59,12 +59,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
-- **The check that the player recognises an HDR10 video never ran on the server, and now it does.**
+- **The check that an HDR10 video can be recognised by its brightness curve never ran on the server,
+  and now it does.** Running it showed that the player does not use that recognition: with an HDR10
+  it still reports SDR, and that is filed to be fixed (`ENG-030`).
   The ffmpeg release CI builds its test samples with stopped writing the HDR brightness curve into
   the container, so the sample arrived without it and the test skipped itself, green, on every run.
   The recipe now tags every frame, which works with the server's release and with the previous one,
   and the test no longer skips: if a future release loses that field again, it turns red. This
   closes the gap of video checks that never ran on the server (`ENG-001`).
+
+- **The package did not carry the texts of two licences it has to accompany.** Three libraries
+  inside five of the video engine's plugins — GNU MP, GNU Nettle and LIVE555 — are under the LGPL-3.0,
+  which asks for its text and that of the GPL-3.0 it is written on to be delivered. Both now travel,
+  with their copyright notices, and a test fails if they go missing. Reading that licence showed that
+  the program's own licence has to permit modifying it for one's own use and debugging those
+  modifications, which today it forbids; that awaits a decision (`ENG-028`).
 
 - **The legal documents named three GPL plugins in the video engine, and there are fourteen on x64
   and eleven on ARM64.** The earlier figures came from searching the binaries for the string FFmpeg
