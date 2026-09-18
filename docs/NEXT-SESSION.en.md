@@ -16,6 +16,63 @@
 > deleted from here, because this document is the record of what happened, and rewriting what happened
 > is a different kind of mistake.
 
+> ## FRONT NOTICE — 2026-09-18: the engine builds without GPL in CI and plays what is promised, and the GPL was fourteen plugins, not three
+>
+> **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here. At the
+> close `main` and the branch were **level**, and every fast-forward was made with CI's conclusion
+> read. This handover may sit one commit ahead, being documentation only.
+>
+> ### What was closed
+>
+> · **`ENG-027`: the legal documents named three GPL plugins and there are fourteen on x64 and eleven
+>   on ARM64.** The earlier figures searched for `--enable-gpl`, which only FFmpeg writes; VLC's
+>   configure has no GPL switch for its own modules. `eng/libvlc/scan-plugin-licenses.ps1` now reads it
+>   in the sources, following the `#include`s. Nothing had been distributed: zero releases. Evidence
+>   `audit-eng027-plugin-gpl-sources.md`.
+> · **`ENG-013` moves from spike to CI.** `.github/workflows/libvlc-nogpl.yml` builds x64 and ARM64 with
+>   VideoLAN's `build.sh` inside their images (22-28 min per architecture), `verify-nogpl.ps1` drops the
+>   GPL modules and demands zero with four controls against VideoLAN's package, and `decode-probe.ps1`
+>   plays the fourteen promised codecs with the reference's figures on real Windows x64 and ARM64,
+>   subtitle included. Evidence `ENG013-reproducible-build.md`.
+> · **`watch-ci.ps1` asks for the `CI` workflow**: with two workflows on a commit it took the first run.
+>
+> ### The finding that paid most, and it is about method
+>
+> **The 2026-09-14 spike's "no GPL" verdict was false, measured by a grep that could only see FFmpeg.**
+> That build carried `lua`, yadif and twenty-odd other GPL modules. What exposed it was asking what
+> else could be GPL beyond what the string finds, and reading the licence where it is written: in each
+> source file's header. **A signal that can only see one class of case certifies none of the others.**
+>
+> ### The traps measured
+>
+> · **Three instruments of mine were born blind and a control caught each**: the scanner returned zero
+>   because it looked for the sources in another folder (the zero forced a look); the gate read GPL from
+>   `config.mak` while `bootstrap` writes it to its `Makefile` (the half demanding `AD_CLAUSES` gave it
+>   away); and the reference was compared with the lock file's `contentHash`, which for a signed package
+>   leaves the signature out.
+> · **A dead SourceForge mirror pinned in `contrib/src/main.mak`**: retries did not help because the
+>   same host failed every time. `SF` is overridden on the `make` command line.
+> · **The scanner reads sources, not binaries**: with the yadif patch applied it called VideoLAN's
+>   deinterlacer clean. The gate checks the binary too.
+> · **`-r` in `build.sh` skips `-o`**, and the first yadif patch put the GPL code into our tree as
+>   deleted lines.
+>
+> ### What is pending is NOT here
+>
+> It is in `docs/FEATURES.md` (scope) and `docs/TAREAS.md` (chores). From this batch: **`ENG-013` stays
+> `EN CURSO`**, and next is replacing `VideoLAN.LibVLC.Windows` with our own tree in the application and
+> the MSIX; **`ENG-027` closed**; **`ENG-026`** records a second walk test going red on its own; and
+> **`ENG-028`** is born, the LGPL-3.0 of gmp, nettle and live555, which nobody has read.
+>
+> ### What waits on the owner
+>
+> · **Where the engine tree is published**, pinned by hash, once the application uses it: that is
+>   publishing something on GitHub. He will be asked with a recommendation when it comes.
+> · **MSYS2 in `C:\msys64` (1.8 GB)** is no longer needed for anything: it can go if he asks.
+> · **The visual judgement on `PLY-016`** and **the backlog ordering rule for the shared rules** stand
+>   as they were.
+
 > ## FRONT NOTICE — 2026-09-14: the engine DOES build without GPL, and a blocker about to be reported was false
 >
 > **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,

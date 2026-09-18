@@ -16,6 +16,62 @@
 > se borraron de aquí porque este documento es el registro de lo que pasó, y reescribir lo que pasó es
 > otra clase de error.
 
+> ## AVISO AL FRENTE — 2026-09-18: el motor compila sin GPL en CI y reproduce lo prometido, y la GPL eran catorce complementos y no tres
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit. Al cerrar,
+> `main` y la rama quedaron **al día** y cada fast-forward se hizo con la conclusión de CI leída. Este
+> relevo puede ir un commit por delante, por ser sólo documentación.
+>
+> ### Lo que se cerró
+>
+> · **`ENG-027`: los documentos legales nombraban tres complementos GPL y son catorce en x64 y once en
+>   ARM64.** Las cifras de antes buscaban `--enable-gpl`, que sólo escribe FFmpeg; el configure de VLC
+>   no tiene interruptor de GPL para sus propios módulos. Ahora lo lee `eng/libvlc/scan-plugin-licenses.ps1`
+>   en las fuentes, siguiendo los `#include`. No se había distribuido nada: cero releases. Evidencia
+>   `audit-eng027-plugin-gpl-sources.md`.
+> · **`ENG-013` pasa del spike a CI.** `.github/workflows/libvlc-nogpl.yml` compila x64 y ARM64 con el
+>   `build.sh` de VideoLAN dentro de sus imágenes (22-28 min por arquitectura), `verify-nogpl.ps1`
+>   retira los módulos GPL y exige cero con cuatro controles contra el paquete de VideoLAN, y
+>   `decode-probe.ps1` reproduce los catorce códecs prometidos con las cifras de la referencia en
+>   Windows x64 y ARM64 reales, subtítulo incluido. Evidencia `ENG013-reproducible-build.md`.
+> · **`watch-ci.ps1` pregunta por el flujo `CI`**: con dos flujos sobre un commit tomaba el primer run.
+>
+> ### El hallazgo que más valió, y es de método
+>
+> **El veredicto «sin GPL» del spike del 2026-09-14 era falso, y lo medía un grep que sólo veía FFmpeg.**
+> Aquel build llevaba `lua`, yadif y otros veintitantos módulos GPL. Lo destapó preguntarse qué más
+> podía ser GPL además de lo que la cadena encuentra, y leer la licencia donde está escrita: en la
+> cabecera de cada fuente. **Una señal que sólo puede ver una clase de caso no certifica las demás.**
+>
+> ### Las trampas medidas
+>
+> · **Tres instrumentos míos nacieron ciegos y los cazó un control**: el escáner daba cero porque buscaba
+>   las fuentes en otra carpeta (el cero obligó a mirar); la puerta leía la GPL de `config.mak` y
+>   `bootstrap` la escribe en su `Makefile` (lo delató la mitad que exige `AD_CLAUSES`); y la
+>   referencia se comparaba con el `contentHash` del lock, que en un paquete firmado excluye la firma.
+> · **Un espejo de SourceForge muerto fijado en `contrib/src/main.mak`**: los reintentos no servían
+>   porque fallaba siempre el mismo host. Se sobrescribe `SF` en la línea de `make`.
+> · **El escáner lee fuentes y no binarios**: con el parche de yadif aplicado daba por limpio el
+>   desentrelazador de VideoLAN. La puerta lo comprueba también en el binario.
+> · **`-r` en `build.sh` se salta `-o`**, y el primer parche de yadif metía el código GPL en nuestro
+>   árbol como líneas borradas.
+>
+> ### Lo pendiente NO está aquí
+>
+> Está en `docs/FEATURES.md` (alcance) y `docs/TAREAS.md` (faenas). De esta tanda: **`ENG-013` sigue
+> `EN CURSO`**, y lo siguiente es cambiar `VideoLAN.LibVLC.Windows` por el árbol propio en la aplicación
+> y en el MSIX; **`ENG-027` cerrada**; **`ENG-026`** recoge una segunda prueba del paseo roja por su
+> cuenta; y nace **`ENG-028`**, la LGPL-3.0 de gmp, nettle y live555, que nadie ha leído.
+>
+> ### Lo que espera al propietario
+>
+> · **Dónde se publica el árbol del motor** fijado por hash cuando la aplicación lo use: es publicar
+>   algo en GitHub. Se le preguntará con una recomendación cuando llegue.
+> · **MSYS2 en `C:\msys64` (1,8 GB)** ya no hace falta para nada: se puede quitar si lo pide.
+> · **El juicio visual de `PLY-016`** y **la regla del orden del backlog para las reglas comunes**
+>   siguen como estaban.
+
 > ## AVISO AL FRENTE — 2026-09-14: el motor SÍ compila sin GPL, y un bloqueo que iba a reportar era falso
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

@@ -41,6 +41,7 @@ New-Item -ItemType Directory -Force $Destination | Out-Null
 $package = Join-Path $Destination 'reference.nupkg'
 Invoke-WebRequest "https://www.nuget.org/api/v2/package/VideoLAN.LibVLC.Windows/$pinnedVersion" -OutFile $package
 $actual = [Convert]::ToBase64String([Security.Cryptography.SHA512]::HashData([IO.File]::ReadAllBytes($package)))
-if ($actual -ne $pinnedSha512) { throw "VideoLAN.LibVLC.Windows $pinnedVersion from nuget.org is not the pinned package: $actual" }
+# -cne: Base64 is case-sensitive and PowerShell's -ne is not.
+if ($actual -cne $pinnedSha512) { throw "VideoLAN.LibVLC.Windows $pinnedVersion from nuget.org is not the pinned package: $actual" }
 Expand-Archive $package $Destination -Force
 "reference: VideoLAN.LibVLC.Windows $pinnedVersion, SHA-512 matches"

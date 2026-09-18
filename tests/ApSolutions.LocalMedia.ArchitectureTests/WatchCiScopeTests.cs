@@ -63,7 +63,9 @@ public sealed class WatchCiScene : IDisposable
                 "if %errorlevel%==0 (type \"%GH_STUB_JOBS%\" & exit /b 0)",
                 // A second workflow on the same commit, as libvlc-nogpl.yml is since 2026-09-18. It
                 // is what gh returns to a run list that does not name the workflow, and it is red.
-                "echo %*| findstr /C:\"--workflow CI\" >nul",
+                // With the next flag after it, or any workflow whose name starts with CI would pass —
+                // measured by gate-auditor on 2026-09-18, 'CI-nogpl' survived as the default.
+                "echo %*| findstr /C:\"--workflow CI --\" >nul",
                 "if not %errorlevel%==0 (type \"%GH_STUB_OTHER%\" & exit /b 0)",
                 "echo %*| findstr /C:\"--commit %GH_STUB_SHA%\" >nul",
                 "if %errorlevel%==0 (type \"%GH_STUB_RUNS%\" & exit /b 0)",

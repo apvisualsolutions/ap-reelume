@@ -135,6 +135,21 @@ Atribuidos marcando cada muestra en el registro.
 - **Con dos flujos sobre un commit, `watch-ci.ps1` tomaba el primer run**, fuera del flujo que
   fuera. Ahora pregunta por `CI`, y la prueba que lo exige se vio fallar antes.
 
+## La auditoría de puertas / The gate audit
+
+`gate-auditor` midió por mutación la prueba nueva del vigía: nueve mutaciones, y siete caen. Las dos
+que sobrevivían tenían la misma causa: la escena casaba `--workflow CI` como prefijo, y
+`CI-nogpl` pasaba por `CI`. Ahora casa `--workflow CI --` y esa mutación la pone roja, 5 de 10.
+
+Los guiones de PowerShell no los pudo ejecutar desde su copia aislada. Nombró tres huecos leyendo, y
+cada uno se cerró y se midió aquí con su mutación:
+
+| Hueco | Corrección | Mutación → resultado |
+| --- | --- | --- |
+| Ningún control probaba que el escáner sigue los `#include` | exige que `libi420_rgb_sse2` sea GPL sólo por un include | sin seguir includes → «The include walk is blind», código 1 |
+| El patrón `GPL := 1` no tenía control de que puede casar | se prueba contra la línea que escribe `bootstrap`, con la misma variable | `^GPLX` → «Control failed: the GPL pattern…» |
+| `-ne` no distingue mayúsculas y Base64 sí | `-cne` | `Ji3p` → `ji3p` → rechazada |
+
 ## Lo que queda / What is left
 
 - Sustituir `VideoLAN.LibVLC.Windows` por este árbol en la aplicación y en el MSIX, con su código

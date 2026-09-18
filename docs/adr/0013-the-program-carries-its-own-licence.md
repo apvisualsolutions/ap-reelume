@@ -61,6 +61,8 @@ colaboradores; los informes de error, abiertos a todo el mundo.
 árbol solo contiene código de AP Solutions—, pero el paquete transporta el decodificador de VideoLAN
 compilado con `--enable-gpl`, y un componente contagioso dentro de un programa propietario es un
 incumplimiento. **La publicación queda bloqueada hasta que ese motor se compile sin esa opción.**
+*Enmendada el 2026-09-14 y el 2026-09-18, al final: esa opción no basta, hace falta que el motor no
+lleve código GPL por ninguna vía.*
 
 ### Por qué, y qué se descartó
 
@@ -139,7 +141,8 @@ collaborators; bug reports stay open to everyone.
 **5. The artifact cannot be released yet.** The source does carry the new licence — the tree holds
 only AP Solutions' code — but the package ships VideoLAN's decoder built with `--enable-gpl`, and a
 copyleft component inside a proprietary program is a breach. **Release is blocked until that engine is
-built without that option.**
+built without that option.** *Amended on 2026-09-14 and 2026-09-18, at the end: that option is not
+enough; the engine must carry no GPL code by any route.*
 
 ### Why, and what was rejected
 
@@ -195,3 +198,31 @@ de Skia, y su reconocimiento **faltaba** — medido al escribir esta enmienda. A
 FTL cubre dos caminos, no uno, y cierra un incumplimiento que estaba abierto sin que nadie lo contara.
 / The obligation predates LibVLC: FreeType already travels inside Skia's native assets and its
 acknowledgement was missing. Choosing the FTL covers both paths and closes a breach nobody was counting.
+
+---
+
+## Enmienda del 2026-09-18 — «sin `--enable-gpl`» no es «sin GPL», y cómo se compila / Amendment of 2026-09-18 — "without `--enable-gpl`" is not "without GPL", and how it is built
+
+**La decisión 5 se corrige en su condición**: la publicación queda bloqueada hasta que el motor **no
+lleve código GPL por ninguna vía**, no sólo hasta que FFmpeg se compile sin `--enable-gpl`. Medido
+(`docs/evidence/stable/audit-eng027-plugin-gpl-sources.md`): el configure de VLC no tiene interruptor
+de GPL para sus propios módulos, y el paquete que se distribuye hoy lleva catorce complementos GPL en
+x64 por tres vías —FFmpeg compilado como GPL, módulos del propio VLC con fuentes GPL y una biblioteca
+GPL enlazada dentro de un módulo LGPL—. La cadena `--enable-gpl` sólo ve la primera. / Decision 5's
+condition is corrected: release is blocked until the engine carries no GPL code by any route, not
+only until FFmpeg is built without `--enable-gpl`, which is one of three routes.
+
+**Y se decide cómo se compila** (`docs/evidence/stable/ENG013-reproducible-build.md`): como compila
+VideoLAN, con su `extras/package/win32/build.sh` y dentro de las imágenes de CI que nombra su
+`extras/ci/gitlab-ci.yml` en el tag, en el flujo `libvlc-nogpl.yml`, aparte del CI principal y una vez
+por versión de VLC. Los módulos GPL se retiran leyendo sus fuentes, nunca con una lista a mano, y dos
+parches mínimos (quitar yadif del desentrelazador, no pedir dvdread) viajan en `eng/libvlc/patches/`.
+**Descartado** compilarlo en MSYS2, como hizo el spike: siete de sus nueve trampas eran herramientas de
+2026 contra código de 2014-2018, y la misma vía de VideoLAN cruza también a ARM64. / It is built the
+way VideoLAN builds it, inside their CI images, in a workflow of its own, once per VLC version; GPL
+modules are dropped by reading their sources, never from a hand list. MSYS2 is rejected.
+
+**Lo que queda abierto** es de `ENG-013` (llevar el árbol a la aplicación) y de `ENG-028` (leer la
+LGPL-3.0 de tres bibliotecas que el motor ya lleva). / What remains is ENG-013's (bringing the tree
+into the application) and ENG-028's (reading the LGPL-3.0 of three libraries the engine already
+carries).

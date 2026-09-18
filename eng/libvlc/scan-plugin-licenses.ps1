@@ -128,6 +128,22 @@ if ((Get-Licence $x264) -ne 'GPL') {
     throw "Control failed: modules/codec/x264.c is GPL and was not classified as GPL. The licence reader is blind."
 }
 
+# The second control, for the include walk. libi420_rgb_sse2 lists no GPL file of its own and gets
+# GPL code only through #include "i420_rgb_mmx.h"; if the walk stopped following includes, that
+# plugin would come out clean and ship. gate-auditor named the gap on 2026-09-18: the x264 control
+# above proves the licence reader and nothing about the walk.
+$includeOnly = 'libi420_rgb_sse2_plugin'
+if ($declared.ContainsKey($includeOnly)) {
+    $direct = @($declared[$includeOnly] | Where-Object { (Get-Licence $_) -eq 'GPL' })
+    $walked = @(Get-IncludeClosure @($declared[$includeOnly]) | Where-Object { (Get-Licence $_) -eq 'GPL' })
+    if ($direct.Count -ne 0 -or $walked.Count -eq 0) {
+        throw "Control failed: $includeOnly should be GPL only through an include (direct $($direct.Count), walked $($walked.Count)). The include walk is blind."
+    }
+}
+else {
+    throw "Control failed: no Makefile.am declares $includeOnly, so the include walk cannot be checked on this tree."
+}
+
 $root = [IO.Path]::GetFullPath($VlcSource)
 $gplMarker = [Text.Encoding]::ASCII.GetBytes('--enable-gpl')
 function Test-Contains([byte[]] $haystack, [byte[]] $needle) {
