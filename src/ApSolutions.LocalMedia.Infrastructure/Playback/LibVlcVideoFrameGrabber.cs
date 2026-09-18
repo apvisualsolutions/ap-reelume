@@ -4,6 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using ApSolutions.LocalMedia.Application.Courses;
+using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Courses;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using LibVLCSharp.Shared;
@@ -35,7 +36,7 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 /// out of a dialog, which is exactly why the check is here and not left to the caller.
 /// </para>
 /// </remarks>
-public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
+public sealed class LibVlcVideoFrameGrabber : IVideoFrameGrabber
 {
     private readonly Func<string, IFrameCapture> _open;
 
@@ -47,7 +48,7 @@ public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
     /// repository has already observed, and a thumbnail pass over a library is precisely the shape
     /// that would do it — one instance per course.
     /// </remarks>
-    public LibVlcCourseFrameGrabber(LibVlcFactory factory)
+    public LibVlcVideoFrameGrabber(LibVlcFactory factory)
         : this(path => new LibVlcCapture(factory, path))
     {
         ArgumentNullException.ThrowIfNull(factory);
@@ -63,7 +64,7 @@ public sealed class LibVlcCourseFrameGrabber : ICourseFrameGrabber
     /// stand on it, and the alternative is exempting the deadline from coverage because the only way
     /// to reach it is with a file no decoder understands.
     /// </remarks>
-    public LibVlcCourseFrameGrabber(Func<string, IFrameCapture> open) =>
+    public LibVlcVideoFrameGrabber(Func<string, IFrameCapture> open) =>
         _open = open ?? throw new ArgumentNullException(nameof(open));
 
     /// <summary>What this needs of a decoder, and nothing else.</summary>

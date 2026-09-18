@@ -19,7 +19,7 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 /// <c>CourseThumbnailPolicy</c>'s and is covered without a decoder; what is here is the half that
 /// needs one.
 /// </remarks>
-public sealed class CourseFrameGrabberTests : IAsyncLifetime
+public sealed class VideoFrameGrabberTests : IAsyncLifetime
 {
     private readonly string _root = Path.Combine(
         Path.GetTempPath(),
@@ -59,7 +59,7 @@ public sealed class CourseFrameGrabberTests : IAsyncLifetime
         var destination = Path.Combine(_root, "course.png");
         var watch = Stopwatch.StartNew();
 
-        var taken = await new LibVlcCourseFrameGrabber(_factory)
+        var taken = await new LibVlcVideoFrameGrabber(_factory)
             .TryCaptureAsync(sample, TimeSpan.FromSeconds(0.3), destination, TestContext.Current.CancellationToken);
 
         Assert.True(taken, "no frame came out of a sample the codec matrix calls playable.");
@@ -90,7 +90,7 @@ public sealed class CourseFrameGrabberTests : IAsyncLifetime
         var notAVideo = Path.Combine(_root, "readme.txt");
         await File.WriteAllTextAsync(notAVideo, "not a video", TestContext.Current.CancellationToken);
 
-        var taken = await new LibVlcCourseFrameGrabber(_factory).TryCaptureAsync(
+        var taken = await new LibVlcVideoFrameGrabber(_factory).TryCaptureAsync(
             notAVideo,
             TimeSpan.Zero,
             Path.Combine(_root, "out.png"),
@@ -104,7 +104,7 @@ public sealed class CourseFrameGrabberTests : IAsyncLifetime
     [Fact]
     public async Task A_file_that_is_not_there_is_refused()
     {
-        var taken = await new LibVlcCourseFrameGrabber(_factory).TryCaptureAsync(
+        var taken = await new LibVlcVideoFrameGrabber(_factory).TryCaptureAsync(
             Path.Combine(_root, "gone.mkv"),
             TimeSpan.Zero,
             Path.Combine(_root, "out.png"),
@@ -130,7 +130,7 @@ public sealed class CourseFrameGrabberTests : IAsyncLifetime
         await File.WriteAllTextAsync(video, "pretend", TestContext.Current.CancellationToken);
 
         var watch = Stopwatch.StartNew();
-        var taken = await new LibVlcCourseFrameGrabber(_ => new SilentCapture())
+        var taken = await new LibVlcVideoFrameGrabber(_ => new SilentCapture())
             .TryCaptureAsync(video, TimeSpan.Zero, Path.Combine(_root, "out.png"), TestContext.Current.CancellationToken);
 
         Assert.False(taken);
@@ -156,7 +156,7 @@ public sealed class CourseFrameGrabberTests : IAsyncLifetime
         var destination = Path.Combine(_root, "out.png");
 
         var watch = Stopwatch.StartNew();
-        var taken = await new LibVlcCourseFrameGrabber(_ => new RefusingCapture())
+        var taken = await new LibVlcVideoFrameGrabber(_ => new RefusingCapture())
             .TryCaptureAsync(video, TimeSpan.Zero, destination, TestContext.Current.CancellationToken);
 
         Assert.False(taken);
@@ -167,11 +167,11 @@ public sealed class CourseFrameGrabberTests : IAsyncLifetime
     }
 
     /// <summary>Will not open at all, which is a machine with no decoder for this container.</summary>
-    private sealed class RefusingCapture : LibVlcCourseFrameGrabber.IFrameCapture
+    private sealed class RefusingCapture : LibVlcVideoFrameGrabber.IFrameCapture
     {
         public bool Start(TimeSpan at) => false;
 
-        public LibVlcCourseFrameGrabber.CapturedFrame? WaitForFrame(TimeSpan deadline) =>
+        public LibVlcVideoFrameGrabber.CapturedFrame? WaitForFrame(TimeSpan deadline) =>
             throw new InvalidOperationException("Nothing asks for a frame from a file that never opened.");
 
         public void Dispose()
@@ -180,11 +180,11 @@ public sealed class CourseFrameGrabberTests : IAsyncLifetime
     }
 
     /// <summary>Opens fine and never hands over a frame, which is the failure the deadline is for.</summary>
-    private sealed class SilentCapture : LibVlcCourseFrameGrabber.IFrameCapture
+    private sealed class SilentCapture : LibVlcVideoFrameGrabber.IFrameCapture
     {
         public bool Start(TimeSpan at) => true;
 
-        public LibVlcCourseFrameGrabber.CapturedFrame? WaitForFrame(TimeSpan deadline)
+        public LibVlcVideoFrameGrabber.CapturedFrame? WaitForFrame(TimeSpan deadline)
         {
             // It waits the deadline out rather than answering at once: what is being measured is
             // that the caller gives up, and an instant refusal would pass on a caller that waits

@@ -1,37 +1,11 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
+using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Domain.Courses;
 
 namespace ApSolutions.LocalMedia.Application.Courses;
-
-/// <summary>
-/// Takes one still frame out of a video file and writes it where it is told.
-/// </summary>
-/// <remarks>
-/// The port between what decides and what decodes. <see cref="CourseThumbnailPolicy"/> answers which
-/// lesson, which moment and whether it is needed at all, and none of that requires a decoder; this is
-/// the half that does, and it is the only half an adapter implements.
-/// </remarks>
-public interface ICourseFrameGrabber
-{
-    /// <summary>
-    /// Writes a frame of <paramref name="videoPath"/> taken at <paramref name="at"/> to
-    /// <paramref name="destinationPath"/>, and answers whether it managed to.
-    /// </summary>
-    /// <remarks>
-    /// It answers <see langword="false"/> rather than throwing when a file has no frame to give.
-    /// That is an ordinary state — a container no decoder here understands is already a state this
-    /// application names — and a course whose picture cannot be taken is a card without one rather
-    /// than an error somebody has to read.
-    /// </remarks>
-    Task<bool> TryCaptureAsync(
-        string videoPath,
-        TimeSpan at,
-        string destinationPath,
-        CancellationToken cancellationToken = default);
-}
 
 /// <summary>
 /// A course's picture: the file holding it, taken from the course's own first lesson (CRS-006).
@@ -50,10 +24,10 @@ public interface ICourseFrameGrabber
 /// </remarks>
 public sealed class GetCourseThumbnail(
     IAppDataPaths paths,
-    ICourseFrameGrabber grabber)
+    IVideoFrameGrabber grabber)
 {
     private readonly IAppDataPaths _paths = paths ?? throw new ArgumentNullException(nameof(paths));
-    private readonly ICourseFrameGrabber _grabber = grabber ?? throw new ArgumentNullException(nameof(grabber));
+    private readonly IVideoFrameGrabber _grabber = grabber ?? throw new ArgumentNullException(nameof(grabber));
 
     /// <summary>Where this course's taken frame lives, whether or not it exists yet.</summary>
     /// <remarks>
