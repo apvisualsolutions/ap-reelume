@@ -54,7 +54,9 @@ public sealed class FeatureCoverageTests
         // asked for a way to put any group of options back the way it came, and the whole
         // application turned out to have TWO reset controls — the speed's «back to 1x» and one
         // title's «restore the provider's fields». Not a single settings section can be undone.
-        Assert.Equal(74, FeatureMatrix.Rows.Count);
+        // 75 on 2026-09-18, when LIB-021 gave ADR-0009 its row: the cover order had been decided
+        // thirteen days earlier and no row counted it, so nothing said it was missing from src/.
+        Assert.Equal(75, FeatureMatrix.Rows.Count);
         Assert.Equal(MvpCommitments, FeatureMatrix.Mvp.Count);
         Assert.Equal(
             FeatureMatrix.Rows.Count,

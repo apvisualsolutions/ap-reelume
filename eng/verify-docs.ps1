@@ -55,6 +55,10 @@ $featureMatrixPath = Join-Path $docsRoot 'FEATURES.md'
 $featureMatrix = Get-Content -LiteralPath $featureMatrixPath -Raw
 $featureIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|')
 $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*\| MVP \|')
+# 75 since 2026-09-18, when LIB-021 gave ADR-0009 its row: a cover's three origins and their order
+# were decided on 2026-09-05 and never entered the matrix, so no count saw that zero lines of src/
+# carried them. A decision without a row is scope nobody is tracking.
+#
 # 74 since 2026-09-12 (evening), when UX-010 was opened: the owner asked for a way to put any group
 # of options back the way it came, and a first count found TWO reset controls in the whole
 # application. That count was short, and both halves of the sentence it produced were wrong:
@@ -84,8 +88,8 @@ $mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*
 # CRS-007 (filtering the courses grid). The count is asserted rather than left open so that a row
 # added to the matrix has to be added here too, which is where somebody notices that the manifest and
 # the localised documents need it as well.
-if ($featureIds.Count -ne 74) {
-    $errors.Add("Expected 74 feature IDs, found $($featureIds.Count).")
+if ($featureIds.Count -ne 75) {
+    $errors.Add("Expected 75 feature IDs, found $($featureIds.Count).")
 }
 if ($mvpIds.Count -ne 46) {
     $errors.Add("Expected 46 MVP feature IDs, found $($mvpIds.Count).")
