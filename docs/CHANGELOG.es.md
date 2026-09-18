@@ -58,6 +58,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **La comprobación de que el reproductor reconoce un vídeo HDR10 no se ejecutaba nunca en el
+  servidor, y ahora sí.** La versión de ffmpeg con la que CI fabrica las muestras de prueba dejó de
+  escribir en el contenedor la curva de brillo HDR, así que la muestra llegaba sin ella y la prueba se
+  saltaba sola, en verde, en cada run. La receta etiqueta ahora cada fotograma, que funciona con la
+  versión del servidor y con la anterior, y la prueba ya no se salta: si una versión futura vuelve a
+  perder ese dato, sale en rojo. Cierra el hueco de las pruebas de vídeo que no corrían en el
+  servidor (`ENG-001`).
+
 - **Los documentos legales nombraban tres complementos GPL del motor de vídeo, y son catorce en x64
   y once en ARM64.** Las cifras anteriores salían de buscar en los binarios la cadena que FFmpeg
   escribe al compilarse como GPL, y esa cadena sólo la escribe FFmpeg. Los que faltaban son módulos

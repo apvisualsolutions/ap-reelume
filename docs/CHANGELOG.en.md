@@ -59,6 +59,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The check that the player recognises an HDR10 video never ran on the server, and now it does.**
+  The ffmpeg release CI builds its test samples with stopped writing the HDR brightness curve into
+  the container, so the sample arrived without it and the test skipped itself, green, on every run.
+  The recipe now tags every frame, which works with the server's release and with the previous one,
+  and the test no longer skips: if a future release loses that field again, it turns red. This
+  closes the gap of video checks that never ran on the server (`ENG-001`).
+
 - **The legal documents named three GPL plugins in the video engine, and there are fourteen on x64
   and eleven on ARM64.** The earlier figures came from searching the binaries for the string FFmpeg
   writes when built as GPL, and only FFmpeg writes it. The missing ones are VLC's own modules whose

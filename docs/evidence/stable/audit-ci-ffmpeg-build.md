@@ -1,6 +1,6 @@
 # El paquete reducido que dejaba cinco pruebas sin correr / The Reduced Package That Left Five Tests Unrun
 
-- IDs: `PLY-002`, `PLY-003`, `PRD-003`
+- IDs: `PLY-002`, `PLY-003`, `PRD-003`, `ENG-001`
 - Fecha / Date: 2026-09-05
 - Alcance / Scope: `.github/workflows/ci.yml`, `.github/workflows/release.yml`
 
@@ -113,6 +113,49 @@ el metadato sobreviva a 9.0.0, o aceptar la omisión con este número al lado.
 **Y la lección de método es la de siempre en esta casa**: la evidencia de arriba se escribió
 prediciendo cinco antes de que el servidor contestara. El servidor contestó cuatro. Lo que vale es el
 número que volvió, no el que se esperaba.
+
+### La quinta, cerrada el 2026-09-18 (`ENG-001`)
+
+**Seguía omitida trece días después.** El run `35352745213` de `9af3de3b` dio en `MediaTests` 199 de
+201 con dos omitidas: esta, con el mismo motivo literal, y un diagnóstico que sólo corre cuando
+alguien le pasa un fotograma por variable de entorno, que no es un hueco. Leído del `.trx` del
+artefacto `test-results`.
+
+**La causa, medida aquí con el mismo binario del servidor** —el 9.0 que empaqueta `ffmpeg-full`
+9.0.0, sacado de su `.nupkg` y usado con `FFMPEG_PATH`—, y leída con `ffprobe` en
+`color_space,color_transfer,color_primaries`:
+
+| Qué | ffmpeg 2024-06-21 | ffmpeg 9.0 |
+| --- | --- | --- |
+| Receta tal cual, `.mkv` | `bt2020nc,smpte2084,bt2020` | **`bt2020nc,unknown,unknown`** |
+| Misma receta, flujo HEVC suelto (`-f hevc`) | `bt2020nc,smpte2084,bt2020` | `bt2020nc,smpte2084,bt2020` |
+| Receta con `-vf setparams=…` | `bt2020nc,smpte2084,bt2020` | `bt2020nc,smpte2084,bt2020` |
+
+**La segunda fila es la que ubica el defecto**: x265 escribe la curva en el flujo con las dos
+versiones; es el contenedor el que en 9.0 sale sin ella. **Lo que sigue es deducción, no medida**:
+lo coherente con las tres filas es que esa versión tome los campos de color del contenedor de los
+fotogramas, que `testsrc2` deja sin etiquetar, de modo que las opciones `-color_trc` del codificador
+ya no llegan al Matroska. No se leyó el código de ffmpeg; el arreglo no depende de ello. `setparams` —el filtro que según su propia
+ayuda «fuerza la propiedad de color del fotograma de salida»— los etiqueta en origen.
+
+**El cambio**: la receta de `mkv-hevc-hdr10` lleva
+`-vf setparams=color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc`, y la prueba **deja de
+omitirse** cuando falta la curva. Una omisión razonada es lo que tuvo esta fila meses sin correr
+en el servidor; con una receta que funciona en las dos versiones, perderla otra vez tiene que ser rojo.
+
+**La prueba, vista fallar antes de darla por buena**, `HdrAccelerationTests` con la muestra borrada
+antes de cada pasada (la caché sólo mira si el fichero existe):
+
+| Pasada | Resultado |
+| --- | --- |
+| 9.0, receta y prueba viejas | 6 superadas, **1 omitida** — lo mismo que el servidor |
+| 9.0, receta nueva | **7 de 7** |
+| 9.0, receta vieja y prueba nueva | **1 con error**: `Expected: "smpte2084"` |
+| 2024, receta nueva (control) | 7 de 7 |
+
+Con esto `ENG-001` se cierra: las cinco omisiones que dejaba el paquete reducido corren en el
+servidor. El número que lo confirma es el del run de este cambio, no esta tabla.
+
 ---
 
 ## English
@@ -216,3 +259,45 @@ taken here: raise the pinned version and measure again, change the recipe so the
 **And the method lesson is this house's usual one**: the evidence above was written predicting five
 before the server answered. The server answered four. What counts is the number that came back, not
 the one that was expected.
+
+### The fifth, closed on 2026-09-18 (`ENG-001`)
+
+**It was still skipped thirteen days later.** Run `35352745213` of `9af3de3b` gave 199 of 201 in
+`MediaTests` with two skipped: this one, with the same literal reason, and a diagnostic that only runs
+when somebody hands it a frame through an environment variable, which is not a gap. Read from the
+`.trx` in the `test-results` artifact.
+
+**The cause, measured here with the server's own binary** — the 9.0 that `ffmpeg-full` 9.0.0
+packages, taken out of its `.nupkg` and used through `FFMPEG_PATH` — and read with `ffprobe` as
+`color_space,color_transfer,color_primaries`:
+
+| What | ffmpeg 2024-06-21 | ffmpeg 9.0 |
+| --- | --- | --- |
+| Recipe as it was, `.mkv` | `bt2020nc,smpte2084,bt2020` | **`bt2020nc,unknown,unknown`** |
+| Same recipe, bare HEVC stream (`-f hevc`) | `bt2020nc,smpte2084,bt2020` | `bt2020nc,smpte2084,bt2020` |
+| Recipe with `-vf setparams=…` | `bt2020nc,smpte2084,bt2020` | `bt2020nc,smpte2084,bt2020` |
+
+**The second row is the one that places the defect**: x265 writes the curve into the stream on both
+releases; it is the container that comes out without it on 9.0. **What follows is inference, not
+measurement**: what fits the three rows is that this release takes the container's colour fields from
+the frames, which `testsrc2` leaves untagged, so the encoder's `-color_trc` options no longer reach
+the Matroska track. ffmpeg's code was not read; the fix does not depend on it. `setparams` — the filter that, by its own help, forces
+«color property for the output video frame» — tags them at the source.
+
+**The change**: `mkv-hevc-hdr10`'s recipe carries
+`-vf setparams=color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc`, and the test **stops
+skipping** when the curve is missing. A reasoned skip is what kept this row unrun on the server for
+months; with a recipe that works on both releases, losing it again has to be red.
+
+**The test, seen failing before it was trusted**, `HdrAccelerationTests` with the sample deleted
+before every pass (the cache only checks that the file exists):
+
+| Pass | Result |
+| --- | --- |
+| 9.0, old recipe and old test | 6 passed, **1 skipped** — the same as the server |
+| 9.0, new recipe | **7 of 7** |
+| 9.0, old recipe and new test | **1 failed**: `Expected: "smpte2084"` |
+| 2024, new recipe (control) | 7 of 7 |
+
+With this `ENG-001` closes: the five skips the reduced package left behind run on the server. The
+number that confirms it is this change's run, not this table.
