@@ -78,6 +78,26 @@ export CONTRIBFLAGS="--disable-gpl --disable-x264 --disable-x265 --enable-ad-cla
 export CONFIGFLAGS="--disable-faad --disable-lua --disable-realrtsp --disable-mpc --disable-update-check"
 
 cd "$SRC"
+
+# Fetch the contrib sources first, with retries. build.sh runs `make -j fetch` once and gives up on
+# the first failed download, and the first run of this workflow (2026-09-18) died on exactly that:
+# a SourceForge mirror that did not resolve. VideoLAN's own CI rarely fetches at all — it uses
+# prebuilt contribs, which here are useless because they are built with GPL on. The tarballs land
+# in contrib/tarballs, which is where build.sh's own fetch looks, so it finds them and only checks
+# their sums. The folder is not named contrib-* on purpose: verify-nogpl.ps1 expects exactly one
+# of those, the one build.sh configures.
+mkdir -p contrib/prefetch
+(
+    cd contrib/prefetch
+    ../bootstrap --host="$ARCH-w64-mingw32" $CONTRIBFLAGS >/dev/null
+    for attempt in 1 2 3 4 5; do
+        if make -j4 fetch; then exit 0; fi
+        echo "contrib fetch failed (attempt $attempt), retrying in 30 s" >&2
+        sleep 30
+    done
+    exit 1
+)
+
 # -r release (optimised, no --disable-optim), -z libvlc only (no Qt, no skins, no vlc.exe),
 # -o install prefix. Everything else is VideoLAN's script as published.
 #
