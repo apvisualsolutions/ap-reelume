@@ -34,9 +34,32 @@ the GPL (see the third-party notices).
 
 LGPL-2.1.txt covers the binding, the core and the plugins. GPL-2.0.txt is in this folder because it is
 VLC's licence for the VLC media player as a whole, which vlc_about.h compiles into libvlc as the text
-the player displays for itself; no plugin this artifact carries is under it. Some third-party libraries
-linked into the plugins (gmp, nettle and live555) are under LGPL-3.0; how that licence reads against
-this program is an open point recorded in the third-party notices.
+the player displays for itself; no plugin this artifact carries is under it.
+
+Three third-party libraries are linked statically into some of the plugins, and they are under the
+GNU Lesser General Public License version 3 or later. LGPL-3.0.txt and GPL-3.0.txt, which that
+licence is written on, are in this folder:
+
+    GNU MP (GMP) 6.3.0          plugins/misc/libgnutls_plugin.dll,           LGPL-3.0-or-later, chosen from
+                                plugins/access/libaccess_srt_plugin.dll,     its dual licence with
+                                plugins/access_output/                       GPL-2.0-or-later
+                                  libaccess_output_srt_plugin.dll,
+                                plugins/access/libdcp_plugin.dll
+                                Copyright 1991, 1993-1997, 1999-2016, 2020, 2021 Free Software
+                                Foundation, Inc.
+    GNU Nettle 3.7.3            the same four plugins                        LGPL-3.0-or-later, chosen from
+                                Copyright Niels Möller and the other         its dual licence with
+                                authors each source file names               GPL-2.0-or-later
+    LIVE555 Streaming Media     plugins/access/liblive555_plugin.dll         LGPL-3.0-or-later
+      2016.11.28                Copyright (c) 1996-2017 Live Networks, Inc.
+
+Each of those plugins is the combined work the LGPL-3.0 speaks of, and every line of source in it is
+open: VLC's module, GnuTLS, SRT, asdcplib and the library itself. Their complete source, with the
+scripts that link them, is in the second archive below, which is how LGPL-3.0 §4(d)(0) is met. The
+plugins are separate files this program loads at run time, so a rebuilt plugin replaces the one here
+by overwriting it. No Installation Information is owed under §4(e): that obligation comes from GPL-3.0
+§6 and applies only to a User Product, a tangible consumer device, which a program delivered as a
+download is not.
 
 The libraries are separate dynamic libraries that the program loads at run time. Replacing them with
 another build of the same library — VideoLAN's own, or one built from the source below — is a matter

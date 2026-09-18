@@ -16,7 +16,9 @@ copyright. Nombrar el componente en una tabla no es ninguna de las dos cosas.
 | `Apache-2.0.txt` | Texto canónico | SQLitePCLRaw (§4a) |
 | `BSD-3-Clause.txt` | Texto canónico | ANGLE y Skia |
 | `GPL-2.0.txt` | Texto canónico | Ningún complemento desde el 2026-09-18; es la licencia de VLC como programa, que `libvlc` muestra de sí mismo |
+| `GPL-3.0.txt` | Texto canónico | Acompaña a la LGPL-3.0, que está escrita sobre ella y pide las dos (§4b) |
 | `LGPL-2.1.txt` | Texto canónico | LibVLC, libvlccore y LibVLCSharp (§6) |
+| `LGPL-3.0.txt` | Texto canónico | GMP, Nettle y LIVE555, dentro de cinco complementos de LibVLC (§4) |
 | `MIT.txt` | Texto canónico y los avisos de quienes no publican el suyo | Avalonia, MicroCom, Tmds.DBus.Protocol, Microsoft y el motor de .NET |
 | `NOTICE-ANGLE.txt` | Copia literal del paquete | Avalonia.Angle.Windows.Natives |
 | `NOTICE-BouncyCastle.txt` | Copia literal del paquete | BouncyCastle.Cryptography |
@@ -42,6 +44,9 @@ fuente que ya lo distribuía y se contrastó con una segunda copia independiente
   `vlc_about.h` compila dentro de `libvlc`; se extrajo de ahí y se contrastó con la copia que
   distribuye HandBrake, y coinciden salvo una línea en blanco final. Es la licencia que VLC muestra
   de sí mismo, que es exactamente la que obliga a sus complementos.
+- **LGPL-3.0** y **GPL-3.0**: los `COPYING.LESSERv3` y `COPYINGv3` de GMP 6.3.0, tal como viajan en
+  el paquete de fuentes del motor, contrastados con los de Nettle 3.7.3: idénticos byte a byte. Son
+  los textos que esas bibliotecas entregan con su código, que es lo que las obliga.
 - **BSD-3-Clause**: del mismo directorio SPDX. Su reproducción con titular concreto es
   `NOTICE-ANGLE.txt`, que es el archivo que el propio paquete de ANGLE publica.
 - **MIT**: el texto canónico, con los avisos de copyright que cada paquete declara en sus metadatos.
@@ -54,7 +59,8 @@ distribuyendo el aviso de la versión anterior.
 ## Qué prueba lo fija
 
 - `LicenceTextTests` — cada licencia que los avisos declaran tiene su texto aquí, cada texto está
-  entero, cada copia literal coincide con su paquete y ningún identificador nuevo pasa sin archivar.
+  entero, cada copia literal coincide con su paquete, ningún identificador nuevo pasa sin archivar y
+  la LGPL-3.0 no viaja sin la GPL-3.0.
 - `ArtifactContentsTests` y `Arm64PackageTests` — todo lo de esta carpeta llega a `licenses/` dentro
   de los dos artefactos, con el mismo contenido.
 
@@ -64,5 +70,5 @@ El paquete lleva las licencias; el dictamen jurídico de `REL-004` sigue pendien
 publica, no de quien programa. Desde el 2026-09-18 el motor es una compilación propia sin GPL, así
 que ningún complemento necesita ya la oferta del §3 de la GPL-2.0. El punto que le queda es bajo qué
 apartado del §6 de la LGPL-2.1 queda amparada la forma en que LibVLC viaja aquí —biblioteca dinámica
-modificada, con su código fuente adjunto, y sustituible—, y la `LGPL-3.0` de gmp, nettle y live555,
-que es `ENG-028`.
+modificada, con su código fuente adjunto, y sustituible—. La `LGPL-3.0` de gmp, nettle y live555 se
+leyó el 2026-09-18 (`ENG-028`) y la conclusión está en `LEGAL`.
