@@ -105,6 +105,63 @@ public sealed class MetadataEditingTests
         Assert.Equal(chosen, restored.Catalog?.Metadata.PersonalCover);
     }
 
+    /// <summary>
+    /// The first edit of a title that has no row yet creates it: what was typed, and nothing else.
+    /// This suite never took that path until 2026-09-18, when <c>UpdateMetadata</c> gained a field and
+    /// the coverage preview named the lines only a first edit runs.
+    /// </summary>
+    [Fact]
+    public async Task The_first_edit_of_a_title_with_no_row_creates_it_with_only_what_was_typed()
+    {
+        var elsewhere = Catalog(revision: 0, locked: []);
+        var repository = new MemoryMetadataRepository(elsewhere);
+        var fresh = new TitleId(Guid.Parse("60000000-0000-0000-0000-0000000000ff"));
+
+        var created = await new UpdateMetadata(repository).ExecuteAsync(
+            new UpdateMetadataCommand(
+                fresh,
+                new MetadataFieldChanges(Title: "Sin fila todavía"),
+                new HashSet<MetadataField>(),
+                ExpectedRevision: 0),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(MetadataWriteOutcome.Applied, created.Outcome);
+        var metadata = created.Catalog!.Metadata;
+        Assert.Equal(fresh, created.Catalog.TitleId);
+        Assert.Equal("Sin fila todavía", metadata.Title);
+        Assert.Null(metadata.OriginalTitle);
+        Assert.Null(metadata.Overview);
+        Assert.Null(metadata.ReleaseYear);
+        Assert.Empty(metadata.Genres);
+        Assert.Null(metadata.PosterPath);
+        Assert.Null(metadata.BackdropPath);
+        Assert.Null(metadata.PersonalCover);
+        Assert.Empty(metadata.LockedFields);
+    }
+
+    /// <summary>
+    /// A change that names no title keeps the one stored: every field of the changes is «leave it as
+    /// it is» when absent, and the title is no exception. Named by the coverage JSON as the one branch
+    /// no test took — every other test happened to pass a title.
+    /// </summary>
+    [Fact]
+    public async Task A_change_that_names_no_title_keeps_the_stored_one()
+    {
+        var stored = Catalog(revision: 0, locked: []);
+        var repository = new MemoryMetadataRepository(stored);
+
+        var saved = await new UpdateMetadata(repository).ExecuteAsync(
+            new UpdateMetadataCommand(
+                stored.TitleId,
+                new MetadataFieldChanges(Overview: "Sólo cambia el resumen"),
+                new HashSet<MetadataField>(),
+                ExpectedRevision: 0),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(stored.Metadata.Title, saved.Catalog?.Metadata.Title);
+        Assert.Equal("Sólo cambia el resumen", saved.Catalog?.Metadata.Overview);
+    }
+
     /// <summary>Saving a picked cover writes its own field and leaves the provider's poster alone.</summary>
     [Fact]
     public async Task Saving_a_picked_cover_leaves_the_provider_poster_where_it_was()

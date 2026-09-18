@@ -58,6 +58,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Corregido
 
+- **Restaurar los datos del proveedor ya no borra la portada que elegiste.** La portada elegida y la
+  del proveedor compartían un solo campo: elegir una pisaba la del proveedor, y restaurar sus datos
+  quitaba todos los candados y se llevaba la elegida, dejando su archivo olvidado dentro de cada copia
+  de seguridad. Ahora cada una tiene su sitio, la elegida gana y, si su archivo desaparece, se ve la del
+  proveedor en lugar de una tarjeta vacía. Es el primer paso del orden de portadas; faltan el
+  fotograma del propio vídeo y el ajuste para cambiar el orden (`LIB-021`).
+
 - **La comprobación de que se sabe reconocer un vídeo HDR10 por su curva de brillo no se ejecutaba
   nunca en el servidor, y ahora sí.** Al hacerla correr salió que el reproductor no usa ese
   reconocimiento: con un HDR10 sigue indicando SDR, y queda registrado para arreglarlo (`ENG-030`). La versión de ffmpeg con la que CI fabrica las muestras de prueba dejó de

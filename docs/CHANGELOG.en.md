@@ -59,6 +59,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Restoring the provider's data no longer erases the cover you picked.** The picked cover and the
+  provider's shared one field: picking one overwrote the provider's, and restoring its data cleared
+  every lock and took the picked one away, leaving its file forgotten inside every backup. Now each has
+  its own place, the picked one wins and, if its file goes missing, the provider's shows instead of an
+  empty card. It is the first step of the cover order; the frame from the video itself and the setting
+  to change the order remain (`LIB-021`).
+
 - **The check that an HDR10 video can be recognised by its brightness curve never ran on the server,
   and now it does.** Running it showed that the player does not use that recognition: with an HDR10
   it still reports SDR, and that is filed to be fixed (`ENG-030`).

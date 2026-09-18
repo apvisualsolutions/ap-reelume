@@ -307,7 +307,7 @@ preguntar, y si no puede resolverlo **ensancha** la búsqueda en vez de estrecha
 **entero**, no con el corto: emitía `rev-parse --short HEAD`, que es justo el prefijo al que `gh`
 contesta `[]`.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **187** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **186** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -333,8 +333,10 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **187** <!--medido:trinquete-de-deuda-->
-desde el 2026-09-13, y ese día se movió **dos veces**, que es lo que enseña cómo funciona. Primero
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **186** <!--medido:trinquete-de-deuda-->
+desde el 2026-09-18, cuando **bajó por mejora**: `UpdateMetadata.cs` llegó a 100/100 al ganar un campo
+con `LIB-021` —la previsualización lo leyó subiendo y, en vez de copiar el suelo, se cubrió lo que
+faltaba—. Antes estuvo en **187** desde el 2026-09-13, y ese día se movió **dos veces**, que es lo que enseña cómo funciona. Primero
 **bajó a 186 por mejora**: `ScanSettingsViewModel.cs` llegó a 100/100 al ganar su «Restaurar valores
 por defecto» con pruebas, y salió de la lista — la rama que faltaba era la suscripción al evento de
 un comando que nunca cambia de disponibilidad, que ejecuta cualquier binding y no ejecutaba ninguna

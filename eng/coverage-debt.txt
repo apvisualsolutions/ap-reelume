@@ -238,7 +238,6 @@ src/ApSolutions.LocalMedia.Application/Identification/ResolveMatch.cs           
 src/ApSolutions.LocalMedia.Application/Identification/ReviewInboxChanged.cs                   60 100
 src/ApSolutions.LocalMedia.Application/Lifecycle/CloseApplication.cs                         100  93
 src/ApSolutions.LocalMedia.Application/Metadata/RefreshMetadata.cs                            97  95
-src/ApSolutions.LocalMedia.Application/Metadata/UpdateMetadata.cs                             81  88
 src/ApSolutions.LocalMedia.Application/Playback/InputCommandRouter.cs                        100  91
 src/ApSolutions.LocalMedia.Application/Playback/OpenLooseFile.cs                             100  83
 src/ApSolutions.LocalMedia.Application/Playback/PlaybackEvents.cs                             71 100
