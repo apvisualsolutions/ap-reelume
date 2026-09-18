@@ -71,8 +71,9 @@ evidencia, es [FEATURES.md](FEATURES.md).
   que van dentro de cinco complementos del motor de vídeo —GNU MP, GNU Nettle y LIVE555— están bajo
   la LGPL-3.0, que pide entregar su texto y el de la GPL-3.0 sobre la que se escribe. Ahora viajan
   los dos, junto con sus avisos de copyright, y una prueba falla si faltan. Al leer esa licencia salió
-  que la del programa tiene que permitir modificarlo para uso propio y depurar esas modificaciones,
-  cosa que hoy prohíbe; está pendiente de decisión (`ENG-028`).
+  que la del programa tiene que permitir modificarlo para uso propio y depurar esas modificaciones, y
+  lo prohibía. `LICENSE` lleva ahora esa excepción, sin derecho a redistribuir el programa modificado,
+  y una prueba falla si se quita (`ENG-028`).
 
 - **Los documentos legales nombraban tres complementos GPL del motor de vídeo, y son catorce en x64
   y once en ARM64.** Las cifras anteriores salían de buscar en los binarios la cadena que FFmpeg

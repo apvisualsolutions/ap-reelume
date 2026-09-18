@@ -67,8 +67,7 @@ libdvdread, the two GPL pieces that were not a whole plugin, were taken out — 
 say so with a date, as LGPL-2.1 §2(b) asks. Its corresponding source travels with every release (see
 below).
 
-**The `LGPL-3.0` of gmp, nettle and live555 — read on 2026-09-18 (`ENG-028`), with one condition
-pending on the owner.** The three are linked statically inside five plugins, measured in the binaries
+**The `LGPL-3.0` of gmp, nettle and live555 — CLOSED on 2026-09-18 (`ENG-028`).** The three are linked statically inside five plugins, measured in the binaries
 of both architectures: gmp and nettle in `libgnutls`, in the two SRT ones and in `libdcp`; live555 in
 `liblive555`. `libvlc.dll` and `libvlccore.dll` carry none of them. gmp and nettle are dual-licensed —
 LGPL-3.0-or-later or GPL-2.0-or-later, read in their own sources — and the LGPL is the one used;
@@ -89,9 +88,12 @@ live555 is LGPL-3.0-or-later. Against LGPL-3.0 §4:
   work that uses that library: its terms must permit «modification of the work for the customer's own
   use and reverse engineering for debugging such modifications». **`LICENSE` 2.1 and 2.4 forbid both.**
   Clause 4 preserves the rights third-party licences grant over their components, but grants nothing
-  over the program, which is what is asked for. The way out is an express exception in `LICENSE`,
-  which is the owner's decision and is pending. Until it goes in, **releasing would breach the
-  LGPL-2.1**, with or without these three libraries.
+  over the program, which is what is asked for. **The owner approved an express exception on
+  2026-09-18**, which `LICENSE` carries below the list in point 2 in both languages: modifying the
+  program for one's own use, to use it with a modified version of the LGPL libraries, and reverse
+  engineering to debug those modifications, without the right to redistribute it.
+  `LicenceTextTests` fails if it is removed. Until that day releasing would have breached the
+  LGPL-2.1, with or without these three libraries.
 
 `--disable-gnuv3` is not the way out: it would remove the three libraries — and, presumably with
 nettle, access to encrypted streams, which is not measured — and leave the LGPL-2.1 problem untouched.

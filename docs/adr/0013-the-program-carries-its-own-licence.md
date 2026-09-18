@@ -227,6 +227,18 @@ LGPL-3.0 de tres bibliotecas que el motor ya lleva). / What remains is ENG-013's
 into the application) and ENG-028's (reading the LGPL-3.0 of three libraries the engine already
 carries).
 
+### Enmienda del 2026-09-18: la licencia lleva la excepción que la LGPL exige / Amendment of 2026-09-18: the licence carries the exception the LGPL requires
+
+Al leer la LGPL-3.0 (`ENG-028`) salió algo que esta decisión no vio: la LGPL-2.1 §6 y la LGPL-3.0 §4
+sólo dejan usar la biblioteca a un programa de licencia propia si sus condiciones permiten modificarlo
+para uso propio e ingeniería inversa para depurar esas modificaciones, y `LICENSE` 2.1, 2.4 y la
+cláusula 3 lo prohibían. El propietario aprobó una excepción expresa, limitada a eso y sin derecho a
+redistribuir; `LicenceTextTests` falla si se quita. El detalle está en `LEGAL`. / Reading the LGPL-3.0
+showed what this decision missed: LGPL-2.1 §6 and LGPL-3.0 §4 only let a program under its own
+licence use the library if its terms permit modifying it for one's own use and reverse engineering to
+debug that, and `LICENSE` forbade both. The owner approved an express exception, limited to that and
+without a right to redistribute; `LicenceTextTests` fails if it is removed.
+
 ---
 
 ## Enmienda del 2026-09-18, segunda — la aplicación lleva el motor propio, y dónde vive / Second amendment of 2026-09-18 — the application ships the engine of its own, and where it lives

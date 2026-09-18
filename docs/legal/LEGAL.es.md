@@ -68,8 +68,7 @@ yadif y libdvdread, las dos piezas GPL que no eran un complemento entero—, y l
 dicen con fecha, como pide el §2(b) de la LGPL-2.1. Su código fuente correspondiente viaja con cada
 versión (ver más abajo).
 
-**La `LGPL-3.0` de gmp, nettle y live555 — leída el 2026-09-18 (`ENG-028`), con una condición
-pendiente del propietario.** Las tres van enlazadas de forma estática dentro de cinco complementos,
+**La `LGPL-3.0` de gmp, nettle y live555 — CERRADO el 2026-09-18 (`ENG-028`).** Las tres van enlazadas de forma estática dentro de cinco complementos,
 medido en los binarios de las dos arquitecturas: gmp y nettle en `libgnutls`, en los dos de SRT y en
 `libdcp`; live555 en `liblive555`. `libvlc.dll` y `libvlccore.dll` no llevan ninguna. gmp y nettle
 tienen doble licencia —LGPL-3.0-or-later o GPL-2.0-or-later, leído en sus propias fuentes— y se usa la
@@ -89,9 +88,12 @@ LGPL; live555 es LGPL-3.0-or-later. Contra el §4 de la LGPL-3.0:
   programa es la obra que usa esa biblioteca: sus condiciones deben permitir «modificar la obra para
   uso propio» e ingeniería inversa para depurarlo. **`LICENSE` 2.1 y 2.4 prohíben las dos cosas.** La
   cláusula 4 deja a salvo los derechos que las licencias de terceros concedan sobre sus componentes,
-  pero no concede nada sobre el programa, que es lo que se pide. La salida es una excepción expresa en
-  `LICENSE`, que es decisión del propietario y está pendiente. Hasta que entre, **publicar
-  incumpliría la LGPL-2.1**, con o sin estas tres bibliotecas.
+  pero no concede nada sobre el programa, que es lo que se pide. **El propietario aprobó el
+  2026-09-18 una excepción expresa**, que `LICENSE` lleva debajo de la lista del punto 2 en los dos
+  idiomas: modificar el programa para uso propio, para usarlo con una versión modificada de las
+  bibliotecas LGPL, e ingeniería inversa para depurar esas modificaciones, sin derecho a
+  redistribuirlo. `LicenceTextTests` falla si se quita. Hasta ese día publicar habría incumplido la
+  LGPL-2.1, con o sin estas tres bibliotecas.
 
 `--disable-gnuv3` no es la salida: quitaría las tres bibliotecas —y previsiblemente, con nettle, el
 acceso a flujos cifrados, que no está medido— y dejaría intacto el problema de la LGPL-2.1.

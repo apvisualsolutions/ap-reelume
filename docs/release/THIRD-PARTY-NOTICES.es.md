@@ -222,9 +222,9 @@ quienes ensamblaron el programa, no un abogado, y dos preguntas siguen abiertas 
 jurídico profesional de REL-004 las responda. **La primera se cerró por ingeniería el 2026-09-18**:
 desde el 2026-09-13 era un hallazgo —los complementos GPL del paquete de VideoLAN no eran compatibles
 con la licencia propia y frenaban la publicación—, y desde el 2026-09-18 el motor se compila sin ellos.
-La `LGPL-3.0` de tres bibliotecas se leyó el mismo día (`ENG-028`), y lo que dejó abierto es de
-`LICENSE`: tanto esa licencia como la LGPL-2.1 piden que el programa se pueda modificar para uso
-propio y depurar con ingeniería inversa, y hoy lo prohíbe. La segunda sigue siendo
+La `LGPL-3.0` de tres bibliotecas se leyó el mismo día (`ENG-028`): tanto esa licencia como la
+LGPL-2.1 piden que el programa se pueda modificar para uso propio y depurar con ingeniería inversa, y
+`LICENSE` lo permite desde entonces con una excepción expresa. La segunda sigue siendo
 pregunta: bajo qué apartado
 del §6 de la LGPL-2.1 queda amparada la forma en que LibVLC viaja aquí, ahora que la vía del §6(a)
 —publicar nuestro fuente bajo licencia libre— ya no está disponible. Ambas se nombran aquí para que

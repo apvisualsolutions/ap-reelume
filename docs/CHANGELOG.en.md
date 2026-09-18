@@ -73,7 +73,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   which asks for its text and that of the GPL-3.0 it is written on to be delivered. Both now travel,
   with their copyright notices, and a test fails if they go missing. Reading that licence showed that
   the program's own licence has to permit modifying it for one's own use and debugging those
-  modifications, which today it forbids; that awaits a decision (`ENG-028`).
+  modifications, and it forbade that. `LICENSE` now carries that exception, without the right to
+  redistribute the modified program, and a test fails if it is removed (`ENG-028`).
 
 - **The legal documents named three GPL plugins in the video engine, and there are fourteen on x64
   and eleven on ARM64.** The earlier figures came from searching the binaries for the string FFmpeg
