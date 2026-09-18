@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
 using ApSolutions.LocalMedia.Application.Courses;
+using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Continuity;
@@ -262,7 +263,7 @@ public sealed class GetCourseThumbnailTests : IDisposable
             subject.ExecuteAsync(_course, [], null!, cancellationToken: TestContext.Current.CancellationToken));
     }
 
-    private GetCourseThumbnail Subject(ICourseFrameGrabber grabber) =>
+    private GetCourseThumbnail Subject(IVideoFrameGrabber grabber) =>
         new(new Paths(_root), grabber);
 
     private string WriteFile(string name, string content)
@@ -285,7 +286,7 @@ public sealed class GetCourseThumbnailTests : IDisposable
             Position: TimeSpan.Zero,
             Status: WatchStatus.NotStarted);
 
-    private sealed class RecordingGrabber : ICourseFrameGrabber
+    private sealed class RecordingGrabber : IVideoFrameGrabber
     {
         public int Calls { get; private set; }
 
