@@ -51,7 +51,8 @@ No es negociable, y es la razón de que la matriz de funcionalidades signifique 
 
 0. **Documéntate antes de decidir.** Antes de afirmar cómo se comporta una herramienta, y **antes de
    proponer cambiar una regla de este repositorio porque «no contempla mi caso»**, lee su
-   documentación: el MCP de Avalonia para la presentación, `firecrawl` o `context7` para lo demás.
+   documentación: el MCP de Avalonia para la presentación, `web-reader` (WebSearch para buscar) o `context7`
+   para lo demás.
    El 2026-09-02 esto evitó ensanchar una puerta que no había que tocar — el mecanismo ya existía y
    la consulta lo dijo en una sola pregunta. / **Read the documentation first**, and especially
    before proposing to widen a rule because it does not cover your case.

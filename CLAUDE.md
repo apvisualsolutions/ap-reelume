@@ -26,7 +26,7 @@ te asegures, documéntate»— y la documentación de coverlet contestó en una 
 ya existía, que no hacía falta tocar ninguna guarda, **y** que aplicarlo a lo bruto habría sido el
 arreglo equivocado. Ver la regla 10.
 
-**Para lo que no tiene MCP hay `firecrawl` y `context7`**, y el orden es el mismo: la documentación
+**Para lo que no tiene MCP hay `web-reader` (y WebSearch para buscar) y `context7`**, y el orden es el mismo: la documentación
 de la herramienta antes que el razonamiento sobre ella. Un razonamiento correcto sobre una premisa
 que nadie comprobó es la forma más cara de equivocarse que tiene este repositorio.
 
