@@ -139,6 +139,29 @@ public sealed class LicenceTextTests
     }
 
     /// <summary>
+    /// LGPL-2.1 §6 and LGPL-3.0 §4 let a program under terms of its own use the library only if those
+    /// terms permit modifying it for one's own use and reverse engineering to debug that. The
+    /// program's licence forbids both in 2.1 and 2.4, so the exception is what keeps a release
+    /// compliant, and removing it would breach both licences without failing anything else.
+    /// </summary>
+    [Fact]
+    public void The_programs_licence_keeps_the_exception_the_lgpl_asks_for()
+    {
+        var licence = Collapsed(File.ReadAllText(RepositoryLayout.PathFromRoot("LICENSE")));
+
+        Assert.Contains(
+            "Como excepción a 2.1, 2.4 y a la cláusula 3, puede modificar el Programa para su propio uso",
+            licence,
+            StringComparison.Ordinal);
+        Assert.Contains("ingeniería inversa para depurar esas modificaciones", licence, StringComparison.Ordinal);
+        Assert.Contains(
+            "As an exception to 2.1, 2.4 and clause 3, you may modify the Program for your own use",
+            licence,
+            StringComparison.Ordinal);
+        Assert.Contains("reverse engineer it to debug those modifications", licence, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// A truncated licence is not a copy of the licence. How it ends is checked rather than how long
     /// it is, because a file cut in half is still long. Line breaks are collapsed first: where a
     /// sentence wraps is a typesetting decision and every one of these texts wraps differently.

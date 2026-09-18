@@ -57,6 +57,12 @@ usted no puede:
   2.6 Usar el nombre «AP Reelume», «AP Solutions» ni sus logotipos para
       identificar o promocionar ningún otro producto o servicio.
 
+Como excepción a 2.1, 2.4 y a la cláusula 3, puede modificar el Programa para
+su propio uso, con el fin de usarlo con una versión modificada de las
+bibliotecas que la cláusula 4 identifica bajo licencias LGPL, y aplicarle
+ingeniería inversa para depurar esas modificaciones. Esta excepción no le
+autoriza a redistribuir el Programa modificado.
+
 Publicar el código fuente no es concederle derechos sobre él. Que usted pueda
 leerlo no le autoriza a copiarlo, reutilizarlo ni incorporarlo a ningún otro
 trabajo.
@@ -214,6 +220,12 @@ you may not:
   2.5 Remove or alter copyright, licence or attribution notices, or the marks.
   2.6 Use the names "AP Reelume" or "AP Solutions", or their logos, to identify
       or promote any other product or service.
+
+As an exception to 2.1, 2.4 and clause 3, you may modify the Program for your
+own use, in order to use it with a modified version of the libraries that
+clause 4 identifies as under LGPL licences, and reverse engineer it to debug
+those modifications. This exception does not entitle you to redistribute the
+modified Program.
 
 Publishing the source code grants you no rights over it. Being able to read it
 does not entitle you to copy it, reuse it or incorporate it into any other work.

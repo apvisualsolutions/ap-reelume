@@ -221,9 +221,9 @@ by the people who assembled the software, not by a lawyer, and two questions sta
 professional legal opinion under REL-004 answers them. **The first was closed by engineering on
 2026-09-18**: since 2026-09-13 it had been a finding — the GPL plugins in VideoLAN's package were not
 compatible with the program's own licence and blocked release — and since 2026-09-18 the engine is
-built without them. The `LGPL-3.0` of three libraries was read the same day (`ENG-028`), and what it left open belongs to
-`LICENSE`: both that licence and the LGPL-2.1 ask that the program may be modified for one's own use
-and reverse engineered to debug that, and today it forbids it. The
+built without them. The `LGPL-3.0` of three libraries was read the same day (`ENG-028`): both that licence and the
+LGPL-2.1 ask that the program may be modified for one's own use and reverse engineered to debug that,
+and `LICENSE` has permitted it since then through an express exception. The
 second is still a question: which subsection of
 LGPL-2.1 §6 covers the way LibVLC travels here, now that the §6(a) route — publishing our source under
 a free licence — is no longer available. Both are named here so nobody mistakes this document for the
