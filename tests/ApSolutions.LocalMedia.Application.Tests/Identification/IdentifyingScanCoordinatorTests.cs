@@ -49,19 +49,26 @@ public sealed class IdentifyingScanCoordinatorTests
             new UnreadIdentity(),
             new FileReconciliationPolicy(),
             new PendingReassignments());
+        var handOffsWhenFinished = -1;
         var coordinator = new IdentifyingScanCoordinator(
             new FixedScanCoordinator(summary),
             () => reconciliation,
             () => identification,
             () => grouping,
             () => series,
-            () => naming);
+            () => naming,
+            scanFinished: () => handOffsWhenFinished = roots.Asked.Count);
 
         var returned = await coordinator.StartAsync(
             new StartScanCommand(rootId, ScanTrigger.Watcher),
             TestContext.Current.CancellationToken);
 
         Assert.Same(summary, returned);
+
+        // And the scan says it finished only after all of them (LIB-021): the frame pass it starts
+        // asks which titles still have no cover, and naming and series grouping decide which cards
+        // exist at all.
+        Assert.Equal(4, handOffsWhenFinished);
 
         // Identification, version grouping, series grouping and naming each asked the repository for
         // this scan's root, which is the first thing all four do with a summary: every hand-off

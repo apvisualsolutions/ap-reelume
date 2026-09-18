@@ -21,15 +21,23 @@ public sealed class IdentifyingScanCoordinator : IScanCoordinator
     private readonly Func<GroupScannedVersions> _grouping;
     private readonly Func<GroupScannedEpisodes> _series;
     private readonly Func<NameScannedTitles> _naming;
+    private readonly Action? _scanFinished;
 
+    /// <param name="scanFinished">
+    /// Told when every hand-off is done, and only told: whoever listens starts its own work rather
+    /// than making the scan wait for it. The frame pass of LIB-021 is the listener, and running it
+    /// here would add minutes of decoding to every scan's summary.
+    /// </param>
     public IdentifyingScanCoordinator(
         IScanCoordinator inner,
         Func<ReconcileScannedFiles> reconciliation,
         Func<IdentifyScannedFiles> identification,
         Func<GroupScannedVersions> grouping,
         Func<GroupScannedEpisodes> series,
-        Func<NameScannedTitles> naming)
+        Func<NameScannedTitles> naming,
+        Action? scanFinished = null)
     {
+        _scanFinished = scanFinished;
         _inner = inner ?? throw new ArgumentNullException(nameof(inner));
         _reconciliation = reconciliation ?? throw new ArgumentNullException(nameof(reconciliation));
         _identification = identification ?? throw new ArgumentNullException(nameof(identification));
@@ -63,6 +71,7 @@ public sealed class IdentifyingScanCoordinator : IScanCoordinator
         // said so. Everything else — the films, and whatever the parser cannot place — keeps a card,
         // and until 2026-08-28 that card said the file name with the year still inside it.
         _ = await _naming().ExecuteAsync(summary, cancellationToken).ConfigureAwait(false);
+        _scanFinished?.Invoke();
         return summary;
     }
 }

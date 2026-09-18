@@ -473,6 +473,20 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Looks the covers of the cards already loaded up again, without asking the catalogue: a frame
+    /// taken in the background (LIB-021) reaches the grid this way, and re-querying would put whoever
+    /// is scrolling back at the top. With no picture changed nothing is rebuilt.
+    /// </summary>
+    public void RefreshPosters()
+    {
+        var refreshed = Items.Select(card => Card(card.Item)).ToArray();
+        if (refreshed.Zip(Items).Any(pair => pair.First.PosterFile != pair.Second.PosterFile))
+        {
+            Items = refreshed;
+        }
+    }
+
+    /// <summary>
     /// Opens the card for one entry.
     /// <para>
     /// A title nobody has identified yet is one file with one path, so it gets the single-title card:

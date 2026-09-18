@@ -106,6 +106,25 @@ public interface ITitleFrameSources
 - [ ] **Step 3:** implementación. La marca `.from` se lee y escribe igual que en `GetCourseThumbnail` (`"{Length}|{ModifiedUtc:O}"` invariante); **extraer** esas dos funciones a un ayudante compartido en `Application/Playback/FrameStampFile.cs` y hacer que `GetCourseThumbnail` lo use, en vez de copiarlas (y sus pruebas siguen verdes sin tocarlas).
 - [ ] **Step 4:** verde `Application.Tests`. Commit: `feat: LIB-021, una pasada de fondo saca el fotograma de los títulos sin portada`.
 
+### Estado al 2026-09-18, al parar
+
+Hechas las tareas 1 a 4 y dos piezas de la 5, **sin registrar nada**: `LibraryViewModel.RefreshPosters()`
+(refresca las imágenes de lo ya cargado sin volver a consultar, con sus dos pruebas), el aviso
+`scanFinished` de `IdentifyingScanCoordinator` (con su prueba de orden, vista fallar) y la guarda de
+`CaptureTitleFrames` contra dos pasadas a la vez (con una prueba que falla limpia en vez de colgarse:
+su primera versión se colgó). **Se decidió cambiar la recarga**: no `LoadAsync`, que vuelve a la
+primera página y devuelve arriba a quien esté recorriendo la cuadrícula, sino `RefreshPosters()`.
+
+**Lo que paró la conexión, y hay que medir antes de hacerla.** Las pruebas de paseo
+(`AssembledPhysicalWalkTests`, `AssembledJourneyTests`) montan la aplicación entera con
+`ConfigureWindow`. Conectada, la pasada decodificaría vídeos reales en mitad de sus escenas y
+`RefreshPosters` sustituiría las tarjetas mientras el paseo las pulsa, en un paseo que ya tiene rojos
+sueltos (`ENG-026`). Tres preguntas, por este orden: ¿esos paseos pasan por `ConfigureWindow` y por el
+aviso de fin de escaneo? (leer el código, no suponer); ¿sus bibliotecas tienen títulos sin portada, y
+por tanto trabajo para la pasada? (medir); y si lo tienen, la salida que no esconde nada: que el paseo
+espere a la pasada antes de pulsar, igual que ya espera a que acabe un escaneo, en vez de apagarla en
+pruebas. **Una pasada que sólo se desactiva en pruebas es una pasada que ninguna prueba ejercita.**
+
 ### Task 5: conectarla, y que la cuadrícula lo vea
 
 **Files:**

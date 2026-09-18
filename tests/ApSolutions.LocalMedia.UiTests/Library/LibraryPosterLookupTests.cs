@@ -50,9 +50,67 @@ public sealed class LibraryPosterLookupTests
         Assert.Equal(@"C:\personal-artwork\cover.png", Assert.Single(viewModel.Items).PosterFile);
     }
 
+    /// <summary>
+    /// A frame taken in the background (LIB-021) reaches the cards already on screen without asking
+    /// the catalogue again: re-querying would put whoever is scrolling back at the top.
+    /// </summary>
+    [Fact]
+    public async Task Refreshing_the_posters_redraws_a_new_picture_without_querying_again()
+    {
+        var item = new CatalogItem(
+            new TitleId(Guid.Parse("33333333-3333-3333-3333-333333333333")),
+            CatalogTitleKind.Movie,
+            "Arrival",
+            2016,
+            IsAvailable: true,
+            HasProgress: false,
+            IsPersonal: false,
+            AddedUtc: DateTimeOffset.UnixEpoch,
+            LastPlayedUtc: null);
+        string? onDisk = null;
+        var catalogue = new OnePage(new CatalogPage([item], null));
+        var viewModel = new LibraryViewModel(catalogue, findPoster: (_, _, _) => onDisk);
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Null(Assert.Single(viewModel.Items).PosterFile);
+
+        onDisk = @"C:\cache\title-frames\frame.png";
+        viewModel.RefreshPosters();
+
+        Assert.Equal(@"C:\cache\title-frames\frame.png", Assert.Single(viewModel.Items).PosterFile);
+        Assert.Equal(1, catalogue.Queries);
+    }
+
+    /// <summary>With no picture changed nothing is rebuilt, so the cards on screen are left alone.</summary>
+    [Fact]
+    public async Task Refreshing_with_nothing_new_leaves_the_cards_as_they_are()
+    {
+        var item = new CatalogItem(
+            new TitleId(Guid.Parse("44444444-4444-4444-4444-444444444444")),
+            CatalogTitleKind.Movie,
+            "Dune",
+            2021,
+            IsAvailable: true,
+            HasProgress: false,
+            IsPersonal: false,
+            AddedUtc: DateTimeOffset.UnixEpoch,
+            LastPlayedUtc: null);
+        var viewModel = new LibraryViewModel(new OnePage(new CatalogPage([item], null)), findPoster: (_, _, _) => "same.png");
+        await viewModel.LoadAsync(TestContext.Current.CancellationToken);
+        var before = viewModel.Items;
+
+        viewModel.RefreshPosters();
+
+        Assert.Same(before, viewModel.Items);
+    }
+
     private sealed class OnePage(CatalogPage page) : ICatalogQueryService
     {
-        public Task<CatalogPage> QueryAsync(CatalogQuery query, CancellationToken cancellationToken = default) =>
-            Task.FromResult(page);
+        public int Queries { get; private set; }
+
+        public Task<CatalogPage> QueryAsync(CatalogQuery query, CancellationToken cancellationToken = default)
+        {
+            Queries++;
+            return Task.FromResult(page);
+        }
     }
 }
