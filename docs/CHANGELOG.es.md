@@ -126,6 +126,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **El motor de vídeo ya se puede compilar sin código GPL, para x64 y ARM64, y reproduce lo mismo
+  que el que se distribuye hoy.** Es lo que falta para poder publicar el programa con su licencia
+  propia. Se compila como lo compila VideoLAN, con sus herramientas y dentro de sus propias imágenes,
+  en un proceso aparte que tarda menos de media hora por arquitectura. Una puerta rechaza el
+  resultado si cualquier pieza lleva código GPL, y la misma puerta, aplicada al motor actual, lo
+  rechaza por cuatro motivos distintos. Los catorce formatos de vídeo y audio prometidos se
+  reproducen con las mismas cifras que el motor actual, incluidos los cuatro de audio cuyas
+  bibliotecas GPL desaparecen, y los subtítulos se siguen dibujando. La aplicación todavía usa el
+  motor de VideoLAN: cambiarlo es el paso siguiente. Evidencia `ENG013-reproducible-build.md`.
+
 - **Un vídeo más pequeño que la ventana en la que se ve ahora se ve más nítido, y nadie tiene que
   encender nada.** Hasta hoy, una película de 720p o 1080p en una pantalla grande se estiraba con el
   filtro que el dibujado trae de serie, y ese filtro reparte un borde duro sobre cuatro píxeles

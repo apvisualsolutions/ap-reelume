@@ -126,6 +126,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **The video engine can now be built without GPL code, for x64 and ARM64, and it plays the same as
+  the one shipped today.** It is what is missing before the program can be published under its own
+  licence. It is built the way VideoLAN builds it, with their tools and inside their own images, in
+  a separate process that takes under half an hour per architecture. A gate refuses the result if
+  any piece carries GPL code, and the same gate, applied to today's engine, refuses it for four
+  different reasons. The fourteen promised video and audio formats play with the same figures as
+  today's engine, including the four audio ones whose GPL libraries are gone, and subtitles still
+  render. The application still uses VideoLAN's engine: switching it is the next step. Evidence
+  `ENG013-reproducible-build.md`.
+
 - **A video smaller than the window it is watched in now looks sharper, and nobody has to switch
   anything on.** Until today a 720p or 1080p film on a large screen was stretched by the filter the
   renderer ships with, and that filter spreads a hard edge over four pixels — measured. Now the
