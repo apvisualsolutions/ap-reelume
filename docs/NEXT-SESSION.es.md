@@ -16,6 +16,49 @@
 > se borraron de aquí porque este documento es el registro de lo que pasó, y reescribir lo que pasó es
 > otra clase de error.
 
+> ## AVISO AL FRENTE — 2026-09-18, tercera tanda: la licencia ya permite lo que exige la LGPL, la prueba de HDR corre, y la portada elegida vive aparte
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit. Cada
+> fast-forward a `main` se hizo con la conclusión de CI leída; este relevo va un commit por delante,
+> por ser sólo documentación, y el anterior a él debe estar en `main` si su CI salió verde.
+>
+> ### Lo que se hizo
+>
+> · **`ENG-001` cerrada**: la prueba de reconocer un HDR10 corre en el servidor. ffmpeg 9.0 dejaba la
+>   muestra sin curva en el contenedor; la receta etiqueta los fotogramas con `setparams`.
+> · **`ENG-028` cerrada**: la LGPL-3.0 de gmp, nettle y live555, leída; sus textos y el de la GPL-3.0
+>   viajan en `licenses/`. **Y `LICENSE` lleva desde hoy la excepción que la LGPL-2.1 §6 y la LGPL-3.0
+>   §4 exigen** —modificar para uso propio y depurar con ingeniería inversa, sin redistribuir—,
+>   aprobada por el propietario, con prueba que falla si se quita.
+> · **`ENG-003` / `LIB-021`**: el orden de portadas de la `ADR-0009` tiene fila y está `IN_PROGRESS`.
+>   **Plan 1 hecho y en `main`**: la portada elegida vive en su propia columna (migración 24) y gana, y
+>   restaurar los datos del proveedor ya no la borra. **Plan 2 a medias y SIN CONECTAR**: el fotograma
+>   como tercer origen, la consulta de qué vídeo usa cada título, la pasada de fondo y el refresco de
+>   imágenes están hechos y probados; registrarla y lanzarla se paró a propósito. Qué medir antes
+>   está en `docs/superpowers/plans/2026-09-18-lib-021-cover-origins-frame.md`. El plan 3 está sin
+>   escribir.
+>
+> ### Lo que se abrió
+>
+> · **`ENG-029`**: los avisos legales no nombran todas las bibliotecas que el motor lleva dentro.
+> · **`ENG-030`**: con un HDR10 el reproductor dice «SDR»; el reconocimiento no está conectado, y la
+>   fila `PLY-003` lo da por verificado. Hay que revisarla con lo que se mida.
+>
+> ### Las trampas medidas
+>
+> · **La previsualización de suelos con `AccessibilityTests` tapa rojos de CI**: el paseo recorre
+>   caminos que la pasada medida no recorre (run `35395167269`).
+> · **Una prueba de concurrencia que espera a la segunda llamada se cuelga en vez de fallar**: se lee
+>   `IsCompleted` antes de liberar.
+> · **Una afirmación sobre el estado del editor puede seguir verde sin recarga**: se lee la fila guardada.
+>
+> ### Lo que espera al propietario
+>
+> · **Un rato sin usar el ordenador (unos 15 min) para medir `ENG-002` con el Narrador.**
+> · MSYS2 en `C:\msys64` (1,8 GB), el juicio visual de `PLY-016` y la regla del orden del backlog para
+>   las reglas comunes, como estaban.
+
 > ## AVISO AL FRENTE — 2026-09-18, segunda tanda: la aplicación ya lleva el motor sin GPL, y un ensayo evitó publicar el código propio
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

@@ -16,6 +16,48 @@
 > deleted from here, because this document is the record of what happened, and rewriting what happened
 > is a different kind of mistake.
 
+> ## FRONT NOTICE — 2026-09-18, third batch: the licence now permits what the LGPL requires, the HDR test runs, and the picked cover lives apart
+>
+> **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. The commit number is not written here. Every
+> fast-forward to `main` was made with CI's conclusion read; this handover sits one commit ahead,
+> being documentation only, and the one before it should be on `main` if its CI came back green.
+>
+> ### What was done
+>
+> · **`ENG-001` closed**: the HDR10 recognition test runs on the server. ffmpeg 9.0 left the sample
+>   without its curve in the container; the recipe tags the frames with `setparams`.
+> · **`ENG-028` closed**: the LGPL-3.0 of gmp, nettle and live555 was read; its texts and the GPL-3.0's
+>   travel in `licenses/`. **And `LICENSE` now carries the exception LGPL-2.1 §6 and LGPL-3.0 §4
+>   require** — modifying for one's own use and reverse engineering to debug, without redistributing —,
+>   approved by the owner, with a test that fails if it is removed.
+> · **`ENG-003` / `LIB-021`**: ADR-0009's cover order has its row and is `IN_PROGRESS`. **Plan 1 done
+>   and on `main`**: the picked cover lives in its own column (migration 24) and wins, and restoring
+>   the provider's data no longer erases it. **Plan 2 half done and NOT WIRED**: the frame as the third
+>   origin, the query for each title's video, the background pass and the poster refresh are built and
+>   tested; registering and launching it was stopped on purpose. What to measure first is in
+>   `docs/superpowers/plans/2026-09-18-lib-021-cover-origins-frame.md`. Plan 3 is not written yet.
+>
+> ### What was opened
+>
+> · **`ENG-029`**: the legal notices do not name every library the engine carries inside.
+> · **`ENG-030`**: with an HDR10 the player says «SDR»; the recognition is not wired, and the `PLY-003`
+>   row counts it as verified. It needs revising with what gets measured.
+>
+> ### The measured traps
+>
+> · **Previewing floors with `AccessibilityTests` hides CI reds**: the walk takes paths the measured
+>   pass does not (run `35395167269`).
+> · **A concurrency test that awaits the second call hangs instead of failing**: read `IsCompleted`
+>   before releasing.
+> · **An assertion on the editor's state can stay green without a reload**: read the stored row.
+>
+> ### What waits for the owner
+>
+> · **A spell away from the computer (about 15 min) to measure `ENG-002` with Narrator.**
+> · MSYS2 in `C:\msys64` (1.8 GB), `PLY-016`'s visual judgement and the backlog-order rule for the
+>   common rules, as they were.
+
 > ## FRONT NOTICE — 2026-09-18, second batch: the application now ships the GPL-free engine, and a rehearsal stopped our own code being published
 >
 > **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,
