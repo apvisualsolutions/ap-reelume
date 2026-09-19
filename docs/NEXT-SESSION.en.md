@@ -7,20 +7,18 @@
 
 ## State
 
-The repository adopts the house's common working system. With the owner's yes, the adoption was
-merged into `codex/ap-reelume-mvp-x64`, pushed, its CI came out green and `main` moved forward to
-that commit by fast-forward. This handover may be one commit ahead, being documentation only.
+`main` and `codex/ap-reelume-mvp-x64` were left on the same commit, with their CI read green. This
+handover is one commit ahead, being documentation only, and its CI is not waited for.
 
 ## What was done
 
-· **Manifest** (`.claude/project-manifest.json`): measured backlog, the nine closing phases with
-  their command, a CI receipt and twelve gates, each with a case that sounds and one that stays quiet.
-· **`ENG-033`**: the closing marker lives in git's common directory and the plugin's two gates read
-  it. The repository's own push guard was retired in the same commit, after its battery passed.
-· **`ENG-034`**: `.gitignore` excludes the local settings, measured with the global config off.
-· **`ENG-035`**: the handover is overwritten, capped and in parity; history is in `NEXT-SESSION-HISTORY`.
-· **`ENG-036`**: the shared-tools variable lives in the local settings.
-· **`ENG-037`**: the closing record measures IT's checks by the file they leave, not by the text.
+· **The repository adopted the house's common working system** (the IT session's pilot). The
+  manifest is in `.claude/project-manifest.json`, with twelve gates proved in both their cases.
+· Closed `ENG-033` to `ENG-037`: the closing marker, in git's common directory; `.gitignore`
+  ignores the local settings; the handover is overwritten under a cap; the shared-tools variable
+  lives in the local settings; and the closing record measures by effect.
+· The repository's own hook `pre-push-closing.sh` was retired. The plugin's two gates and the
+  record's step-0 row replace it. **This close is the first one with the common system.**
 · Evidence: `docs/evidence/stable/audit-adopt-common-system.md`.
 
 ## The traps measured
@@ -28,11 +26,18 @@ that commit by fast-forward. This handover may be one commit ahead, being docume
 · Freezing a document with `git mv` and writing another in its place is not a rename to git: the
   privacy filter saw 16,000 new lines. With `--find-copies-harder`, fourteen.
 · The common filter reads a regular expression's double backslash as a network path: the manifest
-  sounds in every close that touches it.
+  sounds in every close that touches it. Writing one in prose sets it off too.
+
+## First thing next session
+
+· **The gate auditor** over the adoption's new tests: `HandoffLimitsTests`, the record's battery
+  and `gate-probe.ps1`. It was not run before closing.
+· Then `docs/TAREAS.md`, the first open row that is not stopped.
 
 ## What waits for the owner
 
-· Seven findings about the common system, for the IT session; they are in the evidence.
+· Seven findings about the common system, with the IT session, which received and read them.
+· `ENG-002` (a session with Narrator) and the rest of theirs, as it stood in `docs/TAREAS.md`.
 
 ## What is still open does not live here
 
