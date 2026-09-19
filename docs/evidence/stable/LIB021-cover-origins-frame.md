@@ -71,6 +71,13 @@ constructor, que el paseo no puede tomar porque allí siempre se le pasa la pasa
 `TitleFramePassTests`. **La previsualización local no lo avisó**, y es `ENG-016`: busca archivos
 nuevos con `git diff --diff-filter=A`, que sólo nombra los que ya están en un commit.
 
+**Y el primer arreglo no sirvió, por la aritmética de la puerta**: la prueba se escribió en
+`PackagingTests` y el archivo siguió midiendo 100/50 en el run `35472717318`. Las ramas **se suman**
+entre suites en vez de ganar «cubierta en cualquier sitio» (`check-coverage.ps1:162`), así que una de
+dos aquí y otra de dos allá son dos de cuatro. Las dos mitades tienen que tomarse **dentro de una
+misma suite**, y la prueba se mudó al lado del paseo: 2 de 2 ramas y 6 de 6 líneas, medido con el
+JSON de coverlet.
+
 ### El coste medido
 
 Una tanda (25 archivos, uno tras otro) sobre la muestra `mp4-h264-aac`, dos veces: **7,9 s y 7,7 s**,
@@ -142,6 +149,12 @@ Run `35471110732` passed all ten suites and fell at the coverage gate: `TitleFra
 walk cannot take because there the pass is always handed to it; it was covered with
 `TitleFramePassTests`. **The local preview did not warn**, and that is `ENG-016`: it looks for new
 files with `git diff --diff-filter=A`, which only names those already in a commit.
+
+**And the first fix did not work, because of the gate's arithmetic**: the test was written in
+`PackagingTests` and the file still measured 100/50 on run `35472717318`. Branches are **added** across
+suites rather than taking «covered anywhere» (`check-coverage.ps1:162`), so one of two here and one of
+two there is two of four. Both arms have to be taken **inside one suite**, and the test moved next to
+the walk: 2 of 2 branches and 6 of 6 lines, measured with coverlet's JSON.
 
 ### The measured cost
 
