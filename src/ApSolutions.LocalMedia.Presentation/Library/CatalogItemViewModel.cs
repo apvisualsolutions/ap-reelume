@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
+using System.ComponentModel;
 using System.Globalization;
 
 using ApSolutions.LocalMedia.Application.Catalog;
@@ -9,8 +10,12 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 
 namespace ApSolutions.LocalMedia.Presentation.Library;
 
-public sealed class CatalogItemViewModel(CatalogItem item, string? posterFile = null) : IPosterCard
+public sealed class CatalogItemViewModel(CatalogItem item, string? posterFile = null) : IPosterCard, INotifyPropertyChanged
 {
+    // Never null, so telling it is not a branch: a card nobody is binding to is the common case in
+    // every test that only builds the grid, and a null check there would be a branch no test takes.
+    public event PropertyChangedEventHandler? PropertyChanged = delegate { };
+
     public CatalogItem Item { get; } = item ?? throw new ArgumentNullException(nameof(item));
 
     /// <summary>
@@ -18,7 +23,23 @@ public sealed class CatalogItemViewModel(CatalogItem item, string? posterFile = 
     /// reason it is on the detail cards: the rule that turns a stored value into a file lives in
     /// <c>ResolveTitlePoster</c>, and a view model that reached for it would be a second copy.
     /// </summary>
-    public string? PosterFile { get; } = posterFile;
+    public string? PosterFile { get; private set; } = posterFile;
+
+    /// <summary>
+    /// Draws another cover on this same card. A frame taken in the background (LIB-021) arrives while
+    /// the grid is on screen, and replacing the card would pull it from under whoever is pressing it.
+    /// </summary>
+    public void ShowPoster(string? posterFile)
+    {
+        if (PosterFile == posterFile)
+        {
+            return;
+        }
+
+        PosterFile = posterFile;
+        PropertyChanged!(this, new PropertyChangedEventArgs(nameof(PosterFile)));
+        PropertyChanged!(this, new PropertyChangedEventArgs(nameof(IPosterCard.HasPoster)));
+    }
 
     public string Title => Item.Title;
 
@@ -71,7 +92,9 @@ public sealed class CatalogItemViewModel(CatalogItem item, string? posterFile = 
                 // Substituted rather than formatted: the pattern comes from a dictionary that
                 // changes with the language, so a cached CompositeFormat — which is what the
                 // analyser asks for — would be a cache of whichever language happened to load first.
-                ? Resource("CatalogRuntimeMinutes", "{0} min").Replace(
+                // One string in this model needs formatting rather than picking, and it is read
+                // through the shared lookup, whose «no application» arm is tested where it lives.
+                ? PresentationText.Resource("CatalogRuntimeMinutes", "{0} min").Replace(
                     "{0}",
                     ((int)Math.Round(runtime.TotalMinutes)).ToString(CultureInfo.CurrentCulture),
                     StringComparison.Ordinal)
@@ -96,20 +119,4 @@ public sealed class CatalogItemViewModel(CatalogItem item, string? posterFile = 
     public bool CountsEpisodes => Item.Kind == CatalogTitleKind.Show && Item.EpisodeCount > 0;
 
     public bool IsWatched => Item.Status == WatchStatus.Watched;
-
-    /// <summary>
-    /// The words behind a key, resolved where the resources are, with the key's own fallback.
-    /// </summary>
-    /// <remarks>
-    /// One string in this model needs formatting rather than picking — «{0} min» — so it is the one
-    /// place a view model reaches for a resource. The fallback is not decoration: a headless test
-    /// mounts this without the string dictionaries, and a null there would print an empty running
-    /// time rather than failing loudly.
-    /// </remarks>
-    private static string Resource(string key, string fallback) =>
-        Avalonia.Application.Current is { } application
-            && application.TryGetResource(key, application.ActualThemeVariant, out var value)
-            && value is string text
-                ? text
-                : fallback;
 }

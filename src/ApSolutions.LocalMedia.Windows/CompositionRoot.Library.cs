@@ -45,7 +45,9 @@ public static partial class CompositionRoot
                 () => provider.GetRequiredService<IdentifyScannedFiles>(),
                 () => provider.GetRequiredService<GroupScannedVersions>(),
                 () => provider.GetRequiredService<GroupScannedEpisodes>(),
-                () => provider.GetRequiredService<NameScannedTitles>()))
+                () => provider.GetRequiredService<NameScannedTitles>(),
+                // LIB-021. Only told: the scan's summary goes back without waiting for the frames.
+                provider.GetRequiredService<Metadata.TitleFramePass>().Request))
             .AddSingleton<RootWatchCoordinator>()
             .AddSingleton<RootWatchBackground>()
             .AddSingleton<FileReconciliationPolicy>()

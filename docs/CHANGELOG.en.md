@@ -8,6 +8,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased] / [Sin publicar]
 
+### Added
+
+- **A film or series with no cover shows a frame of its own video.** When there is neither a picked
+  cover nor a provider's, the application takes a frame in the background when it opens and after
+  every scan, keeps it and draws it on the card already on screen, without going back to the top or
+  rebuilding the grid. It yields to playback or a scan, and each file is decoded only once while it
+  does not change (`LIB-021`).
+
 ### Changed
 
 - **The checks of a batch close now look at what they claim to look at.** The record the close's

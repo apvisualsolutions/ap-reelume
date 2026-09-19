@@ -475,14 +475,14 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     /// <summary>
     /// Looks the covers of the cards already loaded up again, without asking the catalogue: a frame
     /// taken in the background (LIB-021) reaches the grid this way, and re-querying would put whoever
-    /// is scrolling back at the top. With no picture changed nothing is rebuilt.
+    /// is scrolling back at the top. The cards stay the same ones and only their picture changes, so
+    /// a card somebody is pressing is never swapped for another.
     /// </summary>
     public void RefreshPosters()
     {
-        var refreshed = Items.Select(card => Card(card.Item)).ToArray();
-        if (refreshed.Zip(Items).Any(pair => pair.First.PosterFile != pair.Second.PosterFile))
+        foreach (var card in Items)
         {
-            Items = refreshed;
+            card.ShowPoster(_findPoster(card.Item.Id, card.Item.PosterPath, card.Item.PersonalCover));
         }
     }
 

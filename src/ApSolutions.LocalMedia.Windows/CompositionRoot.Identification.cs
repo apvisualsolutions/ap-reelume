@@ -6,6 +6,7 @@ using ApSolutions.LocalMedia.Application.Continuity;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Identification;
 using ApSolutions.LocalMedia.Application.Metadata;
+using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
@@ -15,6 +16,7 @@ using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.FileSystem;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
+using ApSolutions.LocalMedia.Infrastructure.Playback;
 using ApSolutions.LocalMedia.Infrastructure.Settings;
 using ApSolutions.LocalMedia.Presentation.Metadata;
 using ApSolutions.LocalMedia.Presentation.Review;
@@ -134,6 +136,15 @@ public static partial class CompositionRoot
                 TimeProvider.System))
             .AddTransient<SetPersonalCover>()
             .AddTransient<ResolveTitlePoster>()
+
+            // LIB-021. A frame of its own video for every title with no other cover. The grabber
+            // opens files on the one native instance the player uses, and the pass is registered
+            // once because it is what refuses a second pass while the first runs.
+            .AddSingleton<ITitleFrameSources, TitleFrameSourceRepository>()
+            .AddSingleton<IVideoFrameGrabber>(provider =>
+                new LibVlcVideoFrameGrabber(provider.GetRequiredService<LibVlcFactory>()))
+            .AddSingleton<CaptureTitleFrames>()
+            .AddSingleton<TitleFramePass>()
             // LIB-018. The picker is handed the two things it cannot reach for itself: the system's
             // own file dialog, which belongs to the host, and the use case that copies the chosen
             // file in. Built with neither — which is what every test that only displays a picker

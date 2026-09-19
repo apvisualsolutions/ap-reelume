@@ -76,6 +76,48 @@ public sealed class VideoFrameGrabberTests : IAsyncLifetime
     }
 
     /// <summary>
+    /// What one batch of the frame pass costs (LIB-021): <c>CaptureTitleFrames.BatchSize</c> files,
+    /// one after the other, the way the pass takes them.
+    /// </summary>
+    /// <remarks>
+    /// The ceiling is the failure that matters and not a benchmark: a grabber that waited out its
+    /// deadline on every file would spend 25 × 3 s on a batch and still take every frame, so no other
+    /// test here would notice. The spike measured 433-472 ms a file; the figure goes to the output so
+    /// the evidence can quote a measurement instead of that estimate.
+    /// </remarks>
+    [Fact]
+    public async Task A_batch_of_twenty_five_frames_costs_seconds_not_the_sum_of_every_deadline()
+    {
+        var descriptor = MediaManifest.Require("mp4-h264-aac");
+        var missing = MediaManifest.MissingEncoders(descriptor);
+        Assert.SkipWhen(missing.Count > 0, $"this machine's ffmpeg has no {string.Join(", ", missing)}.");
+        var sample = await MediaManifest.MaterialiseAsync(descriptor, TestContext.Current.CancellationToken);
+        Directory.CreateDirectory(_root);
+        var grabber = new LibVlcVideoFrameGrabber(_factory);
+        const int Batch = Application.Metadata.CaptureTitleFrames.BatchSize;
+
+        var watch = Stopwatch.StartNew();
+        var taken = 0;
+        for (var index = 0; index < Batch; index++)
+        {
+            var copy = Path.Combine(_root, $"title-{index}.mp4");
+            File.Copy(sample, copy);
+            if (await grabber.TryCaptureAsync(copy, TimeSpan.FromSeconds(0.3), Path.Combine(_root, $"title-{index}.png"), TestContext.Current.CancellationToken))
+            {
+                taken++;
+            }
+        }
+
+        watch.Stop();
+        TestContext.Current.SendDiagnosticMessage(
+            $"LIB-021: {taken} of {Batch} frames in {watch.Elapsed.TotalSeconds:F1} s, {watch.Elapsed.TotalMilliseconds / Batch:F0} ms each.");
+        Assert.Equal(Batch, taken);
+        Assert.True(
+            watch.Elapsed < CourseThumbnailPolicy.Deadline * Batch / 2,
+            $"a batch of {Batch} took {watch.Elapsed}: that is waiting on deadlines, not decoding.");
+    }
+
+    /// <summary>
     /// A path outside the approved containers is refused before LibVLC is touched at all.
     /// </summary>
     /// <remarks>

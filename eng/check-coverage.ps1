@@ -442,7 +442,13 @@ try {
     # cubrió lo que faltaba. Eran la primera edición de un título sin fila, que esta suite nunca
     # tomaba, y la rama del título ausente, que el JSON de coverlet nombró por su offset: todas las
     # pruebas pasaban un título.
-    $debtRatchet = 186
+    #
+    # 185 el 2026-09-19, por mejora: CatalogItemViewModel.cs llega a 100/100 y sale. La tarjeta ganó
+    # un aviso de cambio de portada (LIB-021) y la previsualización la leyó subiendo de 100/90 a
+    # 100/91; las tres ramas que faltaban eran una copia privada de la lectura de textos traducidos,
+    # y se sustituyó por PresentationText.Resource, que ya cubre el caso sin aplicación. El evento
+    # nace con un suscriptor vacío, así que avisar no añade una rama que ninguna prueba tome.
+    $debtRatchet = 185
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

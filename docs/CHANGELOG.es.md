@@ -8,6 +8,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ## [Sin publicar] / [Unreleased]
 
+### Añadido
+
+- **Una película o serie sin portada muestra un fotograma de su propio vídeo.** Cuando no hay
+  portada elegida ni del proveedor, la aplicación saca un fotograma en segundo plano al abrirse y
+  después de cada escaneo, lo guarda y lo dibuja en la tarjeta que ya está en pantalla, sin volver
+  arriba ni rehacer la cuadrícula. Cede ante una reproducción o un escaneo, y cada archivo se
+  decodifica una sola vez mientras no cambie (`LIB-021`).
+
 ### Cambiado
 
 - **Las comprobaciones del cierre de una tanda miran ahora lo que dicen mirar.** El registro que

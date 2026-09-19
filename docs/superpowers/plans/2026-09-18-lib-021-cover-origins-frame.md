@@ -125,6 +125,16 @@ por tanto trabajo para la pasada? (medir); y si lo tienen, la salida que no esco
 espere a la pasada antes de pulsar, igual que ya espera a que acabe un escaneo, en vez de apagarla en
 pruebas. **Una pasada que sólo se desactiva en pruebas es una pasada que ninguna prueba ejercita.**
 
+### Estado al 2026-09-19: conectada
+
+Las tres preguntas, contestadas: sólo dos escenas montan la ventana, pero todas las que escanean pasan
+por el coordinador; y todas tienen trabajo para la pasada, porque el paseo no tiene proveedor. **Se
+cambió la salida**: en vez de que el paseo espere, `RefreshPosters` ya no sustituye las tarjetas —
+`CatalogItemViewModel.ShowPoster` cambia la imagen de la misma—, así que nada sale de debajo de una
+pulsación. La recarga es `RefreshPosters` y no `LoadAsync`, como se decidió al parar. Evidencia en
+`docs/evidence/stable/LIB021-cover-origins-frame.md`. `CRS-006` no cupo en la tanda y sigue en su fila
+de la matriz.
+
 ### Task 5: conectarla, y que la cuadrícula lo vea
 
 **Files:**

@@ -194,6 +194,10 @@ public static partial class CompositionRoot
         PostSafely(() => services.GetRequiredService<RefreshStaleMetadata>()
             .ExecuteAsync(CancellationToken.None));
 
+        // LIB-021. The titles left with no cover since the last launch get a frame of their own
+        // video; a scan that ends later asks again through the coordinator.
+        services.GetRequiredService<Metadata.TitleFramePass>().Request();
+
         // The subtitle style somebody chose comes back. It is loaded onto the surface the shell was
         // handed rather than onto a freshly resolved one, because this view model is transient: a
         // fresh instance would be filled correctly and shown to nobody. Without this the choice was
@@ -611,6 +615,11 @@ public static partial class CompositionRoot
             // The notices strip's other half. A root that cannot be read is announced where the
             // affected titles are (ADR-0010), and until this line the event was published to nobody.
             provider.GetRequiredService<RootNoticeViewModel>());
+
+        // LIB-021. A batch of frames reaches the cards already on screen, on the interface thread,
+        // without re-querying: re-querying would put whoever is scrolling back at the top.
+        provider.GetRequiredService<Metadata.TitleFramePass>().FramesTaken +=
+            (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(library.RefreshPosters);
         library.DetailsLoader = async item =>
         {
             var stored = await catalogMetadata
