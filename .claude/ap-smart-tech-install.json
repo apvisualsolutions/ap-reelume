@@ -1,0 +1,9 @@
+{
+  "path": ".claude/ap-smart-tech-install.json",
+  "version": "0.7.4",
+  "source": "ap-smart-tech",
+  "sha256": "ba96c29a47242fd08cd3bd39614680609497e3ff490c030291698f5b27c7d8e8",
+  "linked": "referenced",
+  "x-origin": "referenciado por variable",
+  "installedAt": "2026-09-19T17:35:53Z"
+}

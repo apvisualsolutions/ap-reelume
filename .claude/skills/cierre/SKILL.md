@@ -29,15 +29,37 @@ el agente siguió arreglando lo que salía tras la orden —un rojo de cobertura
 el auditor—, con tres pushes y tres CI de unos cuarenta minutos, y era la segunda vez que el
 propietario se quejaba de lo mismo.
 
-**Y un hook lo hace cumplir.** Al empezar este paso se crea la marca de cierre, y
-`.claude/hooks/pre-push-closing.sh` deniega mientras exista cualquier push de la rama que lleve algo
-fuera de `docs/` o de un `.md` de la raíz; el fast-forward de `main` pasa, porque sólo lleva lo ya
-verificado. **Se retira al terminar el paso 10**, o la sesión siguiente se encontraría bloqueada:
+**Y lo hace cumplir el sistema común de la casa, desde el 2026-09-19.** Al empezar este paso se pone
+la marca de cierre con la herramienta común, que la deja en el **directorio común de git** —el mismo
+desde cualquier copia de trabajo paralela, que era `ENG-033`— con la sesión, el proceso y una
+caducidad de cuatro horas:
 
 ```powershell
-New-Item -ItemType File -Force (Join-Path (git rev-parse --absolute-git-dir) 'ap-closing') | Out-Null   # al empezar
-Remove-Item (Join-Path (git rev-parse --absolute-git-dir) 'ap-closing')                               # al terminar
+pwsh -NoProfile -File "$env:AP_SHARED_TOOLS\closing-marker.ps1" -Action set -Reason 'cierre de Reelume'   # al empezar
+pwsh -NoProfile -File "$env:AP_SHARED_TOOLS\closing-marker.ps1" -Action clear                              # al terminar
 ```
+
+Con la marca puesta, dos hooks del plugin común miran el recibo que deja el acta:
+
+- **la puerta de commits y pushes** no deja commitear ni subir nada mientras el acta no esté en 0;
+- **la puerta del final de turno** no deja terminar un turno con el acta en rojo.
+
+Y el acta exige, en su fila del paso 0, que **lo que falta por subir sólo toque `docs/` o un `.md` de
+la raíz**, contando también el stage, lo no preparado y los ficheros nuevos sin añadir. Es la regla
+que hacía cumplir `pre-push-closing.sh`, retirado en el commit que activó el común.
+
+**Mientras se espera al CI, la espera se declara**, o la puerta del final de turno bloquea cada
+turno de la espera. Ninguna herramienta común la escribe todavía, así que se escribe a mano, con el
+plazo que se espera:
+
+```powershell
+$c = git rev-parse --path-format=absolute --git-common-dir
+@{ reason = 'esperando el CI de <sha>'; expiresAt = (Get-Date).ToUniversalTime().AddMinutes(90).ToString('yyyy-MM-ddTHH:mm:ssZ') } |
+  ConvertTo-Json | Set-Content (Join-Path $c 'closing-waiting.json')
+```
+
+**El fast-forward de `main` del paso 6 va antes del acta**, así que la puerta de pushes lo pararía:
+se pasa con la vía de escape del plugin, que deja el motivo anotado en el recibo —ver el paso 6—.
 
 **El auditor de puertas va ANTES de la orden de cierre, no después.** Si la tanda añadió pruebas y no
 se lanzó, no se lanza ahora: va al prompt como primer paso de la sesión siguiente.
@@ -61,14 +83,18 @@ dos veces seguidas, con fases despachadas en una frase.
    pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-acta.ps1
    ```
 
-   Comprueba en el transcript de **esta** sesión que cada paso usó su instrumento de verdad
-   —el vigía de CI, las puertas, la previsión de suelos si hubo código, las tres comprobaciones de
-   IT, la lista de pendientes— y en git que el relevo se tocó en los dos idiomas. Sale 1 nombrando
-   lo que falta y 2 si no pudo leer el transcript. **Con el acta en rojo no se hace el commit del
-   relevo.** Es el mecanismo del acta de IT con nuestras fases; su batería está en
-   `scripts/tests/test-cierre-acta.ps1`, con control de mutación por `-Script`. Localiza el
-   transcript con la librería de IT (`cierre-transcript.ps1`), que nunca coge «el más reciente»: si
-   no sabe cuál es el de esta sesión, sale 2.
+   Comprueba en el transcript de **esta** sesión que cada paso usó su instrumento de verdad —el
+   vigía de CI, las puertas, la previsión de suelos si hubo código, la lista de pendientes, el tope
+   del relevo—, en git que el relevo se tocó en los dos idiomas y que lo que falta por subir sólo
+   toca documentación, y **las tres comprobaciones de IT por su efecto, no por su texto**: el
+   fichero que deja `cierre-compartidas.ps1`, posterior a la marca y sin «no se pudo medir». El
+   2026-09-19 dio las tres por hechas estando dentro de la rama de un `if` que no se tomó
+   (`ENG-037`). Sale 1 nombrando lo que falta y 2 si no pudo medir —sin transcript o sin marca—, y
+   **deja su recibo en el directorio común de git**, que es lo que leen las puertas del plugin.
+   **Con el acta en rojo no se hace el commit del relevo**, y la puerta de commits tampoco lo deja.
+   Su batería está en `scripts/tests/test-cierre-acta.ps1`, con control de mutación por `-Script`.
+   Localiza el transcript con la librería común (`closing-transcript.ps1`), que nunca coge «el más
+   reciente»: si no sabe cuál es el de esta sesión, sale 2.
 
 **No se cierra a medias.** Los pasos 1 a 6 publican; los pasos 7 a 10 son los que hacen que la
 sesión siguiente no empiece preguntando. Saltarse los segundos deja el trabajo hecho y el contexto
@@ -211,8 +237,13 @@ en el log.
 
 ```bash
 git merge-base --is-ancestor <main-actual> <sha>   # que es fast-forward de verdad
-git branch -f main <sha> && git push origin main
+git branch -f main <sha> && git push origin main   #closing-ok: fast-forward de main al SHA con CI verde leido
 ```
+
+**El comentario del final no es decoración**: con la marca de cierre puesta y el acta aún sin
+calcular, la puerta de pushes del plugin para este push, y `#closing-ok: <motivo>` es su vía de
+escape, que deja el motivo anotado en el recibo del acta. Sólo vale para el fast-forward de `main`,
+que lleva lo que CI ya verificó; cualquier otro push del cierre espera al acta.
 
 `git branch -f` en vez de `git checkout main && git merge --ff-only`: no cambia de rama, no toca el
 árbol de trabajo y no deja a nadie en `main` por descuido.
@@ -286,22 +317,24 @@ contradice sin enterarse.** Barre la tanda buscándolas y escribe cada una donde
 ### Tres comprobaciones que hace la sesión de IT, invocadas donde viven
 
 No se copian: se llaman donde viven, para que no diverjan. **Su carpeta no se escribe aquí**: este
-repositorio es público, y una ruta de la red de la casa en el árbol la publicaría —lo señaló la
-propia sesión de IT al revisar esta sección el 2026-09-19—. Sale de la variable de entorno de
-usuario `AP_SHARED_TOOLS`, que no se versiona; sin ella, o sin la unidad montada, se dice y cuenta
-como «no se pudo medir», nunca como un verde. Salidas al scratchpad, como manda la norma de arriba:
+repositorio es público, y una ruta de la casa en el árbol la publicaría. Sale de la variable
+`AP_SHARED_TOOLS`, que vive en el bloque `env` del ajuste local de Claude Code y no se versiona
+(`ENG-036`); sin ella se dice y cuenta como «no se pudo medir», nunca como un verde.
+
+**Se corren con `cierre-compartidas.ps1`, y no a mano**, porque el guion deja el **efecto**: la
+salida entera, `EXIT=<código>` y la hora, en `closing-outputs/` del directorio común de git. El acta
+lee ese fichero; un comando escrito a mano deja sólo texto, y el texto fue lo que engañó al acta en
+`ENG-037`. A la conversación llegan el código y las líneas que importan:
 
 ```powershell
-$it = $env:AP_SHARED_TOOLS; $s = '<scratchpad>'; $repo = (Get-Location).Path
-$memoria = Join-Path $env:USERPROFILE ('.claude\projects\' + ($repo -replace '[:\\/]', '-') + '\memory')
-pwsh -NoProfile -File "$it\cierre-contexto.ps1" -Repo $repo > "$s\contexto.txt"; $LASTEXITCODE
-pwsh -NoProfile -File "$it\cierre-lenguaje.ps1" -RepoRuta $repo > "$s\lenguaje.txt"; $LASTEXITCODE
-pwsh -NoProfile -File "$it\cierre-memorias.ps1" -Memorias $memoria > "$s\memorias.txt"; $LASTEXITCODE
+pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-compartidas.ps1 -Comprobacion contexto
+pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-compartidas.ps1 -Comprobacion lenguaje
+pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-compartidas.ps1 -Comprobacion memorias
 ```
 
-La carpeta de memoria se calcula igual que la nombra Claude Code —la ruta del repositorio con `:` y
-las barras cambiadas por guiones—, así que tampoco se escribe. La de memorias encuentra sola su
-barrido de credenciales cuando se la llama donde vive.
+La carpeta de memoria la calcula el guion igual que la nombra Claude Code —la ruta del repositorio
+con `:` y las barras cambiadas por guiones—, porque el barrido común sólo sabe leerla de los ajustes
+versionados y en un repositorio público ahí no puede ir una ruta de esta máquina.
 
 - **Contexto** lista tus peticiones que no dejan rastro ni en `docs/TAREAS.md` ni en los commits del
   día: la petición que más se pierde es la última antes de cerrar. **Señala, no decide**: cada una se
@@ -342,6 +375,21 @@ que es trabajo de lo que son decisiones en pie. Es el punto de partida del relev
 mano: el 2026-08-31 una lista hecha a ojo perdió **ocho filas en silencio** porque el patrón pedía
 tres mayúsculas y `UX` tiene dos.
 
+**El relevo se SOBRESCRIBE, no se acumula** (`ENG-035`, 2026-09-19). Llegó a 9.134 líneas y nadie lo
+leía entero; esa historia está congelada en `docs/NEXT-SESSION-HISTORY.{es,en}.md` y no se toca. El
+vivo lleva la fecha en la primera línea, no pasa de 80 líneas ni de 6 KB por idioma y tiene los
+mismos encabezados en los dos. Antes del commit del relevo, las dos comprobaciones:
+
+```powershell
+pwsh -NoProfile -File eng/check-handoff.ps1                                   # tope y paridad
+pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-privacidad.ps1     # los seis puntos de paso
+```
+
+La segunda pasa por el filtro común, en modo público, el mensaje del commit, lo añadido en el diff,
+lo tocado, el relevo, el prompt (`-Prompt <fichero>`) y la nota del cajón (`-Nota <fichero>`). **Un
+hallazgo se corrige antes del commit**; lo que estuvo en claro en un commit ya publicado no lo
+neutraliza redactar.
+
 El relevo (`NEXT-SESSION`) tiene que llevar, además del trabajo hecho:
 
 - **si `main` y la rama coinciden, y si no, por qué** — pero **NO el SHA**. Escribirlo es un bucle:
@@ -373,5 +421,7 @@ adjunto ni como ruta a un documento.** Debe abrir mandando leer el árbol —`gi
 `gh run list --limit 3`— antes que ninguna otra cosa, porque **el árbol manda sobre el relevo**: un
 relevo se escribe una vez y el árbol cambia después.
 
-**Y al final, con el prompt ya en el chat, se retira la marca de cierre del paso 0**: mientras exista,
-el hook deniega el push de código, y la sesión siguiente se encontraría bloqueada sin saber por qué.
+**Y al final, con el prompt ya en el chat, se retira la marca de cierre del paso 0** con
+`closing-marker.ps1 -Action clear`. Mientras exista, las puertas del plugin miran el acta en cada
+commit, cada push y cada final de turno. Si una sesión muere a medias, la marca caduca a las cuatro
+horas y la herramienta común avisa y la retira en vez de dejar el repositorio bloqueado.

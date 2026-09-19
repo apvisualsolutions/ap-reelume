@@ -16,8 +16,10 @@ evidencia, es [FEATURES.md](FEATURES.md).
   internos en modo estricto. El relevo, que había llegado a más de nueve mil líneas, queda congelado
   como historia y el vivo se sobrescribe en cada cierre, con un tope de 80 líneas por idioma y los
   dos idiomas con la misma estructura; lo vigila una prueba. El ajuste local de la herramienta de
-  desarrollo queda excluido por el propio repositorio y no por la configuración de una máquina. No
-  cambia nada del programa (`ENG-034`, `ENG-035`, `ENG-036`).
+  desarrollo queda excluido por el propio repositorio y no por la configuración de una máquina. El
+  cierre de una tanda pasa a vigilarlo el sistema común: su marca se ve desde cualquier copia de
+  trabajo, no deja publicar nada con el acta en rojo, y el acta comprueba lo que de verdad se ejecutó
+  en vez de lo que se escribió. No cambia nada del programa (`ENG-033` a `ENG-037`).
 
 - **La configuración de trabajo del repositorio deja de nombrar servicios internos de quien lo
   desarrolla.** Desde el 2026-09-05 el archivo de configuración de la herramienta de desarrollo, que

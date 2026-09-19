@@ -666,7 +666,8 @@ rechaza aunque esté bien implementada.
   Se deniegan **en el proyecto y no se borran de la máquina**, porque son de quien programa y se usan
   fuera de aquí. A diferencia de la clave de arriba, **ésta sí se midió en el acto**: `claude mcp
   list` enseñaba tres servidores antes y enseña sólo `avalonia-docs` después.
-- **Cinco hooks** que hacen cumplir lo que antes eran frases. Dos **rechazan antes de escribir**:
+- **Cuatro hooks propios** que hacen cumplir lo que antes eran frases —fueron cinco hasta el
+  2026-09-19; el quinto lo sustituyó el sistema común, ver más abajo—. Dos **rechazan antes de escribir**:
   `eng/coverage-debt.txt` y `eng/walk-pending.txt`, y un `.cs` o `.axaml` de `src/` o `tests/`
   **cuyo contenido no lleve la cabecera SPDX**. **Los dos primeros se rechazan por motivos
   distintos, y confundirlos costó una corrección el 2026-08-29**: `coverage-debt.txt` **lo produce
@@ -713,15 +714,17 @@ rechaza aunque esté bien implementada.
   fast-forward a `main`, que no dispara el flujo, y eso es deliberado: distinguirlo pedía adivinar la
   rama de destino, y una guarda que se equivoca **callando** es indistinguible de una que no corrió.
 
-  **El quinto, desde el 2026-09-19, frena el cierre.** `pre-push-closing.sh` corre en `PreToolUse`
-  sobre `Bash|PowerShell` y **sólo actúa si existe la marca de cierre** que `/cierre` crea en su paso 0
-  dentro del directorio de git —no en el árbol, para que ningún `git add -A` se la lleve—. Con ella,
-  deniega el push de la rama si sus commits sin subir tocan algo fuera de `docs/` o de un `.md` de la
-  raíz, y deja pasar el relevo y el fast-forward de `main`. Probado por tubería en un clon desechable
-  con nueve casos: dos deniegan y siete pasan, incluidos la marca retirada y un heredoc que cita un
-  push. La detección de «esto es un push» es la de `post-push.sh`, sacada a
-  `.claude/hooks/lib-git-push.sh` para no tener dos copias; los once casos de ese hook dieron lo mismo
-  caso a caso antes y después, con un control que rompe la función común y cambia la salida.
+  **El quinto frenaba el cierre y se retiró el 2026-09-19**, en el mismo commit que activó el
+  sistema común de la casa y sólo después de ver pasar su batería: diez casos en un clon desechable
+  —dos que deniegan, ocho que dejan pasar— y un mutante que no deniega nunca, que rompe dos. Un
+  guardián por evento: dos sobre el mismo push se estorban, y el día que uno falle nadie sabe cuál
+  mandaba. Lo sustituyen tres piezas. La **puerta de commits y pushes** del plugin común no deja
+  commitear ni subir nada con la marca de cierre puesta y el acta sin estar en 0. La **puerta del
+  final de turno** no deja terminar un turno así. Y la **fila del paso 0 del acta** exige que lo que
+  falta por subir sólo toque documentación, contando ahora también el stage, lo no preparado y los
+  ficheros nuevos sin añadir, que el hook viejo no veía. La marca vive en el **directorio común** de
+  git, y no en el de la copia de trabajo, así que se ve igual desde una copia paralela (`ENG-033`).
+  La detección de «esto es un push» sigue en `.claude/hooks/lib-git-push.sh`, que usa `post-push.sh`.
 
   **Y sonó en su propio commit, que es el defecto que enseñó a escribirlo bien**: buscaba la cadena
   suelta, y el mensaje del commit —escrito con un heredoc— hablaba de «after any git push». Ahora
@@ -758,8 +761,16 @@ rechaza aunque esté bien implementada.
 - **`/cierre`** ejecuta el ciclo de más abajo, con los fallos que ya ha cometido cada paso. Se
   llamaba `/cerrar-tanda` hasta el 2026-09-19. **Su paso 0 es regla del propietario**: si hay un CI
   en marcha se espera a que acabe, y desde ahí no se escribe código ni se sube nada que no sea el
-  relevo; lo pendiente va al prompt. Lo hace cumplir `.claude/hooks/pre-push-closing.sh`, que durante
-  el cierre deniega el push de la rama si lleva algo fuera de `docs/`.
+  relevo; lo pendiente va al prompt. Lo hace cumplir el sistema común: su marca de cierre, las dos
+  puertas del plugin y el acta, que mide las tres comprobaciones de IT por el fichero que dejan y no
+  por el texto del comando (`ENG-037`).
+- **El sistema común de trabajo de la casa**, adoptado el 2026-09-19. `.claude/project-manifest.json`
+  declara cómo se lee el backlog, las nueve fases del cierre con su comando y doce puertas con su
+  caso que suena y su caso que calla, que `.claude/skills/cierre/scripts/gate-probe.ps1` provoca
+  contra árboles de mentira. `.claude/ap-smart-tech-install.json` fija la versión instalada y la
+  huella del manifiesto: si alguien lo toca sin volver a adoptar, la comprobación de deriva lo
+  denuncia. Las herramientas comunes se llaman por la variable `AP_SHARED_TOOLS`, que vive en el
+  ajuste local y no se versiona, porque el repositorio es público.
 - **`/medir-pixeles`** trae el arnés de rasterización con sus cinco trampas medidas.
 - **`gate-auditor`** busca puertas que pasan sin medir nada; **`prototype-fidelity`** compara la
   aplicación con `design/`.

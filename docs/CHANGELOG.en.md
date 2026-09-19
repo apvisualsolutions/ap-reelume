@@ -16,8 +16,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   mode. The handover, which had grown past nine thousand lines, is frozen as history and the live one
   is overwritten at every close, capped at 80 lines per language with both languages carrying the
   same structure; a test watches it. The development tool's local settings are now excluded by the
-  repository itself rather than by one machine's configuration. Nothing in the program changes
-  (`ENG-034`, `ENG-035`, `ENG-036`).
+  repository itself rather than by one machine's configuration. Closing a batch of work is now
+  watched by the common system: its marker is visible from any working copy, nothing can be
+  published while the record is red, and the record checks what actually ran rather than what was
+  written. Nothing in the program changes (`ENG-033` to `ENG-037`).
 
 - **The repository's working configuration no longer names its developer's internal services.** Since
   2026-09-05 the development tool's settings file, which ships with the public code, named a private
