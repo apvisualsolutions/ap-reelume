@@ -7,10 +7,10 @@
 
 ## Estado
 
-El repositorio adopta el sistema común de trabajo de la casa. Con el sí del propietario, la rama de
-adopción está **fusionada en local** en `codex/ap-reelume-mvp-x64` por fast-forward, **sin push**:
-la rama de trabajo va por delante de su remoto (`git status -sb`) y ese trabajo **no tiene CI
-todavía**. `main` no se tocó. Lo primero de la sesión siguiente es empujar la rama y vigilar su CI.
+El repositorio adopta el sistema común de trabajo de la casa. Con el sí del propietario, la
+adopción se fusionó en `codex/ap-reelume-mvp-x64`, se subió, su CI salió en verde y `main` avanzó
+por fast-forward a ese commit. Este relevo puede ir un commit por delante, por ser sólo
+documentación.
 
 ## Lo que se hizo
 
@@ -33,7 +33,6 @@ todavía**. `main` no se tocó. Lo primero de la sesión siguiente es empujar la
 
 ## Lo que espera al propietario
 
-· Su sí para empujar la rama de trabajo, que lanza el CI de la adopción.
 · Siete hallazgos del sistema común, para la sesión de IT; están en la evidencia.
 
 ## Lo pendiente no está aquí

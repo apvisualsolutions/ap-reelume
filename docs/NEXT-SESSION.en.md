@@ -7,10 +7,9 @@
 
 ## State
 
-The repository adopts the house's common working system. With the owner's yes, the adoption branch
-is **merged locally** into `codex/ap-reelume-mvp-x64` by fast-forward, **not pushed**: the working
-branch is ahead of its remote (`git status -sb`) and that work **has no CI yet**. `main` was not
-touched. The first thing for the next session is to push the branch and watch its CI.
+The repository adopts the house's common working system. With the owner's yes, the adoption was
+merged into `codex/ap-reelume-mvp-x64`, pushed, its CI came out green and `main` moved forward to
+that commit by fast-forward. This handover may be one commit ahead, being documentation only.
 
 ## What was done
 
@@ -33,7 +32,6 @@ touched. The first thing for the next session is to push the branch and watch it
 
 ## What waits for the owner
 
-· Their yes to push the working branch, which starts the adoption's CI.
 · Seven findings about the common system, for the IT session; they are in the evidence.
 
 ## What is still open does not live here
