@@ -317,8 +317,9 @@ barrido de credenciales cuando se la llama donde vive.
 
 ### Un punto de control en el segundo cerebro
 
-Este proyecto tiene cajón propio en el segundo cerebro (el servidor MCP `second-brain-ap-reelume`),
-y las reglas de la casa piden dejar en él un punto de control al cerrar: qué se hizo, qué quedó a
+Este proyecto tiene cajón propio en el segundo cerebro (un servidor MCP de la configuración local,
+cuyo nombre no se escribe aquí porque el repositorio es público: es el que la sesión lista con el
+nombre del proyecto), y las reglas de la casa piden dejar en él un punto de control al cerrar: qué se hizo, qué quedó a
 medias y dónde, y qué trampa se aprendió, en cinco o diez líneas con los identificadores. Se escribe
 con su `write_note` en el cajón **del proyecto**; el cajón común no se toca desde aquí —sólo lo
 escribe la sesión de IT, y con el sí del propietario—. Lo recomendó la sesión de IT el 2026-09-19 al

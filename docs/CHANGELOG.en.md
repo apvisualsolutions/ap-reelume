@@ -10,6 +10,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The repository's working configuration no longer names its developer's internal services.** Since
+  2026-09-05 the development tool's settings file, which ships with the public code, named a private
+  notes server and six permissions on it. The enablement did nothing, because it only acts on servers
+  the repository itself declares, and the denials move to the machine's personal settings, where they
+  protect just the same. Nothing in the program changes. The published history is not rewritten
+  (`ENG-032`).
+
 - **The video engine no longer carries GPL code, and that removes what stopped the program from being
   released.** Until now the application used VideoLAN's package, with fourteen GPL plugins inside a
   program under a licence of its own. It now carries LibVLC built by AP Solutions from the same VLC

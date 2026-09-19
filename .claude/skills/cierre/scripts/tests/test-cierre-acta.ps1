@@ -76,7 +76,7 @@ try {
     Caso 'codigo tocado sin prever suelos'          1 'preview-coverage-floors' (Transcript ($todas -notmatch 'preview-coverage')) (Repo ($relevo + 'src/A.cs'))
     Caso 'sin codigo, prever suelos no hace falta'  0 'completa'                (Transcript ($todas -notmatch 'preview-coverage')) (Repo $relevo)
     Caso 'citado en un grep no es ejecutado'        1 'watch-ci'                (Transcript (($todas -notmatch 'watch-ci') + 'grep -n watch-ci.ps1 SKILL.md')) (Repo $relevo)
-    Caso 'leido con Get-Content no es ejecutado'    1 'cierre-memorias'         (Transcript (($todas -notmatch 'cierre-memorias') + 'Get-Content S:\x\cierre-memorias.ps1')) (Repo $relevo)
+    Caso 'leido con Get-Content no es ejecutado'    1 'cierre-memorias'         (Transcript (($todas -notmatch 'cierre-memorias') + 'Get-Content Z:\x\cierre-memorias.ps1')) (Repo $relevo)
     Caso 'tras un comentario no es ejecutado'       1 'verify-docs'             (Transcript (($todas -notmatch 'verify-docs') + 'git status # luego eng/verify-docs.ps1')) (Repo $relevo)
     Caso 'una orden que fallo no cuenta'            1 'suite entera'            (Transcript $todas @('dotnet test tests/X -c Release')) (Repo $relevo)
     Caso 'dotnet test con --filter no es la suite'  1 'suite entera'            (Transcript (($todas -notmatch '^dotnet test') + 'dotnet test tests/X --filter Y')) (Repo $relevo)

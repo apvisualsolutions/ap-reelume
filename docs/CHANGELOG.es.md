@@ -10,6 +10,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La configuración de trabajo del repositorio deja de nombrar servicios internos de quien lo
+  desarrolla.** Desde el 2026-09-05 el archivo de configuración de la herramienta de desarrollo, que
+  viaja con el código público, nombraba un servidor de notas privado y seis permisos sobre él. La
+  habilitación no hacía nada, porque solo actúa sobre servidores que el propio repositorio declara, y
+  las denegaciones pasan a la configuración personal de la máquina, donde protegen igual. No cambia
+  nada del programa. El historial publicado no se reescribe (`ENG-032`).
+
 - **El motor de vídeo ya no lleva código GPL, y eso quita lo que impedía publicar el programa.** Hasta
   ahora la aplicación usaba el paquete de VideoLAN, con catorce complementos GPL dentro de un programa
   de licencia propia. Ahora lleva LibVLC compilado por AP Solutions desde la misma versión de VLC, sin
