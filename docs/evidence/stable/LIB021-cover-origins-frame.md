@@ -63,6 +63,14 @@ desde el 2026-09-18 y sin conectar; hoy se conectaron.
 La escena de la ventana existe porque la primera no distingue las dos entradas: su escaneo de
 arranque también pide la pasada.
 
+### El rojo de CI que costó, y por qué la previsualización calló
+
+El run `35471110732` pasó las diez suites y cayó en la puerta de cobertura: `TitleFramePass.cs` medía
+**100/50** y el listón de un archivo nuevo es 96/96. La mitad que faltaba es la guarda del
+constructor, que el paseo no puede tomar porque allí siempre se le pasa la pasada; se cubrió con
+`TitleFramePassTests`. **La previsualización local no lo avisó**, y es `ENG-016`: busca archivos
+nuevos con `git diff --diff-filter=A`, que sólo nombra los que ya están en un commit.
+
 ### El coste medido
 
 Una tanda (25 archivos, uno tras otro) sobre la muestra `mp4-h264-aac`, dos veces: **7,9 s y 7,7 s**,
@@ -126,6 +134,14 @@ taken on its own, once, and kept in `cache/title-frames`. The pieces had been bu
 
 The window scene exists because the first one cannot tell the two entry points apart: its startup
 scan asks for the pass too.
+
+### The CI red it cost, and why the preview stayed silent
+
+Run `35471110732` passed all ten suites and fell at the coverage gate: `TitleFramePass.cs` measured
+**100/50** and the bar for a new file is 96/96. The missing half is the constructor guard, which the
+walk cannot take because there the pass is always handed to it; it was covered with
+`TitleFramePassTests`. **The local preview did not warn**, and that is `ENG-016`: it looks for new
+files with `git diff --diff-filter=A`, which only names those already in a commit.
 
 ### The measured cost
 
