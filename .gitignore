@@ -49,3 +49,7 @@ coverage.*.xml
 
 # Local security reports and gstack state
 .gstack/
+
+# Claude Code's per-machine settings: local paths and personal permissions. This repository is
+# public, and until 2026-09-19 only the global ignore file of one machine kept this out (ENG-034).
+.claude/settings.local.json

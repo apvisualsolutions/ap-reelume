@@ -93,9 +93,11 @@ sobre dos píxeles de desalineación visible por medir el modelo en vez de la ti
    lo hecho y lo abierto mezclados y nadie contándolo**. `UX-010` vivió ahí, se construyó entera, y la
    viñeta seguía escrita como pendiente. Lo que es alcance sigue en la matriz y **aquí sólo se nombra**,
    o vuelve el mismo problema con otro nombre.
-3. [docs/NEXT-SESSION.es.md](docs/NEXT-SESSION.es.md) — dónde se retomó por última vez. **Cuenta qué
-   pasó, no qué queda**: sus bloques de «decisiones tomadas y NO ejecutadas» son historia desde el
-   2026-09-13.
+3. [docs/NEXT-SESSION.es.md](docs/NEXT-SESSION.es.md) — dónde se retomó por última vez. **Se
+   sobrescribe en cada cierre** y no pasa de 80 líneas ni de 6 KB por idioma, con la fecha en la
+   primera línea y los mismos encabezados en los dos: lo mide `eng/check-handoff.ps1` y lo prueba
+   `HandoffLimitsTests`. Hasta el 2026-09-19 se acumulaba, llegó a 9.134 líneas y nadie lo leía
+   entero; esa historia está congelada en `docs/NEXT-SESSION-HISTORY.{es,en}.md`.
 4. [CONTRIBUTING.md](CONTRIBUTING.md) — el ciclo de trabajo, que no es opcional.
 5. [docs/legal/LEGAL.es.md](docs/legal/LEGAL.es.md) — lo que está resuelto y lo que sigue abierto.
 

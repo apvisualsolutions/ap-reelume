@@ -10,6 +10,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The repository adopts AP Smart Tech's common working system, and the handover between sessions
+  fits a single read again.** A manifest declares how the task register is read, what each phase of
+  the close checks, and that the repository is public, which puts the internal-data filter in strict
+  mode. The handover, which had grown past nine thousand lines, is frozen as history and the live one
+  is overwritten at every close, capped at 80 lines per language with both languages carrying the
+  same structure; a test watches it. The development tool's local settings are now excluded by the
+  repository itself rather than by one machine's configuration. Nothing in the program changes
+  (`ENG-034`, `ENG-035`, `ENG-036`).
+
 - **The repository's working configuration no longer names its developer's internal services.** Since
   2026-09-05 the development tool's settings file, which ships with the public code, named a private
   notes server and six permissions on it. The enablement did nothing, because it only acts on servers

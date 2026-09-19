@@ -23,9 +23,27 @@
 #     descarta el que llega con is_error o con «Exit code N» distinto de cero;
 #   - `dotnet test` con --filter no cuenta como suite corrida: una prueba sola no es la puerta.
 #
+# LAS TRES COMPROBACIONES DE IT SE MIDEN POR EFECTO, NO POR TEXTO (ENG-037). El 2026-09-19 el acta
+# marco `ok` las tres cuando iban dentro de la rama de un `if` que no se tomo: veia el comando y no
+# podia saber que rama corrio. Ahora cada una la corre cierre-compartidas.ps1, que deja en el
+# directorio comun de git su salida con la linea EXIT=<codigo> y la hora, y el acta lee ESE fichero:
+# tiene que existir, ser posterior a la marca del cierre y no haber salido 2.
+#
+# LA REGLA DEL PASO 0 LA LLEVA EL ACTA DESDE LA ADOPCION DEL SISTEMA COMUN. Antes la hacia cumplir
+# el hook pre-push-closing.sh, que se retiro en el mismo commit que activo el comun: desde la marca,
+# lo que no ha subido solo puede tocar docs/ o un .md de la raiz. Aquello miraba los commits sin
+# subir; esto mira ademas el stage, lo que no esta preparado y los ficheros nuevos sin anadir, que
+# eran el agujero que el hook dejaba. La puerta de commits y pushes del plugin comun no deja
+# commitear ni subir nada mientras el acta no este en 0.
+#
+# EL RECIBO. Al terminar escribe closing-acta-receipt.json en el directorio comun de git, con su
+# codigo y la fase que falta: es lo unico que leen la puerta de commits y la del final de turno del
+# plugin. El contador de bloqueos y los escapes que ya llevara se conservan.
+#
 # CONTRATO DE SALIDA, el de la casa: 0 todo con evidencia, 1 falta algo (se nombra), 2 NO SE PUDO
-# MEDIR -- sin transcript, sin libreria o con git sin contestar --, que nunca es un verde. Git se
-# comprueba llamada a llamada: un diff que falla no puede dejar la lista corta y eximir una fila.
+# MEDIR -- sin transcript, sin libreria, sin marca de cierre o con git sin contestar --, que nunca es
+# un verde. Git se comprueba llamada a llamada: un diff que falla no puede dejar la lista corta y
+# eximir una fila.
 #
 # SE CORRE ANTES DEL COMMIT DEL RELEVO, porque mira el stage.
 [CmdletBinding()]
@@ -37,13 +55,42 @@ param(
     # Carpeta de las herramientas compartidas del cierre. Por defecto, la variable de usuario.
     [string]$HerramientasCompartidas = $env:AP_SHARED_TOOLS,
     # Rama de referencia: lo que la tanda cambio es lo que hay entre ella y HEAD, mas el stage.
-    [string]$Base = 'main'
+    [string]$Base = 'main',
+    # Lo ya subido: lo que hay entre esto y HEAD es lo que el cierre aun va a subir.
+    [string]$Subido = '@{u}',
+    # Donde dejan su efecto las comprobaciones compartidas. Por defecto, el directorio comun de git.
+    [string]$Salidas,
+    # Desde cuando vale un efecto. Por defecto, la hora de la marca del cierre.
+    [string]$Desde,
+    # Donde escribir el recibo. Por defecto, el directorio comun de git.
+    [string]$Recibo
 )
 
 $ErrorActionPreference = 'Stop'
 
+$comun = & git -C $Repo rev-parse --path-format=absolute --git-common-dir 2>$null
+if ($LASTEXITCODE -ne 0 -or -not $comun) { $comun = $null }
+if (-not $Recibo -and $comun) { $Recibo = Join-Path $comun 'closing-acta-receipt.json' }
+
+function Escribir-Recibo([int]$codigo, [string]$fase) {
+    if (-not $Recibo) { return }
+    $previo = $null
+    if (Test-Path -LiteralPath $Recibo) {
+        try { $previo = Get-Content -LiteralPath $Recibo -Raw -Encoding utf8 | ConvertFrom-Json } catch { $previo = $null }
+    }
+    $contenido = [ordered]@{
+        exitCode = $codigo
+        phase    = $fase
+        blocks   = if ($previo -and $null -ne $previo.blocks) { [int]$previo.blocks } else { 0 }
+        escapes  = if ($previo -and $previo.escapes) { @($previo.escapes) } else { @() }
+        at       = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+    }
+    [IO.File]::WriteAllText($Recibo, ($contenido | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))
+}
+
 function Salir-SinMedir([string]$motivo) {
     Write-Output "ACTA: NO SE PUDO MEDIR -- $motivo"
+    Escribir-Recibo 2 "no se pudo medir: $motivo"
     exit 2
 }
 
@@ -53,7 +100,7 @@ if (-not $Transcript) {
     if (-not $HerramientasCompartidas) {
         Salir-SinMedir 'herramientas compartidas no configuradas (variable de usuario AP_SHARED_TOOLS); pasa -Transcript'
     }
-    $libreria = Join-Path $HerramientasCompartidas 'cierre-transcript.ps1'
+    $libreria = Join-Path $HerramientasCompartidas 'closing-transcript.ps1'
     if (-not (Test-Path -LiteralPath $libreria)) {
         Salir-SinMedir 'no se encuentra la libreria de transcript en las herramientas compartidas (unidad sin montar o carpeta movida)'
     }
@@ -128,17 +175,54 @@ $tocados = @(Leer-Git @('diff', '--name-only', "$Base...HEAD")) + @(Leer-Git @('
 $tocoCodigo = [bool]($tocados | Where-Object { $_ -match '^(src|tests)/' })
 function Tocado([string]$ruta) { $tocados -contains $ruta }
 
+# --- Lo que el cierre aun va a subir: solo documentacion ------------------------------------
+# Los commits sin subir, el stage, lo no preparado y los ficheros nuevos sin anadir.
+$sinSubir = @(Leer-Git @('log', '--name-only', '--format=', "$Subido..HEAD")) +
+    @(Leer-Git @('status', '--porcelain', '--untracked-files=all') | ForEach-Object { ($_.Substring(3) -split ' -> ')[-1].Trim('"') }) |
+    Where-Object { $_ } | Sort-Object -Unique
+$fueraDeDocs = @($sinSubir | Where-Object { $_ -notmatch '^docs/' -and $_ -notmatch '^[^/]+\.md$' })
+
+# --- El efecto de las tres comprobaciones compartidas ---------------------------------------
+if (-not $Salidas) {
+    if (-not $comun) { Salir-SinMedir 'no se pudo leer el directorio comun de git' }
+    $Salidas = Join-Path $comun 'closing-outputs'
+}
+if (-not $Desde) {
+    $marca = if ($comun) { Join-Path $comun 'closing-marker.json' } else { $null }
+    if (-not $marca -or -not (Test-Path -LiteralPath $marca)) {
+        Salir-SinMedir 'no hay marca de cierre en el directorio comun de git: sin ella no se sabe desde cuando vale un efecto'
+    }
+    $Desde = (Get-Item -LiteralPath $marca).LastWriteTimeUtc.ToString('yyyy-MM-ddTHH:mm:ssZ')
+}
+$desdeInstante = [datetime]::Parse($Desde, [Globalization.CultureInfo]::InvariantCulture, [Globalization.DateTimeStyles]::AdjustToUniversal -bor [Globalization.DateTimeStyles]::AssumeUniversal)
+
+# Ok solo si el fichero existe, lleva EXIT=0 o EXIT=1 (1 es «senala»: la comprobacion corrio) y su
+# hora es posterior a la marca. Un EXIT=2 es «no se pudo medir», que nunca cuenta como hecho.
+function Efecto([string]$nombre) {
+    $ruta = Join-Path $Salidas "closing-$nombre.txt"
+    if (-not (Test-Path -LiteralPath $ruta)) { return $false }
+    $lineas = Get-Content -LiteralPath $ruta -Encoding utf8
+    $salida = ($lineas | Where-Object { $_ -match '^EXIT=\d+$' } | Select-Object -Last 1)
+    $hora = ($lineas | Where-Object { $_ -match '^AT=' } | Select-Object -Last 1)
+    if (-not $salida -or -not $hora) { return $false }
+    if ([int]($salida -replace 'EXIT=', '') -notin 0, 1) { return $false }
+    $instante = [datetime]::Parse(($hora -replace 'AT=', ''), [Globalization.CultureInfo]::InvariantCulture, [Globalization.DateTimeStyles]::AdjustToUniversal -bor [Globalization.DateTimeStyles]::AssumeUniversal)
+    $instante -ge $desdeInstante
+}
+
 # --- Los pasos de /cierre, cada uno con su evidencia ----------------------------------------
 $filas = @(
     [pscustomobject]@{ Fase = '0'; Que = 'CI vigilado con eng/watch-ci.ps1'; Ok = (Invocado 'watch-ci.ps1') }
+    [pscustomobject]@{ Fase = '0'; Que = "lo que falta por subir solo toca docs/ (fuera: $(($fueraDeDocs | Select-Object -First 5) -join ', '))"; Ok = ($fueraDeDocs.Count -eq 0) }
     [pscustomobject]@{ Fase = '1'; Que = 'formato verificado (dotnet format --verify-no-changes)'; Ok = (Dotnet 'format\b.*--verify-no-changes') }
     [pscustomobject]@{ Fase = '1'; Que = 'compilacion estricta (dotnet build -warnaserror)'; Ok = (Dotnet 'build\b.*-warnaserror') }
     [pscustomobject]@{ Fase = '1'; Que = 'una suite entera corrida (dotnet test sin --filter)'; Ok = (Dotnet 'test\b' '--filter') }
     [pscustomobject]@{ Fase = '1'; Que = 'documentacion verificada (eng/verify-docs.ps1)'; Ok = (Invocado 'verify-docs.ps1') }
     [pscustomobject]@{ Fase = '1'; Que = 'suelos previstos (eng/preview-coverage-floors.ps1), si la tanda toco codigo'; Ok = ((-not $tocoCodigo) -or (Invocado 'preview-coverage-floors.ps1')) }
-    [pscustomobject]@{ Fase = '8'; Que = 'peticiones sin rastro buscadas (cierre-contexto.ps1, compartida)'; Ok = (Invocado 'cierre-contexto.ps1') }
-    [pscustomobject]@{ Fase = '8'; Que = 'nombres del sector revisados (cierre-lenguaje.ps1, compartida)'; Ok = (Invocado 'cierre-lenguaje.ps1') }
-    [pscustomobject]@{ Fase = '8'; Que = 'memoria revisada (cierre-memorias.ps1, compartida)'; Ok = (Invocado 'cierre-memorias.ps1') }
+    [pscustomobject]@{ Fase = '8'; Que = 'peticiones sin rastro buscadas (efecto de closing-context.ps1, compartida)'; Ok = (Efecto 'contexto') }
+    [pscustomobject]@{ Fase = '8'; Que = 'nombres del sector revisados (efecto de closing-language.ps1, compartida)'; Ok = (Efecto 'lenguaje') }
+    [pscustomobject]@{ Fase = '8'; Que = 'memoria revisada (efecto de closing-memories.ps1, compartida)'; Ok = (Efecto 'memorias') }
+    [pscustomobject]@{ Fase = '10'; Que = 'relevo dentro de su tope y con los dos idiomas a la par (eng/check-handoff.ps1)'; Ok = (Invocado 'check-handoff.ps1') }
     [pscustomobject]@{ Fase = '10'; Que = 'relevo escrito en los dos idiomas (docs/NEXT-SESSION.{es,en}.md)'; Ok = ((Tocado 'docs/NEXT-SESSION.es.md') -and (Tocado 'docs/NEXT-SESSION.en.md')) }
     [pscustomobject]@{ Fase = '10'; Que = 'pendientes en su registro (eng/list-pending.ps1)'; Ok = (Invocado 'list-pending.ps1') }
 )
@@ -151,7 +235,9 @@ foreach ($fila in $filas) {
 $faltan = @($filas | Where-Object { -not $_.Ok })
 if ($faltan.Count -gt 0) {
     Write-Output "ACTA: FALTAN $($faltan.Count) paso(s) -- no se hace el commit del relevo hasta completarlos."
+    Escribir-Recibo 1 ("paso {0}: {1}" -f $faltan[0].Fase, $faltan[0].Que)
     exit 1
 }
 Write-Output 'ACTA: completa.'
+Escribir-Recibo 0 'completa'
 exit 0

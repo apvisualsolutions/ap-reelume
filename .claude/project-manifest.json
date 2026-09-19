@@ -1,0 +1,89 @@
+{
+  "manifestVersion": 2,
+  "project": {
+    "id": "ap-reelume",
+    "public": true,
+    "remote": "github",
+    "timezone": "Atlantic/Canary"
+  },
+  "backlog": {
+    "files": ["docs/TAREAS.md", "docs/FEATURES.md"],
+    "entryPoint": "docs/TAREAS.md",
+    "idPattern": "\\b[A-Z]{2,3}-\\d{3}\\b",
+    "idSamples": ["ENG-033", "UX-007", "PLY-016", "LIB-021", "PRD-002"],
+    "idNonSamples": ["ADR-0012", "T-430", "E-1"],
+    "statusPattern": "\\|\\s*`?(ABIERTA|ADELANTADA|EN CURSO|PARADA|DEL PROPIETARIO|POR COMPROBAR|DESIGN_APPROVED|PLANNED|IN_PROGRESS|BLOCKED|IMPLEMENTED|VERIFIED|DEFERRED|OUT_OF_SCOPE)`?\\s*\\|",
+    "listOpen": "pwsh -NoProfile -File eng/list-pending.ps1 -Json",
+    "doneStatus": ["VERIFIED", "OUT_OF_SCOPE"],
+    "evidenceField": "Evidencia / Evidence"
+  },
+  "closing": {
+    "enabled": true,
+    "marker": { "path": "closing-marker.json", "expiresHours": 4 },
+    "actaTimeoutSeconds": 30,
+    "waitingFile": "closing-waiting.json",
+    "handoff": {
+      "paths": ["docs/NEXT-SESSION.es.md", "docs/NEXT-SESSION.en.md"],
+      "languages": ["es", "en"],
+      "maxLines": 80,
+      "maxBytes": 6144,
+      "blocks": 1
+    },
+    "phases": [
+      { "id": "stop", "command": "pwsh -NoProfile -File eng/watch-ci.ps1 -Sha HEAD", "waitFor": "pwsh -NoProfile -File eng/watch-ci.ps1 -Sha HEAD", "timeoutSeconds": 5400 },
+      { "id": "verify", "command": "pwsh -NoProfile -File eng/verify-docs.ps1", "receipt": "ci-head", "timeoutSeconds": 5400, "onFindings": "halt" },
+      { "id": "privacy", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-privacidad.ps1", "timeoutSeconds": 600, "onFindings": "halt" },
+      { "id": "record", "command": "pwsh -NoProfile -File eng/list-pending.ps1", "timeoutSeconds": 1800, "onFindings": "record" },
+      { "id": "decide", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-compartidas.ps1 -Comprobacion contexto", "timeoutSeconds": 600, "onFindings": "record" },
+      { "id": "learn", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-compartidas.ps1 -Comprobacion lenguaje", "timeoutSeconds": 600, "onFindings": "record" },
+      { "id": "hygiene", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/cierre-compartidas.ps1 -Comprobacion memorias", "timeoutSeconds": 600, "onFindings": "record" },
+      { "id": "publish", "command": "git push origin HEAD", "timeoutSeconds": 7200, "ci": { "branches": "codex/**", "watch": "eng/watch-ci.ps1", "promote": "fast-forward-after-green" } },
+      { "id": "handoff", "command": "pwsh -NoProfile -File eng/check-handoff.ps1", "timeoutSeconds": 600, "onFindings": "halt" }
+    ]
+  },
+  "privacy": {
+    "personalData": false,
+    "filter": "pwsh -NoProfile -File ${env:AP_SHARED_TOOLS}/leak-scan.ps1 -Public",
+    "credentialsFilter": "pwsh -NoProfile -File ${env:AP_SHARED_TOOLS}/cred-scan.ps1"
+  },
+  "receipts": [
+    { "id": "ci-head", "kind": "ci", "command": "pwsh -NoProfile -File eng/watch-ci.ps1 -Sha HEAD", "path": "ci-head-receipt.json", "maxAgeHours": 24 }
+  ],
+  "freezeWindows": [],
+  "hooks": {
+    "interpreters": ["bash", "pwsh"],
+    "tests": "pwsh -NoProfile -File .claude/skills/cierre/scripts/tests/test-cierre-acta.ps1",
+    "ownedBy": [
+      { "event": "PreToolUse", "matcher": "Edit|Write|MultiEdit", "owner": "project", "purpose": "rechaza escribir a mano los dos ficheros que produce CI o que solo pueden encoger" },
+      { "event": "PreToolUse", "matcher": "Write", "owner": "project", "purpose": "rechaza un fuente de src o tests sin su cabecera SPDX" },
+      { "event": "PostToolUse", "matcher": "Edit|Write|MultiEdit", "owner": "project", "purpose": "avisa de licencia y de un documento sin su pareja en el otro idioma" },
+      { "event": "PostToolUse", "matcher": "Bash|PowerShell", "owner": "project", "purpose": "tras un push, pide armar el vigía de CI con el SHA entero" },
+      { "event": "PreToolUse", "matcher": "Bash|PowerShell", "owner": "plugin", "purpose": "puerta de commit y push del cierre, que sustituye al guardián de push propio" },
+      { "event": "Stop", "matcher": "", "owner": "plugin", "purpose": "no terminar un turno con el cierre abierto y el acta en rojo" },
+      { "event": "PreCompact", "matcher": "", "owner": "plugin", "purpose": "guardar el punto de control antes de compactar" },
+      { "event": "SessionStart", "matcher": "compact", "owner": "plugin", "purpose": "recuperar el punto de control tras compactar" }
+    ]
+  },
+  "memory": {
+    "brainServer": "${env:AP_BRAIN_SERVER}",
+    "probe": {
+      "query": "registro de tareas la más vieja arriba",
+      "expectedPermalink": "ap-reelume/state/ap-reelume-registro-de-tareas"
+    }
+  },
+  "x-review": "local-diff",
+  "x-gates": [
+    { "name": "push-cierre suena", "expect": "sound", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate push-cierre -Case sound" },
+    { "name": "push-cierre calla", "expect": "silent", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate push-cierre -Case silent" },
+    { "name": "fin-de-turno suena", "expect": "sound", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate fin-de-turno -Case sound" },
+    { "name": "fin-de-turno calla", "expect": "silent", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate fin-de-turno -Case silent" },
+    { "name": "acta suena", "expect": "sound", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate acta -Case sound" },
+    { "name": "acta calla", "expect": "silent", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate acta -Case silent" },
+    { "name": "relevo suena", "expect": "sound", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate relevo -Case sound" },
+    { "name": "relevo calla", "expect": "silent", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate relevo -Case silent" },
+    { "name": "privacidad suena", "expect": "sound", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate privacidad -Case sound" },
+    { "name": "privacidad calla", "expect": "silent", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate privacidad -Case silent" },
+    { "name": "ignorado suena", "expect": "sound", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate ignorado -Case sound" },
+    { "name": "ignorado calla", "expect": "silent", "command": "pwsh -NoProfile -File .claude/skills/cierre/scripts/gate-probe.ps1 -Gate ignorado -Case silent" }
+  ]
+}

@@ -108,7 +108,7 @@ Nueve cosas señaladas mirando la aplicación, no el prototipo. Seis cerradas en
 herramientas del título que aparecían sin tener nada que hacer, el botón del tráiler externo, el
 contorno punteado con el radio equivocado, los rótulos de la tarjeta de revisión en dos estilos, la
 columna de «Otras acciones» con dos gramáticas y el convertidor de forma que se retiró—. Las tres que
-quedan están descritas en [la nota de la próxima sesión](../../NEXT-SESSION.es.md): el reproductor
+quedan están descritas en [la nota de la próxima sesión](../../NEXT-SESSION-HISTORY.es.md): el reproductor
 como copia exacta, Apariencia con las opciones del prototipo y el selector de color de subtítulos.
 / Nine things the owner named while looking at the application; six closed the same day, three
 described in the next-session note.
