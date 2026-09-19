@@ -4,17 +4,18 @@
 using ApSolutions.LocalMedia.Windows.Metadata;
 using Xunit;
 
-namespace ApSolutions.LocalMedia.PackagingTests.Metadata;
+namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 
 /// <summary>
 /// The refusal of the frame pass's launcher (LIB-021), which is the one arm the assembled walk
 /// cannot take: there the composition root always hands it the pass it wraps.
 /// </summary>
 /// <remarks>
-/// Measured on 2026-09-19: with the walk alone the file read 100/50 in CI and the gate for new files
-/// refused it, because half of the branches is this guard. What it protects is worth the line — a
-/// launcher built with nothing would answer every request by doing nothing at all, and the grid
-/// would simply never draw a frame, with no failure anywhere to say why.
+/// <b>It lives in this suite and not in a tidier one, and that is the lesson.</b> Written first in
+/// <c>PackagingTests</c>, it covered the refusal there while the walk covered the other arm here, and
+/// the file still measured 100/50 in CI: the coverage gate <b>adds</b> branches across suites rather
+/// than taking «covered anywhere» — 1 of 2 plus 1 of 2 is 2 of 4. Both arms have to be taken inside
+/// one suite, so the refusal belongs beside the walk that takes the other one.
 /// </remarks>
 public sealed class TitleFramePassTests
 {
