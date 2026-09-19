@@ -1,4 +1,4 @@
-# Dónde retomar — 2026-09-19
+# Dónde retomar — 2026-09-20
 
 > Se **sobrescribe** en cada cierre y no pasa de 80 líneas ni de 6 KB por idioma; lo mide
 > `eng/check-handoff.ps1`. La historia hasta el 2026-09-19 está congelada en
@@ -12,32 +12,35 @@ relevo va un commit por delante, por ser sólo documentación, y su CI no se esp
 
 ## Lo que se hizo
 
-· **El repositorio adoptó el sistema común de trabajo de la casa** (piloto de la sesión de IT). El
-  manifiesto está en `.claude/project-manifest.json`, con doce puertas probadas en sus dos casos.
-· Cerradas `ENG-033` a `ENG-037`: la marca del cierre, en el directorio común de git; el ajuste local
-  lo ignora `.gitignore`; el relevo se sobrescribe con tope; la variable de las herramientas
-  compartidas vive en el ajuste local; y el acta mide por efecto.
-· Se retiró el hook propio `pre-push-closing.sh`. Lo sustituyen las dos puertas del plugin y la fila
-  del paso 0 del acta. **Este cierre es el primero con el sistema común.**
-· Evidencia: `docs/evidence/stable/audit-adopt-common-system.md`.
+· **El auditor de puertas sobre lo que trajo la adopción**, y trece comprobaciones pasaban sin
+  detectar el defecto que debían detectar. Cada una tiene ahora su mutante, visto sobrevivir antes y
+  morir después. Cerrada `ENG-038`: el recibo del acta guardaba mal la lista de saltos.
+· **El fotograma del propio vídeo ya llega a la cuadrícula** (`LIB-021`, plan 2 de 3): la pasada
+  corre al abrir la ventana y tras cada escaneo, y la tarjeta cambia su imagen en vez de rehacerse
+  la cuadrícula, que es lo que la hacía peligrosa para el paseo.
+· `CatalogItemViewModel` sale de la deuda de cobertura al 100/100 y el trinquete baja a **185**.
+· Evidencias: `audit-adoption-gates.md` y `LIB021-cover-origins-frame.md`.
 
 ## Las trampas medidas
 
-· Congelar un documento con `git mv` y escribir otro en su sitio no es un renombre para git: el
-  filtro de privacidad veía 16.000 líneas nuevas. Con `--find-copies-harder`, catorce.
-· El filtro común toma las dos barras invertidas de una expresión regular por una ruta de red: el
-  manifiesto suena en cada cierre que lo toque. Escribirlas en prosa también lo hace sonar.
+· **La puerta de cobertura SUMA las ramas de cada suite**, no toma «cubierta en cualquier sitio»:
+  media rama aquí y media allá son dos de cuatro. Costó un rojo de CI.
+· **La previsualización de suelos calla sobre un archivo nuevo sin commitear** (`ENG-016`), así que
+  no avisó de que el archivo nuevo medía 100/50. Costó el otro rojo.
+· En PowerShell, un `if` usado como valor desenrolla su salida: una lista vacía sale `null` y una de
+  uno sale suelta. Era el defecto de `ENG-038`, y el mismo patrón está en el plugin común.
 
 ## Lo primero de la sesión siguiente
 
-· **El auditor de puertas** sobre las pruebas nuevas de la adopción: `HandoffLimitsTests`, la
-  batería del acta y `gate-probe.ps1`. No se lanzó antes de cerrar.
-· Luego `docs/TAREAS.md`, la primera abierta que no esté parada.
+· `docs/TAREAS.md`, la primera abierta que no esté parada.
+· El plan 3 de `LIB-021` —el ajuste del orden de portadas con su «Restaurar valores por defecto» y
+  la excepción por título— cierra `ENG-003`, que lleva abierta desde el 2026-09-05.
 
 ## Lo que espera al propietario
 
-· Siete hallazgos del sistema común, en manos de la sesión de IT, que los recibió y leyó.
-· `ENG-002` (una sesión con el Narrador) y lo demás suyo, como estaba en `docs/TAREAS.md`.
+· La sesión de IT publica hoy la **0.10.0** del sistema común; al avisar, toca migrar el registro de
+  métricas a JSON Lines con `adopt-enrol` y repetir ping, `prove` y el doctor.
+· `ENG-002` (una sesión con el Narrador) y lo demás suyo, como está en `docs/TAREAS.md`.
 
 ## Lo pendiente no está aquí
 
