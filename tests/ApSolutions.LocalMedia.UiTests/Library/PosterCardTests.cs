@@ -320,6 +320,48 @@ public sealed class PosterCardTests
     }
 
     /// <summary>
+    /// A frame taken in the background (LIB-021) reaches a card already on screen: the same card,
+    /// told, swaps its initials for the picture. Without the notice the card would keep its letters
+    /// until the grid was rebuilt, and rebuilding it is what pulled cards from under a press.
+    /// </summary>
+    [AvaloniaFact]
+    public void A_card_on_screen_draws_a_cover_that_arrives_later()
+    {
+        var picture = Path.Combine(Path.GetTempPath(), $"poster-{Guid.NewGuid():N}.png");
+        WritePicture(picture);
+
+        try
+        {
+            var model = new CatalogItemViewModel(new CatalogItem(
+                new TitleId(Guid.Parse("55555555-5555-5555-5555-555555555555")),
+                CatalogTitleKind.Movie,
+                "Dune",
+                2021,
+                IsAvailable: true,
+                HasProgress: false,
+                IsPersonal: false,
+                AddedUtc: DateTimeOffset.UnixEpoch,
+                LastPlayedUtc: null));
+            var card = Mount(model);
+            var image = card.GetLogicalDescendants().OfType<Image>().Single(each => each.Name == "PosterPicture");
+            var initials = card.GetLogicalDescendants().OfType<TextBlock>()
+                .Single(each => string.Equals(each.Text, PosterInitials.From("Dune"), StringComparison.Ordinal));
+            Assert.False(image.IsVisible);
+
+            model.ShowPoster(picture);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(image.IsVisible);
+            Assert.NotNull(image.Source);
+            Assert.False(initials.IsVisible);
+        }
+        finally
+        {
+            File.Delete(picture);
+        }
+    }
+
+    /// <summary>
     /// A name that is not a picture leaves the letters showing rather than a hole.
     /// </summary>
     [AvaloniaFact]

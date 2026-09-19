@@ -310,7 +310,6 @@ src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsRailView.axaml      
 src/ApSolutions.LocalMedia.Presentation/Home/RecommendationsViewModel.cs                      96  95
 src/ApSolutions.LocalMedia.Presentation/Home/ResourceKeyConverter.cs                         100  83
 src/ApSolutions.LocalMedia.Presentation/Home/ResumeHeroView.axaml                            100  50
-src/ApSolutions.LocalMedia.Presentation/Library/CatalogItemViewModel.cs                      100  90
 src/ApSolutions.LocalMedia.Presentation/Library/LibraryView.axaml                            100  50
 src/ApSolutions.LocalMedia.Presentation/Library/ManualReassignmentViewModel.cs                94  70
 src/ApSolutions.LocalMedia.Presentation/Library/PosterArtView.axaml                          100  50

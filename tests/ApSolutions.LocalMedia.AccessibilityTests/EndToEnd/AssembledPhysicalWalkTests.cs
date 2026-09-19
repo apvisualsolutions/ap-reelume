@@ -9,6 +9,7 @@ using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Personalization;
 using ApSolutions.LocalMedia.Application.Playback;
+using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Application.Updates;
 using ApSolutions.LocalMedia.Domain.Appearance;
 using ApSolutions.LocalMedia.Domain.Catalog;
@@ -111,6 +112,80 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 "The assembled application failed to shut down after the scene finished.",
                 _teardownFailures);
         }
+    }
+
+    /// <summary>
+    /// LIB-021 as lived: a film nobody gave a cover and no provider knows reaches the grid with a
+    /// frame of its own video, taken by the pass the window starts, with nobody pressing anything.
+    /// </summary>
+    /// <remarks>
+    /// The walk has no provider, so every title it scans is exactly this case and the pass runs
+    /// beside every scene that scans. That is why the grid changes a card's picture in place rather
+    /// than rebuilding the cards: a rebuilt grid would pull the card from under a press.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task A_film_with_no_cover_anywhere_shows_a_frame_of_its_own_video()
+    {
+        var sample = await RequireSampleAsync("walk-copy.mp4", durationSeconds: 3);
+        var media = Path.Combine(_dataRoot, "framed");
+        Directory.CreateDirectory(media);
+        File.Copy(sample, Path.Combine(media, "Arrival.2016.mp4"));
+        var factory = await SeedRootAsync(media, ScanPolicy.Startup);
+
+        using var host = ShowShell();
+        host.Application.ConfigureWindow(host.Window);
+        await WaitForAsync(
+            async () => await CountAsync(factory, "media_files") == 1,
+            "the startup scan never catalogued the film");
+
+        Navigate(host, AppRoute.Library);
+        var library = host.ViewModel.Library;
+        Assert.NotNull(library);
+        await library!.LoadAsync(TestContext.Current.CancellationToken);
+        var frames = host.Application.Services.GetRequiredService<IAppDataPaths>().TitleFrameDirectory;
+        await WaitForAsync(
+            () =>
+            {
+                Dispatcher.UIThread.RunJobs();
+                return Task.FromResult(library.Items.Any(card =>
+                    card.PosterFile?.StartsWith(frames, StringComparison.OrdinalIgnoreCase) == true));
+            },
+            "the film's card never drew a frame of its own video: the pass did not run, took nothing, or "
+                + "nobody told the grid");
+
+        var poster = Assert.Single(library.Items).PosterFile!;
+        Assert.True(new FileInfo(poster).Length > 0, $"the frame at {poster} is empty.");
+    }
+
+    /// <summary>
+    /// And the pass the window starts on its own, with no scan behind it: a title catalogued in an
+    /// earlier session that never got its frame — the application closed, or somebody pressed play
+    /// and the pass yielded — gets it at the next launch.
+    /// </summary>
+    /// <remarks>
+    /// The root is manual and the file is written straight into the catalogue, so no scan runs and
+    /// the only thing that can take the frame is the pass the window asks for. The scene above cannot
+    /// tell the two apart: its startup scan asks too.
+    /// </remarks>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task A_title_left_without_a_frame_gets_one_when_the_window_opens()
+    {
+        var sample = await RequireSampleAsync("walk-copy.mp4", durationSeconds: 3);
+        var media = Path.Combine(_dataRoot, "left");
+        Directory.CreateDirectory(media);
+        var film = Path.Combine(media, "Arrival.2016.mp4");
+        File.Copy(sample, film);
+        var factory = await SeedRootAsync(media, ScanPolicy.Manual);
+        _ = await SeedMediaFileAsync(factory, media, film, TimeSpan.FromSeconds(3));
+
+        using var host = ShowShell();
+        var frames = host.Application.Services.GetRequiredService<IAppDataPaths>().TitleFrameDirectory;
+        host.Application.ConfigureWindow(host.Window);
+
+        await WaitForAsync(
+            () => Task.FromResult(
+                Directory.Exists(frames) && Directory.EnumerateFiles(frames, "*.png").Any()),
+            "the window opened over a title with no cover and no frame, and no frame was taken");
     }
 
     /// <summary>

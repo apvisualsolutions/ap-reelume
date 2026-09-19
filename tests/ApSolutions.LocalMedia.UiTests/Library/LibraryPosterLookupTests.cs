@@ -73,11 +73,22 @@ public sealed class LibraryPosterLookupTests
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
         Assert.Null(Assert.Single(viewModel.Items).PosterFile);
 
+        var card = Assert.Single(viewModel.Items);
+        var told = new List<string?>();
+        card.PropertyChanged += (_, args) => told.Add(args.PropertyName);
+
         onDisk = @"C:\cache\title-frames\frame.png";
         viewModel.RefreshPosters();
 
         Assert.Equal(@"C:\cache\title-frames\frame.png", Assert.Single(viewModel.Items).PosterFile);
         Assert.Equal(1, catalogue.Queries);
+
+        // The same card, told: rebuilding the grid would pull the card from under whoever is pressing
+        // it — a person, or the assembled walk, which the background pass runs beside.
+        Assert.Same(card, Assert.Single(viewModel.Items));
+        Assert.Contains(nameof(CatalogItemViewModel.PosterFile), told);
+        Assert.Contains(nameof(IPosterCard.HasPoster), told);
+        Assert.True(((IPosterCard)card).HasPoster);
     }
 
     /// <summary>With no picture changed nothing is rebuilt, so the cards on screen are left alone.</summary>
