@@ -16,6 +16,55 @@
 > se borraron de aquí porque este documento es el registro de lo que pasó, y reescribir lo que pasó es
 > otra clase de error.
 
+> ## AVISO AL FRENTE — 2026-09-19: el repositorio público publicaba nombres internos, y el sistema de trabajo común se midió en vez de suponerse
+>
+> **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,
+> `git log --oneline -1` y `gh run list --limit 3`. Aquí no se escribe el número del commit. `main` y la
+> rama quedaron **al día y en el mismo commit**, y ese commit tiene su CI leído en verde; este relevo va
+> un commit por delante por ser sólo documentación.
+>
+> ### Lo que se hizo
+>
+> · **`ENG-032` cerrada**: `.claude/settings.json`, que viaja en un repositorio **público**, nombraba
+>   siete veces el servidor del cajón común de la memoria compartida desde el 2026-09-05, y el skill de
+>   cierre nombraba el del cajón propio. La habilitación **nunca hizo nada** —sólo actúa sobre servidores
+>   que declara `.mcp.json`—, así que ese cajón no ha estado conectado aquí nunca: registrado y nunca
+>   alimentado, otra vez. Las seis denegaciones pasaron a la configuración de usuario, donde una
+>   denegación gana desde cualquier ámbito. El historial público **no se reescribe**, por decisión del
+>   propietario.
+> · **Trabajo para el sistema de trabajo común de la casa** (lo pidió la sesión de IT; los documentos
+>   viven en su carpeta, no aquí): el esqueleto de nueve fases del cierre con el contrato de sus ganchos,
+>   la especificación, el contraste con nuestro cierre real y dos tandas de medición de hooks.
+>
+> ### Las trampas medidas
+>
+> · **Git Bash reescribe rutas**: `git show origin/main:.claude/settings.json` contestó **0**
+>   coincidencias porque la referencia se convirtió en una ruta de Windows, y `claude -p "/compact"`
+>   recibió `C:/Program Files/Git/compact` y no compactó nada. Con `MSYS_NO_PATHCONV=1`, siete y una
+>   compactación de verdad. Un cero obliga a comprobar el instrumento.
+> · **Un barrido sin límite de palabra miente**: buscar el nombre de una herramienta interna sin `\b` dio
+>   **14 falsos positivos**, todos palabras corrientes en español que lo contienen.
+> · **El tope de bloqueos del `Stop` es configurable** (`CLAUDE_CODE_STOP_HOOK_BLOCK_CAP`), se obedecen
+>   ocho y el noveno se anula con un aviso que **queda en el transcript y no se ve en pantalla**.
+> · **Lo que un hook devuelve al contexto entra entero hasta unos 10.000 caracteres**; por encima, el
+>   producto lo guarda en un fichero y deja 2 KB de vista previa. El límite es **por hook**.
+> · **Un hook que agota su tiempo deja pasar**: medido con un `Stop` de 5 segundos que dormía 20.
+>
+> ### Lo pendiente NO está aquí
+>
+> Se lee con `pwsh -NoProfile -File eng/list-pending.ps1` y en `docs/TAREAS.md`. Lo nuevo de hoy:
+> `ENG-033` (la marca del cierre no se ve desde una copia paralela), `ENG-034` (el `.gitignore` no
+> protege el ajuste local), `ENG-035` (este relevo mide 9.134 líneas y hay que partirlo) y `ENG-037`
+> (**el acta es ciega**: dio por ejecutadas las tres comprobaciones compartidas en este mismo cierre,
+> y estaban dentro de una rama del `if` que no se tomó; hay que exigir el fichero de salida con su
+> código, no el texto del comando).
+>
+> ### Lo que espera al propietario
+>
+> · **`ENG-036`**: la variable `AP_SHARED_TOOLS` **no existe en este equipo**, así que las tres
+>   comprobaciones del cierre y el acta no pueden medir nada y salen 2. Hace falta crearla, o que la
+>   sesión de IT diga qué ruta lleva.
+>
 > ## AVISO AL FRENTE — 2026-09-18, tercera tanda: la licencia ya permite lo que exige la LGPL, la prueba de HDR corre, y la portada elegida vive aparte
 >
 > **Lo primero es mirar el árbol, que manda sobre este documento**: `git log --oneline -1 main`,

@@ -16,6 +16,56 @@
 > deleted from here, because this document is the record of what happened, and rewriting what happened
 > is a different kind of mistake.
 
+> ## FRONT NOTICE — 2026-09-19: the public repository was publishing internal names, and the shared working system was measured instead of assumed
+>
+> **Look at the tree first; it overrides this document**: `git log --oneline -1 main`,
+> `git log --oneline -1` and `gh run list --limit 3`. No commit number is written here. `main` and the
+> branch ended up **up to date and on the same commit**, and that commit has its CI read green; this
+> handover is one commit ahead because it is documentation only.
+>
+> ### What was done
+>
+> · **`ENG-032` closed**: `.claude/settings.json`, which ships in a **public** repository, named the
+>   shared memory's common drawer server seven times since 2026-09-05, and the closing skill named the
+>   project's own one. The enablement **never did anything** — it only acts on servers declared in
+>   `.mcp.json` — so that drawer has never been connected here: registered and never fed, again. The six
+>   denials moved to the user settings, where a denial wins from any scope. The public history is **not
+>   rewritten**, by the owner's decision.
+> · **Work for the house's shared working system** (asked for by the IT session; its documents live in
+>   that session's folder, not here): the nine-phase closing skeleton with its hook contract, the
+>   specification, the contrast against our real closing, and two rounds of hook measurements.
+>
+> ### The traps measured
+>
+> · **Git Bash rewrites paths**: `git show origin/main:.claude/settings.json` answered **0** matches
+>   because the reference became a Windows path, and `claude -p "/compact"` received
+>   `C:/Program Files/Git/compact` and compacted nothing. With `MSYS_NO_PATHCONV=1`, seven matches and a
+>   real compaction. A zero forces you to check the instrument.
+> · **A sweep without a word boundary lies**: searching for an internal tool name without `\b` gave
+>   **14 false positives**, all ordinary Spanish words that contain it.
+> · **The `Stop` block cap is configurable** (`CLAUDE_CODE_STOP_HOOK_BLOCK_CAP`): eight blocks are
+>   obeyed and the ninth is overridden with a warning that **stays in the transcript and is not visible
+>   on screen**.
+> · **What a hook feeds back into the context enters whole up to about 10,000 characters**; above that
+>   the product saves it to a file and leaves a 2 KB preview. The limit is **per hook**.
+> · **A hook that exhausts its timeout lets the turn through**: measured with a 5-second `Stop` that
+>   slept 20.
+>
+> ### What is pending is NOT here
+>
+> Read it with `pwsh -NoProfile -File eng/list-pending.ps1` and in `docs/TAREAS.md`. New today:
+> `ENG-033` (the closing marker is invisible from a parallel worktree), `ENG-034` (the `.gitignore`
+> does not protect the local settings file), `ENG-035` (this handover is 9,134 lines and must be
+> split) and `ENG-037` (**the minutes script is blind**: in this very closing it counted the three
+> shared checks as executed while they sat in an `if` branch that was never taken; it must require the
+> output file and its exit code, not the command text).
+>
+> ### What is waiting for the owner
+>
+> · **`ENG-036`**: the `AP_SHARED_TOOLS` variable **does not exist on this machine**, so the closing's
+>   three checks and the minutes script can measure nothing and exit 2. It has to be created, or the IT
+>   session has to say which path it holds.
+>
 > ## FRONT NOTICE — 2026-09-18, third batch: the licence now permits what the LGPL requires, the HDR test runs, and the picked cover lives apart
 >
 > **Look at the tree first, which overrules this document**: `git log --oneline -1 main`,
