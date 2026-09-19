@@ -7,10 +7,10 @@
 
 ## Estado
 
-El repositorio adopta el sistema común de trabajo de la casa en la rama **local**
-`codex/adopt-ap-smart-tech`, por delante de la rama de trabajo (`git log --oneline codex/ap-reelume-mvp-x64..HEAD`). **Sin push, sin PR y sin
-fusionar**: el diff local espera la revisión del propietario. `main` y la rama de trabajo no se
-tocaron y siguen como las dejó el cierre anterior, con su CI en verde.
+El repositorio adopta el sistema común de trabajo de la casa. Con el sí del propietario, la rama de
+adopción está **fusionada en local** en `codex/ap-reelume-mvp-x64` por fast-forward, **sin push**:
+la rama de trabajo va por delante de su remoto (`git status -sb`) y ese trabajo **no tiene CI
+todavía**. `main` no se tocó. Lo primero de la sesión siguiente es empujar la rama y vigilar su CI.
 
 ## Lo que se hizo
 
@@ -33,8 +33,7 @@ tocaron y siguen como las dejó el cierre anterior, con su CI en verde.
 
 ## Lo que espera al propietario
 
-· Revisar el diff local de la rama de adopción y decidir si se fusiona.
-· Retirar de la configuración global de git el patrón muerto escrito con barra invertida.
+· Su sí para empujar la rama de trabajo, que lanza el CI de la adopción.
 · Siete hallazgos del sistema común, para la sesión de IT; están en la evidencia.
 
 ## Lo pendiente no está aquí

@@ -7,10 +7,10 @@
 
 ## State
 
-The repository adopts the house's common working system on the **local** branch
-`codex/adopt-ap-smart-tech`, ahead of the working branch (`git log --oneline codex/ap-reelume-mvp-x64..HEAD`). **No push, no PR and no
-merge**: the local diff waits for the owner's review. `main` and the working branch were not touched
-and stay as the previous close left them, with their CI green.
+The repository adopts the house's common working system. With the owner's yes, the adoption branch
+is **merged locally** into `codex/ap-reelume-mvp-x64` by fast-forward, **not pushed**: the working
+branch is ahead of its remote (`git status -sb`) and that work **has no CI yet**. `main` was not
+touched. The first thing for the next session is to push the branch and watch its CI.
 
 ## What was done
 
@@ -33,8 +33,7 @@ and stay as the previous close left them, with their CI green.
 
 ## What waits for the owner
 
-· Review the adoption branch's local diff and decide whether to merge it.
-· Remove the dead pattern written with a backslash from the global git configuration.
+· Their yes to push the working branch, which starts the adoption's CI.
 · Seven findings about the common system, for the IT session; they are in the evidence.
 
 ## What is still open does not live here
