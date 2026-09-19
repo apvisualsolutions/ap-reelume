@@ -8,7 +8,7 @@
 ## State
 
 The repository adopts the house's common working system on the **local** branch
-`codex/adopt-ap-smart-tech`, two commits ahead of the working branch. **No push, no PR and no
+`codex/adopt-ap-smart-tech`, ahead of the working branch (`git log --oneline codex/ap-reelume-mvp-x64..HEAD`). **No push, no PR and no
 merge**: the local diff waits for the owner's review. `main` and the working branch were not touched
 and stay as the previous close left them, with their CI green.
 

@@ -8,7 +8,7 @@
 ## Estado
 
 El repositorio adopta el sistema común de trabajo de la casa en la rama **local**
-`codex/adopt-ap-smart-tech`, dos commits por delante de la rama de trabajo. **Sin push, sin PR y sin
+`codex/adopt-ap-smart-tech`, por delante de la rama de trabajo (`git log --oneline codex/ap-reelume-mvp-x64..HEAD`). **Sin push, sin PR y sin
 fusionar**: el diff local espera la revisión del propietario. `main` y la rama de trabajo no se
 tocaron y siguen como las dejó el cierre anterior, con su CI en verde.
 
