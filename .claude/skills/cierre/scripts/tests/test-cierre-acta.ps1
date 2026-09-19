@@ -30,15 +30,20 @@ $todas = @(
 
 # Un transcript con cada orden como tool_use y su tool_result emparejado por id. Las que se pasan en
 # $fallan llevan is_error, como deja el harness una orden que salio distinto de cero.
-function Transcript([string[]]$ordenes, [string[]]$fallan = @()) {
+# $senal elige como se ve el fallo: 'ambas' (is_error y el texto), 'is_error' sola, 'texto' solo, o
+# 'lista' (el texto dentro de una lista de bloques, sin is_error). El acta debe aceptar cada una sola.
+function Transcript([string[]]$ordenes, [string[]]$fallan = @(), [string]$senal = 'ambas') {
     $ruta = Join-Path $raiz ("t-" + [guid]::NewGuid().ToString('N') + '.jsonl')
     $n = 0
     $lineas = foreach ($o in $ordenes) {
         $n++; $id = "toolu_$n"
         @{ type = 'assistant'; message = @{ content = @(@{ type = 'tool_use'; id = $id; name = 'Bash'; input = @{ command = $o } }) } } |
             ConvertTo-Json -Depth 10 -Compress
-        $error = $fallan -contains $o
-        @{ type = 'user'; message = @{ content = @(@{ type = 'tool_result'; tool_use_id = $id; is_error = $error; content = $(if ($error) { 'Exit code 1' } else { 'ok' }) }) } } |
+        $fallo = $fallan -contains $o
+        $marcaError = $fallo -and $senal -in 'ambas', 'is_error'
+        $texto = if ($fallo -and $senal -in 'ambas', 'texto', 'lista') { 'Exit code 1' } else { 'ok' }
+        $cuerpo = if ($senal -eq 'lista') { , @(@{ type = 'text'; text = $texto }) } else { $texto }
+        @{ type = 'user'; message = @{ content = @(@{ type = 'tool_result'; tool_use_id = $id; is_error = $marcaError; content = $cuerpo }) } } |
             ConvertTo-Json -Depth 10 -Compress
     }
     Set-Content -LiteralPath $ruta -Value $lineas -Encoding utf8
@@ -47,7 +52,7 @@ function Transcript([string[]]$ordenes, [string[]]$fallan = @()) {
 
 # Un repositorio con main y una rama «tanda». Lo que va en $archivos se commitea en la tanda; lo que
 # va en $sueltos se deja en el arbol sin anadir.
-function Repo([string[]]$archivos, [string]$base = 'main', [string[]]$sueltos = @()) {
+function Repo([string[]]$archivos, [string]$base = 'main', [string[]]$sueltos = @(), [string[]]$preparados = @()) {
     $dir = Join-Path $raiz ("r-" + [guid]::NewGuid().ToString('N'))
     git init -q -b $base $dir
     git -C $dir config user.email t@t; git -C $dir config user.name t
@@ -58,10 +63,11 @@ function Repo([string[]]$archivos, [string]$base = 'main', [string[]]$sueltos = 
         Set-Content $p 'x'
     }
     if ($archivos) { git -C $dir add -A; git -C $dir commit -qm tanda }
-    foreach ($s in $sueltos) {
+    foreach ($s in $sueltos + $preparados) {
         $p = Join-Path $dir $s; New-Item -ItemType Directory -Force (Split-Path $p) | Out-Null
         Set-Content $p 'x'
     }
+    foreach ($s in $preparados) { git -C $dir add -- $s }
     $dir
 }
 
@@ -79,8 +85,11 @@ function Efectos([hashtable]$codigos = @{}, [hashtable]$horas = @{}, [string[]]$
 }
 
 function Caso([string]$nombre, [int]$esperado, [string]$debeNombrar, [string]$transcript, [string]$repo,
-    [string]$salidas = (Efectos), [string]$subido = 'tanda', [string]$desde = $marca) {
+    [string]$salidas = (Efectos), [string]$subido = 'tanda', [string]$desde = $marca, [string]$reciboPrevio) {
     $recibo = Join-Path $raiz ("recibo-" + [guid]::NewGuid().ToString('N') + '.json')
+    if ($reciboPrevio) { Set-Content -LiteralPath $recibo -Value $reciboPrevio -Encoding utf8 }
+    $escapesPrevios = 0
+    if ($reciboPrevio) { $escapesPrevios = @(($reciboPrevio | ConvertFrom-Json).escapes | Where-Object { $null -ne $_ }).Count }
     $argumentos = @('-NoProfile', '-File', $Script, '-Repo', $repo, '-HerramientasCompartidas', '',
         '-Subido', $subido, '-Salidas', $salidas, '-Desde', $desde, '-Recibo', $recibo)
     if ($transcript) { $argumentos += @('-Transcript', $transcript) }
@@ -88,8 +97,31 @@ function Caso([string]$nombre, [int]$esperado, [string]$debeNombrar, [string]$tr
     $codigo = $LASTEXITCODE
     # El recibo es lo que leen las puertas del plugin: tiene que llevar el mismo codigo que la salida.
     $enRecibo = if (Test-Path $recibo) { (Get-Content $recibo -Raw | ConvertFrom-Json).exitCode } else { 'sin recibo' }
-    $ok = ($codigo -eq $esperado) -and ($enRecibo -eq $esperado) -and (-not $debeNombrar -or $salida -match [regex]::Escape($debeNombrar))
-    if (-not $ok) { $script:fallos++; Write-Output $salida; Write-Output "recibo: $enRecibo" }
+    # ENG-038: los escapes son siempre una lista JSON y conservan los que ya hubiera. La puerta de
+    # commits hace @($verdict.escapes) antes de anadir: un null se vuelve un elemento nulo, y un escape
+    # suelto sin corchetes deja de ser lista.
+    # Sin if como valor: desenrollaria la lista que se quiere medir, que es el propio defecto.
+    $escapes = $null
+    if (Test-Path $recibo) { $escapes = (Get-Content $recibo -Raw | ConvertFrom-Json).escapes }
+    $escapesOk = ($escapes -is [array]) -and ($escapes.Count -eq $escapesPrevios) -and (@($escapes | Where-Object { $null -eq $_ }).Count -eq 0)
+    # El acta imprime todas las filas, bien o mal: lo esperado se busca en la fila marcada con !!, no
+    # en cualquier sitio. La fase del recibo es la primera marcada, y el contador de bloqueos se conserva.
+    $marcadas = @($salida -split "`r?`n" | Where-Object { $_ -match '^\s*!!\s+paso\s' })
+    $nombraOk = switch ($esperado) {
+        1 { [bool]($marcadas | Where-Object { $_ -match [regex]::Escape($debeNombrar) }) }
+        0 { $marcadas.Count -eq 0 -and $salida -match 'ACTA: completa' }
+        default { $salida -match [regex]::Escape($debeNombrar) }
+    }
+    $leido = $null
+    if (Test-Path $recibo) { $leido = Get-Content $recibo -Raw | ConvertFrom-Json }
+    $faseEsperada = 'completa'
+    if ($esperado -eq 1 -and $marcadas[0] -match '^\s*!!\s+paso\s+(\S+)\s+(.*)$') { $faseEsperada = "paso $($Matches[1]): $($Matches[2])" }
+    $faseOk = ($esperado -eq 2) -or ($leido.phase -eq $faseEsperada)
+    $bloqueosPrevios = 0
+    if ($reciboPrevio) { $bloqueosPrevios = [int]($reciboPrevio | ConvertFrom-Json).blocks }
+    $bloqueosOk = $leido -and ($leido.blocks -eq $bloqueosPrevios)
+    $ok = ($codigo -eq $esperado) -and ($enRecibo -eq $esperado) -and $escapesOk -and $nombraOk -and $faseOk -and $bloqueosOk
+    if (-not $ok) { $script:fallos++; Write-Output $salida; Write-Output "recibo: $enRecibo; escapes: $(Get-Content $recibo -Raw -ErrorAction SilentlyContinue)" }
     Write-Output ("{0}  {1}  (salida {2}, recibo {3}, esperado {4})" -f ($(if ($ok) { 'ok' } else { 'FALLA' })), $nombre, $codigo, $enRecibo, $esperado)
 }
 
@@ -106,7 +138,15 @@ try {
     Caso 'tras un comentario no es ejecutado'       1 'verify-docs'             (Transcript (($todas -notmatch 'verify-docs') + 'git status # luego eng/verify-docs.ps1')) (Repo $relevo)
     Caso 'una orden que fallo no cuenta'            1 'suite entera'            (Transcript $todas @('dotnet test tests/X -c Release')) (Repo $relevo)
     Caso 'dotnet test con --filter no es la suite'  1 'suite entera'            (Transcript (($todas -notmatch '^dotnet test') + 'dotnet test tests/X --filter Y')) (Repo $relevo)
-    Caso 'invocado tras && cuenta'                  0 'completa'                (Transcript (($todas -notmatch 'verify-docs') + 'cd x && pwsh -NoProfile -File eng/verify-docs.ps1')) (Repo $relevo)
+    Caso 'sin verificar el formato'                 1 'formato verificado'      (Transcript ($todas -notmatch '^dotnet format')) (Repo $relevo)
+    Caso 'build sin -warnaserror no es estricta'    1 'compilacion estricta'    (Transcript (($todas -notmatch '^dotnet build') + 'dotnet build X.sln -c Release')) (Repo $relevo)
+    Caso 'sin leer los pendientes'                  1 'list-pending'            (Transcript ($todas -notmatch 'list-pending')) (Repo $relevo)
+    Caso 'lo citado tras # no se invoca'            1 'verify-docs'             (Transcript (($todas -notmatch 'verify-docs') + 'pwsh -NoProfile -File eng/otro.ps1 # luego -File eng/verify-docs.ps1')) (Repo $relevo)
+    Caso 'fallo marcado solo con is_error'          1 'suite entera'            (Transcript $todas @('dotnet test tests/X -c Release') 'is_error') (Repo $relevo)
+    Caso 'fallo dicho solo en el texto'             1 'suite entera'            (Transcript $todas @('dotnet test tests/X -c Release') 'texto') (Repo $relevo)
+    Caso 'fallo dicho en una lista de bloques'      1 'suite entera'            (Transcript $todas @('dotnet test tests/X -c Release') 'lista') (Repo $relevo)
+    Caso 'relevo preparado sin commitear cuenta'    0 'completa'                (Transcript $todas) (Repo @() 'main' @() $relevo)
+    Caso 'invocado tras && cuenta'                 0 'completa'                (Transcript (($todas -notmatch 'verify-docs') + 'cd x && pwsh -NoProfile -File eng/verify-docs.ps1')) (Repo $relevo)
 
     # ENG-037: las tres comprobaciones compartidas se miden por su efecto, no por el texto.
     Caso 'rama no tomada: el comando esta y el efecto no' 1 'closing-context' (Transcript ($todas + 'if ($it) { pwsh -NoProfile -File "$it\closing-context.ps1" -Repo x }')) (Repo $relevo) (Efectos -faltan @('contexto'))
@@ -120,7 +160,16 @@ try {
     Caso 'solo docs sin subir en el cierre'         0 'completa'                (Transcript $todas) (Repo $relevo) (Efectos) 'main'
     Caso 'fichero nuevo sin anadir fuera de docs'   1 'src/nuevo.cs'            (Transcript $todas) (Repo $relevo 'main' @('src/nuevo.cs'))
 
-    Caso 'sin la rama base: no se pudo medir'       2 'NO SE PUDO MEDIR'        (Transcript $todas) (Repo $relevo 'trunk')
+    # ENG-038: el recibo que ya llevaba escapes los conserva como lista, uno y dos.
+    $unEscape = '{"exitCode":1,"phase":"x","blocks":1,"escapes":[{"at":"2026-09-19T10:30:00Z","reason":"uno"}]}'
+    $dosEscapes = '{"exitCode":1,"phase":"x","blocks":2,"escapes":[{"reason":"uno"},{"reason":"dos"}]}'
+    Caso 'un escape previo sigue siendo lista'      0 'completa'                (Transcript $todas) (Repo $relevo) (Efectos) 'tanda' $marca $unEscape
+    Caso 'dos escapes previos se conservan'         1 'verify-docs'             (Transcript ($todas -notmatch 'verify-docs')) (Repo $relevo) (Efectos) 'tanda' $marca $dosEscapes
+    # Y los recibos que el defecto ya escribio: null solo, y null con un escape anadido detras.
+    Caso 'un recibo viejo con null queda en lista vacia' 0 'completa'           (Transcript $todas) (Repo $relevo) (Efectos) 'tanda' $marca '{"exitCode":1,"blocks":1,"escapes":null}'
+    Caso 'el nulo delante de un escape se descarta'  0 'completa'               (Transcript $todas) (Repo $relevo) (Efectos) 'tanda' $marca '{"exitCode":1,"blocks":1,"escapes":[null,{"reason":"uno"}]}'
+
+    Caso 'sin la rama base: no se pudo medir'      2 'NO SE PUDO MEDIR'        (Transcript $todas) (Repo $relevo 'trunk')
     Caso 'transcript inexistente: no se pudo medir' 2 'NO SE PUDO MEDIR'        (Join-Path $raiz 'no-hay.jsonl') (Repo $relevo)
     Caso 'transcript sin ordenes: no se pudo medir' 2 'NO SE PUDO MEDIR'        (Transcript @()) (Repo $relevo)
     Caso 'sin herramientas compartidas ni -Transcript' 2 'no configuradas'     '' (Repo $relevo)

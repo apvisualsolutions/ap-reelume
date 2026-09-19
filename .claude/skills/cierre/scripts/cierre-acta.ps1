@@ -82,7 +82,10 @@ function Escribir-Recibo([int]$codigo, [string]$fase) {
         exitCode = $codigo
         phase    = $fase
         blocks   = if ($previo -and $null -ne $previo.blocks) { [int]$previo.blocks } else { 0 }
-        escapes  = if ($previo -and $previo.escapes) { @($previo.escapes) } else { @() }
+        # ENG-038: un if como valor desenrolla su salida -- @() sale como null y una lista de uno
+        # como el elemento suelto --, asi que la lista se forma fuera de el. Los nulos que dejo el
+        # defecto en recibos viejos se descartan.
+        escapes  = @(if ($previo) { $previo.escapes | Where-Object { $null -ne $_ } })
         at       = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
     }
     [IO.File]::WriteAllText($Recibo, ($contenido | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))

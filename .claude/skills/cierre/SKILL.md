@@ -92,7 +92,10 @@ dos veces seguidas, con fases despachadas en una frase.
    (`ENG-037`). Sale 1 nombrando lo que falta y 2 si no pudo medir —sin transcript o sin marca—, y
    **deja su recibo en el directorio común de git**, que es lo que leen las puertas del plugin.
    **Con el acta en rojo no se hace el commit del relevo**, y la puerta de commits tampoco lo deja.
-   Su batería está en `scripts/tests/test-cierre-acta.ps1`, con control de mutación por `-Script`.
+   Su batería está en `scripts/tests/test-cierre-acta.ps1`, con control de mutación por `-Script`;
+   la de `cierre-privacidad.ps1`, con una fuga por cada punto de paso, en
+   `scripts/tests/test-cierre-privacidad.ps1`. **Hoy no las corre nada solo** (`ENG-039`): se corren
+   a mano al tocar cualquier guion de `scripts/`.
    Localiza el transcript con la librería común (`closing-transcript.ps1`), que nunca coge «el más
    reciente»: si no sabe cuál es el de esta sesión, sale 2.
 

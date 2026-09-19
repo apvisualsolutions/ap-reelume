@@ -78,6 +78,34 @@ public sealed class HandoffLimitsTests
     }
 
     [Fact]
+    public void The_size_limit_counts_bytes_not_characters()
+    {
+        // 3,100 accented letters: under the limit counted as characters, 6,200 bytes in UTF-8. Spanish
+        // prose is where the two measures part, and the ASCII scene above cannot tell them apart.
+        using var scene = new HandoffScene();
+        scene.Write("es", Dated, new string('é', 3100));
+        scene.Write("en", DatedEnglish, "· line");
+
+        var (code, output) = Run(scene.Root);
+
+        Assert.Equal(1, code);
+        Assert.Contains("NEXT-SESSION.es.md pesa", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void A_handover_updated_in_one_language_only_sounds_by_its_date()
+    {
+        using var scene = new HandoffScene();
+        scene.Write("es", Dated);
+        scene.Write("en", "# Where to pick up — 2026-09-18");
+
+        var (code, output) = Run(scene.Root);
+
+        Assert.Equal(1, code);
+        Assert.Contains("fechas distintas", output, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void A_section_added_in_one_language_only_sounds()
     {
         using var scene = new HandoffScene();

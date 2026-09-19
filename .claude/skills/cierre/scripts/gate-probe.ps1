@@ -122,17 +122,17 @@ try {
             exit (Traducir $codigo 1 0)
         }
         'privacidad' {
-            # El filtro comun en modo publico: una ruta de una maquina en el relevo suena (1).
-            $puntos = @{}
-            foreach ($p in 'CommitMessage', 'AddedDiff', 'TouchedTree', 'Handoff', 'Prompt', 'Note') {
-                $ruta = Join-Path $raiz "$p.txt"
-                $texto = if ($p -eq 'Handoff' -and $Case -eq 'sound') { "ver " + 'C' + ':\Usuarios\alguien\notas.md' } else { 'texto limpio' }
-                [IO.File]::WriteAllText($ruta, "$texto`n", $utf8)
-                $puntos[$p] = $ruta
-            }
-            $argumentos = @('-NoProfile', '-File', ('"' + (Join-Path $Herramientas 'privacy-gate.ps1') + '"'), '-Public')
-            foreach ($p in $puntos.Keys) { $argumentos += @("-$p", ('"' + $puntos[$p] + '"')) }
-            $codigo = Correr $argumentos
+            # El guion del cierre, que es el que corre la fase: una ruta de una maquina en el relevo
+            # suena (1). Hasta el 2026-09-19 esto llamaba al filtro comun directamente, y ninguna
+            # prueba ejecutaba cierre-privacidad.ps1: vaciar el relevo que le pasa no lo veia nadie.
+            # Cada punto de paso por separado lo cubre tests/test-cierre-privacidad.ps1.
+            $dir = Arbol
+            & git -C $dir checkout -q -b tanda
+            $relevo = if ($Case -eq 'sound') { "ver " + 'C' + ':\Usuarios\alguien\notas.md' } else { 'texto limpio' }
+            New-Item -ItemType Directory -Force (Join-Path $dir 'docs') | Out-Null
+            foreach ($idioma in 'es', 'en') { [IO.File]::WriteAllText((Join-Path $dir "docs/NEXT-SESSION.$idioma.md"), "$relevo`n", $utf8) }
+            $codigo = Correr @('-NoProfile', '-File', ('"' + (Join-Path $scripts 'cierre-privacidad.ps1') + '"'),
+                '-Repo', ('"' + $dir + '"'), '-Herramientas', ('"' + $Herramientas + '"'))
             exit (Traducir $codigo 1 0)
         }
         'ignorado' {

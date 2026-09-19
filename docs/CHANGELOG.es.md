@@ -10,6 +10,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **Las comprobaciones del cierre de una tanda miran ahora lo que dicen mirar.** El registro que
+  deja el acta del cierre guardaba mal la lista de excepciones consentidas, y con una sola la perdía
+  como lista. Una auditoría con mutantes encontró trece comprobaciones que pasaban sin detectar el
+  defecto que debían detectar, entre ellas que el filtro de privacidad nunca se probaba con el guion
+  que de verdad lo llama; cada una tiene ahora un caso que la hace fallar. No cambia nada del
+  programa (`ENG-038`).
+
 - **El repositorio adopta el sistema de trabajo común de AP Smart Tech, y el relevo entre sesiones
   vuelve a caber en una lectura.** Un manifiesto declara cómo se lee el registro de tareas, qué
   comprueba cada fase del cierre y que el repositorio es público, lo que pone el filtro de datos

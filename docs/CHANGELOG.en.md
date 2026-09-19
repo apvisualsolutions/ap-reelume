@@ -10,6 +10,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The checks of a batch close now look at what they claim to look at.** The record the close's
+  checklist leaves behind stored the list of consented exceptions wrongly, and with a single one it
+  lost it as a list. A mutation audit found thirteen checks that passed without catching the defect
+  they were meant to catch, among them that the privacy filter was never tested through the script
+  that actually calls it; each now has a case that makes it fail. Nothing in the program changes
+  (`ENG-038`).
+
 - **The repository adopts AP Smart Tech's common working system, and the handover between sessions
   fits a single read again.** A manifest declares how the task register is read, what each phase of
   the close checks, and that the repository is public, which puts the internal-data filter in strict
