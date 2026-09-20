@@ -52,7 +52,8 @@
 param(
     [string[]]$Suites = @('Domain.Tests', 'Application.Tests', 'UiTests'),
     [string]$BaseRef = 'origin/main',
-    [switch]$SkipRun
+    [switch]$SkipRun,
+    [switch]$ListNewFiles
 )
 
 $ErrorActionPreference = 'Stop'
@@ -77,6 +78,42 @@ $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
     lambdas are separate <class> entries over the same lines: 28 branches where the file has 14.
     Keyed by number, this answers 100/92.86 — the 100/92 CI wrote.
 #>
+<#
+    Every source file CI will measure as new, which is NOT the same question a commit range answers.
+
+    THREE SOURCES RATHER THAN ONE, AND THE OTHER TWO ARE THE POINT OF THIS SCRIPT. A commit range
+    only names files that are already IN a commit, which is right for the gate - it runs in CI,
+    where the tree it measures is committed by definition - but wrong here, because the whole reason
+    to preview is to be told BEFORE committing. Measured 2026-09-13 with three uncommitted new
+    files: this said "nothing falls short" while two of the three were under 96/96. Measured again
+    2026-09-19, and that silence cost a red: with TitleFramePass.cs new and uncommitted it named one
+    short floor and said nothing about the new file reading 100/50, which took run 35471110732 down.
+
+    The fix is to WIDEN, never to narrow: staged additions and files git does not track yet are both
+    new source that CI will measure, and a file missing from this list reads as a file that passed.
+
+    It is a function with a switch of its own rather than four lines inline BECAUSE OF HOW IT HAS TO
+    BE TESTED. An assertion that reads this file for the word "ls-files" would stay green while the
+    query it names ran nowhere, which is the blind gate this repository keeps finding. -ListNewFiles
+    gives the check a seam: a lying tree with one uncommitted file, the script asked, and the same
+    tree without it asked again - a control on both sides, because a search that always finds
+    something is no search.
+#>
+function Get-NewSourceFile {
+    param([string]$BaseRef)
+
+    return @(@(
+        git diff --name-only --diff-filter=A "$BaseRef...HEAD" -- 'src/*.cs' 2>$null
+        git diff --name-only --diff-filter=A --cached -- 'src/*.cs' 2>$null
+        git ls-files --others --exclude-standard -- 'src/*.cs' 2>$null
+    ) | Where-Object { $_ } | ForEach-Object { $_ -replace '\\', '/' } | Sort-Object -Unique)
+}
+
+if ($ListNewFiles) {
+    Get-NewSourceFile -BaseRef $BaseRef | ForEach-Object { Write-Output $_ }
+    exit 0
+}
+
 function Read-FileCoverage {
     param([string]$ResultsDirectory)
 
@@ -201,7 +238,7 @@ try {
     }
 
     # New files clear 96/96 with no measured ceilings, so they are worth the same look.
-    $newFiles = @(git diff --name-only --diff-filter=A "$BaseRef...HEAD" -- 'src/*.cs' 2>$null)
+    $newFiles = @(Get-NewSourceFile -BaseRef $BaseRef)
     $newShort = @()
     foreach ($file in $newFiles) {
         $relative = ($file -replace '\\', '/')
