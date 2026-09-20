@@ -43,9 +43,11 @@ Cuatro runs hoy, **los cuatro verdes**, con cada conclusión leída dos veces: p
 · **`gate-auditor` NO se lanzó sobre las pruebas que añadió `ENG-016`.** Es el primer paso, en una
   copia aislada, antes de trabajo nuevo — y su copia pone roja `EvidenceLinkTests` mientras exista.
 · **Dos comprobaciones que sólo puede hacer una sesión NUEVA**: si llegan por fin las herramientas
-  del cajón de memoria de este proyecto —IT lo guardaba bajo tres formas de ruta y sólo había
-  reenganchado una— y el marcador de cierre más el doctor contra el plugin **0.10.1**, publicado hoy.
-  Esta sesión corrió con la 0.10.0 y no podía ver ninguna de las dos.
+  del cajón de memoria de este proyecto —era la confianza de carpeta por forma de ruta, ya
+  persistida— y el sistema común contra la **0.11.0**, publicada al cerrar. `claude plugin update`
+  debe decir `updated 0.10.1 → 0.11.0` y el ping contestar `dependencias: OK`; en un terminal sin
+  permisos dirá «no se pudo medir» o pedirá aprobación en vez de imprimir la línea, que es un
+  defecto conocido de IT y **no** un fallo del plugin. Esta sesión corrió con la 0.10.0.
 · Después, `ENG-017`, la primera fila tomable: nada comprueba que el escalador compile su shader una
   sola vez por película, y borrar la guarda deja 1.446 pruebas en verde.
 

@@ -42,10 +42,12 @@ Four runs today, **all four green**, each conclusion read twice: through the wat
 · **`gate-auditor` was NOT run over the tests `ENG-016` added.** That is the first step, in an
   isolated worktree, before any new work — and remember its copy makes `EvidenceLinkTests` red
   while it exists.
-· **Two checks that only a NEW session can make**: whether the `second-brain` tools for this
-  project finally arrive (IT stored it under three path spellings and had only reconnected one),
-  and the closing marker plus doctor against plugin **0.10.1**, published today. This session ran
-  on 0.10.0 and could not see either.
+· **Two checks that only a NEW session can make**: whether this project's `second-brain` tools
+  finally arrive — the cause was folder trust keyed by path spelling, now persisted — and the
+  common system against **0.11.0**, published as this closed. `claude plugin update` should say
+  `updated 0.10.1 → 0.11.0` and the ping answer `dependencias: OK`; in a terminal without
+  permissions it will say it could not measure, or ask for approval instead of printing the line,
+  which is a known IT defect and **not** a plugin failure. This session ran on 0.10.0.
 · Then `ENG-017`, the first takeable row: nothing checks that the upscaler compiles its shader once
   per film, and deleting the guard leaves 1,446 tests green.
 
