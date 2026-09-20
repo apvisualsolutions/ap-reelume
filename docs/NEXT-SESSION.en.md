@@ -1,77 +1,80 @@
-# Where to pick up — 2026-09-20 (afternoon)
+# Where to pick up — 2026-09-20 (closing)
 
-> **Overwritten** at every close, and never above 80 lines or 6 KB per language; measured by
+> **Overwritten** at every closing, and no more than 80 lines or 6 KB per language; measured by
 > `eng/check-handoff.ps1`. The history up to 2026-09-19 is frozen in
 > [NEXT-SESSION-HISTORY.en.md](NEXT-SESSION-HISTORY.en.md). **The tree beats this document**:
 > `git log --oneline -1`, `git log --oneline -1 main` and `gh run list --limit 3` before anything.
 
 ## State
 
-`main` is up to date with the `ENG-009` commit, its CI read green before the fast-forward.
+`main` stands at the `ENG-042` commit, with its CI read green, and stays there.
 
-**The branch is ahead with `ENG-044` pushed and its CI running, unread.** It went to the branch and
-not to `main`, which is where a red does not get in the way. **And that run is expected to come back
-red**, with the exact cause already measured here: see the first bullet below. `main` does not move
-until it is read.
+**The `ENG-011` commit came out RED and was not fixed here**, which is the step-0 rule. The cause is
+measured and is a two-minute job: **all ten suites passed** — 891, 406, 55, 684, 1,474, 155, 201,
+202, 118, 17 — and the only failure was the coverage gate with «1 improved»:
+`CompositionRoot.cs now reaches 90/65`, because the new wiring gave it one more covered branch while
+its floor says 90/64. **First thing tomorrow**: `gh run download 35515823303 -n coverage-debt`, copy
+the artefact over `eng/coverage-debt.txt` normalising CRLF to LF, check the only difference is that
+row, and push. With that green, `main` moves to `ENG-011`.
 
 ## What was done
 
-· **`ENG-009` closed.** The document sweep no longer reads other sessions' checkouts, so running
-  `gate-auditor` in a worktree stops turning `EvidenceLinkTests` red. It was the **third** time that
-  exclusion had been written by hand, in two different spellings; the rule now lives in
-  `RepositoryLayout.IsInsideAnotherCheckout`, with both of its lessons inside.
-· **`ENG-043` closed by the Product Owner's decision**: what was published is accepted, with no
-  rename and no history rewrite, consistent with `ENG-032`. The reasoning is written into the row so
-  it does not get reopened.
-· **`ENG-044` opened and half built** — born while measuring `ENG-010`, which is its symptom. Below.
-· `LIB-003` lowered from `VERIFIED` to `IMPLEMENTED`, with its blocker declared in the manifest.
+· **`ENG-044` closed, and `ENG-010` with it**: folder watching switches on, is governed from
+  Settings and takes effect without a restart. `LIB-003` returns to `VERIFIED`, blocker withdrawn.
+· **`ENG-042` closed**: the three documents that travel with the package say `plugin`.
+· **`ENG-011` closed**: playback speed is stored and applied as a file opens.
+· The debt ratchet dropped to **185**: `FallbackScanScheduler.cs` reached 100/100 and left the list.
 
-## The traps measured
+## The measured traps
 
-· **`LIB-003` promised continuous watching and never switched on.** The only thing activating it was
-  `ScanPolicy.Continuous`, and **nothing in `src/` assigned it**: the three ways of adding a root
-  give `Startup | Manual` or `Manual`, and no screen offers the choice. Negative control done: the
-  same grep does find the other two flags.
-· **Why no gate saw it: the tests hand themselves the flag.** Twelve places in `tests/` set it and
-  zero in `src/`. They all measure that watching works **when it is on**; none that it ever comes
-  on. The missing guard is not another test of the watcher.
-· **A test that already existed corrected the design**, and it was the most valuable thing of the
-  batch. `A_manual_root_is_not_watched_behind_its_owners_back` forced the setting to reach only the
-  roots carrying `Startup`: `DeclareCourseFolder` gives plain `Manual` **on purpose**, because the
-  dialog promises the rest of the drive is left alone.
-· **The CI watcher needs the forty-character SHA.** It was armed once with a SHA invented from the
-  short one; `gh` answers `[]` and that reads exactly like «no run yet». Resolve it with
-  `git rev-parse HEAD`, never by hand.
-· **A new row in `docs/TAREAS.md` goes in its place by identifier, not at the end of the done ones.**
-  `TareasRegisterTests` requires it and said so.
+· **Two faults of the same kind on the same day, and it is the house defect**: watching and speed
+  were built, stored and resolved, and **nobody called them**. The grep that finds it asks who READS
+  the resolved value, with a positive control beside it — `resolved.Picture` returned one and
+  `resolved.SpeedMultiplier` returned zero.
+· **The fallback sweep ran for nobody either**, held by the same flag as watching. That left USB and
+  network roots with no recovery — the other half of `LIB-003` — and a dead watcher with no retry. It
+  was on no row: it surfaced while finishing `ENG-044`.
+· **Two blind guards**, found by mutating: a `Dispose` test green without the code it claimed to
+  check, and a branch nothing could take. And **a textual assertion** — `RootWatchWiringTests`
+  looking for a constant in the source — stayed green for weeks while what it named ran for nobody.
+· **A zero gets measured twice, and today I failed three times**: I read `tail`'s exit code after a
+  pipe and accused an IT guard; I measured two states as one because another session changed the
+  machine between my readings; and I called a drawer absent from files that return zero by design.
 
 ## First thing next session
 
-· **Push the local `ENG-044` commit and read its CI.** Every local gate passed — format, build,
-  `Domain` 879, `Application` 393, `Architecture` 55, `Documentation` 118 and `Integration` 683 —
-  but only CI verifies for real. **And that run will come back red with «1 improved», measured here
-  before pushing**: `RootWatchCoordinator.cs` rises from **96/89 to 97/90** because the new tests
-  walk through it. That is not a defect: download that run's `coverage-debt` artefact and raise its
-  row in the same change, never editing the file by hand. No new file falls short.
-· **Finish `ENG-044`, which also closes `ENG-010`**: make the two Settings controls govern the
-  setting and store it, the assembly guard — a root created the real way ends up watched —, reread
-  `audit-wp2-assembly.md`, and decide the interval (the control says 30 and the code uses 15).
-· **`ENG-041` before raising coverage**: two written rules about how that gate counts contradict
-  each other, and the row says how to measure it.
+· **Read the `ENG-011` CI and move `main` if green.** It is the only thing left to publish.
+· **Repeat the closing marker and the doctor of the shared system** once IT publishes **0.10.1** —
+  see below.
 
-## What waits for the Product Owner
+## Waiting on the owner
 
-· **`ENG-042`**: the language check flags 31 places in living files, **all of them older than this
-  batch** — the only one it introduced was corrected before committing. Whether the manufacturer's
-  term is deliberate in the video engine's legal documents has to be decided before the sweep.
-· **`ENG-002`** (a session with the Narrator) and **`ENG-005`** (opening a window when he is not
-  working).
-· The IT session will publish the new version of the shared system; when it says so, update and
-  repeat its checks, using the names held in the local settings.
-· The IT session will migrate this repository to the NAS once told «ready to migrate». Measured
-  today: **zero live worktrees**, and the two empty shells already removed.
+· **The shared system is broken over the NAS and this closing was done WITHOUT its marker.**
+  The tool that sets the marker exits 2 because its scripts resolve paths with
+  `(Resolve-Path X).Path`, which over a network drive returns the provider-prefixed PSPath that git
+  rejects with 128; with `.ProviderPath` it exits 0. Isolated with positive and negative controls, and reproduced by IT on
+  their side: it affects **every** project since the migration. Their grep found **33 uses of the
+  pattern, 9 in production**. Fix commissioned as **0.10.1**; they will tell us when it ships.
+  **Consequence for this closing**: the plugin's two gates did not read the record, and the record
+  could not be computed.
+· **The second-brain drawer exists but did NOT reach this session**, so no checkpoint was written; IT
+  has re-wired it. **Mind how this is checked**: the connector lives in the per-project user
+  configuration, not in `.mcp.json` or the local settings — an IT decision after an internal name was
+  published in a public repository — so those two return zero **by design**. Ask whether the session
+  has the drawer's tools, and only that; its name is not written here, for the same reason as
+  `ENG-043`. It is already wired to the new path: check it and write the previous batch's checkpoint.
+  Here a zero was taken for an absence when the pattern was looking in the wrong place.
+· **`ENG-015` has a finding that blocks it**: the hook protecting `eng/walk-pending.txt` denies every
+  write without telling apart adding a row from fixing a stale comment, so its three out-of-date
+  figures **cannot be fixed** with the editing tools. And `CLAUDE.md` contradicts itself there too:
+  the real sequence has to be reconstructed before rewriting anything.
+· **`ENG-002`** (a session with Narrator) and **`ENG-005`** (opening a window when he is not working).
+
+The privacy filter ends at 1 finding, and it is a **false positive IT has accepted**: VideoLAN's
+public IP, quoted in the `ENG-042` commit while documenting a network failure. History is not
+rewritten (`ENG-032`). Convention until they refine it: cite a third party by host name, never by IP.
 
 ## What is pending is not here
 
-Read it with `pwsh -NoProfile -File eng/list-pending.ps1` and in [TAREAS.md](TAREAS.md). Today: 25
+Read it with `pwsh -NoProfile -File eng/list-pending.ps1` and in [TAREAS.md](TAREAS.md). Today: 24
 open of 75.
