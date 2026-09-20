@@ -15,6 +15,7 @@ using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.FileSystem;
 using ApSolutions.LocalMedia.Infrastructure.Media;
+using ApSolutions.LocalMedia.Infrastructure.Settings;
 using ApSolutions.LocalMedia.Infrastructure.Time;
 using ApSolutions.LocalMedia.Presentation.Courses;
 using ApSolutions.LocalMedia.Presentation.Navigation;
@@ -90,6 +91,10 @@ public static partial class CompositionRoot
             .AddSingleton<IMediaFileEnumerator, MediaFileEnumerator>()
             .AddSingleton<IMediaProbe, LibVlcMediaProbe>()
             .AddSingleton<IClock, SystemClock>()
+            // ENG-044. What decides whether a root gets a live watcher at all. Until this existed,
+            // the only switch was a per-root Continuous flag that nothing here ever assigned, so
+            // the watching slice below was built, registered, started — and never reached.
+            .AddSingleton<IScanWatchSettings, StoredScanWatchSettings>()
             .AddSingleton<IRootWatcher>(provider => new DebouncedFileWatcher(
                 provider.GetRequiredService<IClock>()))
             .AddSingleton<IFallbackScanScheduler>(provider => new FallbackScanScheduler(

@@ -22,6 +22,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   rebuilding the grid. It yields to playback or a scan, and each file is decoded only once while it
   does not change (`LIB-021`).
 
+### Fixed
+
+- **A video added to a library folder shows up on its own, without restarting the application.**
+  Folder watching was built whole — and tested — but **never switched on**: the only thing that
+  activated it was a per-folder flag nothing in the program ever assigned and no screen ever offered,
+  so in the assembled application the watcher never started for any folder. The decision now belongs
+  to a named rule, taken from a setting that is stored and survives closing the program. It reaches
+  the local folders that already asked to be kept up to date, and **not** the ones declared "only
+  when I ask" — a course folder, say, whose own dialog promises the rest of the drive is left alone —
+  nor removable drives and network folders, which are what the recovery sweep exists for. It is on
+  unless somebody says otherwise, unlike the settings that reach the internet: watching a folder
+  never leaves this machine (`ENG-044`).
+
 ### Changed
 
 - **The tool this repository recommends for auditing its own checks no longer breaks one of them.**

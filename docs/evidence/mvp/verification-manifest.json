@@ -160,7 +160,12 @@
     },
     {
       "id": "LIB-003",
-      "status": "VERIFIED",
+      "status": "IMPLEMENTED",
+      "blocker": {
+        "reason": "La vigilancia estaba construida y no se encendía en la aplicación montada: lo único que la activaba era una bandera por raíz que nada de src/ asignaba y ninguna pantalla ofrecía, así que la evidencia archivada midió raíces fabricadas por las pruebas y no las que el programa crea. Ya se enciende (ENG-044), pero nada lo mide de punta a punta todavía. / Watching was built and never switched on in the assembled application: the only thing activating it was a per-root flag nothing in src/ assigned and no screen offered, so the archived evidence measured roots the tests fabricated rather than the ones the program creates. It switches on now (ENG-044), but nothing measures it end to end yet.",
+        "owner": "Engineering",
+        "unblockCondition": "Una guarda que mida que una raíz creada por las vías reales del programa acaba vigilada —no una raíz fabricada con la bandera puesta—, y releer la evidencia de WP-2 con eso medido. / A guard measuring that a root created the program's real way ends up watched — not one fabricated with the flag already set — and a reread of the WP-2 evidence with that measured."
+      },
       "tasks": [
         "T9"
       ],

@@ -22,6 +22,20 @@ evidencia, es [FEATURES.md](FEATURES.md).
   arriba ni rehacer la cuadrícula. Cede ante una reproducción o un escaneo, y cada archivo se
   decodifica una sola vez mientras no cambie (`LIB-021`).
 
+### Arreglado
+
+- **Un vídeo añadido a una carpeta de la biblioteca aparece solo, sin reiniciar la aplicación.** La
+  vigilancia de carpetas estaba construida entera —y probada— pero **no se encendía nunca**: lo único
+  que la activaba era una marca por carpeta que ninguna parte del programa ponía y que ninguna
+  pantalla ofrecía, así que en la aplicación montada el vigilante no llegaba a arrancar para ninguna
+  carpeta. Ahora la decisión la toma una regla con nombre, a partir de un ajuste que se guarda y
+  sobrevive a cerrar el programa. Alcanza a las carpetas locales que ya pedían estar al día, y **no**
+  a las declaradas «sólo cuando yo lo pida» —una carpeta de curso, por ejemplo, cuyo propio diálogo
+  promete no tocar el resto del disco—, ni a las unidades extraíbles y las carpetas de red, que son
+  para lo que existe el rebarrido de recuperación. Viene puesto a vigilar si nadie dice lo contrario,
+  al revés que los ajustes que tocan internet: vigilar una carpeta no sale de este ordenador
+  (`ENG-044`).
+
 ### Cambiado
 
 - **La herramienta que este repositorio recomienda para auditar sus propias comprobaciones ya no

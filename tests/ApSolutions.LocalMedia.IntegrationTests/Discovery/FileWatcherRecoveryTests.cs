@@ -435,7 +435,8 @@ public sealed class FileWatcherRecoveryTests
         var watch = new RootWatchCoordinator(
             new ThrowingRootWatcher(),
             new EmptyFallbackScheduler(),
-            scan);
+            scan,
+            new FakeScanWatchSettings(watchLocalRoots: false));
         await watch.StartAsync(root, TestContext.Current.CancellationToken);
         await watch.RunFallbackAsync(root, ScanTrigger.Recovery, TestContext.Current.CancellationToken);
 
@@ -658,5 +659,13 @@ public sealed class FileWatcherRecoveryTests
             cancellationToken.ThrowIfCancellationRequested();
             return Task.CompletedTask;
         }
+    }
+
+    // Off on purpose: this root carries ScanPolicy.Continuous, so the flag and not the setting still starts the watcher.
+    private sealed class FakeScanWatchSettings(bool watchLocalRoots) : IScanWatchSettings
+    {
+        public bool WatchLocalRoots { get; private set; } = watchLocalRoots;
+
+        public void SetWatchLocalRoots(bool enabled) => WatchLocalRoots = enabled;
     }
 }

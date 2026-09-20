@@ -80,7 +80,11 @@ public sealed class RootWatchBackgroundTests
         var scans = new SignallingScanCoordinator(expectedScans: 1);
         using var background = new RootWatchBackground(
             new FixedRootRepository([root]),
-            new RootWatchCoordinator(watcher, new EndlessScheduler(), scans));
+            new RootWatchCoordinator(
+                watcher,
+                new EndlessScheduler(),
+                scans,
+                new FakeScanWatchSettings(watchLocalRoots: false)));
 
         background.Start();
         await watcher.WaitForStartAsync(WaitBudget);
@@ -97,7 +101,11 @@ public sealed class RootWatchBackgroundTests
         IScanCoordinator scans,
         IRootWatcher watcher) => new(
             new FixedRootRepository(roots),
-            new RootWatchCoordinator(watcher, new StartupOnlyScheduler(), scans));
+            new RootWatchCoordinator(
+                watcher,
+                new StartupOnlyScheduler(),
+                scans,
+                new FakeScanWatchSettings(watchLocalRoots: false)));
 
     private static LibraryRoot CreateRoot(ScanPolicy policy) => new(
         new LibraryRootId(Guid.NewGuid()),
@@ -283,5 +291,13 @@ public sealed class RootWatchBackgroundTests
             var completed = await Task.WhenAny(_done.Task, Task.Delay(timeout));
             Assert.True(completed == _done.Task, "The expected scans never arrived.");
         }
+    }
+
+    // Off on purpose: these roots carry ScanPolicy.Continuous, so the flag and not the setting still starts the watcher.
+    private sealed class FakeScanWatchSettings(bool watchLocalRoots) : IScanWatchSettings
+    {
+        public bool WatchLocalRoots { get; private set; } = watchLocalRoots;
+
+        public void SetWatchLocalRoots(bool enabled) => WatchLocalRoots = enabled;
     }
 }

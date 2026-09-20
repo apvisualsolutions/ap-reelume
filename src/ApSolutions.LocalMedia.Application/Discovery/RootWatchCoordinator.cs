@@ -14,16 +14,19 @@ public sealed class RootWatchCoordinator
     private readonly IRootWatcher _rootWatcher;
     private readonly IFallbackScanScheduler _fallbackScanScheduler;
     private readonly IScanCoordinator _scanCoordinator;
+    private readonly IScanWatchSettings _watchSettings;
 
     public RootWatchCoordinator(
         IRootWatcher rootWatcher,
         IFallbackScanScheduler fallbackScanScheduler,
-        IScanCoordinator scanCoordinator)
+        IScanCoordinator scanCoordinator,
+        IScanWatchSettings watchSettings)
     {
         _rootWatcher = rootWatcher ?? throw new ArgumentNullException(nameof(rootWatcher));
         _fallbackScanScheduler = fallbackScanScheduler ??
             throw new ArgumentNullException(nameof(fallbackScanScheduler));
         _scanCoordinator = scanCoordinator ?? throw new ArgumentNullException(nameof(scanCoordinator));
+        _watchSettings = watchSettings ?? throw new ArgumentNullException(nameof(watchSettings));
     }
 
     public async Task StartAsync(
@@ -42,10 +45,15 @@ public sealed class RootWatchCoordinator
             SingleWriter = true,
         });
 
-        // The live file watcher is what Continuous means; a root whose owner chose Manual or
-        // Startup is not followed behind their back. The fallback scheduler reads the policy on
-        // its own, so it always gets the root.
-        var watcher = root.ScanPolicy.HasFlag(ScanPolicy.Continuous)
+        // Who gets a live watcher is ScanWatchPolicy's decision, not a flag read here: the per-root
+        // Continuous flag is one of its two answers, and the setting a person can actually reach is
+        // the other (ENG-044). A root that said «only when I ask» is still not followed behind its
+        // owner's back. The fallback scheduler reads the policy on its own, so it always gets the
+        // root.
+        var watcher = ScanWatchPolicy.ShouldWatchLive(
+            root.Kind,
+            root.ScanPolicy,
+            _watchSettings.WatchLocalRoots)
             ? ProcessWatcherAsync(root, retries.Reader, cancellationToken)
             : Task.CompletedTask;
         await Task.WhenAll(
