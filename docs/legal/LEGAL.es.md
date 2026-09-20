@@ -60,24 +60,24 @@ Compatibilidad: una licencia propietaria admite incorporar `LGPL-2.1-or-later`, 
 porque las bibliotecas viajan como archivos separados que quien quiera puede sustituir—. **Lo que no
 admite es código GPL.**
 
-**Complementos GPL de VideoLAN — CERRADO por ingeniería el 2026-09-18 (`ENG-013`).** La aplicación ya
+**Plugins GPL de VideoLAN — CERRADO por ingeniería el 2026-09-18 (`ENG-013`).** La aplicación ya
 no lleva el paquete de VideoLAN: lleva LibVLC compilado por este repositorio desde la misma versión de
-VLC, sin código GPL, verificado por una puerta que lee la licencia de cada complemento en sus fuentes
+VLC, sin código GPL, verificado por una puerta que lee la licencia de cada plugin en sus fuentes
 y fijado por hash (`eng/libvlc/libvlc.lock.json`). Está **modificado** —se le quitaron el algoritmo
-yadif y libdvdread, las dos piezas GPL que no eran un complemento entero—, y los ficheros tocados lo
+yadif y libdvdread, las dos piezas GPL que no eran un plugin entero—, y los ficheros tocados lo
 dicen con fecha, como pide el §2(b) de la LGPL-2.1. Su código fuente correspondiente viaja con cada
 versión (ver más abajo).
 
-**La `LGPL-3.0` de gmp, nettle y live555 — CERRADO el 2026-09-18 (`ENG-028`).** Las tres van enlazadas de forma estática dentro de cinco complementos,
+**La `LGPL-3.0` de gmp, nettle y live555 — CERRADO el 2026-09-18 (`ENG-028`).** Las tres van enlazadas de forma estática dentro de cinco plugins,
 medido en los binarios de las dos arquitecturas: gmp y nettle en `libgnutls`, en los dos de SRT y en
 `libdcp`; live555 en `liblive555`. `libvlc.dll` y `libvlccore.dll` no llevan ninguna. gmp y nettle
 tienen doble licencia —LGPL-3.0-or-later o GPL-2.0-or-later, leído en sus propias fuentes— y se usa la
 LGPL; live555 es LGPL-3.0-or-later. Contra el §4 de la LGPL-3.0:
 
-- **La obra combinada es cada complemento**, y todo su código es abierto; su fuente completo, con los
-  guiones que lo enlazan, viaja con cada versión. Eso es el §4(d)(0). Los complementos son archivos
+- **La obra combinada es cada plugin**, y todo su código es abierto; su fuente completo, con los
+  guiones que lo enlazan, viaja con cada versión. Eso es el §4(d)(0). Los plugins son archivos
   separados que el programa carga al arrancar y que cualquiera puede sustituir.
-- **Aviso y textos (§4a y §4b)**: los avisos de terceros las nombran con sus complementos y sus
+- **Aviso y textos (§4a y §4b)**: los avisos de terceros las nombran con sus plugins y sus
   copyrights, y `licenses/` lleva `LGPL-3.0.txt` y `GPL-3.0.txt`, porque la LGPL-3.0 está escrita sobre
   la GPL-3.0 y pide las dos. Faltaban hasta este día; `LicenceTextTests` impide que vuelvan a faltar.
 - **Información de instalación (§4e)**: no se debe. Viene del §6 de la GPL-3.0 y sólo alcanza a un
@@ -104,11 +104,11 @@ estuvo cerrado desde el 2026-08-10 **con el razonamiento contrario**, y conviene
 invirtió, porque es el ejemplo de que una conclusión correcta puede dejar de serlo sin que nadie
 toque el código. Entonces el argumento era: el `COPYING` del árbol de VLC lleva la GPL versión 2
 **con** la cláusula «either version 2 of the License, or (at your option) any later version», de modo
-que un complemento `GPL-2.0-or-later` sube a GPL-3.0 y **encaja dentro de un programa GPL-3.0**. El
+que un plugin `GPL-2.0-or-later` sube a GPL-3.0 y **encaja dentro de un programa GPL-3.0**. El
 razonamiento era válido y sigue siéndolo; lo que cambió es la premisa: **el programa ya no es GPL**,
 así que no hay ninguna versión a la que subir.
 
-**Son catorce complementos en x64 y once en ARM64, por tres causas distintas**, leídas el 2026-09-18
+**Son catorce plugins en x64 y once en ARM64, por tres causas distintas**, leídas el 2026-09-18
 en las fuentes de VLC 3.0.23 con `eng/libvlc/scan-plugin-licenses.ps1` (evidencia
 `audit-eng027-plugin-gpl-sources.md`). Hasta ese día este párrafo decía «dos», y luego «tres»: las dos
 cifras salían de buscar `--enable-gpl` en los binarios, y esa cadena sólo la escribe FFmpeg.
@@ -125,7 +125,7 @@ cifras salían de buscar `--enable-gpl` en los binarios, y esa cadena sólo la e
 **El núcleo, `libvlc.dll` y `libvlccore.dll`, está limpio.** No se ha distribuido ningún artefacto:
 el repositorio no tiene releases.
 
-**La consecuencia práctica fue dura mientras duró**: con esos complementos dentro del paquete, **el
+**La consecuencia práctica fue dura mientras duró**: con esos plugins dentro del paquete, **el
 artefacto no se podía distribuir** bajo la licencia propia, y el empaquetado quedó suspendido del
 2026-09-13 al 2026-09-18.
 
@@ -261,7 +261,7 @@ Ninguno de estos puntos lo puede cerrar quien escribe código, y ninguno frena e
 | Marca y dominio | Informe formal de `REL-004` | `REL-004`, ADR-0001 |
 | Firma Authenticode | Decisión económica pospuesta, ya documentada | SMARTSCREEN |
 
-Salieron de esta lista el 2026-08-10, resueltos en vez de delegados: los **complementos de VideoLAN**
+Salieron de esta lista el 2026-08-10, resueltos en vez de delegados: los **plugins de VideoLAN**
 (comprobado que son `GPL-2.0-or-later`, compatible) y el **logotipo de TMDB**, que no era una decisión
 sino un requisito de sus términos. Está incorporado desde esa misma fecha; abajo queda cómo, y qué se
 midió para corregir la cifra que la especificación traía mal.

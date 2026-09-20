@@ -15,10 +15,10 @@ copyright. Nombrar el componente en una tabla no es ninguna de las dos cosas.
 |---|---|---|
 | `Apache-2.0.txt` | Texto canónico | SQLitePCLRaw (§4a) |
 | `BSD-3-Clause.txt` | Texto canónico | ANGLE y Skia |
-| `GPL-2.0.txt` | Texto canónico | Ningún complemento desde el 2026-09-18; es la licencia de VLC como programa, que `libvlc` muestra de sí mismo |
+| `GPL-2.0.txt` | Texto canónico | Ningún plugin desde el 2026-09-18; es la licencia de VLC como programa, que `libvlc` muestra de sí mismo |
 | `GPL-3.0.txt` | Texto canónico | Acompaña a la LGPL-3.0, que está escrita sobre ella y pide las dos (§4b) |
 | `LGPL-2.1.txt` | Texto canónico | LibVLC, libvlccore y LibVLCSharp (§6) |
-| `LGPL-3.0.txt` | Texto canónico | GMP, Nettle y LIVE555, dentro de cinco complementos de LibVLC (§4) |
+| `LGPL-3.0.txt` | Texto canónico | GMP, Nettle y LIVE555, dentro de cinco plugins de LibVLC (§4) |
 | `MIT.txt` | Texto canónico y los avisos de quienes no publican el suyo | Avalonia, MicroCom, Tmds.DBus.Protocol, Microsoft y el motor de .NET |
 | `NOTICE-ANGLE.txt` | Copia literal del paquete | Avalonia.Angle.Windows.Natives |
 | `NOTICE-BouncyCastle.txt` | Copia literal del paquete | BouncyCastle.Cryptography |
@@ -27,7 +27,7 @@ copyright. Nombrar el componente en una tabla no es ninguna de las dos cosas.
 | `NOTICE-Skia-HarfBuzz-natives.txt` | Copia literal del paquete | Todo lo que Skia y HarfBuzz llevan dentro: ANGLE, freetype, ICU, libpng, libwebp, zlib y veinte más |
 | `NOTICE-SQLite.txt` | Copia literal del paquete | SQLite (dominio público) |
 | `NOTICE-SQLitePCLRaw.txt` | Aviso compuesto | SQLitePCLRaw |
-| `NOTICE-VideoLAN.txt` | Aviso compuesto | LibVLC y sus complementos |
+| `NOTICE-VideoLAN.txt` | Aviso compuesto | LibVLC y sus plugins |
 
 No hay texto de una licencia de catálogo para el propio programa: su licencia del propio programa viaja como `LICENSE` en la raíz del paquete,
 que es donde se busca.
@@ -43,7 +43,7 @@ fuente que ya lo distribuía y se contrastó con una segunda copia independiente
 - **GPL-2.0**: del propio árbol de VLC. El paquete de VideoLAN la lleva como la cadena que
   `vlc_about.h` compila dentro de `libvlc`; se extrajo de ahí y se contrastó con la copia que
   distribuye HandBrake, y coinciden salvo una línea en blanco final. Es la licencia que VLC muestra
-  de sí mismo, que es exactamente la que obliga a sus complementos.
+  de sí mismo, que es exactamente la que obliga a sus plugins.
 - **LGPL-3.0** y **GPL-3.0**: los `COPYING.LESSERv3` y `COPYINGv3` de GMP 6.3.0, tal como viajan en
   el paquete de fuentes del motor, contrastados con los de Nettle 3.7.3: idénticos byte a byte. Son
   los textos que esas bibliotecas entregan con su código, que es lo que las obliga.
@@ -68,7 +68,7 @@ distribuyendo el aviso de la versión anterior.
 
 El paquete lleva las licencias; el dictamen jurídico de `REL-004` sigue pendiente y es de quien
 publica, no de quien programa. Desde el 2026-09-18 el motor es una compilación propia sin GPL, así
-que ningún complemento necesita ya la oferta del §3 de la GPL-2.0. El punto que le queda es bajo qué
+que ningún plugin necesita ya la oferta del §3 de la GPL-2.0. El punto que le queda es bajo qué
 apartado del §6 de la LGPL-2.1 queda amparada la forma en que LibVLC viaja aquí —biblioteca dinámica
 modificada, con su código fuente adjunto, y sustituible—. La `LGPL-3.0` de gmp, nettle y live555 se
 leyó el 2026-09-18 (`ENG-028`) y la conclusión está en `LEGAL`.

@@ -44,9 +44,9 @@ el paquete se pidió directamente o llegó arrastrado.
 | BouncyCastle.Cryptography | 2.7.0 | MIT |
 | LibVLCSharp | 3.10.0 | LGPL-2.1-or-later |
 | LibVLC, compilado por AP Solutions sin GPL | 3.0.23-nogpl.1 | LGPL-2.1-or-later |
-| GNU MP (GMP), dentro de cuatro complementos de LibVLC | 6.3.0 | LGPL-3.0-or-later, elegida de su doble licencia con GPL-2.0-or-later |
-| GNU Nettle, dentro de cuatro complementos de LibVLC | 3.7.3 | LGPL-3.0-or-later, elegida de su doble licencia con GPL-2.0-or-later |
-| LIVE555 Streaming Media, dentro de un complemento de LibVLC | 2016.11.28 | LGPL-3.0-or-later |
+| GNU MP (GMP), dentro de cuatro plugins de LibVLC | 6.3.0 | LGPL-3.0-or-later, elegida de su doble licencia con GPL-2.0-or-later |
+| GNU Nettle, dentro de cuatro plugins de LibVLC | 3.7.3 | LGPL-3.0-or-later, elegida de su doble licencia con GPL-2.0-or-later |
+| LIVE555 Streaming Media, dentro de un plugin de LibVLC | 2016.11.28 | LGPL-3.0-or-later |
 | Microsoft.Data.Sqlite | 10.0.10 | MIT |
 | Microsoft.Data.Sqlite.Core | 10.0.10 | MIT |
 | SQLitePCLRaw.bundle_e_sqlite3 | 2.1.11 | Apache-2.0 |
@@ -92,24 +92,24 @@ del SDK de Windows (`Microsoft.Windows.SDK.NET.dll`, `WinRT.Runtime.dll`). Todo 
 Microsoft bajo `MIT`. Nadie tiene que instalar un motor de ejecución para usar AP Reelume, y esa
 comodidad es lo que mete varios cientos de archivos con licencia de Microsoft dentro del paquete.
 
-### LibVLC, su núcleo y sus complementos
+### LibVLC, su núcleo y sus plugins
 
 **Desde el 2026-09-18 el motor no es el paquete de VideoLAN, sino una compilación propia sin GPL**
 (`ENG-013`). Se construye desde la misma versión de VLC, la 3.0.23, con el guion y las imágenes de
 compilación de VideoLAN, las bibliotecas de terceros configuradas con `--disable-gpl` y FreeType bajo su
-FTL. Después se retira todo complemento cuyo código fuente sea GPL, y una puerta exige que no quede
+FTL. Después se retira todo plugin cuyo código fuente sea GPL, y una puerta exige que no quede
 ninguno. La publica este repositorio como `libvlc-3.0.23-nogpl.1`, fijada por el hash de cada archivo.
 **Está modificada**, y las dos modificaciones son quitar piezas GPL: el algoritmo de desentrelazado
-yadif del complemento `libdeinterlace` y la biblioteca libdvdread del guion de compilación. Los
+yadif del plugin `libdeinterlace` y la biblioteca libdvdread del guion de compilación. Los
 ficheros tocados lo dicen en su cabecera, con fecha, como pide el §2(b) de la LGPL-2.1.
 
-Todo lo que viaja —`libvlc.dll`, `libvlccore.dll` y los complementos de `plugins/`— es
+Todo lo que viaja —`libvlc.dll`, `libvlccore.dll` y los plugins de `plugins/`— es
 `LGPL-2.1-or-later`. El texto viaja en `licenses/LGPL-2.1.txt`, y en `licenses/NOTICE-VideoLAN.txt` el
-detalle de la compilación y dónde está su código fuente. Qué complementos faltan respecto al paquete de
+detalle de la compilación y dónde está su código fuente. Qué plugins faltan respecto al paquete de
 VideoLAN, y por qué, lo registra el `manifest.json` que se publica con el motor: los que eran GPL y
 los que ni ese paquete ni esta compilación usan.
 
-**Tres bibliotecas de terceros van enlazadas dentro de cinco complementos bajo `LGPL-3.0-or-later`**,
+**Tres bibliotecas de terceros van enlazadas dentro de cinco plugins bajo `LGPL-3.0-or-later`**,
 y el paquete de VideoLAN también las llevaba: GNU MP y GNU Nettle dentro de `libgnutls`,
 `libaccess_srt`, `libaccess_output_srt` y `libdcp`, y LIVE555 dentro de `liblive555`, en las dos
 arquitecturas. GMP y Nettle se ofrecen con doble licencia, LGPL-3.0 o GPL-2.0, y se usa la LGPL. Sus
@@ -119,31 +119,31 @@ pide las dos. Cómo encaja esa licencia con un programa propietario se leyó el 
 está en `LEGAL`.
 
 **Y «todo es LGPL-2.1» es la licencia de VLC, no el inventario de lo que llevan dentro sus
-complementos.** Además de esas tres, van enlazadas otras bibliotecas de terceros con sus propias
+plugins.** Además de esas tres, van enlazadas otras bibliotecas de terceros con sus propias
 licencias —SRT, por ejemplo, es MPL-2.0—, y ese inventario completo está sin hacer (`ENG-029`).
 
 **Lo que había antes, y por qué hubo que cambiarlo.** El paquete `VideoLAN.LibVLC.Windows` 3.0.23.1
-llevaba catorce complementos GPL en x64 y once en ARM64. `libavcodec_plugin.dll` y
+llevaba catorce plugins GPL en x64 y once en ARM64. `libavcodec_plugin.dll` y
 `libswscale_plugin.dll` lo eran porque su FFmpeg se compiló con `--enable-gpl`. Once más lo eran porque
 su código fuente es GPL, entre ellos `liblua`, `libdeinterlace` y `libhqdn3d`, y `libts_plugin.dll`
 porque enlaza aribb24. La lista sale de `eng/libvlc/scan-plugin-licenses.ps1` (evidencia
 `audit-eng027-plugin-gpl-sources.md`).
 
 **Esto estuvo cerrado desde el 2026-08-10 y se reabrió el 2026-09-13, y el motivo no fue un error.**
-El razonamiento de entonces era: para un programa publicado bajo `GPL-3.0-or-later`, un complemento
+El razonamiento de entonces era: para un programa publicado bajo `GPL-3.0-or-later`, un plugin
 `GPL-2.0-or-later` es compatible, porque el «o posterior» hace que ambos se encuentren en GPL-3.0.
 Era correcto y lo sigue siendo. **Lo que cambió es el programa**: desde el 2026-09-13 lleva licencia
-propia, así que no hay ninguna versión común a la que llegar, y un complemento contagioso dentro de
+propia, así que no hay ninguna versión común a la que llegar, y un plugin contagioso dentro de
 un programa propietario es un incumplimiento, no un encaje.
 
-**Y la palanca de recortar complementos ya no es opcional: es la única salida.** De los catorce, los
+**Y la palanca de recortar plugins ya no es opcional: es la única salida.** De los catorce, los
 que importan **no son el codificador x264** —un reproductor no codifica y ése se puede quitar—, sino
 **`libavcodec_plugin.dll` y `libswscale_plugin.dll`, los decodificadores**: su línea de compilación
 empieza por `--enable-gpl`, leída dentro de los dos binarios. Los módulos GPL de VLC son funciones que
 la aplicación no ofrece, un algoritmo de desentrelazado que no es el de por defecto y una conversión
 de color que `libswscale` también hace; `libts` sin aribb24 sigue leyendo `.ts`.
 
-**Mientras esos complementos viajaran aquí, el artefacto no se podía distribuir, y eso es lo que cerró
+**Mientras esos plugins viajaran aquí, el artefacto no se podía distribuir, y eso es lo que cerró
 la compilación propia.** No pierde formatos: la biblioteca que descodifica es permisiva por defecto, y
 lo contagioso eran piezas opcionales que se activan al compilar —un filtro de posprocesado heredado y
 algunas optimizaciones—, **sin ningún decodificador entre ellas**. Medido en Windows x64 y ARM64
@@ -220,7 +220,7 @@ se copia durante las pruebas.
 Este archivo dice qué declara cada componente y cómo encajan esas declaraciones entre sí. Lo escriben
 quienes ensamblaron el programa, no un abogado, y dos preguntas siguen abiertas hasta que el dictamen
 jurídico profesional de REL-004 las responda. **La primera se cerró por ingeniería el 2026-09-18**:
-desde el 2026-09-13 era un hallazgo —los complementos GPL del paquete de VideoLAN no eran compatibles
+desde el 2026-09-13 era un hallazgo —los plugins GPL del paquete de VideoLAN no eran compatibles
 con la licencia propia y frenaban la publicación—, y desde el 2026-09-18 el motor se compila sin ellos.
 La `LGPL-3.0` de tres bibliotecas se leyó el mismo día (`ENG-028`): tanto esa licencia como la
 LGPL-2.1 piden que el programa se pueda modificar para uso propio y depurar con ingeniería inversa, y
