@@ -454,7 +454,17 @@ try {
     # número sube (LIB-021, el ajuste del orden de portadas). Su ViewModel NO entró en la lista: el
     # run lo midió por encima del listón y lo que faltaba se cubrió con pruebas, que es la otra
     # mitad de la regla — un archivo nuevo sólo entra cuando no puede mejorar.
-    $debtRatchet = 186
+    #
+    # 185 el 2026-09-20, por mejora: FallbackScanScheduler.cs llega a 100/100 y sale de la lista.
+    # ENG-044 le quitó las dos ramas que lo sostenían por debajo del listón — un guard contra un
+    # intervalo no positivo y un `_recoveryInterval is not { }` — al dejar de recibir una constante
+    # y pasar a leer IScanWatchSettings, cuyo contrato promete un valor ya dentro de rango, recortado
+    # en el almacén. Lo que queda es la bandera de Startup, la decisión de ScanWatchPolicy y el
+    # bucle, y las tres las toman pruebas. Anticipado antes de empujar con preview-coverage-floors
+    # sobre Domain, Application, Integration y UiTests, que lo leyó 94/91 → 100/100, y confirmado por
+    # el artefacto del run 35510164184: el artefacto CONFIRMA, no descubre, que es para lo que existe
+    # esa previsualización.
+    $debtRatchet = 185
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

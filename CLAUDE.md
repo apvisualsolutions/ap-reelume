@@ -309,7 +309,7 @@ preguntar, y si no puede resolverlo **ensancha** la búsqueda en vez de estrecha
 **entero**, no con el corto: emitía `rev-parse --short HEAD`, que es justo el prefijo al que `gh`
 contesta `[]`.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **186** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **185** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -335,8 +335,15 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **186** <!--medido:trinquete-de-deuda-->
-desde el 2026-09-20, cuando **subió por una vista nueva**: `CoverOrderSettingsView.axaml` mide 100/50
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **185** <!--medido:trinquete-de-deuda-->
+desde el 2026-09-20 (tarde), cuando **bajó por mejora**: `FallbackScanScheduler.cs` llegó a 100/100 y
+salió de la lista. `ENG-044` le quitó las dos ramas que lo sostenían por debajo del listón —un guard
+contra un intervalo no positivo y un `is not { }`— al dejar de recibir una constante y pasar a leer
+el ajuste, cuyo contrato promete un valor ya recortado. **Y esta vez el rojo estaba anunciado antes
+de empujar**: `preview-coverage-floors.ps1` lo leyó 94/91 → 100/100 sobre cuatro suites, así que el
+artefacto de CI confirmó en vez de descubrir, que es exactamente para lo que existe esa
+previsualización. Antes estuvo en **186**
+desde el 2026-09-20 (mañana), cuando **subió por una vista nueva**: `CoverOrderSettingsView.axaml` mide 100/50
 como las otras sesenta y cinco, y eso no es deuda. **Una vista nueva sube este número en uno.** Su
 ViewModel **no** entró en la lista, que es la otra mitad de la regla: podía mejorar, así que se
 cubrió. Antes estuvo en **185**
