@@ -85,6 +85,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   published while the record is red, and the record checks what actually ran rather than what was
   written. Nothing in the program changes (`ENG-033` to `ENG-037`).
 
+- **The guard over the automated walk's pending list learns to tell two things apart.** It used to
+  refuse every write to the list of controls the automated walk has not pressed yet — which is right
+  for adding one, because a control nobody has ever pressed must not ship — but it refused just the
+  same when all that changed was the explanation written above the list. So that explanation went
+  stale and could not be fixed with the editing tools, and the guard itself was what kept the
+  contradiction alive. It now refuses what touches the list and lets through what only touches the
+  explanation; the stale figures are up to date, and the sequence behind them was measured from the
+  history rather than copied. Nothing in the program changes (`ENG-015`).
+
 - **The repository's working configuration no longer names its developer's internal services.** Since
   2026-09-05 the development tool's settings file, which ships with the public code, named a private
   notes server and six permissions on it. The enablement did nothing, because it only acts on servers

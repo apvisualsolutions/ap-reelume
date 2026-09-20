@@ -19,10 +19,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // empty' | tr -d '\\r' | { read -r f; case \"$f\" in *coverage-debt.txt) printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"eng/coverage-debt.txt LO PRODUCE CI: se copia del artefacto coverage-debt de un run, y nunca se edita a mano ni se genera con una ejecucion local (CLAUDE.md). Editarlo a mano relaja en silencio la cobertura de todo el arbol.\"}}';; *walk-pending.txt) printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"eng/walk-pending.txt NO lo produce CI: ci.yml no lo emite y el archivo vive en este arbol. Es el trinquete del paseo y SOLO PUEDE ENCOGER. Subirlo exige medir por que un control no se puede pulsar y escribir esa razon en su cabecera, como el 2026-08-25. No lo toques sin eso.\"}}';; esac; }",
+            "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/pre-write-ratchets.sh\"",
             "shell": "bash",
             "timeout": 10,
-            "statusMessage": "Comprobando los archivos que produce CI"
+            "statusMessage": "Comprobando los trinquetes del arbol"
           }
         ]
       },

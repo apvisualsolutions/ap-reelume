@@ -88,6 +88,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   trabajo, no deja publicar nada con el acta en rojo, y el acta comprueba lo que de verdad se ejecutó
   en vez de lo que se escribió. No cambia nada del programa (`ENG-033` a `ENG-037`).
 
+- **La guarda de la lista de pendientes del recorrido automático aprende a distinguir.** Rechazaba
+  toda escritura sobre la lista de controles que el recorrido todavía no pulsa —lo correcto para
+  añadir uno, porque un control que nadie ha pulsado nunca no debe publicarse—, pero rechazaba igual
+  cuando lo único que cambiaba era la explicación escrita encima de la lista. Así esa explicación se
+  quedó desfasada y no se podía corregir con las herramientas de edición, y era la propia guarda la
+  que sostenía la contradicción. Ahora rechaza lo que toca la lista y deja pasar lo que sólo toca la
+  explicación; las cifras desfasadas quedan al día, y la secuencia que hay detrás se midió del
+  historial en vez de copiarse. No cambia nada del programa (`ENG-015`).
+
 - **La configuración de trabajo del repositorio deja de nombrar servicios internos de quien lo
   desarrolla.** Desde el 2026-09-05 el archivo de configuración de la herramienta de desarrollo, que
   viaja con el código público, nombraba un servidor de notas privado y seis permisos sobre él. La

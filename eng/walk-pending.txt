@@ -2,12 +2,13 @@
 ##
 ## It is NOT empty, and the block below says why. Every other command control this application
 ## declares is pressed with a mouse by eng/run-accessibility.ps1's walk, asserted on its effect, and
-## clicked beside to no effect. The ratchet in eng/check-walk-coverage.ps1 is 20, and it only shrinks.
+## clicked beside to no effect. The ratchet in eng/check-walk-coverage.ps1 is 23, and it only shrinks.
 ##
 ## A control added from here on arrives with its scene in the same change. This list does not reopen
 ## for the application's sake: a line here would mean shipping something nobody has ever pressed, and
-## this application ships free and is tested by nobody by hand. The twenty below are the harness's
-## limit rather than the application's, and every one of them is pressable with a real mouse.
+## this application ships free and is tested by nobody by hand. The twenty-three below are the
+## harness's limit or this machine's rather than the application's; each block below says which of
+## the two it is, and what was measured to tell them apart.
 ##
 ## This file is NOT produced by CI. ci.yml publishes eng/coverage-debt.txt and nothing else; this one
 ## lives in the tree and changes in ordinary commits, with the measured reason written here.
