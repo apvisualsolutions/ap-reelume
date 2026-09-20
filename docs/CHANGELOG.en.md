@@ -164,6 +164,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   seriously unless the scene really did draw the three times it claims, because a scene drawn once
   would also count one. Nothing in the program changes (`ENG-017`).
 
+- **The tool that warns about coverage before a change is sent no longer answers "all clear" when
+  it could not look at anything.** It asked version control which files are new and threw its
+  complaints away without checking whether it had answered at all, so a repository it could not
+  read gave exactly the same reply as a tree with nothing new in it: none. Measured on a copy
+  broken on purpose with an unmeasured new file in front of it, it said there was nothing to fix.
+  Now it refuses to answer and says why, which is the rule the same tool already kept a few lines
+  below for coverage reports. Nothing in the program changes (`ENG-047`).
+
 ### Fixed
 
 - **Restoring the provider's data no longer erases the cover you picked.** The picked cover and the

@@ -88,6 +88,34 @@ public sealed class PreviewCoverageFloorsTests
 
         Assert.Empty(scene.ListNewFiles());
     }
+
+    /// <summary>
+    /// ENG-047: a git that cannot answer must not read as a clean tree. Measured on a copy with its
+    /// <c>.git</c> removed, the script printed «No floor moves and no new file falls short» over
+    /// exactly the file it exists to catch, and exited 0.
+    /// </summary>
+    /// <remarks>
+    /// <b>What this file still does not watch, and why it is a task and not an oversight.</b> The
+    /// gate auditor measured on 2026-09-20 that putting the pre-ENG-016 commit range back into the
+    /// REPORTING path leaves every case here green, because they all stop at <c>-ListNewFiles</c>.
+    /// Covering that turned out to need more than a sixth case: the script answers
+    /// <c>-ListNewFiles</c> from the working directory and then does <c>Push-Location</c> to this
+    /// repository before the reporting path runs, so the seam and the path it stands for ask two
+    /// different repositories, and no lying tree can reach the second. Closing it means making both
+    /// ask the same one, which rewrites the scene every case here is built on. It is written down
+    /// in ENG-047 rather than half-done.
+    /// </remarks>
+    [Fact]
+    public void A_repository_git_cannot_read_is_refused_rather_than_reported_clean()
+    {
+        using var scene = new PreviewScene();
+        scene.WriteSource("Fresh.cs");
+        scene.BreakGitDirectory();
+
+        var failure = scene.RunExpectingFailure("-ListNewFiles");
+
+        Assert.Contains("was not measured at all", failure, StringComparison.Ordinal);
+    }
 }
 
 /// <summary>
@@ -122,7 +150,56 @@ public sealed class PreviewScene : IDisposable
     /// Runs the real script with -ListNewFiles, which is the seam that lets this be measured by
     /// effect instead of by reading the file.
     /// </summary>
-    public string[] ListNewFiles()
+    public string[] ListNewFiles() =>
+        Run("-ListNewFiles")
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Trim())
+            .Where(line => line.Length > 0)
+            .ToArray();
+
+    /// <summary>
+    /// Leaves a repository git will not read. The directory is MOVED ASIDE and replaced by a file
+    /// of rubbish rather than deleted, for two reasons measured on 2026-09-20: deleting it sends
+    /// git looking up the parent directories, and what it would find there is whatever happens to
+    /// be on that machine — a scene that depends on that cannot be believed; and the objects inside
+    /// it are read-only, so the delete itself threw. An unreadable gitfile fails here, every time,
+    /// on any machine.
+    /// </summary>
+    public void BreakGitDirectory()
+    {
+        var git = Path.Combine(_root, ".git");
+        Directory.Move(git, Path.Combine(_root, ".git-moved-aside"));
+        File.WriteAllText(git, "this is not a gitfile");
+    }
+
+    /// <summary>
+    /// The script refusing to answer, which is a result and not an accident: hands back what it
+    /// complained about, having first insisted that it did complain.
+    /// </summary>
+    public string RunExpectingFailure(params string[] extra)
+    {
+        var (exitCode, stdout, stderr) = Start(extra);
+
+        Assert.True(
+            exitCode != 0,
+            "preview-coverage-floors.ps1 exited 0 on a repository git cannot read, so a tree it "
+                + $"could not look at reads exactly like a clean one. It printed: {stdout}");
+
+        return stderr;
+    }
+
+    private string Run(params string[] extra)
+    {
+        var (exitCode, stdout, stderr) = Start(extra);
+
+        Assert.True(
+            exitCode == 0,
+            $"preview-coverage-floors.ps1 {string.Join(' ', extra)} exited {exitCode}: {stderr}");
+
+        return stdout;
+    }
+
+    private (int ExitCode, string Stdout, string Stderr) Start(string[] extra)
     {
         var start = new ProcessStartInfo("pwsh")
         {
@@ -134,7 +211,11 @@ public sealed class PreviewScene : IDisposable
         start.ArgumentList.Add("-NoProfile");
         start.ArgumentList.Add("-File");
         start.ArgumentList.Add(RepositoryLayout.PathFromRoot("eng/preview-coverage-floors.ps1"));
-        start.ArgumentList.Add("-ListNewFiles");
+        foreach (var argument in extra)
+        {
+            start.ArgumentList.Add(argument);
+        }
+
         start.ArgumentList.Add("-BaseRef");
         start.ArgumentList.Add(BaseSha);
 
@@ -144,15 +225,7 @@ public sealed class PreviewScene : IDisposable
         var stderr = process.StandardError.ReadToEnd();
         process.WaitForExit(120_000);
 
-        Assert.True(
-            process.ExitCode == 0,
-            $"preview-coverage-floors.ps1 -ListNewFiles exited {process.ExitCode}: {stderr}");
-
-        return stdout
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Trim())
-            .Where(line => line.Length > 0)
-            .ToArray();
+        return (process.ExitCode, stdout, stderr);
     }
 
     public string Git(string arguments)

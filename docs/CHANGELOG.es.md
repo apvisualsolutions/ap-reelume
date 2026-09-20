@@ -168,6 +168,15 @@ evidencia, es [FEATURES.md](FEATURES.md).
   dice, porque una escena dibujada una sola vez también contaría uno. No cambia nada del programa
   (`ENG-017`).
 
+- **La herramienta que avisa de la cobertura antes de enviar un cambio ya no contesta «todo bien»
+  cuando no ha podido mirar nada.** Le preguntaba al control de versiones qué ficheros son nuevos y
+  tiraba sus quejas a la basura sin comprobar si había llegado a contestar, así que un repositorio
+  que no podía leer daba exactamente la misma respuesta que un árbol sin nada nuevo: ninguna.
+  Medido sobre una copia estropeada a propósito y con un fichero nuevo sin medir delante, decía que
+  no había nada que corregir. Ahora se niega a contestar y dice por qué, que es la regla que la
+  misma herramienta ya cumplía unas líneas más abajo para los informes de cobertura. No cambia nada
+  del programa (`ENG-047`).
+
 ### Corregido
 
 - **Restaurar los datos del proveedor ya no borra la portada que elegiste.** La portada elegida y la
