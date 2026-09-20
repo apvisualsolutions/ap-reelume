@@ -430,6 +430,14 @@ los siete archivos de hardware. Lo que cambia es que el artefacto **confirma** e
 suites que corres —un archivo cubierto por una que no corriste lee bajo—, y esos siete archivos
 nunca leen aquí como leen en el runner.
 
+**Tuvo un tercero y era el peor, porque cegaba justo su caso de uso: `ENG-016`, cerrada el
+2026-09-20.** Buscaba los archivos nuevos con un rango de commits, que sólo nombra lo que **ya está
+en un commit**, así que callaba sobre lo que aún no habías confirmado — que es cuando se
+previsualiza. Costó el run `35471110732`. Ahora mira también lo preparado y lo que git no sigue
+todavía, y **eso lo mide `PreviewCoverageFloorsTests` por efecto**, contra un repositorio de mentira
+y no contra éste: preguntando al árbol real la respuesta cambia con lo que cualquiera tenga sin
+commitear, así que el caso negativo no se podría creer nunca.
+
 **Y no basta con mirar los archivos nuevos.** Un archivo sube por dos vías, y la segunda es la que se
 olvida: porque le añades una rama cubierta, o porque **pruebas nuevas lo recorren de paso**. Ese día
 `AddLibraryRoot` pasó de 85 a 92 sin que nadie lo tocara, sólo porque las pruebas de
@@ -687,7 +695,23 @@ rechaza aunque esté bien implementada.
   distintos, y confundirlos costó una corrección el 2026-08-29**: `coverage-debt.txt` **lo produce
   CI** y se copia de su artefacto, mientras que `walk-pending.txt` **no lo produce nadie más que
   este árbol** —`ci.yml` no lo emite— y es un trinquete que sólo puede encoger. Decirle a alguien
-  que espere un artefacto de CI para un archivo que CI nunca publica es peor que no decirle nada. El tercero **avisa después** si se
+  que espere un artefacto de CI para un archivo que CI nunca publica es peor que no decirle nada.
+
+  **Y desde el 2026-09-20 el de los trinquetes DISTINGUE, que es `ENG-015`.** Denegaba toda
+  escritura sobre `walk-pending.txt` sin mirar qué cambiaba, así que la explicación de su cabecera
+  —desfasada desde el 2026-09-02— **no se podía corregir con las herramientas de edición**, y era el
+  propio guardián lo que sostenía la contradicción. Ahora deniega si el cambio toca una **fila** y
+  deja pasar si sólo toca **comentarios `##`**, incluidos los fragmentos que empiezan o terminan a
+  media fila; `coverage-debt.txt` conserva la denegación total, porque ahí no hay nada que
+  distinguir. Un guardián que impide arreglar su propia documentación acaba con alguien buscando
+  cómo esquivarlo. Vive en `.claude/hooks/pre-write-ratchets.sh`, con su batería al lado en
+  `pre-write-ratchets.test.sh` —**versionada, no en un temporal**: un hook que calla no deja rastro
+  en el registro, así que lo único que prueba que corre es la tubería con un caso que debe sonar al
+  lado del que debe callar, y eso hay que poder repetirlo—. Doce casos y dos mutantes; el primer
+  intento de mutante salió **idéntico** al original porque el `sed` no casó, dio 12 de 12 y no medía
+  nada, así que el guion compara el mutante con el original antes de creerse el resultado.
+
+  El tercero **avisa después** si se
   toca un `.es.md` y su pareja `.en.md` se queda como está en `HEAD` — pregunta a git y no al reloj,
   porque comparar `mtime` hacía que sonara también con los dos idiomas al día.
 
@@ -712,8 +736,9 @@ rechaza aunque esté bien implementada.
   comando entero **dos veces** delante del texto útil, así que en línea costaba **2.712 caracteres**
   de contexto por aviso. Ahora está en `.claude/hooks/post-write.sh` y el `settings.json` sólo lo
   llama: **488 caracteres**, un 82 % menos, leído del registro y no calculado — la cuenta a mano daba
-  528. Los otros dos hooks siguen en línea porque son cortos y **deniegan**, así que su texto nunca
-  se imprime dos veces.
+  528. **El de los trinquetes también vive en un archivo desde el 2026-09-20**, y ahí el motivo no
+  fue el precio sino que dejó de caber en una línea al aprender a distinguir. El del SPDX es el
+  único que sigue en línea: es corto y **deniega**, así que su texto nunca se imprime dos veces.
 
   Y como el aviso llega etiquetado de «error» después de una escritura que sí funcionó, los tres
   mensajes **empiezan diciendo que la escritura no falló**: sin eso se lee como un fallo y se
