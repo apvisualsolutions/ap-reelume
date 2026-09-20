@@ -32,11 +32,18 @@ namespace ApSolutions.LocalMedia.Application.Metadata;
 /// choice. Now each has its own field, and this walks the order: the first origin with a file on
 /// disk draws, so a picked file that went missing falls through to the provider's.
 /// </para>
+/// <para>
+/// <b>Which order that is stopped being fixed on 2026-09-20</b> (ADR-0009 decision 4). A title that
+/// carries one of its own is walked by it; every other title follows the general setting, asked for
+/// here rather than at the two call sites, so the rule that decides which picture a person sees
+/// stays in one place.
+/// </para>
 /// </remarks>
-public sealed class ResolveTitlePoster(IArtworkStore artwork, IAppDataPaths paths)
+public sealed class ResolveTitlePoster(IArtworkStore artwork, IAppDataPaths paths, ICoverOrderSettings coverOrder)
 {
     private readonly IArtworkStore _artwork = artwork ?? throw new ArgumentNullException(nameof(artwork));
     private readonly IAppDataPaths _paths = paths ?? throw new ArgumentNullException(nameof(paths));
+    private readonly ICoverOrderSettings _coverOrder = coverOrder ?? throw new ArgumentNullException(nameof(coverOrder));
 
     /// <summary>
     /// Where the frame taken from <paramref name="titleId"/>'s own video lives, whether or not it has
@@ -62,9 +69,16 @@ public sealed class ResolveTitlePoster(IArtworkStore artwork, IAppDataPaths path
     /// The picked cover's own field (LIB-021). <paramref name="posterPath"/> is still read as a
     /// personal cover too, for a row stored before the field existed that nothing has re-saved yet.
     /// </param>
-    public string? Find(TitleId titleId, string? posterPath, string? personalCover = null)
+    /// <param name="coverOrder">
+    /// The order this one title overrides the general one with, as its column holds it, or
+    /// <see langword="null"/> to follow the general setting. Text that names no origins is refused
+    /// and the general order decides, so a row written by hand cannot leave a card empty.
+    /// </param>
+    public string? Find(TitleId titleId, string? posterPath, string? personalCover = null, string? coverOrder = null)
     {
-        foreach (var origin in CoverOrderPolicy.Default)
+        foreach (var origin in CoverOrderPolicy.TryParse(coverOrder, out var forThisTitle)
+            ? forThisTitle
+            : _coverOrder.Current)
         {
             var file = origin switch
             {

@@ -51,6 +51,10 @@ public static partial class CompositionRoot
             .AddSingleton<ExportLibrary>()
             .AddSingleton<IPrivacySettings, StoredPrivacySettings>()
 
+            // LIB-021. Read where a poster is resolved, which is the one place that knows whether
+            // the title being drawn overrides this order with one of its own.
+            .AddSingleton<ICoverOrderSettings, StoredCoverOrderSettings>()
+
             // ARQ-004. One per application, so two of them in one process do not write each other's
             // failures into a log the other owns. It is read where the diagnostics inputs are built.
             .AddSingleton<ISessionFailureLog, InMemorySessionFailureLog>()

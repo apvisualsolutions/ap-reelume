@@ -68,7 +68,8 @@ public sealed record CatalogItem(
     int EpisodeCount = 0,
     int EpisodesWatched = 0,
     string? PosterPath = null,
-    string? PersonalCover = null);
+    string? PersonalCover = null,
+    string? CoverOrder = null);
 
 public sealed record CatalogPage(
     IReadOnlyList<CatalogItem> Items,
