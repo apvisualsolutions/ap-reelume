@@ -7,40 +7,51 @@
 
 ## Estado
 
-`main` y `codex/ap-reelume-mvp-x64` quedaron en el mismo commit, con su CI leído en verde. Este
-relevo va un commit por delante, por ser sólo documentación, y su CI no se espera.
+`main` y `codex/ap-reelume-mvp-x64` quedaron al día, y cada fast-forward se hizo con su CI leído en
+verde. Este relevo va un commit por delante, por ser sólo documentación, y su CI no se espera.
 
 ## Lo que se hizo
 
-· **El auditor de puertas sobre lo que trajo la adopción**, y trece comprobaciones pasaban sin
-  detectar el defecto que debían detectar. Cada una tiene ahora su mutante, visto sobrevivir antes y
-  morir después. Cerrada `ENG-038`: el recibo del acta guardaba mal la lista de saltos.
-· **El fotograma del propio vídeo ya llega a la cuadrícula** (`LIB-021`, plan 2 de 3): la pasada
-  corre al abrir la ventana y tras cada escaneo, y la tarjeta cambia su imagen en vez de rehacerse
-  la cuadrícula, que es lo que la hacía peligrosa para el paseo.
-· `CatalogItemViewModel` sale de la deuda de cobertura al 100/100 y el trinquete baja a **185**.
-· Evidencias: `audit-adoption-gates.md` y `LIB021-cover-origins-frame.md`.
+· **`LIB-021` entero, y con él `ENG-003`**, abierta desde el 2026-09-05. El orden de portadas se
+  cambia en una sección propia de Ajustes —dos botones sobre una lista, con su «Restaurar valores por
+  defecto»— y un título puede saltárselo desde su editor, con una fila de cuatro opciones.
+· **Migración 25** (`cover_order`), que guarda **el orden entero** y no el origen que gana: así mover
+  el orden general más tarde no cambia lo que ese título tenía dicho.
+· `MetadataFieldChanges.CoverOrder` lleva **dos centinelas** —`null` no toca la excepción, la lista
+  vacía la quita—, que es el hueco que `PersonalCover` todavía tiene.
+· Trinquete de deuda **185 → 186** por la vista nueva. El suelo de `MetadataEditorViewModel.cs`
+  **sube** a 95 por mejora, y el de `CatalogRepository.cs` **no bajó**: se cubrió la rama que la
+  columna nueva traía.
+· Enmienda al `ADR-0009` y evidencia `LIB021-cover-order-setting.md`.
 
 ## Las trampas medidas
 
-· **La puerta de cobertura SUMA las ramas de cada suite**, no toma «cubierta en cualquier sitio»:
-  media rama aquí y media allá son dos de cuatro. Costó un rojo de CI.
-· **La previsualización de suelos calla sobre un archivo nuevo sin commitear** (`ENG-016`), así que
-  no avisó de que el archivo nuevo medía 100/50. Costó el otro rojo.
-· En PowerShell, un `if` usado como valor desenrolla su salida: una lista vacía sale `null` y una de
-  uno sale suelta. Era el defecto de `ENG-038`, y el mismo patrón está en el plugin común.
+· **Una migración mueve CINCO afirmaciones del esquema, no tres.** Las tres escritas —conteo, máximo
+  y lista de nombres— dejaron una cuarta prueba roja: `Migration_is_idempotent_...` cuenta **una copia
+  de seguridad por migración** y vuelve a contar el historial.
+· **Un desplegable es un control que el paseo autónomo no puede pulsar**, porque nada dentro de un
+  popup lo alcanza, y su trinquete sólo encoge. Siete puertas rechazaron ese control desde siete
+  sitios distintos y **ninguna hubo que aflojarla**; la forma buena es la fila de opciones con radios
+  que la lista de dispositivos de audio ya usaba.
+· **Un `Test Case Cleanup Failure` de `UiTests` no es del código**: es el arnés. Tumbó un commit que
+  sólo tocaba los dos relevos. Tercera aparición, ya con ficha (`ENG-040`).
 
 ## Lo primero de la sesión siguiente
 
-· `docs/TAREAS.md`, la primera abierta que no esté parada.
-· El plan 3 de `LIB-021` —el ajuste del orden de portadas con su «Restaurar valores por defecto» y
-  la excepción por título— cierra `ENG-003`, que lleva abierta desde el 2026-09-05.
+· `docs/TAREAS.md`, la primera abierta que no esté parada. `ENG-002` y `ENG-005` piden al propietario
+  (un lector de pantalla real, y abrir una ventana), así que la primera tomable es **`ENG-009`**:
+  correr `gate-auditor` en un worktree pone roja `EvidenceLinkTests`, que trata sus copias como
+  documentos del proyecto. Hay que excluir `.claude/worktrees/` del barrido.
+· **`ENG-041` antes de subir cobertura**: dos reglas escritas sobre cómo cuenta esa puerta se
+  contradicen, y la fila dice cómo medirlo.
 
 ## Lo que espera al propietario
 
-· La sesión de IT publica hoy la **0.10.0** del sistema común; al avisar, toca migrar el registro de
-  métricas a JSON Lines con `adopt-enrol` y repetir ping, `prove` y el doctor.
-· `ENG-002` (una sesión con el Narrador) y lo demás suyo, como está en `docs/TAREAS.md`.
+· La sesión de IT publica la **0.10.0** del sistema común; al avisar, actualizar el plugin, comprobar
+  que responde, migrar su registro de métricas a JSON Lines y repetir sus comprobaciones. Los nombres
+  de esas herramientas **no se escriben aquí**: este repositorio es público.
+· `ENG-002` (una sesión con el Narrador), `ENG-005` (abrir una ventana cuando no esté trabajando) y
+  `ENG-042` (si «complemento» es deliberado en los documentos legales del motor o es una desviación).
 
 ## Lo pendiente no está aquí
 

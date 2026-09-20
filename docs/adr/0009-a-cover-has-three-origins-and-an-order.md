@@ -152,3 +152,42 @@ Removing either leaves a real case unanswered.
   already in the declared library, once per title, and the result is stored. `CRS-006`'s spike
   measured that an unreadable file takes 4,5 s to give up, so the call needs a deadline of its own.
 - **`CRS-006` stops being a courses row** and becomes the third origin of this decision.
+
+---
+
+## Enmienda del 2026-09-20 / Amendment of 2026-09-20
+
+**Qué cambia**: la decisión 4 dice que la excepción por título se ofrece «con la galería que el
+prototipo dibuja». Se construyó como **una fila de cuatro opciones** —el orden general y los tres
+orígenes— dentro del editor de la ficha, y **no** como una galería.
+
+**Por qué, medido el 2026-09-20 al construirlo**:
+
+- **Elegir un origen no es elegir una imagen.** La galería del prototipo enseña cuatro portadas
+  concretas para escoger una; lo que esta decisión pide es decir **de qué sitio** sale, que es una
+  respuesta entre cuatro y no una imagen entre cuatro. Las dos cosas siguen haciendo falta, y la
+  galería sigue siendo alcance de `PRD-006`, la paridad con el prototipo.
+- **Un desplegable se probó y lo rechazaron siete puertas**, entre ellas la que cuenta lo que el
+  paseo autónomo puede pulsar: nada dentro de un popup lo alcanza, y ese trinquete sólo encoge.
+- La forma que quedó es la que la lista de dispositivos de audio ya usaba en este árbol.
+
+**Lo que NO cambia**: los tres orígenes, el orden por defecto, que el fotograma se saque solo, y que
+la elección se pueda cambiar en dos sitios. La decisión 4 sigue en pie; lo que se enmienda es la
+forma del control, no lo que ofrece.
+
+Evidencia: [`LIB021-cover-order-setting.md`](../evidence/stable/LIB021-cover-order-setting.md).
+
+---
+
+**What changes**: decision 4 says the per-title override is offered «with the gallery the prototype
+draws». It was built as **a row of four options** — the general order and the three origins — inside
+the title's editor, and **not** as a gallery.
+
+**Why, measured on 2026-09-20 while building it**: picking an origin is not picking an image, and the
+gallery remains `PRD-006`'s scope; a drop-down was tried and seven gates refused it, among them the
+one counting what the autonomous walk can click — nothing inside a popup is reachable, and that
+ratchet only shrinks. The shape it ended with is the one the audio device list already used here.
+
+**What does not change**: the three origins, the default order, the frame being taken on its own, and
+the choice being changeable in two places. Decision 4 stands; what is amended is the control's shape,
+not what it offers.
