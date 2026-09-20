@@ -52,7 +52,8 @@ public sealed class WatchCoordinatorTests
         var coordinator = new RootWatchCoordinator(
             new FakeRootWatcher([batch]),
             new FakeFallbackScanScheduler([]),
-            scanner);
+            scanner,
+            new FakeScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -72,7 +73,8 @@ public sealed class WatchCoordinatorTests
         var coordinator = new RootWatchCoordinator(
             new FakeRootWatcher([new FileChangeBatch(root.Id, changes, DateTimeOffset.UnixEpoch)]),
             new FakeFallbackScanScheduler([]),
-            scanner);
+            scanner,
+            new FakeScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -87,7 +89,8 @@ public sealed class WatchCoordinatorTests
         var coordinator = new RootWatchCoordinator(
             new FakeRootWatcher([]),
             new FakeFallbackScanScheduler([ScanTrigger.Startup, ScanTrigger.Recovery]),
-            scanner);
+            scanner,
+            new FakeScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
         await coordinator.RunFallbackAsync(root, ScanTrigger.Manual, TestContext.Current.CancellationToken);
@@ -110,7 +113,8 @@ public sealed class WatchCoordinatorTests
                     DateTimeOffset.UnixEpoch),
             ]),
             new FakeFallbackScanScheduler([ScanTrigger.Startup]),
-            scanner);
+            scanner,
+            new FakeScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -126,7 +130,8 @@ public sealed class WatchCoordinatorTests
         var coordinator = new RootWatchCoordinator(
             new FakeRootWatcher([], new IOException("UNC watcher unavailable")),
             new FakeFallbackScanScheduler([]),
-            scanner);
+            scanner,
+            new FakeScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -155,7 +160,8 @@ public sealed class WatchCoordinatorTests
                     DateTimeOffset.UnixEpoch),
             ]),
             new FakeFallbackScanScheduler([]),
-            scanner);
+            scanner,
+            new FakeScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -180,7 +186,8 @@ public sealed class WatchCoordinatorTests
         var coordinator = new RootWatchCoordinator(
             watcher,
             new FakeFallbackScanScheduler([ScanTrigger.Recovery]),
-            scanner);
+            scanner,
+            new FakeScanWatchSettings(watchLocalRoots: false));
 
         var watching = coordinator.StartAsync(root, cancellation.Token);
         await watcher.WaitForStartsAsync(2, TimeSpan.FromSeconds(10));
@@ -200,7 +207,8 @@ public sealed class WatchCoordinatorTests
         var coordinator = new RootWatchCoordinator(
             watcher,
             new FakeFallbackScanScheduler([]),
-            scanner);
+            scanner,
+            new FakeScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -208,6 +216,62 @@ public sealed class WatchCoordinatorTests
         // Manual gets no watcher and no scan they did not ask for.
         Assert.Equal(0, watcher.Starts);
         Assert.Empty(scanner.Commands);
+    }
+
+    /// <summary>
+    /// ENG-044: a normal local folder is followed live because the setting says so, without the
+    /// per-root Continuous flag — which nothing in the application ever assigned, so the whole
+    /// watching slice never ran outside these tests.
+    /// </summary>
+    [Fact]
+    public async Task A_local_root_is_watched_when_the_setting_is_on_without_the_per_root_flag()
+    {
+        var root = CreateRoot(RootKind.Local) with { ScanPolicy = ScanPolicy.Startup | ScanPolicy.Manual };
+        var watcher = new CountingRootWatcher();
+        var coordinator = new RootWatchCoordinator(
+            watcher,
+            new FakeFallbackScanScheduler([]),
+            new RecordingScanCoordinator(),
+            new FakeScanWatchSettings(watchLocalRoots: true));
+
+        await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
+
+        Assert.Equal(1, watcher.Starts);
+    }
+
+    /// <summary>
+    /// And the same root is left alone when the setting is off, which is the half that makes the
+    /// setting a setting rather than a decoration.
+    /// </summary>
+    [Fact]
+    public async Task The_same_local_root_is_left_alone_when_the_setting_is_off()
+    {
+        var root = CreateRoot(RootKind.Local) with { ScanPolicy = ScanPolicy.Startup | ScanPolicy.Manual };
+        var watcher = new CountingRootWatcher();
+        var scanner = new RecordingScanCoordinator();
+        var coordinator = new RootWatchCoordinator(
+            watcher,
+            new FakeFallbackScanScheduler([]),
+            scanner,
+            new FakeScanWatchSettings(watchLocalRoots: false));
+
+        await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
+
+        Assert.Equal(0, watcher.Starts);
+        Assert.Empty(scanner.Commands);
+    }
+
+    /// <summary>
+    /// The older tests above hand this <c>false</c> on purpose. They build their roots with the
+    /// per-root <see cref="ScanPolicy.Continuous"/> flag, so with the setting off they keep
+    /// measuring exactly what they measured before: that the flag is what switches the live watcher
+    /// on, and not the setting that arrived with ENG-044.
+    /// </summary>
+    private sealed class FakeScanWatchSettings(bool watchLocalRoots) : IScanWatchSettings
+    {
+        public bool WatchLocalRoots { get; private set; } = watchLocalRoots;
+
+        public void SetWatchLocalRoots(bool enabled) => WatchLocalRoots = enabled;
     }
 
     /// <summary>A watcher whose first life ends the way an unreliable root ends it.</summary>

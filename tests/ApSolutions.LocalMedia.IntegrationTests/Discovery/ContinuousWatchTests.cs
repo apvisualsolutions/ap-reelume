@@ -52,7 +52,8 @@ public sealed class ContinuousWatchTests
                 mediaFiles,
                 new MediaFileEnumerator(),
                 new StubProbe(),
-                new InProcessApplicationEventPublisher()));
+                new InProcessApplicationEventPublisher()),
+            new FakeScanWatchSettings(watchLocalRoots: false));
         using var background = new RootWatchBackground(roots, coordinator);
 
         background.Start();
@@ -115,5 +116,13 @@ public sealed class ContinuousWatchTests
                 1920,
                 1080));
         }
+    }
+
+    // Off on purpose: this root carries ScanPolicy.Continuous, so the flag and not the setting still starts the watcher.
+    private sealed class FakeScanWatchSettings(bool watchLocalRoots) : IScanWatchSettings
+    {
+        public bool WatchLocalRoots { get; private set; } = watchLocalRoots;
+
+        public void SetWatchLocalRoots(bool enabled) => WatchLocalRoots = enabled;
     }
 }
