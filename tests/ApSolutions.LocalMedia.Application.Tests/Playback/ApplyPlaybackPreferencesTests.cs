@@ -116,6 +116,46 @@ public sealed class ApplyPlaybackPreferencesTests
         Assert.Equal(["beside.srt", "beside.es.srt"], engine.ExternalSubtitles);
     }
 
+    /// <summary>
+    /// ENG-011. The speed was stored, resolved and written to SQLite, and <b>nobody applied it</b>:
+    /// `resolved.SpeedMultiplier` was read in exactly zero places across `src/`.
+    /// </summary>
+    [Fact]
+    public async Task The_stored_speed_reaches_the_engine_as_the_file_opens()
+    {
+        var engine = new RecordingEngine([SpanishAudio], activeAudioTrackId: "1", activeSubtitleTrackId: null);
+        var apply = new ApplyPlaybackPreferences(new StoredPreferences(new PlaybackPreference
+        {
+            Scope = PreferenceScope.Global,
+            ScopeKey = PlaybackPreference.GlobalKey,
+            SpeedMultiplier = 1.5,
+        }));
+
+        var applied = await apply.ApplyAsync(engine, Context(), TestContext.Current.CancellationToken);
+
+        Assert.Equal(1.5, Assert.Single(engine.Speeds));
+        Assert.Equal(PreferenceScope.Global, applied.Resolved.SpeedSource);
+    }
+
+    /// <summary>
+    /// <b>The half that is a defect today and not only a forgotten setting.</b> The engine and the
+    /// transport both outlive the file — they are singletons — so a film left at 1.5× hands the next
+    /// film 1.5× without anybody asking, and the screen reads it back as if it had been chosen. The
+    /// comment beside the picture adjustment already said this in writing about itself; the speed
+    /// has the same shape and nobody joined the two. So silence is not «leave whatever is running»:
+    /// silence is the engine's own normal speed, written every time.
+    /// </summary>
+    [Fact]
+    public async Task Silence_puts_the_speed_back_to_normal_instead_of_carrying_the_last_film_over()
+    {
+        var engine = new RecordingEngine([SpanishAudio], activeAudioTrackId: "1", activeSubtitleTrackId: null);
+        var apply = new ApplyPlaybackPreferences(new EmptyPreferences());
+
+        _ = await apply.ApplyAsync(engine, Context(), TestContext.Current.CancellationToken);
+
+        Assert.Equal(1.0, Assert.Single(engine.Speeds));
+    }
+
     [Fact]
     public async Task The_stored_picture_adjustment_reaches_the_engine_as_the_file_opens()
     {
@@ -189,6 +229,9 @@ public sealed class ApplyPlaybackPreferencesTests
     {
         public PictureAdjustment PictureAdjustment { get; set; } = PictureAdjustment.Neutral;
 
+        /// <summary>Every speed this engine was told to run at, which nobody used to tell it.</summary>
+        public List<double> Speeds { get; } = [];
+
         public List<(MediaTrackKind Kind, string? TrackId)> Selections { get; } = [];
 
         public List<string> ExternalSubtitles { get; } = [];
@@ -244,8 +287,11 @@ public sealed class ApplyPlaybackPreferencesTests
             return Task.FromResult(new MediaTrack(path, MediaTrackKind.Subtitle, IsExternal: true));
         }
 
-        public Task SetSpeedAsync(double multiplier, CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
+        public Task SetSpeedAsync(double multiplier, CancellationToken cancellationToken = default)
+        {
+            Speeds.Add(multiplier);
+            return Task.CompletedTask;
+        }
 
         public Task SetAudioOutputDeviceAsync(string deviceId, CancellationToken cancellationToken = default) =>
             Task.CompletedTask;

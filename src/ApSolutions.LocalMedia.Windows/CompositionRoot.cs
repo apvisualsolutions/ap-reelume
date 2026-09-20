@@ -1372,6 +1372,17 @@ public static partial class CompositionRoot
             // preferences simply have nothing to act on.
         }
 
+        // The transport keeps its own copy of the speed — it is what the screen reads — and the
+        // engine has just been told the resolved one. Without this line the two disagree and the
+        // screen lies in both directions (ENG-011). It is the consumer that makes AdoptSpeedAsync
+        // exist: a method nobody calls would be this repository's own house defect again.
+        if (applied is { } preference)
+        {
+            _ = await provider.GetRequiredService<ControlPlayback>()
+                .AdoptSpeedAsync(preference.Resolved.SpeedMultiplier, cancellationToken)
+                .ConfigureAwait(true);
+        }
+
         void OnPositionChanged(object? sender, PlaybackPositionChangedEventArgs args)
         {
             tracker.Observe(args.Position, args.Duration);

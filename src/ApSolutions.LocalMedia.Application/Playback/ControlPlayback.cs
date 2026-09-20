@@ -23,6 +23,7 @@ public sealed class ControlPlayback : IDisposable
 {
     private readonly IMediaPlayerEngine _engine;
     private readonly Func<TimeSpan, TimeSpan?, CancellationToken, Task>? _persistAfterSeek;
+    private readonly Func<double, CancellationToken, Task>? _persistSpeed;
     private readonly SemaphoreSlim _gate = new(1, 1);
     private double _speed = 1.0;
     private int _volumePercent = VolumeBoostPolicy.MaximumNormalPercent;
@@ -35,12 +36,20 @@ public sealed class ControlPlayback : IDisposable
     /// Called with the clamped target after every seek, because a jump is a moment worth surviving a
     /// crash: the person chose that position on purpose.
     /// </param>
+    /// <param name="persistSpeed">
+    /// Called with the clamped multiplier after every speed change, because the speed is a
+    /// preference and not a moment: it belongs to how this person watches, so it has to survive the
+    /// application closing (ENG-011). It receives what the engine was told and never what was asked
+    /// for, exactly like the seek above.
+    /// </param>
     public ControlPlayback(
         IMediaPlayerEngine engine,
-        Func<TimeSpan, TimeSpan?, CancellationToken, Task>? persistAfterSeek = null)
+        Func<TimeSpan, TimeSpan?, CancellationToken, Task>? persistAfterSeek = null,
+        Func<double, CancellationToken, Task>? persistSpeed = null)
     {
         _engine = engine ?? throw new ArgumentNullException(nameof(engine));
         _persistAfterSeek = persistAfterSeek;
+        _persistSpeed = persistSpeed;
     }
 
     public Task<PlaybackControlState> SetSpeedAsync(double requested, CancellationToken cancellationToken = default) =>
@@ -49,6 +58,29 @@ public sealed class ControlPlayback : IDisposable
             {
                 _speed = PlaybackControlPolicy.ClampSpeed(requested);
                 await _engine.SetSpeedAsync(_speed, token).ConfigureAwait(false);
+                if (_persistSpeed is { } persist)
+                {
+                    await persist(_speed, token).ConfigureAwait(false);
+                }
+            },
+            cancellationToken);
+
+    /// <summary>
+    /// Takes the speed the preferences resolved as the session opens, so the transport's own idea of
+    /// it matches what the engine is doing.
+    /// </summary>
+    /// <remarks>
+    /// Without this the screen would lie in both directions: a stored 1.5× would show as 1× while
+    /// the film ran fast, and the 1× that opening a new film writes would show as the 1.5× left over
+    /// from the last one. <b>It does not persist</b> — nothing was chosen here, this is the stored
+    /// value arriving.
+    /// </remarks>
+    public Task<PlaybackControlState> AdoptSpeedAsync(double resolved, CancellationToken cancellationToken = default) =>
+        RunAsync(
+            _ =>
+            {
+                _speed = PlaybackControlPolicy.ClampSpeed(resolved);
+                return Task.CompletedTask;
             },
             cancellationToken);
 

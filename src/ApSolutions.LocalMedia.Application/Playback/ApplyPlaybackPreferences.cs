@@ -75,6 +75,15 @@ public sealed class ApplyPlaybackPreferences
             adjustable.PictureAdjustment = resolved.Picture;
         }
 
+        // The speed has exactly the shape of the comment above, and for five weeks nobody joined the
+        // two (ENG-011). It was stored, resolved and written to SQLite, and `resolved.SpeedMultiplier`
+        // was read in zero places across src/: the chosen speed did not survive closing, and — the
+        // half that is a defect rather than a forgotten setting — a film left at 1.5× handed the next
+        // film 1.5×, because ControlPlayback is a singleton too and the screen reads its speed back
+        // as if somebody had chosen it. So this is written every time, silence included: silence
+        // resolves to the engine's own normal speed, never to «whatever is still running».
+        await engine.SetSpeedAsync(resolved.SpeedMultiplier, cancellationToken).ConfigureAwait(false);
+
         var snapshot = await engine.GetSnapshotAsync(cancellationToken).ConfigureAwait(false);
 
         // A scope that answered is a decision somebody took; a scope that did not is silence, and
