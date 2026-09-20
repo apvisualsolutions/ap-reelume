@@ -102,11 +102,36 @@ $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 function Get-NewSourceFile {
     param([string]$BaseRef)
 
-    return @(@(
-        git diff --name-only --diff-filter=A "$BaseRef...HEAD" -- 'src/*.cs' 2>$null
-        git diff --name-only --diff-filter=A --cached -- 'src/*.cs' 2>$null
-        git ls-files --others --exclude-standard -- 'src/*.cs' 2>$null
-    ) | Where-Object { $_ } | ForEach-Object { $_ -replace '\\', '/' } | Sort-Object -Unique)
+    <#
+        A GIT THAT CANNOT ANSWER MUST NOT READ AS A CLEAN TREE, and until ENG-047 it did. The three
+        queries sent their complaints to $null and nobody looked at the exit code, so a repository
+        git refuses to touch - the wrong directory, a dubious ownership refusal, a base ref that is
+        not there - produced an empty list, which is the same answer a tree with no new source
+        gives. Measured 2026-09-20 on a copy with its .git removed and an unmeasured new file in
+        front of it: "No floor moves and no new file falls short". An all-clear over exactly the
+        file it exists to catch.
+
+        It is the same rule Read-FileCoverage already keeps one function down, where no report at
+        all throws rather than reporting nothing wrong. Refusing to answer is the only honest reply,
+        because "I looked and there is nothing" and "I could not look" are one output otherwise.
+    #>
+    $found = @()
+    foreach ($query in @(
+            @('diff', '--name-only', '--diff-filter=A', "$BaseRef...HEAD", '--', 'src/*.cs'),
+            @('diff', '--name-only', '--diff-filter=A', '--cached', '--', 'src/*.cs'),
+            @('ls-files', '--others', '--exclude-standard', '--', 'src/*.cs')
+        )) {
+        $answer = @(git @query 2>$null)
+        if ($LASTEXITCODE -ne 0) {
+            throw "git $($query -join ' ') answered $LASTEXITCODE, so which files are new was not " +
+            'measured at all and this preview would have read as a clean tree. Run it from inside ' +
+            "the repository, and check that -BaseRef names a ref that exists here."
+        }
+
+        $found += $answer
+    }
+
+    return @($found | Where-Object { $_ } | ForEach-Object { $_ -replace '\\', '/' } | Sort-Object -Unique)
 }
 
 if ($ListNewFiles) {
