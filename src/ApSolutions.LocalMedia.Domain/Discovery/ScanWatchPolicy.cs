@@ -34,10 +34,76 @@ namespace ApSolutions.LocalMedia.Domain.Discovery;
 /// </remarks>
 public static class ScanWatchPolicy
 {
+    /// <summary>How long the recovery sweep waits between passes when nobody has said otherwise.</summary>
+    /// <remarks>
+    /// <b>This number lived in two places saying different things.</b> The settings screen offered
+    /// thirty minutes and <c>FallbackScanScheduler</c> ran every fifteen, and neither knew about the
+    /// other — which nobody could notice, because the screen's value governed nothing at all
+    /// (ENG-010). Fifteen wins: it is the one the code actually ran and the one the archived WP-2
+    /// evidence backs in writing, so there is no behaviour on the other side to preserve. It lives
+    /// here once and both ends point at it rather than copying the digits.
+    /// </remarks>
+    public static readonly TimeSpan DefaultSweepInterval = TimeSpan.FromMinutes(15);
+
+    /// <summary>The shortest sweep this application will run, however it is asked.</summary>
+    /// <remarks>
+    /// A sweep every zero minutes is a scan in a hot loop, and the settings file is plain text that
+    /// somebody can open. The bounds are the ones the screen's spinner already paints, so a value
+    /// typed there can never be out of range and one edited by hand is brought back into it.
+    /// </remarks>
+    public static readonly TimeSpan MinimumSweepInterval = TimeSpan.FromMinutes(1);
+
+    /// <summary>The longest sweep this application will run, however it is asked.</summary>
+    public static readonly TimeSpan MaximumSweepInterval = TimeSpan.FromMinutes(1440);
+
     /// <param name="kind">Where the root lives: a fixed disk, a removable drive, or a share.</param>
     /// <param name="policy">What that root itself declares.</param>
     /// <param name="watchLocalRoots">The setting a person can reach.</param>
     public static bool ShouldWatchLive(RootKind kind, ScanPolicy policy, bool watchLocalRoots) =>
         policy.HasFlag(ScanPolicy.Continuous)
         || (watchLocalRoots && kind == RootKind.Local && policy.HasFlag(ScanPolicy.Startup));
+
+    /// <summary>
+    /// Whether a root gets the periodic recovery sweep on top of whatever watcher it has.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is the other half of ENG-044, and it was still broken after the first half was fixed.
+    /// <c>FallbackScanScheduler</c> kept asking for <see cref="ScanPolicy.Continuous"/> on its own,
+    /// which nothing assigns, so <b>no real root ever reached its loop</b> — it emitted the startup
+    /// pass and broke out. That silently cost two things: the recovery sweep <see cref="ScanPolicy"/>
+    /// promises for USB and network roots, and the retry that brings a dead live watcher back, which
+    /// <c>RootWatchCoordinator</c> feeds from this very schedule.
+    /// </para>
+    /// <para>
+    /// <b>Every root followed live is swept</b>, because the sweep is the watcher's safety net: a
+    /// file watcher reports events it can miss, and the recovery pass is what catches them.
+    /// </para>
+    /// <para>
+    /// <b>And a removable or network root is swept even with the setting off</b>, which is the one
+    /// asymmetry worth reading twice. The setting says «local roots» and means it: it never spoke
+    /// for the drive that gets pulled out or the share across the network, so it cannot switch off
+    /// a sweep it never switched on. There the sweep is the only net that exists, because the
+    /// setting never gives either of them a live watcher — which is the half of LIB-003 that reads
+    /// «recovery for USB/NAS».
+    /// </para>
+    /// <para>
+    /// <b>The mirror case: a local root the setting left alone is not swept either.</b> The screen's
+    /// own description sells the sweep as the watcher's backup — «if watching fails, it checks them
+    /// again every so often» — so leaving it running after the box is unticked would keep files
+    /// appearing every quarter of an hour for somebody who just asked for that to stop. The startup
+    /// pass still happens; that one is the root's own decision and not the setting's.
+    /// </para>
+    /// <para>
+    /// <b>And <see cref="ScanPolicy.Manual"/> alone is never swept, in any branch</b>, for the same
+    /// written promise that shapes <see cref="ShouldWatchLive"/>: a recovery pass is a scan nobody
+    /// asked for.
+    /// </para>
+    /// </remarks>
+    /// <param name="kind">Where the root lives: a fixed disk, a removable drive, or a share.</param>
+    /// <param name="policy">What that root itself declares.</param>
+    /// <param name="watchLocalRoots">The setting a person can reach.</param>
+    public static bool ShouldSweepPeriodically(RootKind kind, ScanPolicy policy, bool watchLocalRoots) =>
+        ShouldWatchLive(kind, policy, watchLocalRoots)
+        || (kind != RootKind.Local && policy.HasFlag(ScanPolicy.Startup));
 }

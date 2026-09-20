@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.Application.Tests.Discovery;
@@ -53,7 +54,7 @@ public sealed class WatchCoordinatorTests
             new FakeRootWatcher([batch]),
             new FakeFallbackScanScheduler([]),
             scanner,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -74,7 +75,7 @@ public sealed class WatchCoordinatorTests
             new FakeRootWatcher([new FileChangeBatch(root.Id, changes, DateTimeOffset.UnixEpoch)]),
             new FakeFallbackScanScheduler([]),
             scanner,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -90,7 +91,7 @@ public sealed class WatchCoordinatorTests
             new FakeRootWatcher([]),
             new FakeFallbackScanScheduler([ScanTrigger.Startup, ScanTrigger.Recovery]),
             scanner,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
         await coordinator.RunFallbackAsync(root, ScanTrigger.Manual, TestContext.Current.CancellationToken);
@@ -114,7 +115,7 @@ public sealed class WatchCoordinatorTests
             ]),
             new FakeFallbackScanScheduler([ScanTrigger.Startup]),
             scanner,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -131,7 +132,7 @@ public sealed class WatchCoordinatorTests
             new FakeRootWatcher([], new IOException("UNC watcher unavailable")),
             new FakeFallbackScanScheduler([]),
             scanner,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -161,7 +162,7 @@ public sealed class WatchCoordinatorTests
             ]),
             new FakeFallbackScanScheduler([]),
             scanner,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -187,7 +188,7 @@ public sealed class WatchCoordinatorTests
             watcher,
             new FakeFallbackScanScheduler([ScanTrigger.Recovery]),
             scanner,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
 
         var watching = coordinator.StartAsync(root, cancellation.Token);
         await watcher.WaitForStartsAsync(2, TimeSpan.FromSeconds(10));
@@ -208,7 +209,7 @@ public sealed class WatchCoordinatorTests
             watcher,
             new FakeFallbackScanScheduler([]),
             scanner,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -232,7 +233,7 @@ public sealed class WatchCoordinatorTests
             watcher,
             new FakeFallbackScanScheduler([]),
             new RecordingScanCoordinator(),
-            new FakeScanWatchSettings(watchLocalRoots: true));
+            new InMemoryScanWatchSettings(watchLocalRoots: true));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -253,7 +254,7 @@ public sealed class WatchCoordinatorTests
             watcher,
             new FakeFallbackScanScheduler([]),
             scanner,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
@@ -261,18 +262,12 @@ public sealed class WatchCoordinatorTests
         Assert.Empty(scanner.Commands);
     }
 
-    /// <summary>
-    /// The older tests above hand this <c>false</c> on purpose. They build their roots with the
-    /// per-root <see cref="ScanPolicy.Continuous"/> flag, so with the setting off they keep
-    /// measuring exactly what they measured before: that the flag is what switches the live watcher
-    /// on, and not the setting that arrived with ENG-044.
-    /// </summary>
-    private sealed class FakeScanWatchSettings(bool watchLocalRoots) : IScanWatchSettings
-    {
-        public bool WatchLocalRoots { get; private set; } = watchLocalRoots;
-
-        public void SetWatchLocalRoots(bool enabled) => WatchLocalRoots = enabled;
-    }
+    // The tests above hand the settings stub `false` on purpose. They build their roots with the
+    // per-root ScanPolicy.Continuous flag, so with the setting off they keep measuring exactly what
+    // they measured before: that the flag is what switches the live watcher on, and not the setting
+    // that arrived with ENG-044. The stub itself is InMemoryScanWatchSettings, in
+    // tests/Shared/ScanWatchStubs.cs, which carries this same note — it used to be five copies of
+    // the same six lines, and widening the port meant finding and editing every one of them.
 
     /// <summary>A watcher whose first life ends the way an unreliable root ends it.</summary>
     private sealed class DyingRootWatcher : IRootWatcher, IDisposable

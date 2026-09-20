@@ -11,6 +11,9 @@
     <ProjectReference Include="..\..\src\ApSolutions.LocalMedia.Windows\ApSolutions.LocalMedia.Windows.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Shared\ScanWatchStubs.cs" Link="ScanWatchStubs.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Avalonia.Headless.XUnit" />
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="FlaUI.Core" />

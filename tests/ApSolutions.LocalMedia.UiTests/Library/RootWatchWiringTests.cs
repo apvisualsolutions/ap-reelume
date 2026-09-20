@@ -59,18 +59,17 @@ public sealed class RootWatchWiringTests
             StringComparison.Ordinal);
     }
 
-    [Fact]
-    public void The_fallback_scheduler_is_given_a_real_recovery_interval()
-    {
-        var composition = CompositionSource();
-
-        // Without an interval the Continuous policy silently means "never": the scheduler yields
-        // the startup pass and then nothing recovers a lost event for USB and NAS roots.
-        Assert.Contains(
-            "FallbackScanScheduler.DefaultRecoveryInterval",
-            composition,
-            StringComparison.Ordinal);
-    }
+    // The_fallback_scheduler_is_given_a_real_recovery_interval lived here and is gone on purpose
+    // (ENG-044). It asserted that the composition's source text mentioned
+    // FallbackScanScheduler.DefaultRecoveryInterval, and it was green throughout the whole time the
+    // sweep ran for absolutely nobody: the words were there, the constant was handed over, and the
+    // scheduler broke out before its loop because nothing in the application ever assigned the
+    // Continuous flag it asked for. A gate satisfied by text cannot see that.
+    //
+    // What replaced it resolves the real scheduler from the real container and makes it emit:
+    // CompositionDescriptorTests.The_assembled_fallback_scheduler_sweeps_a_root_the_application_can_really_create.
+    // The four assertions left below are still textual and still worth having — they name wiring
+    // that has no other witness — but none of them may be read as evidence that the slice runs.
 
     private static string CompositionSource()
     {

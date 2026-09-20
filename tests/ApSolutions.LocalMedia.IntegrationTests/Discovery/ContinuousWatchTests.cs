@@ -10,6 +10,7 @@ using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.FileSystem;
 using ApSolutions.LocalMedia.Infrastructure.Time;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.IntegrationTests.Discovery;
@@ -44,17 +45,20 @@ public sealed class ContinuousWatchTests
             ScanPolicy.Startup | ScanPolicy.Continuous);
         await roots.AddAsync(root, TestContext.Current.CancellationToken);
         var mediaFiles = new MediaFileRepository(factory);
+        // Off on purpose: this root carries ScanPolicy.Continuous, so the flag and not the setting
+        // still starts the watcher — which is what this scene measured before ENG-044 existed.
+        var settings = new InMemoryScanWatchSettings(watchLocalRoots: false);
         var coordinator = new RootWatchCoordinator(
             new DebouncedFileWatcher(new SystemClock(), TimeSpan.FromMilliseconds(150)),
-            new FallbackScanScheduler(new SystemClock()),
+            new FallbackScanScheduler(new SystemClock(), settings),
             new ScanCoordinator(
                 roots,
                 mediaFiles,
                 new MediaFileEnumerator(),
                 new StubProbe(),
                 new InProcessApplicationEventPublisher()),
-            new FakeScanWatchSettings(watchLocalRoots: false));
-        using var background = new RootWatchBackground(roots, coordinator);
+            settings);
+        using var background = new RootWatchBackground(roots, coordinator, settings);
 
         background.Start();
         await WaitForAsync(
@@ -118,11 +122,4 @@ public sealed class ContinuousWatchTests
         }
     }
 
-    // Off on purpose: this root carries ScanPolicy.Continuous, so the flag and not the setting still starts the watcher.
-    private sealed class FakeScanWatchSettings(bool watchLocalRoots) : IScanWatchSettings
-    {
-        public bool WatchLocalRoots { get; private set; } = watchLocalRoots;
-
-        public void SetWatchLocalRoots(bool enabled) => WatchLocalRoots = enabled;
-    }
 }

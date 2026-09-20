@@ -24,6 +24,7 @@ using ApSolutions.LocalMedia.Presentation.Player;
 using ApSolutions.LocalMedia.Presentation.Review;
 using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
@@ -676,7 +677,7 @@ public sealed class ShellAssemblyTests
             new GetReviewInbox(new StubCandidates()),
             new ResolveMatch(new StubCandidates(), new StubEvents(), SilentIdentification.Create()),
             new RejectMatch(new StubCandidates(), new StubEvents())),
-        ScanSettings = new ScanSettingsViewModel(),
+        ScanSettings = new ScanSettingsViewModel(new InMemoryScanWatchSettings()),
         Shortcuts = new ShortcutSettingsViewModel(new ShortcutMap()),
         SubtitleStyle = new SubtitleStyleViewModel(new StubPreferences()),
         OpenMetadataEditor = (titleId, _) => Task.FromResult<MetadataEditorViewModel?>(BuildEditor(titleId)),
