@@ -122,6 +122,7 @@ public sealed class CatalogQueryTests
                     new HashSet<MetadataField>())
                 {
                     PersonalCover = new string('f', 64) + ".png",
+                    CoverOrder = "Frame,Personal,Provider",
                 },
                 Revision: 1),
             expectedRevision: 0,
@@ -140,6 +141,13 @@ public sealed class CatalogQueryTests
         Assert.Equal(new string('f', 64) + ".png", arrival.PersonalCover);
         Assert.Null(dune.PosterPath);
         Assert.Null(dune.PersonalCover);
+
+        // And the order this one title overrides the general one with, handed over as stored. The
+        // title without one reads null and follows the general order — the two together are what
+        // stops the grid drawing every title with the same order while a stored override sits in the
+        // database unread, which is this repository's characteristic defect.
+        Assert.Equal("Frame,Personal,Provider", arrival.CoverOrder);
+        Assert.Null(dune.CoverOrder);
     }
 
     [Fact]
