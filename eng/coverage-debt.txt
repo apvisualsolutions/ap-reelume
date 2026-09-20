@@ -317,7 +317,7 @@ src/ApSolutions.LocalMedia.Presentation/Library/PosterCardView.axaml            
 src/ApSolutions.LocalMedia.Presentation/Library/ScanProgressViewModel.cs                      98  85
 src/ApSolutions.LocalMedia.Presentation/Library/UnavailableBadge.axaml                       100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorView.axaml                    100  50
-src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs                  100  93
+src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs                  100  95
 src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewView.axaml                     100  50
 src/ApSolutions.LocalMedia.Presentation/Metadata/RenamePreviewViewModel.cs                    95  63
 src/ApSolutions.LocalMedia.Presentation/Movie/MovieDetailsView.axaml                         100  50
@@ -364,6 +364,7 @@ src/ApSolutions.LocalMedia.Presentation/Review/DuplicateReviewViewModel.cs      
 src/ApSolutions.LocalMedia.Presentation/Review/DuplicatesOverviewView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Review/ReviewInboxView.axaml                         100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/AppearanceSettingsView.axaml                100  50
+src/ApSolutions.LocalMedia.Presentation/Settings/CoverOrderSettingsView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/DiagnosticsPreviewView.axaml                100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/LanguageSettingsView.axaml                  100  50
 src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsView.axaml                 100  50
