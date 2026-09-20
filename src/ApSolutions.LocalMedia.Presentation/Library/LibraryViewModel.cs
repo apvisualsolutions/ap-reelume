@@ -22,7 +22,7 @@ public enum LibrarySurface
 public sealed class LibraryViewModel : INotifyPropertyChanged
 {
     private readonly ICatalogQueryService _queryService;
-    private readonly Func<TitleId, string?, string?, string?> _findPoster;
+    private readonly Func<TitleId, string?, string?, string?, string?> _findPoster;
     private readonly RelayCommand _back;
     private readonly AsyncRelayCommand _clearSearch;
     private readonly AsyncRelayCommand _clearFilters;
@@ -52,11 +52,11 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
         MovieDetailsViewModel? movieDetails = null,
         ShowDetailsViewModel? showDetails = null,
         ScanProgressViewModel? scanProgress = null,
-        Func<TitleId, string?, string?, string?>? findPoster = null,
+        Func<TitleId, string?, string?, string?, string?>? findPoster = null,
         RootNoticeViewModel? rootNotices = null)
     {
         _queryService = queryService ?? throw new ArgumentNullException(nameof(queryService));
-        _findPoster = findPoster ?? ((_, _, _) => null);
+        _findPoster = findPoster ?? ((_, _, _, _) => null);
         MovieDetails = movieDetails ?? new MovieDetailsViewModel();
         ShowDetails = showDetails ?? new ShowDetailsViewModel();
         ScanProgress = scanProgress ?? new ScanProgressViewModel();
@@ -482,7 +482,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     {
         foreach (var card in Items)
         {
-            card.ShowPoster(_findPoster(card.Item.Id, card.Item.PosterPath, card.Item.PersonalCover));
+            card.ShowPoster(_findPoster(card.Item.Id, card.Item.PosterPath, card.Item.PersonalCover, card.Item.CoverOrder));
         }
     }
 
@@ -532,7 +532,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     /// page and the ones scrolled after it cannot come to differ.
     /// </summary>
     private CatalogItemViewModel Card(CatalogItem item) =>
-        new(item, _findPoster(item.Id, item.PosterPath, item.PersonalCover));
+        new(item, _findPoster(item.Id, item.PosterPath, item.PersonalCover, item.CoverOrder));
 
     private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {

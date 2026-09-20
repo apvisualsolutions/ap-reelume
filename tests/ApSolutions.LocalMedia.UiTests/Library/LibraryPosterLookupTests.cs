@@ -34,19 +34,22 @@ public sealed class LibraryPosterLookupTests
             AddedUtc: DateTimeOffset.UnixEpoch,
             LastPlayedUtc: null,
             PosterPath: "/provider.jpg",
-            PersonalCover: chosen);
-        (TitleId Id, string? Poster, string? Personal)? asked = null;
+            PersonalCover: chosen,
+            CoverOrder: "Frame,Personal,Provider");
+        (TitleId Id, string? Poster, string? Personal, string? Order)? asked = null;
         var viewModel = new LibraryViewModel(
             new OnePage(new CatalogPage([item], null)),
-            findPoster: (title, poster, personal) =>
+            findPoster: (title, poster, personal, order) =>
             {
-                asked = (title, poster, personal);
+                asked = (title, poster, personal, order);
                 return @"C:\personal-artwork\cover.png";
             });
 
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal((id, "/provider.jpg", chosen), asked);
+        // LIB-021: the title's own order travels with the lookup, or an override set on one title
+        // would be stored and never drawn — which is this repository's characteristic defect.
+        Assert.Equal((id, "/provider.jpg", chosen, "Frame,Personal,Provider"), asked);
         Assert.Equal(@"C:\personal-artwork\cover.png", Assert.Single(viewModel.Items).PosterFile);
     }
 
@@ -69,7 +72,7 @@ public sealed class LibraryPosterLookupTests
             LastPlayedUtc: null);
         string? onDisk = null;
         var catalogue = new OnePage(new CatalogPage([item], null));
-        var viewModel = new LibraryViewModel(catalogue, findPoster: (_, _, _) => onDisk);
+        var viewModel = new LibraryViewModel(catalogue, findPoster: (_, _, _, _) => onDisk);
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
         Assert.Null(Assert.Single(viewModel.Items).PosterFile);
 
@@ -105,7 +108,7 @@ public sealed class LibraryPosterLookupTests
             IsPersonal: false,
             AddedUtc: DateTimeOffset.UnixEpoch,
             LastPlayedUtc: null);
-        var viewModel = new LibraryViewModel(new OnePage(new CatalogPage([item], null)), findPoster: (_, _, _) => "same.png");
+        var viewModel = new LibraryViewModel(new OnePage(new CatalogPage([item], null)), findPoster: (_, _, _, _) => "same.png");
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
         var before = viewModel.Items;
 

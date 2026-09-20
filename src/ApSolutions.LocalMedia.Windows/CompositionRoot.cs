@@ -725,8 +725,9 @@ public static partial class CompositionRoot
         IServiceProvider provider,
         TitleId titleId,
         string? posterPath,
-        string? personalCover) =>
-        provider.GetRequiredService<ResolveTitlePoster>().Find(titleId, posterPath, personalCover);
+        string? personalCover,
+        string? coverOrder = null) =>
+        provider.GetRequiredService<ResolveTitlePoster>().Find(titleId, posterPath, personalCover, coverOrder);
 
     /// <summary>
     /// Everything the shell is handed. The long-lived surfaces arrive built; the ones that describe

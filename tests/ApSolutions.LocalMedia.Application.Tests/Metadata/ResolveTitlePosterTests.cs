@@ -4,6 +4,7 @@
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Metadata;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.Application.Tests.Metadata;
@@ -25,6 +26,9 @@ public sealed class ResolveTitlePosterTests
     /// <summary>A frames folder nobody ever wrote into.</summary>
     private static readonly FramePaths NoFrames = new(Path.Combine(Path.GetTempPath(), "no-title-frames-" + Guid.NewGuid().ToString("N")));
 
+    /// <summary>The general order as it comes out of the box.</summary>
+    private static readonly ICoverOrderSettings DefaultOrder = new StubOrder(CoverOrderPolicy.Default);
+
     /// <summary>
     /// ADR-0009's third origin: with nothing picked and nothing from the provider, the frame taken
     /// from the title's own video draws.
@@ -34,7 +38,7 @@ public sealed class ResolveTitlePosterTests
     {
         using var frames = FramePaths.WithFrameFor(Title);
 
-        var found = new ResolveTitlePoster(new StubStore(), frames).Find(Title, posterPath: null);
+        var found = NewResolver(new StubStore(), frames).Find(Title, posterPath: null);
 
         Assert.Equal(ResolveTitlePoster.FrameFileFor(frames, Title), found);
     }
@@ -46,7 +50,7 @@ public sealed class ResolveTitlePosterTests
         using var frames = FramePaths.WithFrameFor(Title);
         var store = new StubStore { RemoteAnswer = "cache/artwork/abc/poster.jpg" };
 
-        var found = new ResolveTitlePoster(store, frames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
+        var found = NewResolver(store, frames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
 
         Assert.Equal("cache/artwork/abc/poster.jpg", found);
     }
@@ -55,7 +59,7 @@ public sealed class ResolveTitlePosterTests
     [Fact]
     public void A_frame_not_taken_yet_is_no_picture()
     {
-        Assert.Null(new ResolveTitlePoster(new StubStore(), NoFrames).Find(Title, posterPath: null));
+        Assert.Null(NewResolver(new StubStore(), NoFrames).Find(Title, posterPath: null));
     }
 
     [Fact]
@@ -63,7 +67,7 @@ public sealed class ResolveTitlePosterTests
     {
         var store = new StubStore { RemoteAnswer = "cache/artwork/abc/poster.jpg" };
 
-        var found = new ResolveTitlePoster(store, NoFrames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
+        var found = NewResolver(store, NoFrames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
 
         Assert.Equal("cache/artwork/abc/poster.jpg", found);
         Assert.Equal(Title, store.LastRemoteTitle);
@@ -76,7 +80,7 @@ public sealed class ResolveTitlePosterTests
         var store = new StubStore { PersonalAnswer = "personal-artwork/abc/cover.png" };
         var chosen = new string('a', 64) + ".png";
 
-        var found = new ResolveTitlePoster(store, NoFrames).Find(
+        var found = NewResolver(store, NoFrames).Find(
             Title,
             Path.Combine("C:", "anywhere", "personal-artwork", chosen));
 
@@ -100,7 +104,7 @@ public sealed class ResolveTitlePosterTests
             PersonalAnswer = "personal-artwork/abc/cover.png",
         };
 
-        var found = new ResolveTitlePoster(store, NoFrames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
+        var found = NewResolver(store, NoFrames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg");
 
         Assert.Equal("cache/artwork/abc/poster.jpg", found);
         Assert.Equal(0, store.PersonalCalls);
@@ -116,7 +120,7 @@ public sealed class ResolveTitlePosterTests
             PersonalAnswer = "personal-artwork/abc/cover.png",
         };
 
-        var found = new ResolveTitlePoster(store, NoFrames).Find(
+        var found = NewResolver(store, NoFrames).Find(
             Title,
             "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg",
             new string('a', 64) + ".png");
@@ -134,7 +138,7 @@ public sealed class ResolveTitlePosterTests
     {
         var store = new StubStore { RemoteAnswer = "cache/artwork/abc/poster.jpg" };
 
-        var found = new ResolveTitlePoster(store, NoFrames).Find(
+        var found = NewResolver(store, NoFrames).Find(
             Title,
             "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg",
             new string('a', 64) + ".png");
@@ -152,7 +156,7 @@ public sealed class ResolveTitlePosterTests
     {
         var store = new StubStore { PersonalAnswer = "personal-artwork/abc/cover.png" };
 
-        Assert.Null(new ResolveTitlePoster(store, NoFrames).Find(Title, posterPath: null, @"C:\Windows\win.ini"));
+        Assert.Null(NewResolver(store, NoFrames).Find(Title, posterPath: null, @"C:\Windows\win.ini"));
         Assert.Equal(0, store.PersonalCalls);
     }
 
@@ -178,7 +182,7 @@ public sealed class ResolveTitlePosterTests
             PersonalAnswer = "personal-artwork/abc/cover.png",
         };
 
-        Assert.Null(new ResolveTitlePoster(store, NoFrames).Find(Title, stored));
+        Assert.Null(NewResolver(store, NoFrames).Find(Title, stored));
         Assert.Equal(0, store.RemoteCalls);
         Assert.Equal(0, store.PersonalCalls);
     }
@@ -191,15 +195,121 @@ public sealed class ResolveTitlePosterTests
     {
         var store = new StubStore();
 
-        Assert.Null(new ResolveTitlePoster(store, NoFrames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg"));
+        Assert.Null(NewResolver(store, NoFrames).Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg"));
         Assert.Equal(1, store.RemoteCalls);
     }
 
     [Fact]
     public void A_resolver_without_a_store_is_refused_where_it_is_built()
     {
-        _ = Assert.Throws<ArgumentNullException>(() => new ResolveTitlePoster(null!, NoFrames));
-        _ = Assert.Throws<ArgumentNullException>(() => new ResolveTitlePoster(new StubStore(), null!));
+        _ = Assert.Throws<ArgumentNullException>(() => new ResolveTitlePoster(null!, NoFrames, DefaultOrder));
+        _ = Assert.Throws<ArgumentNullException>(() => new ResolveTitlePoster(new StubStore(), null!, DefaultOrder));
+        _ = Assert.Throws<ArgumentNullException>(() => new ResolveTitlePoster(new StubStore(), NoFrames, null!));
+    }
+
+    /// <summary>
+    /// The general setting decides when the title says nothing, so moving it in Settings moves what
+    /// the whole library draws (LIB-021, ADR-0009 decision 4).
+    /// </summary>
+    [Fact]
+    public void The_general_order_decides_when_the_title_has_none_of_its_own()
+    {
+        var store = new StubStore
+        {
+            RemoteAnswer = "cache/artwork/abc/poster.jpg",
+            PersonalAnswer = "personal-artwork/abc/cover.png",
+        };
+
+        var found = new ResolveTitlePoster(store, NoFrames, new StubOrder([CoverOrigin.Provider, CoverOrigin.Personal, CoverOrigin.Frame]))
+            .Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg", new string('a', 64) + ".png");
+
+        Assert.Equal("cache/artwork/abc/poster.jpg", found);
+        Assert.Equal(0, store.PersonalCalls);
+    }
+
+    /// <summary>
+    /// A title's own order wins over the general one, and the general one is not even asked for —
+    /// which is what makes an override survive somebody moving the general order later.
+    /// </summary>
+    [Fact]
+    public void A_titles_own_order_wins_over_the_general_one()
+    {
+        var store = new StubStore
+        {
+            RemoteAnswer = "cache/artwork/abc/poster.jpg",
+            PersonalAnswer = "personal-artwork/abc/cover.png",
+        };
+        var general = new StubOrder([CoverOrigin.Provider, CoverOrigin.Personal, CoverOrigin.Frame]);
+
+        var found = new ResolveTitlePoster(store, NoFrames, general).Find(
+            Title,
+            "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg",
+            new string('a', 64) + ".png",
+            "Personal,Provider,Frame");
+
+        Assert.Equal("personal-artwork/abc/cover.png", found);
+        Assert.Equal(0, general.Reads);
+    }
+
+    /// <summary>
+    /// An order stored for one title that no longer names origins is not obeyed and not fatal: the
+    /// general one decides, which is the same repair a hand-edited settings file gets.
+    /// </summary>
+    [Fact]
+    public void A_titles_order_that_names_nothing_valid_falls_back_to_the_general_one()
+    {
+        var store = new StubStore
+        {
+            RemoteAnswer = "cache/artwork/abc/poster.jpg",
+            PersonalAnswer = "personal-artwork/abc/cover.png",
+        };
+
+        var found = new ResolveTitlePoster(store, NoFrames, new StubOrder([CoverOrigin.Provider, CoverOrigin.Personal, CoverOrigin.Frame]))
+            .Find(Title, "/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg", new string('a', 64) + ".png", "Nonsense");
+
+        Assert.Equal("cache/artwork/abc/poster.jpg", found);
+    }
+
+    /// <summary>
+    /// An order that leads with an origin this title has nothing for falls through, rather than
+    /// leaving an empty card: an order is a preference and not a single answer.
+    /// </summary>
+    [Fact]
+    public void An_order_leading_with_a_missing_origin_falls_through_to_the_next()
+    {
+        var store = new StubStore { PersonalAnswer = "personal-artwork/abc/cover.png" };
+
+        var found = new ResolveTitlePoster(store, NoFrames, DefaultOrder).Find(
+            Title,
+            posterPath: null,
+            new string('a', 64) + ".png",
+            "Frame,Personal,Provider");
+
+        Assert.Equal("personal-artwork/abc/cover.png", found);
+    }
+
+    /// <summary>
+    /// A resolver whose general order is the default one, which is what every test written before
+    /// the order could be changed assumed without saying so.
+    /// </summary>
+    private static ResolveTitlePoster NewResolver(IArtworkStore store, IAppDataPaths paths) =>
+        new(store, paths, DefaultOrder);
+
+    private sealed class StubOrder(IReadOnlyList<CoverOrigin> order) : ICoverOrderSettings
+    {
+        /// <summary>How many times the general order was asked for, so a test can say it was not.</summary>
+        public int Reads { get; private set; }
+
+        public IReadOnlyList<CoverOrigin> Current
+        {
+            get
+            {
+                Reads++;
+                return order;
+            }
+        }
+
+        public void Save(IReadOnlyList<CoverOrigin> updated) => throw new NotSupportedException();
     }
 
     private sealed class StubStore : IArtworkStore
