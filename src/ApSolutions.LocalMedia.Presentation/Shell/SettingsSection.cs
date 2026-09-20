@@ -23,6 +23,14 @@ public enum SettingsSection
     /// <summary>The library's folders and the scanning that watches them: «Biblioteca y escaneo».</summary>
     Library,
 
+    /// <summary>
+    /// Where a cover comes from and in which order: «Orden de las portadas» (LIB-021, ADR-0009). A
+    /// destination of its own rather than a card inside <see cref="Library"/>, which already hosts
+    /// the scanning group: the gate refuses two option groups in one place, and a second «Restaurar
+    /// valores por defecto» on one screen is a button the walk cannot resolve.
+    /// </summary>
+    Covers,
+
     // «Reproducción» and «Detección de segmentos» were here until 2026-09-13. They went down to the
     // player's gear (ADR-0012) and are reached through PlayerSettingsGroup now: their value is
     // decided while watching something, which is not a question a settings page can be asked.

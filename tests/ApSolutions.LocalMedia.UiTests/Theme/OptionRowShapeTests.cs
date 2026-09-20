@@ -111,6 +111,13 @@ public sealed class OptionRowShapeTests
             + "a list row."),
         ("DuplicatesOverviewView",
             "the same decision one level up, on the group's own card."),
+        ("MetadataEditorView",
+            "LIB-021: choosing where this title's cover comes from is a field of a form, not a row "
+            + "of the player's panel. The prototype draws this row style three times and all three "
+            + "are lists in a 320 px panel; wearing that shape inside an editor whose other eleven "
+            + "fields are boxes and checkboxes would make one field look like something else. It is "
+            + "a row of options rather than a drop-down because nothing inside a popup can be "
+            + "clicked by the autonomous walk."),
     ];
 
     [AvaloniaFact]

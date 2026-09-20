@@ -196,7 +196,7 @@ elección se equivoca hacia abajo con facilidad —tocar el shell rompió una ob
 | `Application.Tests` | casos de uso y puertos | ~ 1 s |
 | `ArchitectureTests` | las cinco reglas, red declarada, servicios huérfanos | ~ 2 s |
 | `DocumentationTests` | bilingüismo y matriz de alcance | < 1 s |
-| `UiTests` | AXAML, ViewModels, las 65 vistas <!--medido:vistas--> | ~ 1 min |
+| `UiTests` | AXAML, ViewModels, las 66 vistas <!--medido:vistas--> | ~ 1 min |
 | `AccessibilityTests` | recorrido y paseo autónomo | ~ 5 min |
 | `IntegrationTests` | SQLite, sistema de archivos, TMDB | ~ 7 min |
 | `MediaTests` | LibVLC con vídeo real | ~ 7 min |
@@ -335,7 +335,11 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **185** <!--medido:trinquete-de-deuda-->
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **186** <!--medido:trinquete-de-deuda-->
+desde el 2026-09-20, cuando **subió por una vista nueva**: `CoverOrderSettingsView.axaml` mide 100/50
+como las otras sesenta y cinco, y eso no es deuda. **Una vista nueva sube este número en uno.** Su
+ViewModel **no** entró en la lista, que es la otra mitad de la regla: podía mejorar, así que se
+cubrió. Antes estuvo en **185**
 desde el 2026-09-19, cuando **bajó por mejora**: `CatalogItemViewModel.cs` llegó a 100/100 al ganar el
 aviso de cambio de portada de `LIB-021`, sustituyendo su copia privada de la lectura de textos por
 `PresentationText.Resource`. Antes estuvo en **186** desde el 2026-09-18, también por mejora:
@@ -528,11 +532,11 @@ Llegaron con el rediseño y fallan igual de rápido. Ninguna se deduce leyendo e
    **el marcado no escribe el número**, no que el valor coincida: un token de 8 y un literal de 8
    pintan igual, así que comparar el valor aprueba justo lo que debía rechazar.
 7. **Cada vista lidera con el botón que se decidió, o con ninguno.** `LeadingActionTests` lleva una
-   tabla cerrada de las 65 <!--medido:vistas-->; **una vista que no esté en la tabla falla**,
+   tabla cerrada de las 66 <!--medido:vistas-->; **una vista que no esté en la tabla falla**,
    y `primary-action` se afirma
    como **la única** de su vista. Si tu vista es nueva, la decisión es tuya y hay que escribirla ahí.
 8. **Ningún control se dibuja fuera de la ventana más estrecha que la aplicación permite** (900, el
-   `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 65 <!--medido:vistas-->, sin
+   `MinWidth` de `App.axaml.cs`). Lo mide `ViewOverflowTests` sobre las 66 <!--medido:vistas-->, sin
    contexto de datos —lo
    que deja **todas** las ramas visibles a la vez—. Sus dos limitaciones están escritas dentro: un
    silencio suyo no es un certificado.

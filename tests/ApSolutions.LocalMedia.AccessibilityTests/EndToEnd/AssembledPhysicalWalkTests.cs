@@ -476,6 +476,23 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Refresh from provider never brought the provider's answer into the editor");
         Assert.Equal("La llegada", editor.Title);
 
+        // LIB-021: this one title can be taken off the general cover order from here. The four rows
+        // share the list's accessible name — one identity for the walk's inventory — so the row is
+        // told apart by its help text, the way the version radios are. The text is resolved from the
+        // dictionary rather than written here: this machine speaks Spanish and the runner English.
+        Assert.Equal(0, editor.CoverSourceIndex);
+        var frameChoice = Avalonia.Application.Current!.TryFindResource("CoverOriginFrame", out var frameText)
+            && frameText is string words
+                ? words
+                : throw new InvalidOperationException("CoverOriginFrame is not in the dictionary.");
+        await PressAsync(
+            host,
+            "MetadataCoverSourceLabel",
+            () => editor.CoverSourceIndex,
+            "clicking the cover source option never changed which cover this title uses",
+            helpText: frameChoice);
+        Assert.NotEqual(0, editor.CoverSourceIndex);
+
         Assert.Equal("Una lingüista traduce a los visitantes.", editor.Overview);
         Assert.False(editor.IsUnidentified);
         Assert.False(editor.HasNoProviderAnswer);
@@ -1112,6 +1129,67 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// controls, and the two that are not a checkbox — a slider and a button whose work happens in
     /// the catalogue — are the reason this batch is worth pressing at all.
     /// </summary>
+    /// <summary>
+    /// LIB-021, ADR-0009 decision 4: the order every cover is looked for in is moved with the mouse
+    /// and put back, and what is measured is the stored setting rather than the list on screen — a
+    /// panel that reorders itself and stores nothing looks right and survives closing as it was.
+    /// </summary>
+    [AvaloniaFact(Timeout = 120_000)]
+    public async Task The_cover_order_is_moved_and_restored_with_the_mouse()
+    {
+        var media = Path.Combine(_dataRoot, "media");
+        Directory.CreateDirectory(media);
+        _ = await SeedRootAsync(media, ScanPolicy.Manual);
+
+        using var host = ShowShell(height: 2000);
+        Navigate(host, AppRoute.Settings);
+
+        await PressAsync(
+            host,
+            "CoverOrderSettingsTitle",
+            () => host.ViewModel.CurrentSettingsSection,
+            "clicking «Orden de las portadas» in the settings index never opened its section");
+        Assert.Equal(SettingsSection.Covers, host.ViewModel.CurrentSettingsSection);
+
+        var covers = host.ViewModel.CoverOrderSettings;
+        Assert.NotNull(covers);
+        var stored = host.Application.Services.GetRequiredService<ICoverOrderSettings>();
+        Assert.Equal(CoverOrderPolicy.Default, stored.Current);
+
+        // The panel opens on the first row, so «Bajar» is the move that can be made from there, and
+        // the selection follows the row it moved — which is what leaves «Subir» pressable next.
+        await PressAsync(
+            host,
+            "CoverOrderMoveDownAction",
+            () => string.Join(',', stored.Current),
+            "clicking «Bajar» never changed the stored cover order");
+        Assert.NotEqual(CoverOrderPolicy.Default, stored.Current);
+
+        await PressAsync(
+            host,
+            "CoverOrderMoveDownAction",
+            () => string.Join(',', stored.Current),
+            "clicking «Bajar» a second time never moved the row any further");
+
+        // Both directions are walked, and not because the gate counts controls: a panel where one
+        // of the two buttons never moved anything would be half a control with nothing saying so.
+        await PressAsync(
+            host,
+            "CoverOrderMoveUpAction",
+            () => string.Join(',', stored.Current),
+            "clicking «Subir» never changed the stored cover order");
+        Assert.NotEqual(CoverOrderPolicy.Default, stored.Current);
+
+        // Something has to have moved before restoring, or a reset that did nothing would read the
+        // same as one that worked — which is what the scanning scene documents next door.
+        await PressAsync(
+            host,
+            "RestoreDefaultsAction",
+            () => string.Join(',', stored.Current),
+            "clicking «restore default values» never put the cover order back");
+        Assert.Equal(CoverOrderPolicy.Default, stored.Current);
+    }
+
     [AvaloniaFact(Timeout = 120_000)]
     public async Task The_recommendation_threshold_and_the_shortcut_defaults_are_pressed_with_the_mouse()
     {

@@ -7,9 +7,14 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:automation="using:Avalonia.Automation"
+    xmlns:home="using:ApSolutions.LocalMedia.Presentation.Home"
     xmlns:metadata="using:ApSolutions.LocalMedia.Presentation.Metadata"
     x:DataType="metadata:MetadataEditorViewModel"
     automation:AutomationProperties.Name="{DynamicResource MetadataEditorAccessibleName}">
+  <UserControl.Resources>
+    <!-- The choices travel as resource keys, so changing the language changes what they say. -->
+    <home:ResourceKeyConverter x:Key="MetadataResourceKey" />
+  </UserControl.Resources>
   <ScrollViewer>
     <Grid Margin="24" ColumnDefinitions="2*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="{DynamicResource Space8}" ColumnSpacing="{DynamicResource Space12}">
       <!-- A section of the library pane, whose level one belongs to LibraryView. -->
@@ -79,6 +84,38 @@ SPDX-License-Identifier: LicenseRef-APSolutions
             Text="{Binding ArtworkPicker.Status}"
             TextWrapping="Wrap"
             automation:AutomationProperties.LiveSetting="Polite" />
+        <!--
+          LIB-021, ADR-0009 decision 4: this one title can override the general order. One choice
+          and not a second reorderer — picking an origin puts it first and leaves the rest as they
+          were, which is what overriding means; the general order itself is moved in Settings.
+        -->
+        <TextBlock Foreground="{DynamicResource TextPrimaryBrush}" Text="{DynamicResource MetadataCoverSourceLabel}" />
+        <!--
+          A row of options and not a drop-down, which is the shape the audio device list already
+          has: a drop-down keeps its choices inside a popup, and nothing inside one can be clicked
+          by the autonomous walk. The accessible name is the list's key on every row, with the
+          choice itself in HelpText, because the walk's inventory reads the anchor out of the markup
+          and the whole list has to be one identity.
+        -->
+        <ItemsControl x:Name="MetadataCoverSource" ItemsSource="{Binding CoverSourceChoices}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="metadata:CoverSourceOption">
+              <!--
+                No Classes="option": that class is the player panel's list row, whose shape the
+                prototype writes for three 320 px lists. This is a field of a form, and
+                OptionRowShapeTests carries that decision with its reason.
+              -->
+              <RadioButton
+                  Command="{Binding $parent[ItemsControl].((metadata:MetadataEditorViewModel)DataContext).ChooseCoverSourceCommand}"
+                  CommandParameter="{Binding}"
+                  Content="{Binding NameKey, Converter={StaticResource MetadataResourceKey}}"
+                  GroupName="MetadataCoverSource"
+                  IsChecked="{Binding IsSelected, Mode=OneWay}"
+                  automation:AutomationProperties.Name="{DynamicResource MetadataCoverSourceLabel}"
+                  automation:AutomationProperties.HelpText="{Binding NameKey, Converter={StaticResource MetadataResourceKey}}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
       </StackPanel>
       <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding LockPosterPath}" Content="{DynamicResource MetadataLockPoster}" automation:AutomationProperties.Name="{DynamicResource MetadataLockPoster}" />
 

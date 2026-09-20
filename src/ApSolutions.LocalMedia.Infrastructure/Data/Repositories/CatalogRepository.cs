@@ -273,7 +273,12 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                        -- Both are handed over; which one draws is CoverOrderPolicy's order, walked
                        -- by ResolveTitlePoster, never a COALESCE here.
                        (SELECT m.personal_cover FROM catalog_metadata m WHERE m.title_id = t.id)
-                           AS personal_cover
+                           AS personal_cover,
+                       -- And the order this one title overrides the general setting with, when it
+                       -- has one. Handed over as stored: reading it is CoverOrderPolicy's job, and
+                       -- a CASE here deciding which origin wins would be that rule for a third time.
+                       (SELECT m.cover_order FROM catalog_metadata m WHERE m.title_id = t.id)
+                           AS cover_order
                 FROM titles t
                 UNION ALL
                 -- The year comes out of the projection now rather than being a literal NULL. It was
@@ -283,8 +288,9 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                        scanned.release_year,
                        media.is_available, 0, 0, scanned.added_utc, NULL,
                        media.duration_ticks, NULL, NULL, NULL, NULL, 0, 0,
-                       -- A scanned file has no metadata row, so it has no cover to name.
-                       NULL, NULL
+                       -- A scanned file has no metadata row, so it has no cover to name and no
+                       -- order of its own: it follows the general one.
+                       NULL, NULL, NULL
                 FROM scanned_titles scanned
                 INNER JOIN media_files media ON media.id = scanned.media_file_id
                 WHERE NOT EXISTS (
@@ -300,7 +306,7 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                    t.has_progress, t.is_personal, t.added_utc, t.last_played_utc,
                    {sortExpression} AS sort_key,
                    t.duration_ticks, t.genres, t.watch_status, t.watch_position, t.watch_duration,
-                   t.episode_count, t.episodes_watched, t.poster_path, t.personal_cover
+                   t.episode_count, t.episodes_watched, t.poster_path, t.personal_cover, t.cover_order
             FROM catalog_items t
             {where}
             ORDER BY {sortExpression} {direction}, t.id {direction}
@@ -347,7 +353,8 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                     reader.IsDBNull(15) ? 0 : reader.GetInt32(15),
                     reader.IsDBNull(16) ? 0 : reader.GetInt32(16),
                     reader.IsDBNull(17) ? null : reader.GetString(17),
-                    reader.IsDBNull(18) ? null : reader.GetString(18)),
+                    reader.IsDBNull(18) ? null : reader.GetString(18),
+                    reader.IsDBNull(19) ? null : reader.GetString(19)),
                 Convert.ToString(reader.GetValue(9), CultureInfo.InvariantCulture) ?? string.Empty));
         }
 

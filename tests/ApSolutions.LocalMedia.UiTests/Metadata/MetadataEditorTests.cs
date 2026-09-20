@@ -61,6 +61,18 @@ public sealed class MetadataEditorTests
             Assert.NotEmpty(editableControls);
             Assert.All(editableControls, control =>
                 Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(control))));
+
+            // LIB-021: the cover source is a row of options, and each row says the list's name out
+            // loud plus its own choice in the help text — the shape the audio device list has. All
+            // four are asserted here rather than in the layout tests, which show this view with no
+            // data context and would find an empty list and pass.
+            var options = view.GetVisualDescendants().OfType<RadioButton>().ToArray();
+            Assert.Equal(1 + Enum.GetValues<CoverOrigin>().Length, options.Length);
+            Assert.All(options, option =>
+            {
+                Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(option)));
+                Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetHelpText(option)));
+            });
             Assert.Equal(Enum.GetValues<MetadataField>().Length, view.GetVisualDescendants().OfType<CheckBox>().Count());
             Assert.NotNull(view.FindControl<TextBox>("ArtworkAlternativeText"));
             Assert.NotNull(view.FindControl<Button>("RestoreProviderMetadata"));
@@ -419,6 +431,131 @@ public sealed class MetadataEditorTests
             CancellationToken cancellationToken = default) =>
             Task.FromResult<MetadataDetails?>(null);
     }
+
+    /// <summary>
+    /// LIB-021, ADR-0009 decision 4: this one title can override the general cover order, and can
+    /// be put back on it.
+    /// </summary>
+    [AvaloniaFact]
+    public void The_cover_source_of_one_title_is_chosen_and_can_be_put_back_on_the_general_order()
+    {
+        var repository = new UiMetadataRepository(CoverOrderCatalog(null));
+        var editor = new MetadataEditorViewModel(
+            repository.Value,
+            new UpdateMetadata(repository),
+            Refresh(repository),
+            new ArtworkPickerViewModel());
+
+        // A title that never chose opens on the general order, which is the first choice offered.
+        Assert.Equal(0, editor.CoverSourceIndex);
+        Assert.Equal(1 + Enum.GetValues<CoverOrigin>().Length, editor.CoverSourceChoices.Count);
+
+        editor.CoverSourceIndex = 1 + (int)CoverOrigin.Frame;
+        editor.SaveCommand.Execute(null);
+
+        // The whole order is stored with the chosen origin first, so moving the general order later
+        // cannot change what this title was told to do.
+        Assert.Equal("Frame,Personal,Provider", repository.Value.Metadata.CoverOrder);
+
+        var reopened = new MetadataEditorViewModel(
+            repository.Value,
+            new UpdateMetadata(repository),
+            Refresh(repository),
+            new ArtworkPickerViewModel());
+        Assert.Equal(1 + (int)CoverOrigin.Frame, reopened.CoverSourceIndex);
+
+        // Changing the choice on a title that already had one keeps the rest of the stored order
+        // behind the new winner, rather than rebuilding it from the general one.
+        reopened.CoverSourceIndex = 1 + (int)CoverOrigin.Provider;
+        reopened.SaveCommand.Execute(null);
+        Assert.Equal("Provider,Frame,Personal", repository.Value.Metadata.CoverOrder);
+
+        var third = new MetadataEditorViewModel(
+            repository.Value,
+            new UpdateMetadata(repository),
+            Refresh(repository),
+            new ArtworkPickerViewModel());
+        third.CoverSourceIndex = 0;
+        third.SaveCommand.Execute(null);
+
+        Assert.Null(repository.Value.Metadata.CoverOrder);
+    }
+
+    /// <summary>
+    /// A row whose stored order names nothing valid opens on the general order rather than on
+    /// nothing, which is the same repair a hand-edited settings file gets.
+    /// </summary>
+    [AvaloniaFact]
+    public void A_stored_order_that_names_nothing_valid_opens_on_the_general_order()
+    {
+        var repository = new UiMetadataRepository(CoverOrderCatalog("Nonsense"));
+
+        var editor = new MetadataEditorViewModel(
+            repository.Value,
+            new UpdateMetadata(repository),
+            Refresh(repository),
+            new ArtworkPickerViewModel());
+
+        Assert.Equal(0, editor.CoverSourceIndex);
+    }
+
+    /// <summary>
+    /// The command behind the cover source rows: it picks one, refuses anything that is not a row,
+    /// and every row says when it becomes the chosen one — which is what draws the radio filled.
+    /// </summary>
+    [AvaloniaFact]
+    public void Choosing_a_cover_source_refuses_anything_that_is_not_one_and_every_row_says_so()
+    {
+        var repository = new UiMetadataRepository(CoverOrderCatalog(null));
+        var editor = new MetadataEditorViewModel(
+            repository.Value,
+            new UpdateMetadata(repository),
+            Refresh(repository),
+            new ArtworkPickerViewModel());
+        var frame = editor.CoverSourceChoices.Single(choice => choice.Index == 1 + (int)CoverOrigin.Frame);
+        var told = new List<string?>();
+        frame.PropertyChanged += (_, args) => told.Add(args.PropertyName);
+
+        Assert.False(editor.ChooseCoverSourceCommand.CanExecute(null));
+        Assert.False(editor.ChooseCoverSourceCommand.CanExecute("Frame"));
+        editor.ChooseCoverSourceCommand.Execute("not a choice");
+        Assert.Equal(0, editor.CoverSourceIndex);
+        Assert.Empty(told);
+
+        Assert.True(editor.ChooseCoverSourceCommand.CanExecute(frame));
+        editor.ChooseCoverSourceCommand.Execute(frame);
+
+        Assert.Equal(frame.Index, editor.CoverSourceIndex);
+        Assert.True(frame.IsSelected);
+        Assert.Contains(nameof(CoverSourceOption.IsSelected), told);
+        Assert.All(
+            editor.CoverSourceChoices.Where(choice => choice.Index != frame.Index),
+            choice => Assert.False(choice.IsSelected));
+
+        // Choosing the same row again says nothing: a notification per click would redraw the whole
+        // list every time somebody pressed what was already chosen.
+        told.Clear();
+        editor.ChooseCoverSourceCommand.Execute(frame);
+        Assert.Empty(told);
+    }
+
+    private static CatalogMetadata CoverOrderCatalog(string? coverOrder) =>
+        new(
+            new TitleId(Guid.Parse("60000000-0000-0000-0000-000000000009")),
+            new EditableMetadata(
+                "La llegada",
+                null,
+                null,
+                2016,
+                [],
+                "/poster.jpg",
+                null,
+                null,
+                new HashSet<MetadataField>())
+            {
+                CoverOrder = coverOrder,
+            },
+            Revision: 0);
 
     private sealed class UiMetadataRepository(CatalogMetadata initial) : ICatalogMetadataRepository
     {

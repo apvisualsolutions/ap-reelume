@@ -10,6 +10,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Añadido
 
+- **De dónde sale cada portada ya se elige, y se puede cambiar en un título suelto.** En Ajustes hay
+  una sección nueva, «Orden de las portadas», donde se ordenan los tres sitios de los que puede venir
+  —la que elegiste tú, la del proveedor y un fotograma del vídeo— subiendo y bajando la que se
+  quiera, con su «Restaurar valores por defecto». Y en el editor de cualquier película o serie se
+  puede dejar el orden general y decir qué portada usar sólo en ese título, sin que cambiar el orden
+  general más tarde deshaga esa elección (`LIB-021`).
 - **Una película o serie sin portada muestra un fotograma de su propio vídeo.** Cuando no hay
   portada elegida ni del proveedor, la aplicación saca un fotograma en segundo plano al abrirse y
   después de cada escaneo, lo guarda y lo dibuja en la tarjeta que ya está en pantalla, sin volver

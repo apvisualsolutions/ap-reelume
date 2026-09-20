@@ -20,6 +20,19 @@ public sealed record MetadataFieldChanges(
     /// no lock because nothing but its owner ever writes it: a refresh has no field to reach it by.
     /// </summary>
     public string? PersonalCover { get; init; }
+
+    /// <summary>
+    /// The order of origins this one title overrides the general setting with (LIB-021):
+    /// <see langword="null"/> leaves it as it is, an empty list removes the override and puts the
+    /// title back on the general order, and a list sets it.
+    /// </summary>
+    /// <remarks>
+    /// The empty list is a second sentinel and it is not decoration. With <see langword="null"/>
+    /// alone there would be no way to undo an override once set — which is the hole
+    /// <see cref="PersonalCover"/> still has, and the reason this one was written with two from the
+    /// start.
+    /// </remarks>
+    public IReadOnlyList<CoverOrigin>? CoverOrder { get; init; }
 }
 
 /// <param name="Provider">
@@ -135,6 +148,12 @@ public sealed class UpdateMetadata
             BackdropPath = changes.BackdropPath ?? current.Metadata.BackdropPath,
             LockedFields = command.LockedFields.ToHashSet(),
             PersonalCover = changes.PersonalCover ?? current.Metadata.PersonalCover,
+            CoverOrder = changes.CoverOrder switch
+            {
+                null => current.Metadata.CoverOrder,
+                { Count: 0 } => null,
+                var order => CoverOrderPolicy.Format(order),
+            },
         };
 
         return await _repository.TrySaveAsync(

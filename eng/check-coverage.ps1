@@ -448,7 +448,13 @@ try {
     # 100/91; las tres ramas que faltaban eran una copia privada de la lectura de textos traducidos,
     # y se sustituyó por PresentationText.Resource, que ya cubre el caso sin aplicación. El evento
     # nace con un suscriptor vacío, así que avisar no añade una rama que ninguna prueba tome.
-    $debtRatchet = 185
+    # 186 el 2026-09-20, por una vista nueva: CoverOrderSettingsView.axaml mide 100/50 como las otras
+    # sesenta y cinco, porque esa mitad es la única rama que el compilador de Avalonia genera para un
+    # .axaml, en la línea del elemento raíz. Eso no es deuda, y es la única razón por la que este
+    # número sube (LIB-021, el ajuste del orden de portadas). Su ViewModel NO entró en la lista: el
+    # run lo midió por encima del listón y lo que faltaba se cubrió con pruebas, que es la otra
+    # mitad de la regla — un archivo nuevo sólo entra cuando no puede mejorar.
+    $debtRatchet = 186
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

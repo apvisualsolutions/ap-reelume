@@ -238,6 +238,22 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="ScanSettingsDescription">AP Reelume watches your folders and adds whatever turns up in them. If watching fails or the system interrupts it, it goes back over them every so often.</x:String>
   <x:String x:Key="ScanSettingsWatchLocal">Watch changes in local roots</x:String>
   <x:String x:Key="ScanSettingsFallbackMinutes">Recovery interval in minutes</x:String>
+  <!-- LIB-021, ADR-0009. The names of the three origins are one key each and are read from two
+       screens — the general order and one title's override — because they are one idea: two keys
+       for the same words are how «Volver a 1×» and «Restaurar campos del proveedor» came to say the
+       same thing differently. They are composed as "CoverOrigin" + the enum member, which is a shape
+       OrphanedResourceTests knows; the interpolated shape it cannot see is what made it call forty
+       live strings dead in its first pass. -->
+  <x:String x:Key="CoverOrderSettingsAccessibleName">Cover order settings</x:String>
+  <x:String x:Key="CoverOrderSettingsTitle">Cover order</x:String>
+  <x:String x:Key="CoverOrderSettingsDescription">Where each film's or show's cover comes from. They are looked for top to bottom and the first one that exists wins, so a film without the one above uses the next.</x:String>
+  <x:String x:Key="CoverOriginPersonal">The one you picked</x:String>
+  <x:String x:Key="CoverOriginProvider">The provider's</x:String>
+  <x:String x:Key="CoverOriginFrame">A frame of the video</x:String>
+  <x:String x:Key="CoverOrderMoveUpAction">Move up</x:String>
+  <x:String x:Key="CoverOrderMoveDownAction">Move down</x:String>
+  <x:String x:Key="MetadataCoverSourceLabel">Which cover to use for this title</x:String>
+  <x:String x:Key="MetadataCoverSourceDefault">The general order</x:String>
   <!-- The empty tray is the good outcome, not a blank panel: everything was identified without
        anybody being asked. IsEmpty had existed on the model all along with no view reading it. -->
   <x:String x:Key="ReviewInboxEmptyTitle">Nothing left to review</x:String>

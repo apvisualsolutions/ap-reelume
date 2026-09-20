@@ -148,6 +148,7 @@ public sealed class LeadingActionTests
         ["AppearanceSettingsView"] = null,
         ["PrivacySettingsView"] = null,
         ["ScanSettingsView"] = null,
+        ["CoverOrderSettingsView"] = null,
         // UX-010 gave the language a destination of its own. Two mutually exclusive options and a
         // reset: nothing here is the thing to do, and accenting the undo would point at it.
         ["LanguageSettingsView"] = null,

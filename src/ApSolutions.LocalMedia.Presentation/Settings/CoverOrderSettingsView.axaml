@@ -1,0 +1,80 @@
+<!--
+SPDX-FileCopyrightText: 2026 AP Solutions
+SPDX-License-Identifier: LicenseRef-APSolutions
+-->
+<UserControl
+    x:Class="ApSolutions.LocalMedia.Presentation.Settings.CoverOrderSettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:automation="clr-namespace:Avalonia.Automation;assembly=Avalonia.Controls"
+    xmlns:home="clr-namespace:ApSolutions.LocalMedia.Presentation.Home"
+    xmlns:settings="clr-namespace:ApSolutions.LocalMedia.Presentation.Settings"
+    x:DataType="settings:CoverOrderSettingsViewModel"
+    automation:AutomationProperties.Name="{DynamicResource CoverOrderSettingsAccessibleName}">
+  <UserControl.Resources>
+    <!-- The row carries the key of its name and not the words, so that changing the language while
+         the application runs changes what this list says. -->
+    <home:ResourceKeyConverter x:Key="CoverOriginName" />
+  </UserControl.Resources>
+  <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
+    <StackPanel MaxWidth="620" Spacing="{DynamicResource Space12}">
+      <!-- UX-010: inside the group and in its heading row, the one button on this screen. -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+        <TextBlock
+            FontSize="{DynamicResource FontSizeSubtitle}"
+            FontWeight="SemiBold"
+            Foreground="{DynamicResource TextPrimaryBrush}"
+            Text="{DynamicResource CoverOrderSettingsTitle}"
+            automation:AutomationProperties.HeadingLevel="2" />
+        <Button
+            x:Name="CoverOrderSettingsResetButton"
+            Grid.Column="1"
+            VerticalAlignment="Center"
+            automation:AutomationProperties.Name="{DynamicResource RestoreDefaultsAction}"
+            Command="{Binding RestoreDefaultsCommand}"
+            Content="{DynamicResource RestoreDefaultsAction}" />
+      </Grid>
+      <TextBlock
+          Foreground="{DynamicResource TextPrimaryBrush}"
+          Text="{DynamicResource CoverOrderSettingsDescription}"
+          TextWrapping="Wrap" />
+      <!--
+        Two buttons over the selected row rather than dragging: a drag cannot be clicked by the
+        autonomous walk, because the headless hit test does not follow a gesture, and it cannot be
+        done with a keyboard at all. It is also what Windows draws for its own priority lists.
+      -->
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+        <ListBox
+            x:Name="CoverOrderList"
+            Grid.Column="0"
+            ItemsSource="{Binding Origins}"
+            SelectedIndex="{Binding SelectedIndex}"
+            automation:AutomationProperties.Name="{DynamicResource CoverOrderSettingsTitle}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="settings:CoverOriginRow">
+              <TextBlock
+                  Classes="setting-name"
+                  Text="{Binding NameKey, Converter={StaticResource CoverOriginName}}"
+                  TextWrapping="Wrap" />
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel
+            Grid.Column="1"
+            Spacing="{DynamicResource Space8}"
+            VerticalAlignment="Center">
+          <Button
+              x:Name="CoverOrderMoveUpButton"
+              automation:AutomationProperties.Name="{DynamicResource CoverOrderMoveUpAction}"
+              Command="{Binding MoveUpCommand}"
+              Content="{DynamicResource CoverOrderMoveUpAction}" />
+          <Button
+              x:Name="CoverOrderMoveDownButton"
+              automation:AutomationProperties.Name="{DynamicResource CoverOrderMoveDownAction}"
+              Command="{Binding MoveDownCommand}"
+              Content="{DynamicResource CoverOrderMoveDownAction}" />
+        </StackPanel>
+      </Grid>
+    </StackPanel>
+  </Border>
+</UserControl>

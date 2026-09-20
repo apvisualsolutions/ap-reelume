@@ -177,6 +177,57 @@ public sealed class CatalogMetadataRepositoryTests
     }
 
     /// <summary>
+    /// LIB-021: the order one title overrides the general one with makes the round trip, and a title
+    /// that never set one reads back as none rather than as an order of its own.
+    /// </summary>
+    /// <remarks>
+    /// It writes twice on purpose. A test that only stores once and reads it back stays green with
+    /// the upsert's assignment removed — measured on the column next door by <c>gate-auditor</c> on
+    /// 2026-09-18, where only the five-minute walk noticed.
+    /// </remarks>
+    [Fact]
+    public async Task A_titles_own_cover_order_is_stored_and_can_be_changed_and_removed()
+    {
+        await using var fixture = await MetadataFixture.CreateAsync();
+        var first = Catalog("Título", 1) with
+        {
+            Metadata = Catalog("Título", 1).Metadata with { CoverOrder = "Frame,Personal,Provider" },
+        };
+        _ = await fixture.Repository.TrySaveAsync(first, 0, TestContext.Current.CancellationToken);
+        var stored = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+        Assert.Equal("Frame,Personal,Provider", stored!.Metadata.CoverOrder);
+
+        _ = await fixture.Repository.TrySaveAsync(
+            stored with { Metadata = stored.Metadata with { CoverOrder = "Provider,Personal,Frame" } },
+            stored.Revision,
+            TestContext.Current.CancellationToken);
+        var changed = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+        Assert.Equal("Provider,Personal,Frame", changed!.Metadata.CoverOrder);
+
+        _ = await fixture.Repository.TrySaveAsync(
+            changed with { Metadata = changed.Metadata with { CoverOrder = null } },
+            changed.Revision,
+            TestContext.Current.CancellationToken);
+        var cleared = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+        Assert.Null(cleared!.Metadata.CoverOrder);
+    }
+
+    /// <summary>
+    /// A title stored before the column existed follows the general order, which is what a null in
+    /// that column means — and not an order of three origins nobody chose.
+    /// </summary>
+    [Fact]
+    public async Task A_title_that_never_set_an_order_reads_back_as_none()
+    {
+        await using var fixture = await MetadataFixture.CreateAsync();
+        _ = await fixture.Repository.TrySaveAsync(Catalog("Título", 1), 0, TestContext.Current.CancellationToken);
+
+        var stored = await fixture.Repository.GetAsync(Title, TestContext.Current.CancellationToken);
+
+        Assert.Null(stored!.Metadata.CoverOrder);
+    }
+
+    /// <summary>
     /// Picking another cover replaces the first one. The test above only shows the field stays; with
     /// the upsert's personal_cover assignment removed it stayed green, and only the five-minute walk
     /// noticed (gate-auditor, 2026-09-18).

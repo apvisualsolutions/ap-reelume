@@ -80,6 +80,9 @@ public sealed record ShellSurfaces
 
     public ScanSettingsViewModel? ScanSettings { get; init; }
 
+    /// <summary>Where the order every cover is looked for in is moved (LIB-021).</summary>
+    public CoverOrderSettingsViewModel? CoverOrderSettings { get; init; }
+
     public ShortcutSettingsViewModel? Shortcuts { get; init; }
 
     public SubtitleStyleViewModel? SubtitleStyle { get; init; }

@@ -10,6 +10,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- **Where each cover comes from is now a choice, and it can be changed on a single title.** Settings
+  has a new section, «Cover order», where the three places a cover can come from — the one you
+  picked, the provider's and a frame of the video — are ordered by moving whichever you want up or
+  down, with its «Restore default values». And the editor of any film or series can leave the
+  general order behind and say which cover to use for that title alone, without a later change to
+  the general order undoing that choice (`LIB-021`).
 - **A film or series with no cover shows a frame of its own video.** When there is neither a picked
   cover nor a provider's, the application takes a frame in the background when it opens and after
   every scan, keeps it and draws it on the card already on screen, without going back to the top or

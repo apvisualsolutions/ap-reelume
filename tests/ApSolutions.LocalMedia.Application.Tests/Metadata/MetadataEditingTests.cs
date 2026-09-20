@@ -182,6 +182,62 @@ public sealed class MetadataEditingTests
         Assert.Equal(stored.Metadata.PosterPath, saved.Catalog?.Metadata.PosterPath);
     }
 
+    /// <summary>
+    /// LIB-021: an order set for one title is stored as the whole order, so moving the general one
+    /// later cannot change what this title was told to do.
+    /// </summary>
+    [Fact]
+    public async Task Setting_an_order_for_one_title_stores_the_whole_order()
+    {
+        var stored = Catalog(revision: 0, locked: []);
+        var repository = new MemoryMetadataRepository(stored);
+
+        var saved = await new UpdateMetadata(repository).ExecuteAsync(
+            new UpdateMetadataCommand(
+                stored.TitleId,
+                new MetadataFieldChanges(Title: "Mi llegada")
+                {
+                    CoverOrder = [CoverOrigin.Frame, CoverOrigin.Provider, CoverOrigin.Personal],
+                },
+                new HashSet<MetadataField>(),
+                ExpectedRevision: 0),
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("Frame,Provider,Personal", saved.Catalog?.Metadata.CoverOrder);
+    }
+
+    /// <summary>
+    /// The second sentinel: an empty list removes the override. Without it there would be no way
+    /// back to the general order once one was set, which is the hole the picked cover still has.
+    /// </summary>
+    [Fact]
+    public async Task An_empty_order_removes_the_override_and_a_missing_one_leaves_it_alone()
+    {
+        var stored = Catalog(revision: 0, locked: []) with
+        {
+            Metadata = Catalog(revision: 0, locked: []).Metadata with { CoverOrder = "Frame,Personal,Provider" },
+        };
+        var repository = new MemoryMetadataRepository(stored);
+
+        var untouched = await new UpdateMetadata(repository).ExecuteAsync(
+            new UpdateMetadataCommand(
+                stored.TitleId,
+                new MetadataFieldChanges(Title: "Mi llegada"),
+                new HashSet<MetadataField>(),
+                ExpectedRevision: 0),
+            TestContext.Current.CancellationToken);
+        Assert.Equal("Frame,Personal,Provider", untouched.Catalog?.Metadata.CoverOrder);
+
+        var cleared = await new UpdateMetadata(repository).ExecuteAsync(
+            new UpdateMetadataCommand(
+                stored.TitleId,
+                new MetadataFieldChanges(Title: "Mi llegada") { CoverOrder = [] },
+                new HashSet<MetadataField>(),
+                ExpectedRevision: untouched.Catalog!.Revision),
+            TestContext.Current.CancellationToken);
+        Assert.Null(cleared.Catalog?.Metadata.CoverOrder);
+    }
+
     [Fact]
     public async Task Stale_edit_conflicts_and_three_edit_refresh_restart_cycles_keep_manual_fields()
     {

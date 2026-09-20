@@ -658,7 +658,12 @@ public static partial class CompositionRoot
                     overview: overview,
                     trailerKey: trailerKey,
                     renameWouldChangeTheName: showRename,
-                    posterFile: FindCachedPoster(provider, item.Item.Id, stored?.Metadata.PosterPath, stored?.Metadata.PersonalCover));
+                    posterFile: FindCachedPoster(
+                        provider,
+                        item.Item.Id,
+                        stored?.Metadata.PosterPath,
+                        stored?.Metadata.PersonalCover,
+                        stored?.Metadata.CoverOrder));
             }
             else
             {
@@ -693,7 +698,12 @@ public static partial class CompositionRoot
                     trailerKey: trailerKey,
                     file: file,
                     renameWouldChangeTheName: movieRename,
-                    posterFile: FindCachedPoster(provider, item.Item.Id, stored?.Metadata.PosterPath, stored?.Metadata.PersonalCover));
+                    posterFile: FindCachedPoster(
+                        provider,
+                        item.Item.Id,
+                        stored?.Metadata.PosterPath,
+                        stored?.Metadata.PersonalCover,
+                        stored?.Metadata.CoverOrder));
             }
         };
         return library;
@@ -726,7 +736,7 @@ public static partial class CompositionRoot
         TitleId titleId,
         string? posterPath,
         string? personalCover,
-        string? coverOrder = null) =>
+        string? coverOrder) =>
         provider.GetRequiredService<ResolveTitlePoster>().Find(titleId, posterPath, personalCover, coverOrder);
 
     /// <summary>
@@ -768,6 +778,7 @@ public static partial class CompositionRoot
             StartScan = (rootId, cancellationToken) => ScanRootAsync(provider, rootId, cancellationToken),
             ReviewInbox = provider.GetRequiredService<ReviewInboxViewModel>(),
             ScanSettings = provider.GetRequiredService<ScanSettingsViewModel>(),
+            CoverOrderSettings = provider.GetRequiredService<CoverOrderSettingsViewModel>(),
             Shortcuts = provider.GetRequiredService<ShortcutSettingsViewModel>(),
             SubtitleStyle = provider.GetRequiredService<SubtitleStyleViewModel>(),
             MiniPlayerPlacement = provider.GetRequiredService<IMiniPlayerPlacementStore>(),
