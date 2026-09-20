@@ -24,6 +24,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The tool this repository recommends for auditing its own checks no longer breaks one of them.**
+  Running that audit in a separate working copy turned the evidence-link check red, because it swept
+  the copies of the repository other sessions keep open inside the tree and read their documents as
+  if they belonged to this one. It now skips them, and the rule — together with the way it failed
+  the two previous times it was written by hand — lives in a single place shared by the three checks
+  that sweep the whole tree. A guard measures it against a fabricated path, because on the server
+  none of those copies exist and a check that only looked at the real sweep would pass there without
+  measuring anything. Nothing in the program changes (`ENG-009`).
+
 - **The checks of a batch close now look at what they claim to look at.** The record the close's
   checklist leaves behind stored the list of consented exceptions wrongly, and with a single one it
   lost it as a list. A mutation audit found thirteen checks that passed without catching the defect

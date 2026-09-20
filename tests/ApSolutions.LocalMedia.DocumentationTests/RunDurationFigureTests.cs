@@ -281,19 +281,14 @@ public sealed class RunDurationFigureTests
     /// Whether a path belongs to a different checkout of this repository rather than to this one.
     /// </summary>
     /// <remarks>
-    /// <c>.claude/worktrees/</c> holds whole copies of the repository belonging to other sessions.
-    /// It is excluded from version control in <c>.git/info/exclude</c>, and a CI runner does not
-    /// have it at all — so a sweep that reads it answers a different question depending on how many
-    /// sessions happen to be open and what each of them is holding in its tree. On 2026-09-02 that
-    /// made this gate <b>red on the machine of whoever was writing and green in CI</b>: it found two
-    /// other checkouts, one of them carrying changelog lines that record the old 55-80 figure. A
-    /// gate that only fails locally is one people learn to ignore, and a gate people ignore has
-    /// stopped guarding.
+    /// The measurement that made this necessary was taken here on 2026-09-02 — two other checkouts,
+    /// one carrying changelog lines recording the old 55-80 figure, so the gate was <b>red on the
+    /// machine of whoever was writing and green in CI</b>. The rule itself moved onto
+    /// <see cref="RepositoryLayout"/> with ENG-009, when a third sweep of this suite needed it and
+    /// the tree was about to hold a fourth spelling of the same idea.
     /// </remarks>
     private static bool IsInsideAnotherCheckout(string path) =>
-        Path.GetRelativePath(RepositoryLayout.Root, path)
-            .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-            .Any(segment => segment.Equals("worktrees", StringComparison.OrdinalIgnoreCase));
+        RepositoryLayout.IsInsideAnotherCheckout(path);
 
     private sealed record Quotation(string Document, int Line, string Range, int Fastest, int Slowest);
 }

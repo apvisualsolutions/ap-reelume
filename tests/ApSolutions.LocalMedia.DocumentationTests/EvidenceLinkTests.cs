@@ -254,6 +254,54 @@ public sealed class EvidenceLinkTests
                 + string.Join("; ", offences));
     }
 
+    /// <summary>
+    /// The sweep reads this checkout and nothing else, so it gives the same answer here and on a
+    /// runner.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is ENG-009, and the shape of it is worth keeping: the sweep above reads <c>.claude/</c>
+    /// on purpose — the skills and the agents are documents of this repository — and that is exactly
+    /// where the worktrees of other sessions live. Running the gate auditor the way this repository
+    /// recommends, in a worktree, put the gate red over a <b>copy</b> of the one document allowed to
+    /// quote the invention it guards against: the copy's path does not match the allow-list entry,
+    /// so its archived quotations read as fresh offences.
+    /// </para>
+    /// <para>
+    /// Asserted against a fabricated path as well as against the real sweep, because in CI there are
+    /// no other checkouts: a test that only looked at the real sweep would pass there without
+    /// measuring anything, which is the exact shape of the defect it guards against. And the floor
+    /// is here too, because an exclusion that grew wide enough to skip this repository's own
+    /// documents would otherwise leave the sweep reading nothing and agreeing with everything.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_sweep_never_reads_another_sessions_checkout()
+    {
+        Assert.True(
+            RepositoryLayout.IsInsideAnotherCheckout(
+                RepositoryLayout.PathFromRoot(".claude/worktrees/other/docs/FEATURES.md")),
+            "A path under .claude/worktrees is another session's copy of this repository.");
+        Assert.False(
+            RepositoryLayout.IsInsideAnotherCheckout(
+                RepositoryLayout.PathFromRoot(".claude/skills/cierre/SKILL.md")),
+            "The exclusion has grown wide enough to skip this repository's own documents.");
+
+        var documents = Documents().ToArray();
+        var trespassing = documents
+            .Where(RepositoryLayout.IsInsideAnotherCheckout)
+            .Select(path => Path.GetRelativePath(RepositoryLayout.Root, path).Replace('\\', '/'))
+            .ToArray();
+
+        Assert.True(
+            trespassing.Length == 0,
+            "The sweep is reading other sessions' checkouts, so its answer depends on how many "
+                + $"sessions are open: {string.Join("; ", trespassing)}");
+        Assert.True(
+            documents.Length >= 100,
+            $"Only {documents.Length} documents were swept; the exclusion is reading nothing.");
+    }
+
     /// <summary>Every Markdown document of the tree, skipping build output and the design package.</summary>
     private static IEnumerable<string> Documents()
     {
@@ -268,7 +316,12 @@ public sealed class EvidenceLinkTests
 
             foreach (var path in Directory.EnumerateFiles(directory, "*.md", SearchOption.AllDirectories))
             {
-                yield return path;
+                // NOT the other sessions' checkouts that live under «.claude/worktrees/». See
+                // The_sweep_never_reads_another_sessions_checkout above (ENG-009).
+                if (!RepositoryLayout.IsInsideAnotherCheckout(path))
+                {
+                    yield return path;
+                }
             }
         }
 

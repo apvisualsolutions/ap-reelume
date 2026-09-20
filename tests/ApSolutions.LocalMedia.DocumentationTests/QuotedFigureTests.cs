@@ -184,16 +184,10 @@ public sealed class QuotedFigureTests
             // this gate red over work nobody had done. A gate that fails because somebody else is
             // working is a gate that teaches people to ignore it.
             //
-            // RELATIVE TO THE ROOT AND NEVER ABSOLUTE, which the first version got wrong and a
-            // parallel session measured within the hour. Matched against the absolute path, a
-            // checkout that itself lives under «.claude/worktrees/» excludes EVERY ONE of its own
-            // documents: the sweep reads nothing, and the anti-blindness floor below fires — so the
-            // gate went red for three of the four sessions and green in CI, where the checkout sits
-            // somewhere else. It failed by its LOCATION rather than by its content, which is the
-            // same defect it was written to fix, pointed at itself.
-            .Where(path => !Path.GetRelativePath(RepositoryLayout.Root, path)
-                .Replace(Path.DirectorySeparatorChar, '/')
-                .Contains(".claude/worktrees/", StringComparison.Ordinal));
+            // The rule, and the way it failed the first time — relative to the root and never
+            // absolute — is written once on the helper, which is where the other two sweeps of this
+            // suite read it from as well (ENG-009).
+            .Where(path => !RepositoryLayout.IsInsideAnotherCheckout(path));
 
         foreach (var path in documents)
         {

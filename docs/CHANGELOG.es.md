@@ -24,6 +24,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **La herramienta que este repositorio recomienda para auditar sus propias comprobaciones ya no
+  rompe una de ellas.** Correr esa auditoría en una copia de trabajo aparte ponía roja la
+  comprobación de enlaces de evidencia, porque barría también las copias del repositorio que otras
+  sesiones tienen abiertas dentro del árbol y leía sus documentos como si fueran de éste. Ahora las
+  salta, y la regla —con la forma en que falló las dos veces anteriores que se escribió a mano— vive
+  en un solo sitio, compartido por las tres comprobaciones que barren el árbol entero. Lo mide una
+  guarda con una ruta fabricada, porque en el servidor no existe ninguna de esas copias y una
+  comprobación que sólo mirase el barrido real pasaría allí sin medir nada. No cambia nada del
+  programa (`ENG-009`).
+
 - **Las comprobaciones del cierre de una tanda miran ahora lo que dicen mirar.** El registro que
   deja el acta del cierre guardaba mal la lista de excepciones consentidas, y con una sola la perdía
   como lista. Una auditoría con mutantes encontró trece comprobaciones que pasaban sin detectar el

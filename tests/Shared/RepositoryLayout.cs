@@ -34,6 +34,38 @@ internal static class RepositoryLayout
     public static string PathFromRoot(params string[] segments) =>
         Path.Combine([Root, .. segments]);
 
+    /// <summary>
+    /// Whether a path belongs to a different checkout of this repository rather than to this one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <c>.claude/worktrees/</c> holds whole copies of this repository belonging to other sessions.
+    /// Git ignores them and a CI runner does not have them at all, so a sweep that reads them
+    /// answers a different question depending on how many sessions happen to be open and what each
+    /// of them is holding — <b>red on the machine of whoever is writing and green in CI</b>, which
+    /// is the worst way for a gate to be wrong. Measured three times: on 2026-09-02 against the
+    /// run-duration figure, on 2026-09-03 with three parallel sessions each holding its own
+    /// <c>CLAUDE.md</c>, and on 2026-09-20 as ENG-009, where running the gate auditor in a worktree
+    /// put <c>EvidenceLinkTests</c> red over a copy of the one document allowed to quote the defect
+    /// it guards against.
+    /// </para>
+    /// <para>
+    /// <b>Relative to the root and never absolute</b>, which the first version of this got wrong and
+    /// a parallel session measured within the hour. Matched against the absolute path, a checkout
+    /// that itself lives under <c>.claude/worktrees/</c> excludes <b>every one of its own</b>
+    /// documents: the sweep reads nothing and agrees with everything. Relative to its own root, a
+    /// worktree's files simply do not carry the prefix, so it reads itself and nobody else.
+    /// </para>
+    /// <para>
+    /// The prefix is the whole path and not a lone <c>worktrees</c> segment: a directory of that
+    /// name anywhere else in the tree is this repository's own and has to be read.
+    /// </para>
+    /// </remarks>
+    public static bool IsInsideAnotherCheckout(string path) =>
+        Path.GetRelativePath(Root, path)
+            .Replace(Path.DirectorySeparatorChar, '/')
+            .StartsWith(".claude/worktrees/", StringComparison.Ordinal);
+
     private static string FindRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
