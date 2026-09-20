@@ -230,7 +230,7 @@ src/ApSolutions.LocalMedia.Application/Discovery/AddLibraryRoot.cs              
 src/ApSolutions.LocalMedia.Application/Discovery/IRootWatcher.cs                              88 100
 src/ApSolutions.LocalMedia.Application/Discovery/ISafeFileRenamer.cs                          53 100
 src/ApSolutions.LocalMedia.Application/Discovery/ReconcileScanResults.cs                      95  83
-src/ApSolutions.LocalMedia.Application/Discovery/RootWatchCoordinator.cs                      96  89
+src/ApSolutions.LocalMedia.Application/Discovery/RootWatchCoordinator.cs                      97  90
 src/ApSolutions.LocalMedia.Application/Events/CatalogEvents.cs                                93 100
 src/ApSolutions.LocalMedia.Application/Home/GetHome.cs                                        99  91
 src/ApSolutions.LocalMedia.Application/Identification/GetReviewInbox.cs                       92  64
