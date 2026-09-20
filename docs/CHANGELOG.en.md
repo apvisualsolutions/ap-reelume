@@ -34,6 +34,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   nor removable drives and network folders, which are what the recovery sweep exists for. It is on
   unless somebody says otherwise, unlike the settings that reach the internet: watching a folder
   never leaves this machine (`ENG-044`).
+- **An external drive or a network folder gets checked again every so often.** The recovery sweep —
+  the one that picks up whatever watching can miss on a drive that gets plugged in and pulled out, or
+  across the network — **never ran either**, and for the same reason watching did not: it waited for
+  that flag nobody assigned. What went quietly with it was the thing that brings watching back to
+  life if it falls over. It now runs for every folder the program keeps up to date, and on an
+  external drive or a network folder it runs even with local-folder watching switched off, because
+  that setting speaks for local folders and there the sweep is all there is (`ENG-044`).
+- **"Watch changes in local roots" and the recovery interval finally do something, and they are
+  stored.** The two controls in Settings moved, restored and changed nothing: the value was lost on
+  closing and no part of the program read it. The switch is now felt **straight away**, without
+  restarting, and the interval is honoured from the next sweep. The factory interval becomes
+  **fifteen** minutes, which is the one the program actually used; the screen showed thirty and that
+  figure governed nothing (`ENG-010`).
 
 ### Changed
 

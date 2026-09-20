@@ -13,6 +13,7 @@ using ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 using ApSolutions.LocalMedia.Infrastructure.FileSystem;
 using ApSolutions.LocalMedia.Infrastructure.Time;
 using ApSolutions.LocalMedia.IntegrationTests.Data;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.IntegrationTests.Discovery;
@@ -146,7 +147,9 @@ public sealed class FileWatcherRecoveryTests
     {
         using var directory = new DatabaseTestDirectory();
         var root = Root(directory.Path, RootKind.Usb);
-        var scheduler = new FallbackScanScheduler(new SystemClock(), TimeSpan.FromMilliseconds(100));
+        var scheduler = new FallbackScanScheduler(
+            new SystemClock(),
+            new InMemoryScanWatchSettings(watchLocalRoots: false, TimeSpan.FromMilliseconds(100)));
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         timeout.CancelAfter(TimeSpan.FromSeconds(5));
         await using var triggers = scheduler.ScheduleAsync(root, timeout.Token).GetAsyncEnumerator(timeout.Token);
@@ -158,6 +161,107 @@ public sealed class FileWatcherRecoveryTests
 
         Assert.Equal(ScanTrigger.Recovery, triggers.Current);
         Assert.True(DateTimeOffset.UtcNow - started >= TimeSpan.FromMilliseconds(75));
+    }
+
+    /// <summary>
+    /// <b>The sweep nobody was getting.</b> The scheduler used to ask for
+    /// <see cref="ScanPolicy.Continuous"/> on its own, and nothing in the application ever assigned
+    /// that flag — so for every root a person can actually create, this enumerable emitted the
+    /// startup pass and stopped. That silently cost the recovery LIB-003 promises for USB and
+    /// network roots, and the retry that brings a dead live watcher back, which the coordinator
+    /// feeds from this very schedule.
+    /// </summary>
+    [Theory]
+    [InlineData(RootKind.Usb)]
+    [InlineData(RootKind.Unc)]
+    public async Task A_removable_or_network_root_recovers_without_anybody_declaring_it_continuous(
+        RootKind kind)
+    {
+        using var directory = new DatabaseTestDirectory();
+        var root = new LibraryRoot(
+            new LibraryRootId(Guid.NewGuid()),
+            directory.Path,
+            kind,
+            RootAvailability.Available,
+            ScanPolicy.Startup | ScanPolicy.Manual);
+        var scheduler = new FallbackScanScheduler(
+            new SystemClock(),
+            new InMemoryScanWatchSettings(watchLocalRoots: false, TimeSpan.FromMilliseconds(100)));
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(5));
+        await using var triggers = scheduler.ScheduleAsync(root, timeout.Token).GetAsyncEnumerator(timeout.Token);
+
+        Assert.True(await triggers.MoveNextAsync());
+        Assert.Equal(ScanTrigger.Startup, triggers.Current);
+        Assert.True(await triggers.MoveNextAsync());
+
+        Assert.Equal(ScanTrigger.Recovery, triggers.Current);
+    }
+
+    /// <summary>
+    /// The negative control of the one above, and the half that keeps the setting honest: a local
+    /// root whose owner unticked the box gets the startup pass its own policy asks for and nothing
+    /// after it. Without this, unticking would leave files still appearing every so often.
+    /// </summary>
+    [Fact]
+    public async Task A_local_root_the_setting_left_alone_gets_its_startup_pass_and_nothing_more()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var root = new LibraryRoot(
+            new LibraryRootId(Guid.NewGuid()),
+            directory.Path,
+            RootKind.Local,
+            RootAvailability.Available,
+            ScanPolicy.Startup | ScanPolicy.Manual);
+        var scheduler = new FallbackScanScheduler(
+            new SystemClock(),
+            new InMemoryScanWatchSettings(watchLocalRoots: false, TimeSpan.FromMilliseconds(100)));
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(5));
+        await using var triggers = scheduler.ScheduleAsync(root, timeout.Token).GetAsyncEnumerator(timeout.Token);
+
+        Assert.True(await triggers.MoveNextAsync());
+        Assert.Equal(ScanTrigger.Startup, triggers.Current);
+
+        Assert.False(await triggers.MoveNextAsync());
+    }
+
+    /// <summary>
+    /// The interval is read at the top of every pass rather than captured once, so moving the
+    /// spinner in Settings is honoured from the next sweep instead of the next launch.
+    /// <para>
+    /// <b>Its declared limit, measured rather than assumed:</b> a wait already under way is not
+    /// interrupted. This asserts by effect — after a pass arrives at a hundred milliseconds, the
+    /// interval is widened and the pass that would have been due does not come. A test that set the
+    /// long value first and then shortened it would prove nothing, because the long wait had already
+    /// begun.
+    /// </para>
+    /// </summary>
+    [Fact]
+    public async Task A_new_interval_is_honoured_from_the_next_sweep()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var root = Root(directory.Path, RootKind.Usb);
+        var settings = new InMemoryScanWatchSettings(watchLocalRoots: false, TimeSpan.FromMilliseconds(100));
+        var scheduler = new FallbackScanScheduler(new SystemClock(), settings);
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(10));
+        await using var triggers = scheduler.ScheduleAsync(root, timeout.Token).GetAsyncEnumerator(timeout.Token);
+        Assert.True(await triggers.MoveNextAsync());
+        Assert.Equal(ScanTrigger.Startup, triggers.Current);
+        Assert.True(await triggers.MoveNextAsync());
+        Assert.Equal(ScanTrigger.Recovery, triggers.Current);
+
+        settings.SetSweepInterval(TimeSpan.FromSeconds(30));
+        var due = triggers.MoveNextAsync().AsTask();
+        var slept = await Task.WhenAny(due, Task.Delay(TimeSpan.FromSeconds(2), timeout.Token));
+
+        Assert.NotSame(due, slept);
+
+        // Still waiting rather than finished, which is the other half of the claim — and the wait is
+        // observed instead of abandoned, or disposing the enumerator would surface its cancellation.
+        timeout.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => due);
     }
 
     [Fact]
@@ -436,7 +540,7 @@ public sealed class FileWatcherRecoveryTests
             new ThrowingRootWatcher(),
             new EmptyFallbackScheduler(),
             scan,
-            new FakeScanWatchSettings(watchLocalRoots: false));
+            new InMemoryScanWatchSettings(watchLocalRoots: false));
         await watch.StartAsync(root, TestContext.Current.CancellationToken);
         await watch.RunFallbackAsync(root, ScanTrigger.Recovery, TestContext.Current.CancellationToken);
 
@@ -661,11 +765,4 @@ public sealed class FileWatcherRecoveryTests
         }
     }
 
-    // Off on purpose: this root carries ScanPolicy.Continuous, so the flag and not the setting still starts the watcher.
-    private sealed class FakeScanWatchSettings(bool watchLocalRoots) : IScanWatchSettings
-    {
-        public bool WatchLocalRoots { get; private set; } = watchLocalRoots;
-
-        public void SetWatchLocalRoots(bool enabled) => WatchLocalRoots = enabled;
-    }
 }

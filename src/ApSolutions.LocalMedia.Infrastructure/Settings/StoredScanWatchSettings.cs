@@ -3,6 +3,7 @@
 
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Settings;
+using ApSolutions.LocalMedia.Domain.Discovery;
 
 namespace ApSolutions.LocalMedia.Infrastructure.Settings;
 
@@ -19,12 +20,55 @@ public sealed class StoredScanWatchSettings : IScanWatchSettings
 {
     private const string Key = "scan.watchLocalRoots";
 
+    /// <summary>Stored in whole minutes because that is what the screen edits.</summary>
+    private const string SweepKey = "scan.sweepIntervalMinutes";
+
     private readonly ISettingsStore _store;
 
     public StoredScanWatchSettings(ISettingsStore store) =>
         _store = store ?? throw new ArgumentNullException(nameof(store));
 
+    public event EventHandler? Changed;
+
     public bool WatchLocalRoots => _store.Read<bool?>(Key) ?? true;
 
-    public void SetWatchLocalRoots(bool enabled) => _store.Write(Key, enabled);
+    /// <summary>
+    /// <b>The clamping lives here and not in the scheduler, on purpose.</b> This is the only place
+    /// that reads a file a person can open in a text editor, so it is where a value out of range can
+    /// arrive — a sweep every zero minutes is a scan in a hot loop. Doing it downstream instead would
+    /// force every test of the scheduler to wait a whole minute for a pass.
+    /// </summary>
+    public TimeSpan SweepInterval
+    {
+        get
+        {
+            var stored = _store.Read<int?>(SweepKey);
+            if (stored is not { } minutes)
+            {
+                return ScanWatchPolicy.DefaultSweepInterval;
+            }
+
+            var asked = TimeSpan.FromMinutes(minutes);
+            if (asked < ScanWatchPolicy.MinimumSweepInterval)
+            {
+                return ScanWatchPolicy.MinimumSweepInterval;
+            }
+
+            return asked > ScanWatchPolicy.MaximumSweepInterval
+                ? ScanWatchPolicy.MaximumSweepInterval
+                : asked;
+        }
+    }
+
+    public void SetWatchLocalRoots(bool enabled)
+    {
+        _store.Write(Key, enabled);
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void SetSweepInterval(TimeSpan interval)
+    {
+        _store.Write(SweepKey, (int)Math.Round(interval.TotalMinutes));
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
 }

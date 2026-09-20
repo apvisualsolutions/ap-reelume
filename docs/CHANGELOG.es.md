@@ -35,6 +35,20 @@ evidencia, es [FEATURES.md](FEATURES.md).
   para lo que existe el rebarrido de recuperación. Viene puesto a vigilar si nadie dice lo contrario,
   al revés que los ajustes que tocan internet: vigilar una carpeta no sale de este ordenador
   (`ENG-044`).
+- **Un disco externo o una carpeta de red vuelven a revisarse cada cierto tiempo.** El rebarrido de
+  recuperación —el que recoge lo que la vigilancia puede perderse en una unidad que se enchufa y se
+  quita, o al otro lado de la red— **tampoco llegaba a correr nunca**, y por el mismo motivo que la
+  vigilancia: esperaba aquella marca que nadie ponía. Con él se perdía además lo que devuelve la
+  vigilancia a la vida si se cae. Ahora corre para toda carpeta que el programa mantiene al día, y
+  en un disco externo o una carpeta de red corre aunque la vigilancia de carpetas locales esté
+  apagada, porque ese ajuste habla de las locales y ahí el rebarrido es lo único que hay
+  (`ENG-044`).
+- **«Vigilar cambios en raíces locales» y el intervalo de recuperación por fin hacen algo, y se
+  guardan.** Los dos mandos de Ajustes se movían, se restauraban y no cambiaban nada: el valor se
+  perdía al cerrar y no lo leía ninguna parte del programa. Ahora el interruptor **se nota al
+  momento**, sin reiniciar, y el intervalo se respeta desde el barrido siguiente. El valor de
+  fábrica del intervalo pasa a ser **quince** minutos, que es el que el programa usaba de verdad;
+  la pantalla enseñaba treinta y esa cifra no gobernaba nada (`ENG-010`).
 
 ### Cambiado
 

@@ -201,7 +201,14 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var watched = Path.Combine(_dataRoot, "watched");
         Directory.CreateDirectory(watched);
         File.Copy(sample, Path.Combine(watched, "Dune.2021.1080p.mp4"));
-        var factory = await SeedRootAsync(watched, ScanPolicy.Startup | ScanPolicy.Continuous);
+        // ENG-044, and this single argument is the ratchet. It used to say
+        // `Startup | Continuous` — a policy NO entry point in the application produces — so the
+        // scene proved the watching slice works when something switches it on, never that anything
+        // does. Nothing did: the flag was assigned nowhere in src/. This is what a folder added the
+        // ordinary way actually carries, which means the only thing that can start the watcher here
+        // is the setting, at its factory value, reached through the assembled application. Revert
+        // ScanWatchPolicy to the old flag check and this scene goes red.
+        var factory = await SeedRootAsync(watched, ScanPolicy.Startup | ScanPolicy.Manual);
 
         using var host = ShowShell();
         host.Application.ConfigureWindow(host.Window);
@@ -1988,6 +1995,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Add never put the folder in the catalogue");
         Assert.Equal(folder, await RootPathsAsync(factory));
         Assert.Null(onboarding.FailureKey);
+
+        // ENG-044, and this is the half no scene had: the folder is in the catalogue, but does the
+        // application follow it? The sister scene proves a root carrying this policy gets watched;
+        // what nothing proved is that the real Add button produces such a policy. Between the two,
+        // a folder added with the mouse is followed — and the day somebody changes onboarding to
+        // hand out Manual alone, this fails here instead of shipping silent.
+        var added = Assert.Single(
+            await new LibraryRootRepository(factory).ListAsync(TestContext.Current.CancellationToken));
+        var watchSettings = host.Application.Services.GetRequiredService<IScanWatchSettings>();
+        Assert.True(
+            ScanWatchPolicy.ShouldWatchLive(added.Kind, added.ScanPolicy, watchSettings.WatchLocalRoots),
+            "A folder added by pressing Add is not one the assembled application would watch.");
 
         // While the consent is still owed the first-run form is still up, and the removal question is
         // asked and refused here. Since 2026-09-06 the question is one floating surface over the

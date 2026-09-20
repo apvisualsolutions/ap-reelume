@@ -97,9 +97,12 @@ public static partial class CompositionRoot
             .AddSingleton<IScanWatchSettings, StoredScanWatchSettings>()
             .AddSingleton<IRootWatcher>(provider => new DebouncedFileWatcher(
                 provider.GetRequiredService<IClock>()))
+            // The sweep reads the same settings the live watcher does, so the interval a person set
+            // is the interval that runs. It used to be a constant handed in here, which is how the
+            // screen came to offer thirty minutes while the code ran every fifteen (ENG-010).
             .AddSingleton<IFallbackScanScheduler>(provider => new FallbackScanScheduler(
                 provider.GetRequiredService<IClock>(),
-                FallbackScanScheduler.DefaultRecoveryInterval))
+                provider.GetRequiredService<IScanWatchSettings>()))
             .AddSingleton<InProcessApplicationEventPublisher>()
             .AddSingleton<IApplicationEventPublisher>(provider =>
                 provider.GetRequiredService<InProcessApplicationEventPublisher>());

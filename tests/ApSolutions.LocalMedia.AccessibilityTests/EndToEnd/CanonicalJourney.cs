@@ -28,6 +28,7 @@ using ApSolutions.LocalMedia.Presentation.Settings;
 using ApSolutions.LocalMedia.Presentation.Shell;
 using ApSolutions.LocalMedia.Presentation.Show;
 using ApSolutions.LocalMedia.Presentation.Theme;
+using ApSolutions.LocalMedia.TestSupport;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Styling;
@@ -318,7 +319,7 @@ public static class CanonicalJourney
 
     private static ScanSettingsView BuildScanSettings() => new ScanSettingsView
     {
-        DataContext = new ScanSettingsViewModel(),
+        DataContext = new ScanSettingsViewModel(new InMemoryScanWatchSettings()),
     };
 
     private static SubtitleStyleView BuildSubtitleStyle()

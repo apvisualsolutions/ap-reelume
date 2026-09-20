@@ -21,5 +21,26 @@ public interface IScanWatchSettings
 {
     bool WatchLocalRoots { get; }
 
+    /// <summary>
+    /// How long the recovery sweep waits between passes. Always within
+    /// <c>ScanWatchPolicy.MinimumSweepInterval</c> and <c>ScanWatchPolicy.MaximumSweepInterval</c>:
+    /// whoever implements this brings a stored value back into range, so the scheduler reading it
+    /// can believe it without checking.
+    /// </summary>
+    TimeSpan SweepInterval { get; }
+
+    /// <summary>
+    /// Raised after either value changes, so the watching can be rebuilt then and there.
+    /// </summary>
+    /// <remarks>
+    /// Without this the screen would be back where ENG-044 found it: a control that governs
+    /// something, but not until the next launch. The whole point of that task was that a switch
+    /// nobody's code reads and a switch nobody's code reads <i>yet</i> look identical from the
+    /// outside.
+    /// </remarks>
+    event EventHandler? Changed;
+
     void SetWatchLocalRoots(bool enabled);
+
+    void SetSweepInterval(TimeSpan interval);
 }

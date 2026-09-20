@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Discovery;
+using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.Application.Tests.Discovery;
@@ -78,13 +79,15 @@ public sealed class RootWatchBackgroundTests
         var root = CreateRoot(ScanPolicy.Continuous);
         using var watcher = new DyingWatcher();
         var scans = new SignallingScanCoordinator(expectedScans: 1);
+        var settings = new InMemoryScanWatchSettings(watchLocalRoots: false);
         using var background = new RootWatchBackground(
             new FixedRootRepository([root]),
             new RootWatchCoordinator(
                 watcher,
                 new EndlessScheduler(),
                 scans,
-                new FakeScanWatchSettings(watchLocalRoots: false)));
+                settings),
+            settings);
 
         background.Start();
         await watcher.WaitForStartAsync(WaitBudget);
@@ -96,16 +99,137 @@ public sealed class RootWatchBackgroundTests
         Assert.Equal(1, watcher.Starts);
     }
 
+    /// <summary>
+    /// <b>ENG-044's last mile: a control that only takes effect next launch is the same defect in
+    /// miniature.</b> The whole task was about a switch nobody's code read; a switch read only at
+    /// startup looks identical to a person who ticks the box and sees nothing happen.
+    /// </summary>
+    [Fact]
+    public async Task Turning_the_setting_on_starts_watching_without_waiting_for_the_next_launch()
+    {
+        var root = CreateRoot(ScanPolicy.Startup);
+        var watcher = new IdleWatcher();
+        var settings = new InMemoryScanWatchSettings(watchLocalRoots: false);
+        using var background = CreateBackground([root], new SignallingScanCoordinator(0), watcher, settings);
+        background.Start();
+        await Task.Delay(250, TestContext.Current.CancellationToken);
+        Assert.Equal(0, watcher.Starts);
+
+        settings.SetWatchLocalRoots(true);
+
+        await watcher.WaitForStartAsync(WaitBudget);
+        Assert.Equal(1, watcher.Starts);
+    }
+
+    [Fact]
+    public async Task Turning_it_off_stops_the_watchers_it_had_started()
+    {
+        var root = CreateRoot(ScanPolicy.Startup);
+        var watcher = new IdleWatcher();
+        var settings = new InMemoryScanWatchSettings(watchLocalRoots: true);
+        using var background = CreateBackground([root], new SignallingScanCoordinator(0), watcher, settings);
+        background.Start();
+        await watcher.WaitForStartAsync(WaitBudget);
+
+        settings.SetWatchLocalRoots(false);
+
+        await watcher.WaitForCancellationAsync(WaitBudget);
+    }
+
+    /// <summary>
+    /// The promise <c>DeclareCourseFolder</c> makes in writing has to survive the restart path too,
+    /// not only the startup one — a course folder said «only when I ask» and the setting never spoke
+    /// for it.
+    /// </summary>
+    [Fact]
+    public async Task A_manual_root_is_still_left_alone_after_the_setting_is_turned_on()
+    {
+        var root = CreateRoot(ScanPolicy.Manual);
+        var watcher = new IdleWatcher();
+        var settings = new InMemoryScanWatchSettings(watchLocalRoots: false);
+        using var background = CreateBackground([root], new SignallingScanCoordinator(0), watcher, settings);
+        background.Start();
+
+        settings.SetWatchLocalRoots(true);
+
+        await Task.Delay(250, TestContext.Current.CancellationToken);
+        Assert.Equal(0, watcher.Starts);
+    }
+
+    [Fact]
+    public async Task Changing_the_setting_after_the_application_has_left_resurrects_nothing()
+    {
+        var root = CreateRoot(ScanPolicy.Startup);
+        var watcher = new IdleWatcher();
+        var settings = new InMemoryScanWatchSettings(watchLocalRoots: false);
+        using var background = CreateBackground([root], new SignallingScanCoordinator(0), watcher, settings);
+        background.Start();
+        background.Stop();
+
+        settings.SetWatchLocalRoots(true);
+
+        await Task.Delay(250, TestContext.Current.CancellationToken);
+        Assert.Equal(0, watcher.Starts);
+    }
+
+    /// <summary>
+    /// Disposing has to let go of the setting, because the setting is a singleton that outlives any
+    /// one host: a host still subscribed is a host that cannot be collected.
+    /// <para>
+    /// <b>This asserts the subscription and not the watchers, and the first version of it asserted
+    /// the watchers and measured nothing.</b> Removing the unsubscribe left it green, because
+    /// <c>Dispose</c> also cancels the shutdown token and <c>Restart</c> checks that first — so no
+    /// watcher started either way and the test could not tell a leak from a clean release. What
+    /// shows the difference is whether anybody is still listening.
+    /// </para>
+    /// </summary>
+    [Fact]
+    public void Disposing_stops_listening_to_the_setting()
+    {
+        var root = CreateRoot(ScanPolicy.Startup);
+        var settings = new InMemoryScanWatchSettings(watchLocalRoots: false);
+        var background = CreateBackground([root], new SignallingScanCoordinator(0), new IdleWatcher(), settings);
+        Assert.True(settings.HasListeners);
+
+        background.Dispose();
+
+        Assert.False(settings.HasListeners);
+    }
+
+    [Fact]
+    public async Task Two_changes_in_a_row_leave_one_watcher_per_root()
+    {
+        var root = CreateRoot(ScanPolicy.Startup);
+        var watcher = new IdleWatcher();
+        var settings = new InMemoryScanWatchSettings(watchLocalRoots: true);
+        using var background = CreateBackground([root], new SignallingScanCoordinator(0), watcher, settings);
+        background.Start();
+        await watcher.WaitForStartAsync(WaitBudget);
+
+        settings.SetWatchLocalRoots(false);
+        await watcher.WaitForCancellationAsync(WaitBudget);
+        settings.SetWatchLocalRoots(true);
+
+        await Task.Delay(500, TestContext.Current.CancellationToken);
+        Assert.Equal(2, watcher.Starts);
+    }
+
     private static RootWatchBackground CreateBackground(
         IReadOnlyList<LibraryRoot> roots,
         IScanCoordinator scans,
-        IRootWatcher watcher) => new(
+        IRootWatcher watcher,
+        InMemoryScanWatchSettings? settings = null)
+    {
+        var watchSettings = settings ?? new InMemoryScanWatchSettings(watchLocalRoots: false);
+        return new RootWatchBackground(
             new FixedRootRepository(roots),
             new RootWatchCoordinator(
                 watcher,
                 new StartupOnlyScheduler(),
                 scans,
-                new FakeScanWatchSettings(watchLocalRoots: false)));
+                watchSettings),
+            watchSettings);
+    }
 
     private static LibraryRoot CreateRoot(ScanPolicy policy) => new(
         new LibraryRootId(Guid.NewGuid()),
@@ -293,11 +417,4 @@ public sealed class RootWatchBackgroundTests
         }
     }
 
-    // Off on purpose: these roots carry ScanPolicy.Continuous, so the flag and not the setting still starts the watcher.
-    private sealed class FakeScanWatchSettings(bool watchLocalRoots) : IScanWatchSettings
-    {
-        public bool WatchLocalRoots { get; private set; } = watchLocalRoots;
-
-        public void SetWatchLocalRoots(bool enabled) => WatchLocalRoots = enabled;
-    }
 }

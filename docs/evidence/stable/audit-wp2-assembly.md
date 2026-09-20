@@ -200,6 +200,53 @@ archivos movidos de LIB-002/003 (reconciliación → reasignación manual) sigue
 alcance — está contada en la puerta y en el plan. / The physical walk stays pending, and the
 moved-file half still has no surface that reaches it — counted in the gate and the plan.
 
+### Releído el 2026-09-20 (ENG-044): qué midió de verdad este bloque / Reread on 2026-09-20 (ENG-044): what this block actually measured
+
+**Lo de arriba es cierto y estaba incompleto, y el hueco costó cinco semanas de una promesa sin
+cumplir.** Donde dice que un archivo soltado en una raíz vigilada se cataloga solo, lo medido fue
+exactamente eso: **una raíz vigilada**. `ContinuousWatchTests` fabricaba su raíz con
+`ScanPolicy.Continuous` ya puesto y montaba el coordinador a mano, sin pasar por `CompositionRoot`.
+El disco y SQLite eran reales; el ensamblado no. Así que probó que la rebanada funciona **cuando
+algo la enciende** — nunca que algo la encendiera. / **The block above is true and was incomplete.**
+What it measured was a root that was already watched: the scene fabricated it with the flag set and
+wired the coordinator by hand. Real disk, real SQLite, no container.
+
+**Y nada la encendía.** Medido el 2026-09-20: `ScanPolicy.Continuous` no se asignaba en **ningún
+sitio** de `src/`, y ninguna pantalla lo ofrecía. Las tres vías de alta producen `Startup | Manual` o
+`Manual`. Durante cinco semanas `LIB-003` estuvo `VERIFIED` prometiendo vigilancia continua mientras
+Ajustes mostraba su interruptor encendido y nada seguía ninguna carpeta. / **And nothing switched it
+on:** the flag was assigned nowhere in `src/`, and no screen offered it.
+
+**Corrección a la viñeta del intervalo.** Donde dice que `FallbackScanScheduler.DefaultRecoveryInterval`
+(15 min) llega al registro: ya no. Lo que llega es el ajuste (`IScanWatchSettings`), y el intervalo
+vive en `ScanWatchPolicy.DefaultSweepInterval`, en un solo sitio — siguen siendo quince minutos, que
+es lo que este documento respaldaba y lo que el código ejercía, frente a los treinta que la pantalla
+enseñaba sin gobernar nada. Y ese barrido **tampoco corría para nadie**, por la misma bandera: no
+había recuperación para USB ni NAS, ni reintento de un vigilante caído. / **Correction to the
+interval bullet:** the scheduler is handed the setting now, not a constant, and the sweep was not
+running for anybody either — same flag.
+
+**Qué se volvió a medir, y con qué.** Dos escenas del paseo físico, las dos sobre la aplicación
+montada por `CompositionRoot`:
+1. `A_dropped_copy_is_catalogued_by_the_watching_application…` siembra ahora la raíz con
+   `Startup | Manual` — la política que las vías reales producen—, así que **sólo el ajuste puede
+   encender su vigilancia**. Visto caer al revertir `ScanWatchPolicy` a la bandera vieja.
+2. `The_root_onboarding_is_operated_with_the_mouse` comprueba, tras pulsar «Añadir», que la raíz que
+   quedó en el catálogo es una que el ajuste resuelto del contenedor vigila. Visto caer al cambiar la
+   política por defecto del alta.
+Entre las dos: una carpeta añadida con el ratón queda seguida. / **What was measured again:** two
+scenes over the assembled application, each seen to fail against the old code.
+
+**La lección, y es de sitio más que de cobertura.** La puerta que debía cazar esto —
+`ServiceConsumptionTests`, «registrado→consumido»— es **textual** y lo dice en sus propias notas:
+lee el fuente de `CompositionRoot*.cs` con expresiones regulares. Un servicio puede estar registrado,
+resuelto, arrancado y escrito en el texto, y seguir sin hacer nada porque la condición que lo activa
+no la cumple nadie. `RootWatchWiringTests` tenía una aserción que buscaba el nombre de una constante
+en ese mismo texto: estuvo verde todo el tiempo. **Lo que una puerta no puede ver no lo ve más
+fuerte por estar en verde.** / **The lesson is about place, not coverage:** the gate meant to catch
+this reads source text, and text cannot notice that a registered, resolved, started slice never
+reaches its condition.
+
 ## PLY-011 — El final de un episodio por fin ofrece el siguiente / The end of an episode finally offers the next
 
 **El defecto / The defect.** Tres eslabones sueltos: el motor no observaba `EndReached` — el estado

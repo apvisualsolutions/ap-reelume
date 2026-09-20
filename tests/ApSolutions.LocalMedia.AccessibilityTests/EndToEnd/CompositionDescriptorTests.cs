@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
 using System.Text.RegularExpressions;
+using ApSolutions.LocalMedia.Application.Discovery;
 using ApSolutions.LocalMedia.Application.Identification;
 using ApSolutions.LocalMedia.Application.Metadata;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Updates;
+using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Domain.Metadata;
 using ApSolutions.LocalMedia.Infrastructure.Data;
 using ApSolutions.LocalMedia.Infrastructure.Metadata;
@@ -55,6 +58,46 @@ public sealed class CompositionDescriptorTests
         // here — it would open the database, and what this suite is about is the collection.
         using var provider = services.BuildServiceProvider();
         Assert.NotNull(provider.GetRequiredService<CacheTitleArtwork>());
+    }
+
+    /// <summary>
+    /// <b>Moved from <c>RootWatchWiringTests</c>, which asserted that the composition's source text
+    /// mentioned a constant — and that is exactly the kind of gate ENG-044 walked straight past.</b>
+    /// The old assertion was satisfied by the words being present; it could not notice that the
+    /// scheduler they were handed to would never reach its loop, because nothing in the application
+    /// assigned the flag it asked for. This resolves the real scheduler from the real container and
+    /// makes it emit, which is a claim the text cannot fake.
+    /// </summary>
+    [Fact]
+    public async Task The_assembled_fallback_scheduler_sweeps_a_root_the_application_can_really_create()
+    {
+        using var provider = Compose().BuildServiceProvider();
+        var settings = provider.GetRequiredService<IScanWatchSettings>();
+        settings.SetSweepInterval(ScanWatchPolicy.MinimumSweepInterval);
+        var scheduler = provider.GetRequiredService<IFallbackScanScheduler>();
+
+        // A network share added the ordinary way: the policy every real entry point produces, and
+        // never the Continuous flag the old scheduler demanded.
+        var root = new LibraryRoot(
+            new LibraryRootId(Guid.NewGuid()),
+            @"\\nas\Media",
+            RootKind.Unc,
+            RootAvailability.Available,
+            ScanPolicy.Startup | ScanPolicy.Manual);
+
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(5));
+        await using var triggers = scheduler.ScheduleAsync(root, timeout.Token).GetAsyncEnumerator(timeout.Token);
+        Assert.True(await triggers.MoveNextAsync());
+        Assert.Equal(ScanTrigger.Startup, triggers.Current);
+
+        // The recovery pass is due a whole minute out, so what is asserted is that the schedule is
+        // still running rather than broken out of — which is precisely what used to happen.
+        var due = triggers.MoveNextAsync().AsTask();
+        var slept = await Task.WhenAny(due, Task.Delay(TimeSpan.FromMilliseconds(500), timeout.Token));
+        Assert.NotSame(due, slept);
+        timeout.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => due);
     }
 
     /// <summary>
