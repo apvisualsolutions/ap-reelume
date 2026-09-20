@@ -97,6 +97,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   explicación; las cifras desfasadas quedan al día, y la secuencia que hay detrás se midió del
   historial en vez de copiarse. No cambia nada del programa (`ENG-015`).
 
+- **La herramienta que avisa de la cobertura antes de enviar un cambio ya ve los ficheros que
+  todavía no se han confirmado.** Buscaba el código nuevo con un rango de confirmaciones, que sólo
+  nombra lo que ya está dentro de una, así que callaba justo en el momento para el que existe —y ese
+  silencio ya había costado una ejecución fallida—. Ahora mira también lo que está preparado y lo
+  que el control de versiones aún no sigue, y una comprobación lo mide por efecto contra un
+  repositorio hecho a propósito, con el caso contrario al lado de cada uno. No cambia nada del
+  programa (`ENG-016`).
+
 - **La configuración de trabajo del repositorio deja de nombrar servicios internos de quien lo
   desarrolla.** Desde el 2026-09-05 el archivo de configuración de la herramienta de desarrollo, que
   viaja con el código público, nombraba un servidor de notas privado y seis permisos sobre él. La

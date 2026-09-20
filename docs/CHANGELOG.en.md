@@ -94,6 +94,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   explanation; the stale figures are up to date, and the sequence behind them was measured from the
   history rather than copied. Nothing in the program changes (`ENG-015`).
 
+- **The tool that warns about coverage before a change is sent now sees the files that have not been
+  committed yet.** It looked for new source with a range of commits, which only ever names what is
+  already in one — so it went quiet at exactly the moment it exists for, and that silence has
+  already cost a failed run. It now also looks at what is staged and at what the version control
+  does not track yet, and a check measures that by effect against a purpose-built repository, with
+  the opposite case beside each one. Nothing in the program changes (`ENG-016`).
+
 - **The repository's working configuration no longer names its developer's internal services.** Since
   2026-09-05 the development tool's settings file, which ships with the public code, named a private
   notes server and six permissions on it. The enablement did nothing, because it only acts on servers
