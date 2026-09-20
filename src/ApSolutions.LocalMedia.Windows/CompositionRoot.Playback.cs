@@ -110,6 +110,26 @@ public static partial class CompositionRoot
                     var tracker = provider.GetRequiredService<PlaybackProgressTracker>();
                     tracker.Observe(position, duration);
                     _ = await tracker.FlushAsync(PersistenceTrigger.Seek, token).ConfigureAwait(false);
+                },
+                // The speed is stored GLOBALLY and not per file or per series, and that is a
+                // decision rather than the easy path (ENG-011): a speed is how this person watches,
+                // while the audio language is a property of the series — which is why the tracks
+                // carry three scopes and this does not. The three-scope machinery still resolves it,
+                // so narrowing it later costs nothing.
+                async (speed, token) =>
+                {
+                    var preferences = provider.GetRequiredService<IPlaybackPreferenceRepository>();
+                    var stored = await preferences
+                        .GetAsync(PreferenceScope.Global, PlaybackPreference.GlobalKey, token)
+                        .ConfigureAwait(false)
+                        ?? new PlaybackPreference
+                        {
+                            Scope = PreferenceScope.Global,
+                            ScopeKey = PlaybackPreference.GlobalKey,
+                        };
+                    await preferences
+                        .SaveAsync(stored with { SpeedMultiplier = speed }, token)
+                        .ConfigureAwait(false);
                 }))
             .AddSingleton<ChangePlaybackMode>()
             .AddSingleton<IMediaKeySource, WindowsMediaKeyService>()

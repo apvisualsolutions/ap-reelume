@@ -72,6 +72,94 @@ public sealed class ControlPlaybackTests
         Assert.Equal(TimeSpan.Zero, underrun.Position);
     }
 
+    /// <summary>
+    /// ENG-011: the other end of it. The speed reached the engine and stopped there, so closing the
+    /// application forgot it and the person had to choose it again every time. What is handed over
+    /// is the CLAMPED value, for the same reason the seek hands its clamped target: what gets stored
+    /// has to be what the engine was actually told, never what was asked for.
+    /// </summary>
+    [Fact]
+    public async Task Every_speed_change_hands_its_clamped_value_to_the_persistence_callback()
+    {
+        var engine = new RecordingEngine();
+        var persisted = new List<double>();
+        using var control = new ControlPlayback(
+            engine,
+            persistSpeed: (speed, _) =>
+            {
+                persisted.Add(speed);
+                return Task.CompletedTask;
+            });
+
+        _ = await control.SetSpeedAsync(1.5, TestContext.Current.CancellationToken);
+        _ = await control.SetSpeedAsync(99.0, TestContext.Current.CancellationToken);
+
+        Assert.Equal(2, persisted.Count);
+        Assert.Equal(1.5, persisted[0]);
+        Assert.Equal(PlaybackControlPolicy.ClampSpeed(99.0), persisted[1]);
+    }
+
+    /// <summary>
+    /// Opening a file resolves a speed and hands it to the engine; the transport has to take the
+    /// same value or the screen reads one thing while the film runs at another.
+    /// </summary>
+    [Fact]
+    public async Task Adopting_the_resolved_speed_makes_the_transport_agree_with_the_engine()
+    {
+        var engine = new RecordingEngine();
+        using var control = new ControlPlayback(engine);
+
+        var state = await control.AdoptSpeedAsync(1.5, TestContext.Current.CancellationToken);
+
+        Assert.Equal(1.5, state.SpeedMultiplier);
+    }
+
+    /// <summary>
+    /// Adopting is not choosing: the stored value arriving must not be written back as if somebody
+    /// had just picked it. The negative control of the persistence test above.
+    /// </summary>
+    [Fact]
+    public async Task Adopting_a_speed_stores_nothing_because_nobody_chose_it()
+    {
+        var engine = new RecordingEngine();
+        var persisted = new List<double>();
+        using var control = new ControlPlayback(
+            engine,
+            persistSpeed: (speed, _) =>
+            {
+                persisted.Add(speed);
+                return Task.CompletedTask;
+            });
+
+        _ = await control.AdoptSpeedAsync(1.5, TestContext.Current.CancellationToken);
+
+        Assert.Empty(persisted);
+    }
+
+    /// <summary>A stored value out of range is brought back, exactly like one somebody types.</summary>
+    [Fact]
+    public async Task An_adopted_speed_out_of_range_is_brought_back_into_it()
+    {
+        var engine = new RecordingEngine();
+        using var control = new ControlPlayback(engine);
+
+        var state = await control.AdoptSpeedAsync(99.0, TestContext.Current.CancellationToken);
+
+        Assert.Equal(PlaybackControlPolicy.ClampSpeed(99.0), state.SpeedMultiplier);
+    }
+
+    /// <summary>Nothing to store is the ordinary case for a caller that only drives the engine.</summary>
+    [Fact]
+    public async Task A_speed_change_with_nowhere_to_store_it_still_reaches_the_engine()
+    {
+        var engine = new RecordingEngine();
+        using var control = new ControlPlayback(engine);
+
+        var state = await control.SetSpeedAsync(1.5, TestContext.Current.CancellationToken);
+
+        Assert.Equal(1.5, state.SpeedMultiplier);
+    }
+
     [Fact]
     public async Task Every_seek_hands_its_clamped_target_to_the_persistence_callback()
     {

@@ -49,6 +49,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
   momento**, sin reiniciar, y el intervalo se respeta desde el barrido siguiente. El valor de
   fábrica del intervalo pasa a ser **quince** minutos, que es el que el programa usaba de verdad;
   la pantalla enseñaba treinta y esa cifra no gobernaba nada (`ENG-010`).
+- **La velocidad de reproducción se recuerda, y deja de colarse en películas que no la pediste.**
+  Eran dos fallos con la misma causa. El primero: la velocidad se olvidaba al cerrar el programa, así
+  que quien viera a 1,25× tenía que volver a ponerla cada vez. El segundo, que se notaba más y nadie
+  había nombrado: **mientras el programa siguiera abierto, la velocidad se arrastraba de una película
+  a la siguiente** aunque no la hubieras tocado, y la pantalla la mostraba como si la hubieras
+  elegido. Ahora se guarda al cambiarla y se aplica al abrir cada vídeo, así que empezar una película
+  sin haber pedido nada la pone a velocidad normal. Se guarda para todo el programa y no por película
+  ni por serie: la velocidad es de cómo ves tú, mientras que el idioma sí es de la serie (`ENG-011`).
 
 ### Cambiado
 

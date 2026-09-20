@@ -47,6 +47,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   restarting, and the interval is honoured from the next sweep. The factory interval becomes
   **fifteen** minutes, which is the one the program actually used; the screen showed thirty and that
   figure governed nothing (`ENG-010`).
+- **Playback speed is remembered, and stops leaking into films you never asked it for.** Two faults
+  with one cause. The first: the speed was forgotten when the program closed, so anybody watching at
+  1.25× had to choose it again every time. The second, more noticeable and never named: **while the
+  program stayed open, the speed carried from one film to the next** even though you had not touched
+  it, and the screen showed it as though you had chosen it. It is now stored when you change it and
+  applied as each video opens, so starting a film without asking for anything gives you normal
+  speed. It is stored for the whole program rather than per file or per series: the speed is about
+  how you watch, while the audio language is about the series (`ENG-011`).
 
 ### Changed
 
