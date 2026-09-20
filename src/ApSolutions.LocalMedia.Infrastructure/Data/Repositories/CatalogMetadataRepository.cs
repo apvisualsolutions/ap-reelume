@@ -22,7 +22,8 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
 {
     private const string Columns =
         "title_id, title, original_title, overview, release_year, genres, poster_path, backdrop_path, "
-        + "trailer_key, locked_fields, revision, provider, provider_key, refreshed_utc, personal_cover";
+        + "trailer_key, locked_fields, revision, provider, provider_key, refreshed_utc, personal_cover, "
+        + "cover_order";
 
     // A unit separator cannot occur inside a genre name or a field name, so no stored value can be
     // cut in half by the character that joins them.
@@ -101,7 +102,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
         command.CommandText = $"""
             INSERT INTO catalog_metadata ({Columns})
             VALUES ($id, $title, $originalTitle, $overview, $year, $genres, $poster, $backdrop, $trailer, $locked,
-                    $revision, $provider, $providerKey, $refreshedUtc, $personal)
+                    $revision, $provider, $providerKey, $refreshedUtc, $personal, $coverOrder)
             ON CONFLICT (title_id) DO UPDATE SET
                 title = excluded.title,
                 original_title = excluded.original_title,
@@ -116,7 +117,8 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
                 provider = excluded.provider,
                 provider_key = excluded.provider_key,
                 refreshed_utc = excluded.refreshed_utc,
-                personal_cover = excluded.personal_cover
+                personal_cover = excluded.personal_cover,
+                cover_order = excluded.cover_order
             WHERE catalog_metadata.revision = $expected;
             """;
         // The next revision is computed here rather than taken from the caller. Every caller used to
@@ -146,6 +148,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
                 ? refreshed.ToUniversalTime().ToString("O", CultureInfo.InvariantCulture)
                 : DBNull.Value);
         _ = command.Parameters.AddWithValue("$personal", (object?)metadata.PersonalCover ?? DBNull.Value);
+        _ = command.Parameters.AddWithValue("$coverOrder", (object?)metadata.CoverOrder ?? DBNull.Value);
         _ = command.Parameters.AddWithValue("$expected", expectedRevision);
         var written = await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         return written == 0
@@ -185,6 +188,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
                 ReadLockedFields(reader.GetString(9)))
             {
                 PersonalCover = personal,
+                CoverOrder = reader.IsDBNull(15) ? null : reader.GetString(15),
             },
             reader.GetInt32(10),
             reader.IsDBNull(11) ? null : reader.GetString(11),

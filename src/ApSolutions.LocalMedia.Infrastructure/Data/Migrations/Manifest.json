@@ -144,6 +144,12 @@
       "name": "personal_cover",
       "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0024_personal_cover.sql",
       "sha256": "34C4FE28219B4DEFFB07C1B41D4B02742DD678346B21F414206A40A4DDB03769"
+    },
+    {
+      "version": 25,
+      "name": "cover_order",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0025_cover_order.sql",
+      "sha256": "310D0A705ABD982CEF2D5EBE0F65CD873B379FE022252CC26C08546CFAF65A7A"
     }
   ]
 }

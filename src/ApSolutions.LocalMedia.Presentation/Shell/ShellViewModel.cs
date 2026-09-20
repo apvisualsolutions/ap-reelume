@@ -392,6 +392,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public ScanSettingsViewModel? ScanSettings => _surfaces.ScanSettings;
 
+    public CoverOrderSettingsViewModel? CoverOrderSettings => _surfaces.CoverOrderSettings;
+
     public ShortcutSettingsViewModel? Shortcuts => _surfaces.Shortcuts;
 
     public SubtitleStyleViewModel? SubtitleStyle => _surfaces.SubtitleStyle;
@@ -679,6 +681,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsAppearanceSection));
                 OnPropertyChanged(nameof(IsLanguageSection));
                 OnPropertyChanged(nameof(IsLibrarySection));
+                OnPropertyChanged(nameof(IsCoversSection));
                 OnPropertyChanged(nameof(IsRecommendationsSection));
                 OnPropertyChanged(nameof(IsShortcutsSection));
                 OnPropertyChanged(nameof(IsLifecycleSection));
@@ -695,6 +698,9 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public bool IsLanguageSection => CurrentSettingsSection == SettingsSection.Language;
 
     public bool IsLibrarySection => CurrentSettingsSection == SettingsSection.Library;
+
+    /// <summary>Where the cover order is moved for the whole library (LIB-021).</summary>
+    public bool IsCoversSection => CurrentSettingsSection == SettingsSection.Covers;
 
     public bool IsRecommendationsSection => CurrentSettingsSection == SettingsSection.Recommendations;
 
@@ -724,6 +730,8 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public bool HasReviewInbox => ReviewInbox is not null;
 
     public bool HasScanSettings => ScanSettings is not null;
+
+    public bool HasCoverOrderSettings => CoverOrderSettings is not null;
 
     public bool HasShortcuts => Shortcuts is not null;
 

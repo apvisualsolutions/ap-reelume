@@ -68,6 +68,11 @@ public sealed class MetadataEditorLayoutTests
             Assert.Contains(announced!, painted, StringComparer.Ordinal);
         }
 
+        // The cover source options are NOT measured here: this view is shown with no data context,
+        // so the list that draws them is empty and an assertion over it would pass by finding
+        // nothing. They are held to the same rule in MetadataEditorTests, which shows the editor
+        // with a title loaded.
+
         window.Close();
     }
 

@@ -139,6 +139,15 @@ public sealed class OptionGroupTests
             "ScanSettingsResetButton",
             "Watching folders for changes is a property of the machine and its disks, not of "
                 + "anything on screen."),
+        ["Covers"] = new(
+            OptionPlace.Settings,
+            "SettingsSection.Covers",
+            "CoverOrderSettingsView",
+            "CoverOrderSettingsResetButton",
+            "Where a cover comes from is decided looking at the library, not at a video, so rule 11 "
+                + "puts it in Settings and not in the player's gear. It has a destination of its own "
+                + "because SettingsSection.Library already hosts Scanning and this gate refuses two "
+                + "groups in one place (LIB-021, ADR-0009)."),
         ["Recommendations"] = new(
             OptionPlace.Settings,
             "SettingsSection.Recommendations",
@@ -237,6 +246,7 @@ public sealed class OptionGroupTests
         ["ShortcutSettingsView#RestoreDefaultsButton"] = GroupResetKey,
         ["PlaybackSettingsView#PlaybackResetButton"] = GroupResetKey,
         ["ScanSettingsView#ScanSettingsResetButton"] = GroupResetKey,
+        ["CoverOrderSettingsView#CoverOrderSettingsResetButton"] = GroupResetKey,
         ["SegmentDetectionSettingsView#SegmentDetectionResetButton"] = GroupResetKey,
         ["LifecycleSettingsView#LifecycleResetButton"] = GroupResetKey,
         ["PrivacySettingsView#PrivacyResetButton"] = GroupResetKey,
@@ -282,7 +292,7 @@ public sealed class OptionGroupTests
 
         // Anti-blindness floor: a reader that found no destinations would pass by measuring nothing.
         Assert.True(
-            destinations.Length >= 12,
+            destinations.Length >= 13,
             $"only {destinations.Length} destinations were found across the two enums, so this gate "
                 + "is reading the wrong thing rather than finding a small application.");
 
@@ -320,8 +330,8 @@ public sealed class OptionGroupTests
         // Anti-blindness floor: this passes over an empty table by comparing nothing, and an empty
         // table is what a broken list looks like.
         Assert.True(
-            Groups.Count >= 12,
-            $"only {Groups.Count} groups are listed, which is fewer than the twelve that were "
+            Groups.Count >= 13,
+            $"only {Groups.Count} groups are listed, which is fewer than the thirteen that were "
                 + "measured, so the list has lost entries rather than the application having shrunk.");
 
         var shared = Groups
@@ -344,7 +354,7 @@ public sealed class OptionGroupTests
         // Anti-blindness floor: if the anchors stop matching, the reader returns nothing and would
         // report that the application mounts no options at all.
         Assert.True(
-            mounted.Length >= 12,
+            mounted.Length >= 13,
             $"only {mounted.Length} views were found mounted as sections or gear groups, so this "
                 + "gate is reading the wrong markup rather than finding a small application.");
 
@@ -516,7 +526,7 @@ public sealed class OptionGroupTests
         // under that cannot tell «the gear offers a group» from «the gear offers nothing». Measured
         // on 2026-09-13 — replacing PictureAdjustmentView in the gear with anything else left this
         // whole file green when the floor was a single >= 12 over both.
-        return Anchored("Shell/ShellView.axaml", "SettingsSections", presentation, minimum: 10)
+        return Anchored("Shell/ShellView.axaml", "SettingsSections", presentation, minimum: 11)
             .Concat(Anchored(
                 "Player/PlayerSettingsMenuView.axaml", "PlayerSettingsSurface", presentation, minimum: 1))
             .Distinct(StringComparer.Ordinal)

@@ -238,6 +238,22 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="ScanSettingsDescription">AP Reelume vigila tus carpetas y añade lo que aparezca en ellas. Si la vigilancia falla o el sistema la interrumpe, vuelve a revisarlas cada cierto tiempo.</x:String>
   <x:String x:Key="ScanSettingsWatchLocal">Vigilar cambios en raíces locales</x:String>
   <x:String x:Key="ScanSettingsFallbackMinutes">Intervalo de recuperación en minutos</x:String>
+  <!-- LIB-021, ADR-0009. The names of the three origins are one key each and are read from two
+       screens — the general order and one title's override — because they are one idea: two keys
+       for the same words are how «Volver a 1×» and «Restaurar campos del proveedor» came to say the
+       same thing differently. They are composed as "CoverOrigin" + the enum member, which is a shape
+       OrphanedResourceTests knows; the interpolated shape it cannot see is what made it call forty
+       live strings dead in its first pass. -->
+  <x:String x:Key="CoverOrderSettingsAccessibleName">Ajustes del orden de las portadas</x:String>
+  <x:String x:Key="CoverOrderSettingsTitle">Orden de las portadas</x:String>
+  <x:String x:Key="CoverOrderSettingsDescription">De dónde sale la portada de cada película o serie. Se busca de arriba abajo y gana la primera que exista, así que una película sin la de arriba usa la siguiente.</x:String>
+  <x:String x:Key="CoverOriginPersonal">La que elegiste tú</x:String>
+  <x:String x:Key="CoverOriginProvider">La del proveedor</x:String>
+  <x:String x:Key="CoverOriginFrame">Un fotograma del vídeo</x:String>
+  <x:String x:Key="CoverOrderMoveUpAction">Subir</x:String>
+  <x:String x:Key="CoverOrderMoveDownAction">Bajar</x:String>
+  <x:String x:Key="MetadataCoverSourceLabel">Qué portada usar en este título</x:String>
+  <x:String x:Key="MetadataCoverSourceDefault">El orden general</x:String>
   <!-- The empty tray is the good outcome, not a blank panel: everything was identified without
        anybody being asked. IsEmpty had existed on the model all along with no view reading it. -->
   <x:String x:Key="ReviewInboxEmptyTitle">No queda nada por revisar</x:String>

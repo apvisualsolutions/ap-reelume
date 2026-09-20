@@ -86,6 +86,12 @@ public sealed class CommandNotificationTests
             // an option. One command each, so choosing a subtitle cannot arrive at the audio half.
             ["src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorViewModel.cs"] =
                 ["public bool CanExecute(object? parameter) => parameter is TrackOption;"],
+            // LIB-021: the rows that say where this one title's cover comes from. The same question
+            // the two lists above ask — is this parameter one of the options — and the answer cannot
+            // move while the editor is open: the four choices are the general order plus one per
+            // origin, built once and never rebuilt.
+            ["src/ApSolutions.LocalMedia.Presentation/Metadata/MetadataEditorViewModel.cs"] =
+                ["public bool CanExecute(object? parameter) => parameter is CoverSourceOption;"],
             // The subtitle swatches, whose question is whether the parameter is a colour at all.
             ["src/ApSolutions.LocalMedia.Presentation/Player/SubtitleStyleViewModel.cs"] =
                 [

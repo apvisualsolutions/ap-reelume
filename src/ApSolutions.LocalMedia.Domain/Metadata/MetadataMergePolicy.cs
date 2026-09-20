@@ -39,6 +39,20 @@ public sealed record EditableMetadata(
     /// choice and orphaned its file.
     /// </summary>
     public string? PersonalCover { get; init; }
+
+    /// <summary>
+    /// The order of origins this one title overrides the general setting with, as
+    /// <see cref="CoverOrderPolicy.Format"/> writes it, or <see langword="null"/> to follow the
+    /// general one (ADR-0009 decision 4, LIB-021).
+    /// </summary>
+    /// <remarks>
+    /// It holds the whole order and not just the origin that wins, so that somebody moving the
+    /// general order later cannot change what this title was told to do — an override that quietly
+    /// followed it would stop meaning what it meant the day it was set. Like
+    /// <see cref="PersonalCover"/>, <see cref="MetadataMergePolicy"/> never assigns it: a refresh
+    /// has no field to reach it by, so it needs no lock.
+    /// </remarks>
+    public string? CoverOrder { get; init; }
 }
 
 public sealed class MetadataMergePolicy

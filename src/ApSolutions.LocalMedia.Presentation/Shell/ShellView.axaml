@@ -451,6 +451,11 @@ SPDX-License-Identifier: LicenseRef-APSolutions
               Tag="{x:Static shell:SettingsSection.Library}"
               automation:AutomationProperties.Name="{DynamicResource SettingsSectionLibrary}" />
           <ListBoxItem
+              Content="{DynamicResource CoverOrderSettingsTitle}"
+              IsVisible="{Binding HasCoverOrderSettings}"
+              Tag="{x:Static shell:SettingsSection.Covers}"
+              automation:AutomationProperties.Name="{DynamicResource CoverOrderSettingsTitle}" />
+          <ListBoxItem
               Content="{DynamicResource RecommendationSettingsTitle}"
               IsVisible="{Binding HasRecommendationSettings}"
               Tag="{x:Static shell:SettingsSection.Recommendations}"
@@ -517,6 +522,11 @@ SPDX-License-Identifier: LicenseRef-APSolutions
               engranaje del reproductor (ADR-0012): su valor se decide mirando algo, no en una
               página de ajustes. Se alcanzan por PlayerSettingsGroup.
             -->
+            <ContentControl Margin="48,0" IsVisible="{Binding IsCoversSection}">
+              <ContentControl IsVisible="{Binding HasCoverOrderSettings}">
+                <settings:CoverOrderSettingsView DataContext="{Binding CoverOrderSettings}" />
+              </ContentControl>
+            </ContentControl>
             <ContentControl Margin="48,0" IsVisible="{Binding IsRecommendationsSection}">
               <ContentControl IsVisible="{Binding HasRecommendationSettings}">
                 <settings:RecommendationSettingsView DataContext="{Binding RecommendationSettings}" />

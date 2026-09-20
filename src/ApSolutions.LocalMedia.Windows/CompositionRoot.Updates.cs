@@ -160,7 +160,8 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<IThemeService>(),
                 provider.GetRequiredService<ILanguageService>(),
                 provider.GetRequiredService<IAppearanceService>()))
-            .AddTransient<ScanSettingsViewModel>();
+            .AddTransient<ScanSettingsViewModel>()
+            .AddTransient<CoverOrderSettingsViewModel>();
 
     /// <summary>
     /// The running application, which three services need and none of them can invent.
