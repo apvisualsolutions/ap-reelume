@@ -155,6 +155,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   already travelled inside the program with the graphics engine, so the mention was missing beforehand
   and nobody was counting it.
 
+- **The picture enhancement can no longer start redoing its preparation on every frame with nobody
+  noticing.** That preparation happens once per film, and doing it on every frame — about 173,000 of
+  them in a two-hour one — would eat exactly the time the enhancement has to spend. Nothing could see
+  it: the preparation was sealed inside the video surface and nothing outside could count it, so
+  removing what holds it left all fourteen hundred interface checks green. Now it can be counted, and
+  a check requires it to happen once — with another beside it that refuses to take that count
+  seriously unless the scene really did draw the three times it claims, because a scene drawn once
+  would also count one. Nothing in the program changes (`ENG-017`).
+
 ### Fixed
 
 - **Restoring the provider's data no longer erases the cover you picked.** The picked cover and the

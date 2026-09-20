@@ -59,10 +59,11 @@ public sealed class VideoFrameView : Control, IDisposable
     /// releases it instead, and what is at stake is a few hundred bytes once per film.
     /// </para>
     /// <para>
-    /// <b>That «once» is not guarded, and the gate auditor said so on 2026-09-13.</b> Deleting
-    /// <c>_effectAsked</c> compiles the shader on every frame — about 173,000 of them in a two-hour
-    /// film — and no test notices, because nothing outside this class can count compilations. It has
-    /// a task of its own; what it needs is a seam, not a louder comment.
+    /// <b>That «once» went unguarded until ENG-017, and the gate auditor said so on 2026-09-13.</b>
+    /// Deleting <c>_effectAsked</c> compiles the shader on every frame — about 173,000 of them in a
+    /// two-hour film — and no test noticed, because nothing outside this class could count
+    /// compilations. What it needed was a seam and not a louder comment, so
+    /// <see cref="ShaderCompiler"/> is one: a test counts the calls and the count has to be one.
     /// </para>
     /// </remarks>
     private SKRuntimeEffect? _effect;
@@ -79,6 +80,27 @@ public sealed class VideoFrameView : Control, IDisposable
         get => GetValue(IsUpscaleEnabledProperty);
         set => SetValue(IsUpscaleEnabledProperty, value);
     }
+
+    /// <summary>
+    /// Where the compiled shader comes from. A surface built without one asks
+    /// <see cref="UpscaleShaderSource"/>, which is what the application does (ENG-017).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>It is a seam and not a setting</b>, in the shape this folder already uses for them —
+    /// <see cref="AudioOutputViewModel.SelectionHandler"/> and
+    /// <see cref="PlayerViewModel.GestureHandler"/> — and it answers two questions no test could
+    /// reach through this surface before.
+    /// </para>
+    /// <para>
+    /// The first is how many times the shader is compiled, which is what ENG-017 was opened for. The
+    /// second is what this surface draws when the shader does <b>not</b> compile: that arm belongs to
+    /// a driver rejecting the SkSL, so on a machine where it compiles there is no way to enter it.
+    /// It is the same argument, one storey up, that <see cref="UpscaleShaderSource.TryCompile"/>
+    /// makes for taking its source as a parameter.
+    /// </para>
+    /// </remarks>
+    public Func<SKRuntimeEffect?>? ShaderCompiler { get; set; }
 
     public void Dispose()
     {
@@ -173,7 +195,7 @@ public sealed class VideoFrameView : Control, IDisposable
         if (!_effectAsked)
         {
             _effectAsked = true;
-            _effect = UpscaleShaderSource.TryCompile(out _);
+            _effect = (ShaderCompiler ?? CompileShader)();
         }
 
         return UpscaleChainPolicy.Choose(
@@ -189,6 +211,13 @@ public sealed class VideoFrameView : Control, IDisposable
                 RuntimeShader: _effect is not null,
                 CubicResampler: true));
     }
+
+    /// <summary>
+    /// What <see cref="ShaderCompiler"/> falls back to, which is the application's only compiler.
+    /// The error text is dropped because a shader that will not compile here is not a fault to
+    /// report: the chain answers it by handing the frame to the link below.
+    /// </summary>
+    private static SKRuntimeEffect? CompileShader() => UpscaleShaderSource.TryCompile(out _);
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {

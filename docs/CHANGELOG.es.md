@@ -158,6 +158,16 @@ evidencia, es [FEATURES.md](FEATURES.md).
   avisos de terceros. **No es papeleo para el futuro**: FreeType ya viajaba dentro del programa con el
   motor gráfico, así que la mención faltaba desde antes y nadie lo estaba contando.
 
+- **La mejora de imagen ya no puede ponerse a rehacer su preparación en cada fotograma sin que nadie
+  lo note.** Esa preparación se hace una sola vez por película, y hacerla en cada fotograma —unos
+  173.000 en una de dos horas— se comería justo el tiempo del que la mejora dispone. Ninguna
+  comprobación podía verlo: quedaba encerrada dentro de la pantalla de vídeo y nada de fuera podía
+  contarla, así que quitar lo que la sostiene dejaba en verde las mil cuatrocientas comprobaciones
+  de la interfaz. Ahora se puede contar, y una comprobación exige que sea una sola vez — con otra al
+  lado que se niega a dar esa cuenta por buena si la escena no llegó a dibujarse las tres veces que
+  dice, porque una escena dibujada una sola vez también contaría uno. No cambia nada del programa
+  (`ENG-017`).
+
 ### Corregido
 
 - **Restaurar los datos del proveedor ya no borra la portada que elegiste.** La portada elegida y la
