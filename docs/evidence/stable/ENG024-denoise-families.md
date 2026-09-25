@@ -5,7 +5,8 @@
 
 **Fecha:** 2026-09-25
 **Alcance:** `ENG-024`, el reductor de ruido
-**Estado:** medición de laboratorio sobre una escena sintética; **no hay código de producción**
+**Estado:** medición de laboratorio, sobre una escena sintética y sobre el fichero real del
+propietario; **no hay código de producción**
 
 ## Lo que se comprobó antes de medir
 
@@ -88,15 +89,78 @@ filtro se dispara. Se lee como orden, no como proporción.
 - **El bilateral no sirve para esto**: suaviza el grano, pero un salto de bloque es un borde para él
   y lo respeta.
 
+## Sobre el fichero real
+
+El propietario dio permiso para medir sobre el episodio en el que vio los cuadros. Aquí sólo constan
+sus datos técnicos: **Xvid (MPEG-4 parte 2, perfil simple), 720×404, 1,5 Mbit/s**. Es la familia de
+la segunda columna, y **no lleva filtro antibloques dentro del códec**, a diferencia de H.264, lo que
+explica los cuadros. Se trabajó con cuatro fragmentos oscuros de tres segundos, elegidos por su brillo
+medio de 28 a 45, recortados en una carpeta temporal fuera del árbol.
+
+Sin original limpio, la vara es sin referencia: los **bloques** en las zonas planas, como arriba, y el
+**detalle que queda** en las zonas con textura (energía del laplaciano frente al fichero sin
+filtrar). Las dos máscaras salen del fotograma sin filtrar, para que el candidato no decida dónde se
+le mide. **Controles: el propio fichero deja el 100 % del detalle, y un desenfoque gaussiano el 12 %.**
+
+| Reductor | Bloques | Detalle que queda |
+| --- | --- | --- |
+| sin filtro | 1,54 | 100 % |
+| `hqdn3d` por defecto | 1,27 | 98 % |
+| `hqdn3d` sólo espacial | 1,20 | 102 % |
+| `deblock` fuerte | 1,28 | 99 % |
+| antibloques de `libpostproc` (GPL, sólo como referencia) | 1,38 | 100 % |
+| medias no locales 9/7 | **1,00** | 84 % |
+| bilateral | 1,46 | 78 % |
+| desenfoque gaussiano (control) | 1,25 | 12 % |
+
+**`hqdn3d`, el filtro con el que el propietario vio arreglada la imagen, deja el detalle y baja los
+bloques a 1,27; su parte espacial sola, a 1,20.** Las medias no locales los quitan del todo, pero se
+llevan el 16 % del detalle, y además no caben: medido en C# con imagen integral, **81 ms por fotograma
+en 480p con los 28 hilos del equipo**, contra un presupuesto de 40 ms a 25 fotogramas por segundo.
+
+## Un prototipo propio, y dos veces que la cifra mintió
+
+Un suavizado recursivo propio en cuatro pasadas (izquierda, derecha, arriba y abajo): cada píxel se
+acerca al valor acumulado con un peso que cae con la diferencia, así que un salto pequeño (ruido o el
+borde de un bloque) se alisa y uno grande (un borde de verdad) se respeta. **Es diseño nuestro,
+escrito sin leer el código de `hqdn3d`.**
+
+- **La primera versión dio bloques 1,04 y un «detalle que queda» del 110 %.** Un reductor no puede
+  añadir detalle, así que se miró antes de creerlo: **era una acuarela**, con la tela borrada y
+  manchas planas de borde duro, y el laplaciano contaba como detalle los saltos entre manchas. **La
+  vara de detalle no distingue textura de posterizado**, y por eso toda cifra por encima del 100 % se
+  mira.
+- **El barrido de la fuerza se midió también contra la verdad sintética**, y la primera pasada dio a
+  todos un error plano de 11 niveles, hqdn3d incluido: la verdad había pasado por un camino de gamma
+  distinto al de los candidatos. Con el mismo camino, la verdad da 1,01 y error 0.
+
+Con peso máximo 0,6 y σ 2,5:
+
+| | Bloques reales | Detalle real | Bloques sintéticos | RMS plano sintético | RMS detalle sintético |
+| --- | --- | --- | --- | --- | --- |
+| sin filtro | 1,68 | 100 % | 377 | 1,84 | 6,12 |
+| `hqdn3d` sólo espacial | 1,20 | 100 % | 7,10 | 1,74 | 5,91 |
+| propio | 1,23 | 106 % | **1,40** | **1,60** | 5,91 |
+
+(Los bloques reales sin filtro dan 1,68 y no 1,54 porque esta tabla aplica la gamma sobre la luma
+suelta y la anterior sobre el vídeo completo; dentro de cada tabla el camino es el mismo.)
+
+**A la vista, sobre el fragmento real, queda muy cerca de `hqdn3d`**: los dos limpian los bloques y
+conservan el enrejado del fondo, y el propio alisa algo más la tela. El 106 % se miró y esta vez no es
+posterizado. **Coste: 6,6 ms por fotograma de luma en serie**, a 720×404.
+
 ## Límites, y lo que falta antes de construir
 
-- **La escena es sintética.** Lo que falta es medir sobre el fichero en el que el propietario vio los
-  cuadros, fuera del árbol y sin que su nombre ni su contenido lleguen a ningún documento.
+- **El fichero real es uno solo, y un Xvid.** Un fichero H.264 de otra fuente puede pedir otra
+  fuerza, porque su propio códec ya alisó los bordes de bloque.
 - **El detalle ocupa el 1 % de la escena**, así que la columna de detalle es la más débil de la
   tabla. Una escena con textura real la reforzaría.
-- **El coste no está medido.** Las medias no locales de referencia comparan 81 parches de 7×7 por
-  píxel. Hay que medir qué cabe por fotograma en la resolución del fichero, en la CPU —donde el
-  fotograma ya se recorre para convertirlo, y donde correría con el reescalado encendido o apagado—
-  y en el shader.
+- **El coste del prototipo es de luma y en serie.** Falta el croma, y a 1080p la misma cuenta
+  anda por los 47 ms: habrá que repartir filas y columnas entre hilos, que las pasadas permiten, y
+  medirlo dentro de `PerformanceTests`.
+- **Dónde va, propuesto y no medido todavía en el programa**: en la CPU, dentro de la conversión que
+  ya recorre cada fotograma y **antes** de la curva de tono. Ahí la rejilla de 8 está donde el
+  códec la dejó, el filtro corre con el reescalado encendido o apagado, y la curva ya no estira un
+  bloque que se ha alisado antes.
 - **El mando sigue pendiente**: por la regla 11 vive en el engranaje del reproductor, con su
   «Restaurar valores por defecto».
