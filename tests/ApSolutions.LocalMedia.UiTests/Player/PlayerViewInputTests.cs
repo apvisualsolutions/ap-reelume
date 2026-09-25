@@ -192,6 +192,8 @@ public sealed class PlayerViewInputTests
     {
         var (window, view, _) = Mount();
         Assert.False(Wheel(view, deltaY: 1).Handled);
+        view.DataContext = null;
+        Assert.False(Wheel(view, deltaY: 1).Handled);
 
         var (withTransport, transportView, model) = Mount(withTransport: true);
         var before = model.Transport!.VolumePercent;
