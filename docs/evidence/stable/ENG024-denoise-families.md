@@ -179,6 +179,63 @@ escribir un filtro propio. Revisadas en su fuente:
   no devuelve ninguna a nombre de sus autores sobre filtrado que preserva bordes. Si se construye un
   filtro propio, se escribe desde el artículo y se cita, no desde un diseño inventado.
 
+## La investigación completa, y el candidato que sale de ella (2026-09-26)
+
+El propietario insistió en que no se había investigado lo suficiente, y tenía razón: dos
+investigaciones en paralelo cubrieron lo que faltaba, con fuentes primarias, y lo decisivo se volvió
+a leer aquí.
+
+**Herramientas de fabricantes y del sistema:**
+
+- **RTX Video Super Resolution de NVIDIA**, en el controlador: según NVIDIA «reduce o elimina los
+  artefactos de compresión —bloques, halos—», y desde la versión 1.5 también a resolución nativa.
+  Sin licencia ni nada que distribuir, por la extensión D3D11 que `PLY-016` ya sondea. **La enciende
+  el usuario en NVIDIA App**; apagada, la extensión acepta y no mueve un píxel (ya medido).
+- **Maxine «Artifact Reduction»** hace exactamente esto, pero **ya no existe en la versión actual**
+  del SDK (no figura en su índice ni en su instalador de funciones). Queda en el redistribuible
+  v0.7.6, abandonado, que el usuario instalaría aparte (783 MB). No se recomienda.
+- **AMD AMF «VQ Enhancer»**: MIT, en el controlador, quita bloques de AVC/HEVC. Sólo en tarjetas AMD,
+  y aquí no hay ninguna para medirlo.
+- **Intel VPL, modo de eliminación de artefactos**: experimental, exige escalar y probablemente no
+  existe en la UHD 770. **Windows**: nada aplicable (su `VideoScaler` es para caras y corre en NPU).
+
+**Algoritmos y modelos abiertos:**
+
+- **Los modelos de IA** ligeros están entrenados en anime y los que sirven para vídeo real son
+  pesados; ninguno con licencia permisiva llega a tiempo real en cualquier tarjeta. ONNX Runtime
+  con DirectML existe, pero DirectML está en mantenimiento desde 2025.
+- **BM3D y SA-DCT** tienen código de uso no comercial. **CDEF** (AV1) arrastra patentes que su
+  licencia sólo cubre dentro de un decodificador.
+- **La transformada de dominio** tiene una patente de Google vigente hasta 2037 (US10757408B2, leída
+  en Google Patents). Sus tres reivindicaciones independientes exigen comparar con el original y
+  guardar la fuerza en el fichero, o leerla del fichero. **Un filtro de reproductor con la fuerza
+  elegida por el usuario no hace ninguna de las dos cosas**; es lectura técnica, no opinión legal.
+- **La DCT solapada con umbral** (Yu y Sapiro, *DCT Image Denoising*, IPOL 2011, sobre la idea de
+  Nosratinia de 1999): transformadas 8×8 o 16×16 en cada posición, se anulan los coeficientes por
+  debajo de un umbral y se promedian. **Su código de referencia es GPL-3.0**, así que se escribiría
+  desde el artículo.
+
+**Medido sobre el fichero real**, con los filtros de FFmpeg como instrumento:
+
+| Reductor | Bloques | Detalle que queda |
+| --- | --- | --- |
+| sin filtro | 1,54 | 100 % |
+| `hqdn3d` sólo espacial (GPL, referencia) | 1,20 | 102 % |
+| `deblock` (LGPL) | 1,28 | 99 % |
+| `spp`, calidad 3, QP 6 (GPL, instrumento) | 0,86 | 61 % |
+| `pp7`, QP 6 (GPL, instrumento) | 0,91 | 78 % |
+| **DCT solapada (`dctdnoiz`, σ 3; LGPL)** | **0,98** | **102 %** |
+| DCT solapada, σ 4 | 0,97 | 93 % |
+
+**La DCT solapada con σ 3 deja la imagen sin bloques y sin perder detalle**, y a la vista, sobre el
+fragmento real, limpia la ropa y conserva el enrejado y la textura mejor que `hqdn3d`. El 102 % se
+miró. Su coste es el problema: **unos 130 ms por fotograma** en el FFmpeg de referencia, en un hilo.
+Es la operación que mejor se reparte, porque cada bloque es independiente.
+
+**El instrumento falló una vez más**: `spp`, `pp` y `pp7` dieron la imagen original idéntica, y `pp7`
+una cifra vacía. No es que no actúen: toman su fuerza de la cuantización del códec, que en esta
+cadena no les llega. Con la fuerza fijada a mano sí actúan, y se llevan demasiado detalle.
+
 ## Límites, y lo que falta antes de construir
 
 - **El fichero real es uno solo, y un Xvid.** Un fichero H.264 de otra fuente puede pedir otra
