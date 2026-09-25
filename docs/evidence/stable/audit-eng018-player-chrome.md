@@ -109,6 +109,15 @@ y cerrar el reproductor mientras se espera un cambio de modo, que es una carrera
 sobre `UiTests` sola**, el archivo sale de la lista copiando el artefacto `coverage-debt` del run
 `35537409707` sin su fila, y el trinquete baja de 185 a 184.
 
+**Y el primer run de CI cayó por un archivo que la previsualización no mira.** El run `36131030662`
+de `e2a46762` pasó las once suites y las tres puertas del paseo, y la de cobertura se negó:
+`PlayerView.axaml.cs`, que estaba en 96/96 y por eso fuera de la lista, bajó a **100/94**. Eran dos
+ramas de una línea: la de un evento de rueda ya gastado, que Avalonia no entrega nunca a este
+manejador —la prueba que lo lanzaba así lo demostraba—, y la de una vista sin contexto, que nadie
+recorría. Se quitó la primera y se cubrió la segunda: **34 de 34**. El artefacto `coverage-debt` de
+ese run coincide con la lista del árbol en todo menos esa fila, lo que confirma también que
+`ShellView.axaml.cs` salió. El hueco de la previsualización queda como `ENG-050`.
+
 ## Pendiente / Open
 
 `ENG-049`: en la ventana, revelar y ocultar cambia el tamaño del vídeo, y ahora pasa más a menudo.

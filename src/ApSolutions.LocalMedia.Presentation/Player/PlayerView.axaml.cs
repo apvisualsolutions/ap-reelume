@@ -106,15 +106,16 @@ public sealed partial class PlayerView : UserControl
     /// The wheel over the picture moves the volume one step up or down, as the arrow keys do.
     /// </summary>
     /// <remarks>
-    /// A wheel something else already spent — the gear's scroller — is left alone, and so is one
-    /// with no vertical movement: a sideways scroll says nothing about loudness.
+    /// A wheel with no vertical movement is left alone: a sideways scroll says nothing about
+    /// loudness. One something else already spent — the gear's scroller — never reaches here, because
+    /// Avalonia does not hand a class handler an event already marked handled; asking again was a
+    /// branch CI measured nothing taking, on the run of 2026-09-25.
     /// </remarks>
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
         ArgumentNullException.ThrowIfNull(e);
         base.OnPointerWheelChanged(e);
-        if (e.Handled
-            || e.Delta.Y == 0
+        if (e.Delta.Y == 0
             || !IsOnThePicture(e.Source)
             || DataContext is not PlayerViewModel { Transport: { } transport })
         {
