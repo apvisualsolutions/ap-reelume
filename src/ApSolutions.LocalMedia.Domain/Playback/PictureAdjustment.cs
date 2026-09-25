@@ -186,7 +186,10 @@ public sealed record PictureAdjustment(double Brightness, double Contrast, doubl
     /// resolution of the decoded frame and the screen is four times that</b>, so an 8×8 dither cell
     /// becomes a 32×32 block of screen pixels — one level of difference spread over an area large
     /// enough to read as banding of its own. Dither has to be the last step before the screen and here
-    /// it was the first. `ENG-023` carries the ordering.
+    /// it was the first. And moving it there was measured on 2026-09-25 and not built (`ENG-023`): the
+    /// band a raised gamma shows is the file's own eight-bit step stretched by the curve, which a dither
+    /// cannot remove — that is a debanding filter's job — and what it does buy is under one level of
+    /// averaged tone. <c>ToneCurveOrderingCandidateTests</c> fails the day that changes.
     /// </para>
     /// <para>
     /// No clamp is needed and that is arithmetic rather than optimism: the largest sum is
