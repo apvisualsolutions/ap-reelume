@@ -93,3 +93,12 @@ defect: they own their thread and are released by message.
 verde. Las suites enteras de integración y accesibilidad las corre CI. / Format clean, Release build
 with warnings as errors clean, and the suites above green; the full integration and accessibility
 suites run in CI.
+
+**Y el primer run de CI (`36154876887`) pasó las once suites y cayó en la cobertura por una mejora**:
+la prueba del anfitrión monta la ventana y libera la bandeja de verdad, así que recorre de paso más
+de los dos archivos, y la puerta pide subir sus suelos. `WindowsTrayService.cs` pasa de 97/58 a
+**97/64** y `CompositionRoot.cs` de 90/65 a **90/66**. El artefacto `coverage-debt` de ese run
+difiere de la lista del árbol en esas dos filas y en nada más, y se copió tal cual; el trinquete
+sigue en 184. La previsualización local no lo anunció porque cayó antes por `ENG-051`. / The first CI
+run failed coverage on an improvement: two floors rise, copied from that run's artifact, which
+differs from the tree in those two rows only.
