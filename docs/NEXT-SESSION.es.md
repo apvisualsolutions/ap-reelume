@@ -1,4 +1,4 @@
-# Dónde retomar — 2026-09-25 (cierre de la tarde)
+# Dónde retomar — 2026-09-25 (cierre de la noche)
 
 > Se **sobrescribe** en cada cierre y no pasa de 80 líneas ni de 6 KB por idioma; lo mide
 > `eng/check-handoff.ps1`. La historia hasta el 2026-09-19 está congelada en
@@ -7,43 +7,43 @@
 
 ## Estado
 
-`main` y la rama quedaron en el mismo commit, el último con CI verde, leído dos veces: por el vigía y
-por `gh run list --commit`. Se comprueba con `git log --oneline -1 main`; el SHA no se escribe aquí.
-Por delante sólo va este relevo, que es documentación y cuyo CI no se esperó: hay que mirarlo antes
-de avanzar `main`.
+`main` y la rama quedaron en el mismo commit, el último con CI verde, leído por el vigía y por
+`gh run list --commit`. Se comprueba con `git log --oneline -1 main`; el SHA no se escribe aquí. Por
+delante sólo va este relevo, que es documentación y cuyo CI no se esperó: hay que mirarlo antes de
+avanzar `main`.
 
-Los dos runs anteriores de hoy salieron **rojos sólo por la cobertura**, y por una mejora: pasaron las
-once suites y la puerta pidió subir dos suelos. El tercero, con los suelos copiados del artefacto,
-salió verde: 184 de 184 en la deuda y 23 pendientes en el paseo.
+El run del commit de `ENG-022` salió **rojo por una prueba del paseo que no era suya**: su único
+cambio en `src/` eran comentarios, la prueba pasa tres de tres aquí y pasó en el run siguiente. Está
+anotado como tercera aparición de `ENG-026`, y ese run siguiente salió verde entero.
 
 ## Lo que se hizo
 
-· **`ENG-020`**: cerrar la aplicación después de ver un vídeo ya no termina en una excepción. El
-  anfitrión suelta el icono de la bandeja antes de la primera espera del cierre, y liberarlo desde
-  otro hilo lo encarga al suyo en vez de lanzar. Dos rojos archivados y dos mutantes muertos.
-· **La auditoría de las pruebas de `ENG-018`**: `gate-auditor` encontró dos puertas ciegas y cuatro
-  débiles. Las seis están corregidas y cada una mata el mutante que antes la burlaba. La peor era la
-  escena de reloj del paseo, que pasaba con el reloj desconectado.
-· Suben dos suelos de cobertura: la bandeja a 97/64 y el montaje de la ventana a 90/66.
-· Nace **`ENG-051`**.
+· **`ENG-022`, cerrada como decidida y sin construir.** Siete familias medidas contra la verdad
+  sintética, con un arnés que reproduce exactas las cifras del reproductor. El mejor candidato, un
+  núcleo orientado a lo largo del canto, quita el escalón (0 contra 16) con la misma rampa, pero se
+  queda en 34,9 % contra 35,7 % y cuesta seis veces más por software. `EdgeDirectedUpscaleCandidateTests`
+  vigila la decisión; `gate-auditor` encontró una banda demasiado ancha, ya estrechada.
+· **Cayó una afirmación escrita**: no había un techo del 13 % sin escalón. Corregida en el código, en
+  la evidencia de `PLY-016` y en el backlog; la evidencia nueva se enlaza desde la matriz.
+· Nacen **`ENG-052`** y **`ENG-053`** (un rojo de los pósters bajo cobertura, sin mensaje capturado), y `ENG-026` gana su tercera aparición.
 
 ## Las trampas medidas
 
-· **El cierre sólo cambia de hilo después de reproducir algo**: el reproductor espera a que reposen
-  sus medios, y ninguna prueba cedía. La prueba del anfitrión provoca esa espera y exige que ocurra.
-· **`isolation: worktree` no funciona con el repositorio en el NAS**: git la rechaza por propietario.
-  La copia se hace a mano en el scratchpad y se usa con `git -c safe.directory=*`, sin tocar la
-  configuración global. Detalle en el cajón del proyecto.
-· **En la herramienta Bash, `dotnet` no encuentra el SDK**: un bucle de mutantes dio cinco salidas
-  vacías. Las pruebas se lanzan desde PowerShell.
-· **La previsualización de cobertura la tumba `ENG-051`**, así que no anunció las dos mejoras; las
-  confirmó CI con un rojo.
+· **Acotar a muestras ya remuestreadas no quita el timbre**: el anillo ya está dentro del rango.
+  Hay que acotar a los texeles que dio el decodificador.
+· **Un cero de variación es el instrumento**: el primer barrido dio cifras idénticas con tres fuerzas
+  porque una sustitución de texto no casó por los finales de línea y el shader no leía el parámetro.
+· **`gh run view --log-failed` no devuelve nada mientras el run sigue**: el flujo tiene un solo
+  trabajo, así que el fallo de un paso sólo se lee al terminar.
+· **Un mensaje de commit no se pasa por tubería desde PowerShell**: `git commit -F -` con un
+  here-string lo tomó como ruta. Se escribe a un archivo del scratchpad.
 
 ## Lo primero de la sesión siguiente
 
 · Mirar el CI de este relevo y, si está verde, avanzar `main`.
-· La primera fila tomable de `TAREAS.md`: **`ENG-022`**, el reescalador guiado por bordes. Es diseño:
-  medir las opciones y su coste con `UpscaleCostPolicy` antes de escribir el shader.
+· La primera fila tomable de `TAREAS.md`: **`ENG-023`**, el difuminado de la curva de tono. Pide una
+  decisión técnica antes del código: qué pasa cuando el reescalado está apagado, porque el difuminado
+  tiene que ir después del escalado y hoy sólo el shader corre ahí.
 
 ## Lo que espera al propietario
 
@@ -57,4 +57,4 @@ salió verde: 184 de 184 en la deuda y 23 pendientes en el paseo.
 
 Lo contesta `pwsh -NoProfile -File eng/list-pending.ps1`: **24 abiertos de 75**. El alcance vive en
 `FEATURES.md`; las faenas, puertas, deuda y preguntas sin medir en `TAREAS.md`, la más vieja arriba.
-Hoy se cerró `ENG-020` y entró `ENG-051`.
+Hoy se cerró `ENG-022` y entraron `ENG-052` y `ENG-053`.
