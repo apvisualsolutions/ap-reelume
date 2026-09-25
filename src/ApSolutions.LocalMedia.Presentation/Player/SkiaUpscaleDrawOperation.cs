@@ -145,6 +145,15 @@ public static class UpscaleDrawPlan
     /// both needs a different algorithm — interpolating along an edge rather than across it — and that
     /// is `ENG-022`, not a coefficient.
     /// </para>
+    /// <para>
+    /// <b>That ceiling was wrong, measured on 2026-09-25, and `ENG-022` is decided.</b> What stops at
+    /// 13 % is bounding to five samples this cubic has already resampled, so the ring is inside the
+    /// range before the bound looks. Bounding to the four source texels instead takes the step to 0
+    /// by construction and still reaches 30 %; a kernel steered along the edge reaches 34,9 % with the
+    /// same ramp. That is 0,8 points short of this chain, at six times its cost on the software canvas,
+    /// so it is not built — <c>EdgeDirectedUpscaleCandidateTests</c> keeps the candidate measured and
+    /// fails the day it wins.
+    /// </para>
     /// </remarks>
     public static SKSamplingOptions SharpeningSource => new(new SKCubicResampler(0f, 0.85f));
 
