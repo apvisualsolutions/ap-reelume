@@ -4,6 +4,7 @@
 using ApSolutions.LocalMedia.Application.Lifecycle;
 using Avalonia.Controls;
 using Avalonia.Platform;
+using Avalonia.Threading;
 
 namespace ApSolutions.LocalMedia.Windows.Tray;
 
@@ -83,6 +84,23 @@ public sealed class WindowsTrayService : ITrayService, IDisposable
         }
 
         _isDisposed = true;
+
+        // ENG-020. The icon belongs to the interface thread, and the container's teardown resumes
+        // wherever its last await left it. Touching the icon from there threw, and the process ended
+        // on that exception. The host lets go of the icon on its own thread first; this is what keeps
+        // any other caller from turning a release into a failure.
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            Release();
+        }
+        else
+        {
+            Dispatcher.UIThread.Post(Release);
+        }
+    }
+
+    private void Release()
+    {
         _icon.IsVisible = false;
         _icon.Dispose();
     }

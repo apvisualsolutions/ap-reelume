@@ -1,10 +1,14 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
+using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Storage;
 using ApSolutions.LocalMedia.Infrastructure.Data;
+using ApSolutions.LocalMedia.Infrastructure.Playback;
 using ApSolutions.LocalMedia.Windows;
 using ApSolutions.LocalMedia.Windows.Shell;
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -85,6 +89,36 @@ public sealed class ApplicationHostTests : IDisposable
         Assert.NotSame(
             first.Services.GetRequiredService<SqliteConnectionFactory>(),
             second.Services.GetRequiredService<SqliteConnectionFactory>());
+    }
+
+    /// <summary>
+    /// ENG-020. The window's tray icon is let go on the thread that releases the application, and
+    /// before anything in the teardown can yield. <c>Program</c> releases from the interface thread
+    /// after the loop has stopped, so a release left to the container resumed on a pool thread and
+    /// threw there; handing it back to the interface thread instead would leave it to a loop that
+    /// no longer runs, and the icon would outlive the process.
+    /// </summary>
+    /// <remarks>
+    /// What yields is the player's teardown waiting for the media it released to rest, which is why
+    /// the application only failed on exit after something had played. A media waiting in that queue
+    /// is the same wait, without having to play anything.
+    /// </remarks>
+    [AvaloniaFact]
+    public async Task The_window_s_tray_icon_is_let_go_before_the_release_can_yield()
+    {
+        var host = ApplicationHost.Create(new AppDataPaths(Path.Combine(_dataRoot, "tray")));
+        host.ConfigureWindow(new Window());
+        var tray = host.Services.GetRequiredService<ITrayService>();
+        tray.Show();
+        var player = host.Services.GetRequiredService<LibVlcFactory>();
+        player.DeferRelease(player.CreateMedia(Path.Combine(_dataRoot, "resting.mp4")));
+
+        var release = host.DisposeAsync();
+
+        Assert.False(release.IsCompleted, "Nothing in the teardown yielded, so this proves nothing.");
+        Assert.Throws<ObjectDisposedException>(tray.Show);
+        Assert.False(tray.IsVisible);
+        await release;
     }
 
     /// <summary>
