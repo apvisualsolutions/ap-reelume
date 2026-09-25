@@ -24,6 +24,12 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Arreglado
 
+- **Los controles del reproductor se comportan como los de cualquier reproductor.** Se ocultan solos
+  a los tres segundos de no mover el ratón mientras la película avanza —no con un panel abierto, ni
+  con el ratón encima de un botón, ni en pausa—, y el puntero se oculta con ellos. Un clic sobre la
+  imagen pausa y reanuda, la rueda sube y baja el volumen, y Esc retrocede un paso cada vez: cierra
+  el panel, sale de pantalla completa o del mini reproductor y, por último, cierra el reproductor.
+  Antes, un solo movimiento del ratón dejaba los controles fijos hasta la siguiente pausa (`ENG-018`).
 - **Un vídeo añadido a una carpeta de la biblioteca aparece solo, sin reiniciar la aplicación.** La
   vigilancia de carpetas estaba construida entera —y probada— pero **no se encendía nunca**: lo único
   que la activaba era una marca por carpeta que ninguna parte del programa ponía y que ninguna

@@ -782,6 +782,9 @@ public static partial class CompositionRoot
             Shortcuts = provider.GetRequiredService<ShortcutSettingsViewModel>(),
             SubtitleStyle = provider.GetRequiredService<SubtitleStyleViewModel>(),
             MiniPlayerPlacement = provider.GetRequiredService<IMiniPlayerPlacementStore>(),
+            // The clock that puts the chrome away after a while without the mouse (ENG-018). The
+            // application's own, so the shell reads the same time everything else does.
+            ChromeClock = provider.GetRequiredService<IClock>(),
             SegmentDetection = new SegmentDetectionSettingsViewModel(
             () => provider.GetRequiredService<DetectSeriesSegments>().IsEnabled,
             enabled => provider.GetRequiredService<DetectSeriesSegments>().SetEnabled(enabled)),
@@ -2178,8 +2181,8 @@ public static partial class CompositionRoot
     private static string GetExecutablePath() =>
         Environment.ProcessPath ?? Path.Combine(AppContext.BaseDirectory, "ApSolutions.LocalMedia.Windows.exe");
 
-    /// <summary>How far one press of the volume keys moves the level.</summary>
-    private const int VolumeStepPercent = 5;
+    /// <summary>How far one press of the volume keys moves the level: the wheel's step, from one place.</summary>
+    private const int VolumeStepPercent = TransportControlsViewModel.VolumeStepPercent;
 
     /// <summary>
     /// What each input command does to the live session. Keyboard and media keys arrive here
@@ -2248,9 +2251,10 @@ public static partial class CompositionRoot
                 await shell.TogglePlaybackModeAsync(PlaybackMode.Mini, cancellationToken)
                     .ConfigureAwait(true);
                 break;
+            // Escape steps back one layer rather than only leaving fullscreen (ENG-018): the gear, the
+            // panel, the window mode, and then the player itself, in the prototype's order.
             case PlaybackInputCommand.ExitOverlayMode when shell is not null:
-                await shell.TogglePlaybackModeAsync(PlaybackMode.Embedded, cancellationToken)
-                    .ConfigureAwait(true);
+                await shell.EscapeAsync(cancellationToken).ConfigureAwait(true);
                 break;
             default:
                 break;

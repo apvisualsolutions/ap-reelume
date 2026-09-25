@@ -24,6 +24,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **The player's controls behave like any player's.** They hide by themselves three seconds after the
+  mouse stops while the film plays — not with a panel open, not with the mouse on a button, not while
+  paused — and the pointer hides with them. A click on the picture pauses and resumes, the wheel
+  turns the volume up and down, and Escape steps back one layer at a time: it closes the panel, leaves
+  fullscreen or the mini player and, last, closes the player. Before, one movement of the mouse left
+  the controls standing until the next pause (`ENG-018`).
 - **A video added to a library folder shows up on its own, without restarting the application.**
   Folder watching was built whole — and tested — but **never switched on**: the only thing that
   activated it was a per-folder flag nothing in the program ever assigned and no screen ever offered,

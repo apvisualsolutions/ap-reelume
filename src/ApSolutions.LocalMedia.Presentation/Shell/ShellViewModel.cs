@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Common;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Presentation.Commands;
 using ApSolutions.LocalMedia.Presentation.Home;
@@ -53,6 +54,10 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     private PlayerPanel _playerPanel = PlayerPanel.None;
     private int _playerSessionOrdinal;
     private bool _isChromeRevealed = true;
+    private DateTimeOffset _lastActivity;
+    private int _idleWatch;
+    private bool _isWatchingIdle;
+    private bool _isPointerOverChrome;
 
     public ShellViewModel(INavigationService navigationService)
         : this(navigationService, appearanceSettings: null, library: null)
@@ -552,6 +557,9 @@ public sealed class ShellViewModel : INotifyPropertyChanged
                 // a session that is already playing when it arrives has no transition left to watch
                 // — measured on the real engine, where the picture was running and the rail, the
                 // title bar and the header were all still standing.
+                // And the wait that belonged to the session leaving goes with it, or it would wake up
+                // later and decide something about a film that is no longer there.
+                StopIdleWatch();
                 ApplyChromeFor(value?.Player.IsPlaying == true);
                 // A new session starts with its column closed and its own ordinal: the panel that
                 // was open belonged to the file that just left, and a badge that kept counting the
@@ -873,12 +881,17 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// surfaces about the application rather than about the film.
     /// </para>
     /// <para>
-    /// <b>It comes back on a movement of the mouse or a key, and on nothing else — no timer puts it
-    /// away again.</b> That is a decision with a cost written into it: a person who moves the mouse
-    /// once keeps the chrome until they pause and play again. The alternative is a clock, and a clock
-    /// here would be a second thing deciding what is on screen — one that no test can ask a question
-    /// of without waiting for it, and that the autonomous walk would race against on every scene
-    /// where it presses something during a real session.
+    /// <b>It comes back on a movement of the mouse or a key, and goes away again after
+    /// <see cref="ChromeIdleTimeout"/> without either</b> — while the film plays, with no panel open
+    /// and the pointer resting on the picture rather than on a control. That is what every player
+    /// does, and what the owner asked for on 2026-09-13 (ENG-018).
+    /// </para>
+    /// <para>
+    /// Until 2026-09-25 no timer put it away, and the reason was written here: a clock would be a
+    /// second thing deciding what is on screen, one no test could ask without waiting for it and the
+    /// autonomous walk would race against. Both costs were real and both are paid for rather than
+    /// avoided: the clock is a port the tests move by hand, and the walk is handed an infinite
+    /// timeout except in the scene that is about this.
     /// </para>
     /// </remarks>
     public bool IsChromeRevealed
@@ -915,11 +928,72 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// from it — which is what every other player does and what «como cualquier reproductor» meant.
     /// </para>
     /// <para>
-    /// Revealing still happens on a pointer move, and still never un-does itself. That stays: the
-    /// alternative is a clock, and the reason against a clock is written above.
+    /// Revealing happens on a pointer move in both modes, and so does the clock that takes it away
+    /// again; both are written above.
     /// </para>
     /// </remarks>
     public bool IsShellChromeVisible => _isChromeRevealed && _playbackMode != PlaybackMode.Fullscreen;
+
+    /// <summary>
+    /// How long the chrome stays after the last movement of the mouse or key. Three seconds, which is
+    /// where the common players sit; infinite turns the clock off.
+    /// </summary>
+    /// <remarks>
+    /// Settable because the autonomous walk sets it: every one of its scenes presses controls on a
+    /// real session, on a runner whose pace nobody controls, and a chrome that left between the move
+    /// and the press would fail the scene for a reason that has nothing to do with what it measures.
+    /// </remarks>
+    public TimeSpan ChromeIdleTimeout { get; set; } = TimeSpan.FromSeconds(3);
+
+    /// <summary>
+    /// The mouse moved or a key went down: the chrome comes back, and the clock that puts it away
+    /// again starts counting from now.
+    /// </summary>
+    /// <remarks>
+    /// Raised a few hundred times a second by a pointer crossing the window, so what it does on each
+    /// call is write a time and compare two flags. The wait itself is started once and reads the time
+    /// when it wakes, rather than being cancelled and started again on every movement.
+    /// </remarks>
+    public void NoteActivity()
+    {
+        RevealChrome();
+        if (_surfaces.ChromeClock is not { } clock || ChromeIdleTimeout == Timeout.InfiniteTimeSpan)
+        {
+            return;
+        }
+
+        _lastActivity = clock.UtcNow;
+        if (!_isWatchingIdle && _player?.Player.IsPlaying == true)
+        {
+            _isWatchingIdle = true;
+            _ = WatchIdleAsync(clock, _idleWatch);
+        }
+    }
+
+    /// <summary>
+    /// The mouse moved, and the view says whether it came to rest on a control or on the picture.
+    /// </summary>
+    /// <remarks>
+    /// A pointer on a control is somebody about to press it, and every player leaves the bar alone
+    /// while the mouse sits on it. The view answers rather than the model asking, because only the
+    /// view knows what is under the pointer.
+    /// </remarks>
+    public void NotePointerActivity(bool isOverChrome)
+    {
+        _isPointerOverChrome = isOverChrome;
+        NoteActivity();
+    }
+
+    /// <summary>What keeps the chrome standing when the clock runs out.</summary>
+    /// <remarks>
+    /// An open panel and an open gear are somebody reading or choosing; a pointer on a control is
+    /// somebody about to press it. None of the three moves the mouse while it happens, so none of them
+    /// can be left to the clock.
+    /// </remarks>
+    private bool IsChromeInUse =>
+        _playerPanel is not PlayerPanel.None
+        || _player?.Player.Settings?.IsOpen == true
+        || _isPointerOverChrome;
 
     /// <summary>Brings everything back, and does nothing at all when it is already there.</summary>
     public void RevealChrome()
@@ -1143,6 +1217,39 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         // media it was showing.
         PlaybackMode = PlaybackMode.Embedded;
         Player = null;
+    }
+
+    /// <summary>
+    /// Escape steps back one layer: the gear, then the side panel, then fullscreen or the mini player
+    /// back to embedded, then the player itself (ENG-018).
+    /// </summary>
+    /// <remarks>
+    /// The order is the prototype's, read from its key handler. Until 2026-09-25 Escape only did the
+    /// third step, so with a panel open or a film simply playing in the window it did nothing at all.
+    /// </remarks>
+    public async Task EscapeAsync(CancellationToken cancellationToken = default)
+    {
+        if (Player is not { } session)
+        {
+            return;
+        }
+
+        if (session.Player.Settings is { IsOpen: true } gear)
+        {
+            gear.Close();
+        }
+        else if (IsPlayerPanelOpen)
+        {
+            PlayerPanel = PlayerPanel.None;
+        }
+        else if (PlaybackMode != PlaybackMode.Embedded)
+        {
+            await TogglePlaybackModeAsync(PlaybackMode, cancellationToken).ConfigureAwait(true);
+        }
+        else
+        {
+            await ClosePlayerAsync(cancellationToken).ConfigureAwait(true);
+        }
     }
 
     /// <summary>Switches into a mode, or back to embedded when it is already the one in force.</summary>
@@ -1398,8 +1505,56 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         }
         else
         {
+            StopIdleWatch();
             RevealChrome();
         }
+    }
+
+    /// <summary>
+    /// Waits out the timeout from the last activity, and puts the chrome away if nothing that should
+    /// keep it has happened in between.
+    /// </summary>
+    /// <remarks>
+    /// A wait that was stopped is not cancelled, it is outlived: stopping moves the generation on,
+    /// and a wait that wakes to find a different one returns without touching anything. That keeps
+    /// nothing disposable in a view model that has no end of its own, and the most a stale wait costs
+    /// is waking once, three seconds later, to do nothing.
+    /// </remarks>
+    private async Task WatchIdleAsync(IClock clock, int generation)
+    {
+        var remaining = ChromeIdleTimeout;
+        while (true)
+        {
+            await clock.DelayAsync(remaining).ConfigureAwait(true);
+            if (generation != _idleWatch)
+            {
+                return;
+            }
+
+            var idle = clock.UtcNow - _lastActivity;
+            if (idle < ChromeIdleTimeout)
+            {
+                remaining = ChromeIdleTimeout - idle;
+                continue;
+            }
+
+            // Nothing asks whether it is still playing: a pause, a stop or a new session all stop the
+            // watch on their way through, so a wait that gets this far belongs to a running film.
+            StopIdleWatch();
+            if (!IsChromeInUse)
+            {
+                HideChrome();
+            }
+
+            return;
+        }
+    }
+
+    /// <summary>Paused, closed or replaced: whoever stopped it has already decided what is on screen.</summary>
+    private void StopIdleWatch()
+    {
+        _idleWatch++;
+        _isWatchingIdle = false;
     }
 
     private sealed class RouteNavigationCommand(INavigationService navigationService) : ICommand

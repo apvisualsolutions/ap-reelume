@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 
 namespace ApSolutions.LocalMedia.Presentation.Shell;
 
@@ -40,26 +41,55 @@ public sealed partial class ShellView : UserControl
     }
 
     /// <summary>
-    /// The mouse moving anywhere brings the chrome back, and never takes it away.
+    /// The mouse moving anywhere brings the chrome back and restarts the clock that puts it away.
     /// </summary>
     /// <remarks>
     /// Nothing is marked handled and nothing is swallowed: this watches the gesture on its way down
-    /// and lets it carry on to whatever it was aimed at. Revealing when the chrome is already there
-    /// costs a comparison — <c>RevealChrome</c> returns on the first line — which matters, because a
-    /// pointer crossing a window raises this a few hundred times a second.
+    /// and lets it carry on to whatever it was aimed at. What it costs per call is a comparison and a
+    /// time written, which matters, because a pointer crossing a window raises this a few hundred
+    /// times a second.
     /// </remarks>
     private void OnPointerMovedAnywhere(object? sender, PointerEventArgs args)
     {
         _ = sender;
-        _ = args;
-        _viewModel?.RevealChrome();
+        _viewModel?.NotePointerActivity(IsChrome(args.Source as Visual));
     }
+
+    /// <summary>
+    /// Whether the pointer is on one of the surfaces that are not the picture.
+    /// </summary>
+    /// <remarks>
+    /// By the surfaces' names, which are the ones the tests and the walk already reach them by; a
+    /// control that is not inside any of them is on the picture, the letterbox or the failure card,
+    /// and none of those is something a person is about to press while a film plays.
+    /// </remarks>
+    private static bool IsChrome(Visual? source)
+    {
+        for (var visual = source; visual is not null; visual = visual.GetVisualParent())
+        {
+            if (visual is Control { Name: { } name } && ChromeSurfaceNames.Contains(name))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static readonly HashSet<string> ChromeSurfaceNames =
+    [
+        "TitleBarSurface",
+        "NavigationRailSurface",
+        "PlayerHeaderSurface",
+        "PlayerPanelColumn",
+        "TransportControlsSurface",
+    ];
 
     private void OnKeyDownAnywhere(object? sender, KeyEventArgs args)
     {
         _ = sender;
         _ = args;
-        _viewModel?.RevealChrome();
+        _viewModel?.NoteActivity();
     }
 
     private void OnDataContextChanged(object? sender, EventArgs args)
@@ -81,21 +111,48 @@ public sealed partial class ShellView : UserControl
         }
     }
 
+    /// <remarks>
+    /// No null check on the model: this handler is attached only to a model that exists and detached
+    /// before the field changes, so the check was two branches nothing could take — the coverage gate
+    /// named them on 2026-09-25, when the pointer's line copied the mode's.
+    /// </remarks>
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName == nameof(ShellViewModel.PlaybackMode) && _viewModel is not null)
+        _ = sender;
+        if (args.PropertyName == nameof(ShellViewModel.PlaybackMode))
         {
-            ApplyPlaybackMode(_viewModel.PlaybackMode);
+            ApplyPlaybackMode(_viewModel!.PlaybackMode);
+        }
+
+        if (args.PropertyName == nameof(ShellViewModel.IsChromeRevealed))
+        {
+            ApplyPointer(_viewModel!.IsChromeRevealed);
         }
     }
 
+    /// <summary>
+    /// The pointer goes away over the picture with the rest of the chrome, and comes back with it.
+    /// </summary>
+    /// <remarks>
+    /// On the stage and not on the window, so it travels with the picture into the mini window and
+    /// never hides over anything else. Nothing is set while the chrome stands: an unset cursor is the
+    /// one every control underneath already asks for.
+    /// </remarks>
+    private void ApplyPointer(bool isChromeRevealed)
+    {
+        // GetControl and not FindControl: the stage is declared in this view's own markup, so a
+        // lookup that could come back empty would be a branch nothing can take.
+        this.GetControl<Panel>("PlayerStage").Cursor = isChromeRevealed ? null : HiddenPointer;
+    }
+
+    private static readonly Cursor HiddenPointer = new(StandardCursorType.None);
+
     private void ApplyPlaybackMode(PlaybackMode mode)
     {
-        if (this.FindControl<Panel>("PlayerStage") is not { } stage
-            || this.FindControl<ContentControl>("PlayerHost") is not { } host)
-        {
-            return;
-        }
+        // GetControl and not FindControl, for the reason ApplyPointer gives: both are declared in
+        // this view's own markup.
+        var stage = this.GetControl<Panel>("PlayerStage");
+        var host = this.GetControl<ContentControl>("PlayerHost");
 
         // The small window carries a transport of its own — five buttons and 480 logical pixels —
         // and the picture it is handed brings the full bar with it, so both were on screen at once:
@@ -106,7 +163,9 @@ public sealed partial class ShellView : UserControl
         // The full-screen half is told here for the same two reasons, and it decides which of the two
         // arrow glyphs the transport's mode button draws: the prototype swaps `full` for `exitfull`
         // the moment the picture takes the screen, and this drew the entering arrows in both states.
-        if (_viewModel?.Player is { } session)
+        // A mode can arrive with no session: the change is awaited, and the player can be closed
+        // while it is in flight.
+        if (_viewModel!.Player is { } session)
         {
             session.Player.IsCompact = mode == PlaybackMode.Mini;
             session.Player.IsFullscreen = mode == PlaybackMode.Fullscreen;
@@ -137,8 +196,10 @@ public sealed partial class ShellView : UserControl
             var shellMode = mode == PlaybackMode.Fullscreen ? mode : PlaybackMode.Embedded;
             // Where it was before fullscreen took the screen, so leaving it gives that back rather
             // than the coordinator's default embedded shape. Remembered only on the way in, because
-            // on the way out the window is already the size of the screen.
-            if (mode == PlaybackMode.Fullscreen && _windowCoordinator.Current != PlaybackMode.Fullscreen)
+            // on the way out the window is already the size of the screen. «On the way in» is the
+            // mode alone: the model never raises a mode already in force, so the coordinator cannot
+            // be in fullscreen when fullscreen arrives, and asking it too was a branch nothing took.
+            if (mode == PlaybackMode.Fullscreen)
             {
                 _windowCoordinator.Remember(
                     PlaybackMode.Embedded,

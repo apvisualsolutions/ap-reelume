@@ -309,7 +309,7 @@ preguntar, y si no puede resolverlo **ensancha** la búsqueda en vez de estrecha
 **entero**, no con el corto: emitía `rev-parse --short HEAD`, que es justo el prefijo al que `gh`
 contesta `[]`.
 
-**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **185** <!--medido:archivos-en-deuda-->
+**Los suelos de cobertura los mide CI, no esta máquina.** Hoy nombra **184** <!--medido:archivos-en-deuda-->
 archivos por debajo del listón de **96** <!--medido:listones-de-cobertura--> por ciento. `eng/coverage-debt.txt` se copia del
 artefacto `coverage-debt` de un run de CI —el flujo lo emite en cada build, pase o falle— porque
 siete archivos de audio, LibVLC y temporizadores dependen de hardware que un runner hospedado no
@@ -335,7 +335,10 @@ entra el suelo sin una segunda vuelta? No se contradicen, y la salida no es aflo
 escrito: «add it with the reason and raise the ratchet in the same change».
 
 **El trinquete no vive en ese archivo: es `$debtRatchet` dentro de `eng/check-coverage.ps1`**, y ése
-sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **185** <!--medido:trinquete-de-deuda-->
+sí se edita. La lista sólo puede encoger, y las dos cifras tienen que cuadrar. Está en **184** <!--medido:trinquete-de-deuda-->
+desde el 2026-09-25, cuando **bajó por mejora** con `ENG-018`: `ShellView.axaml.cs` llegó a 100/97
+quitando las guardas que nada podía tomar y cubriendo las tres que sí, en vez de copiar un suelo de un
+run que aún no existía. Antes estuvo en **185**
 desde el 2026-09-20 (tarde), cuando **bajó por mejora**: `FallbackScanScheduler.cs` llegó a 100/100 y
 salió de la lista. `ENG-044` le quitó las dos ramas que lo sostenían por debajo del listón —un guard
 contra un intervalo no positivo y un `is not { }`— al dejar de recibir una constante y pasar a leer

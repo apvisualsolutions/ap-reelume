@@ -5022,6 +5022,17 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         await RevealChromeAsync(host);
         Assert.True(host.ViewModel.Player!.Player.AreControlsRevealed);
 
+        // And left alone over the picture it goes away again by itself, on the application's own
+        // clock and the real engine (ENG-018). A short timeout rather than the three seconds, because
+        // what is measured is that the clock is wired, not how long it is — that is the UI suite's.
+        host.ViewModel.ChromeIdleTimeout = TimeSpan.FromMilliseconds(200);
+        await RevealChromeAgainAsync(host);
+        await WaitForAsync(
+            () => Task.FromResult(!host.ViewModel.IsChromeRevealed),
+            "the chrome never went away by itself with the mouse still over a playing film");
+        host.ViewModel.ChromeIdleTimeout = Timeout.InfiniteTimeSpan;
+        await RevealChromeAsync(host);
+
         var tracks = host.ViewModel.Player!.Tracks;
         Assert.NotNull(tracks);
 
@@ -5983,6 +5994,17 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "moving the mouse never brought the chrome back, so nothing on the header is reachable.");
     }
 
+    /// <summary>
+    /// A movement over the picture while the chrome is already there, which is what starts its clock.
+    /// </summary>
+    private static async Task RevealChromeAgainAsync(ShellHost host)
+    {
+        host.Window.MouseMove(
+            new Point((host.Window.Bounds.Width / 2) + 1, host.Window.Bounds.Height / 2),
+            RawInputModifiers.None);
+        await SettleAsync();
+    }
+
     private static async Task OpenPlayerPanelAsync(ShellHost host, PlayerPanel panel)
     {
         if (host.ViewModel.PlayerPanel == panel)
@@ -6295,17 +6317,62 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
+    /// Whether a click at this point lands on a playing picture, which pauses it since ENG-018.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The picture became a command control on 2026-09-25 — one click pauses, the next resumes — and
+    /// the first full walk after it went red in five scenes for exactly that reason: the click
+    /// beside a transport button landed on the film, paused it, and the pause brought back or took
+    /// away the very thing the press was meant to change. It is not a <c>Button</c>, so the list above
+    /// could not see it.
+    /// </para>
+    /// <para>
+    /// <b>By hit test, not by geometry, and only for this question.</b> The first version measured
+    /// the player's rectangle minus the surfaces drawn inside it, and refused every point beside the
+    /// resume offer, the version question and the mini player's buttons: those float over the picture
+    /// from outside the player, and a click on their empty part goes to them and not to the film. What
+    /// the application itself asks is which element the pointer is on — <c>PlayerView.IsOnThePicture</c>
+    /// reads the source of the event — so this asks the same thing the same way.
+    /// </para>
+    /// <para>
+    /// <b>And «nothing» inside a player counts as the picture.</b> Measured on the full walk the same
+    /// day: in the mini window the hit test answered «nothing at all» at the moment the point was
+    /// chosen and «VideoSurface» a moment later, when the click arrived — the picture had not been
+    /// drawn yet. A point nobody can name inside a player is a point that may turn out to be the film.
+    /// </para>
+    /// </remarks>
+    private static bool IsOnAPicture(TopLevel window, Point point)
+    {
+        if (window.InputHitTest(point) is not Visual hit)
+        {
+            return window.GetVisualDescendants()
+                .OfType<PlayerView>()
+                .Where(view => view.IsEffectivelyVisible)
+                .Any(view => view.TranslatePoint(default, window) is { } origin
+                    && new Rect(origin, view.Bounds.Size).Contains(point));
+        }
+
+        // The root panel's parent is the view's content presenter, not the view: measured, because
+        // the first version asked for the direct parent and let every letterbox click through.
+        return hit is PlayerView or VideoFrameView
+            || (hit.FindAncestorOfType<PlayerView>() is { } player && ReferenceEquals(player.Content, hit));
+    }
+
+    /// <summary>
     /// Presses clear of a control, on a point that belongs to no command control at all. It is the
     /// control for the click: whatever the button does, this must not do it.
     /// </summary>
-    private static void ClickBeside(ShellHost host, Control control)
+    private static (Point Point, string ChosenOn) ClickBeside(ShellHost host, Control control)
     {
         var window = RootOf(host, control);
         var beside = BesidePoint(host, control);
+        var chosenOn = DescribeChainAt(host, control, beside);
         window.MouseMove(beside, RawInputModifiers.None);
         window.MouseDown(beside, MouseButton.Left, RawInputModifiers.None);
         window.MouseUp(beside, MouseButton.Left, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
+        return (beside, chosenOn);
     }
 
     /// <summary>
@@ -6374,6 +6441,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             new Vector(0, -step.Y * 2), new Vector(0, step.Y * 2),
             new Vector(-step.X, -step.Y), new Vector(step.X, step.Y),
             new Vector(-step.X / 2, -step.Y), new Vector(-step.X / 2, step.Y),
+
+            // Last, the gap between this button and its neighbour on the same row. The mini
+            // player's five buttons sit in one band under the picture, and since a click on the
+            // picture pauses (ENG-018) the band's own background between them is the only place in
+            // that window a click does nothing. Last so that no scene that already had a point
+            // somewhere else is moved.
+            new Vector(-(step.X / 2) - 4, 0), new Vector((step.X / 2) + 4, 0),
         })
         {
             var candidate = centre!.Value + offset;
@@ -6389,6 +6463,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             if (occupied.FirstOrDefault(rect => rect.Contains(candidate)) is { Width: > 0 } taken)
             {
                 refused.Add($"{candidate} is inside {taken}");
+                continue;
+            }
+
+            if (IsOnAPicture(window, candidate))
+            {
+                refused.Add($"{candidate} is on the picture, where a click pauses");
                 continue;
             }
 
@@ -6454,12 +6534,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var view = WalkLedger.ViewOf(control);
         var before = await probe();
 
-        ClickBeside(host, control);
+        var beside = ClickBeside(host, control);
         await SettleAsync();
         Assert.True(
             EqualityComparer<T>.Default.Equals(await probe(), before),
             $"Clicking beside {anchor} changed the very thing the press is meant to change, so "
-                + "pressing it would have proved nothing.");
+                + $"pressing it would have proved nothing. The click went to {beside.Point}, on "
+                + $"{beside.ChosenOn} when it was chosen and on {DescribeChainAt(host, control, beside.Point)} now.");
 
         // Pressed, and pressed again if nothing happened. A person whose click misses does not wait
         // sixty seconds and give up; they look at where the thing is and press it again. That is
@@ -7054,11 +7135,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // ARQ-005: the shell arrives after the database is ready, not with it, so the walk waits
         // for it. The wait names what stood in its place if it never comes.
         var shell = Assert.IsType<ShellView>(settled);
+        var viewModel = Assert.IsType<ShellViewModel>(shell.DataContext);
+
+        // The chrome would go away three seconds after the last movement, and every scene here
+        // moves the mouse once and then presses on a real session, on a runner whose pace nobody
+        // controls. A chrome that left in between would fail a scene for a reason that is not what
+        // it measures, so the clock is off here — except in the one scene that is about it (ENG-018).
+        viewModel.ChromeIdleTimeout = Timeout.InfiniteTimeSpan;
         return new ShellHost(
             application,
             window,
             shell,
-            Assert.IsType<ShellViewModel>(shell.DataContext),
+            viewModel,
             _teardownFailures.Add);
     }
 

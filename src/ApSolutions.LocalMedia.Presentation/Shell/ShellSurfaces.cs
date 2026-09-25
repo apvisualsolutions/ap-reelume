@@ -3,6 +3,7 @@
 
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Domain.Catalog;
+using ApSolutions.LocalMedia.Domain.Common;
 using ApSolutions.LocalMedia.Domain.Discovery;
 using ApSolutions.LocalMedia.Presentation.Backup;
 using ApSolutions.LocalMedia.Presentation.Home;
@@ -137,4 +138,14 @@ public sealed record ShellSurfaces
     /// its own file is a view that cannot be tested without one.
     /// </remarks>
     public IMiniPlayerPlacementStore? MiniPlayerPlacement { get; init; }
+
+    /// <summary>
+    /// The clock that puts the chrome away after a while without the mouse, or nothing for a shell
+    /// that never does (ENG-018).
+    /// </summary>
+    /// <remarks>
+    /// A port rather than a timer built inside the shell, because a timer built inside cannot be asked
+    /// a question without waiting for it — which was the whole case against having one.
+    /// </remarks>
+    public IClock? ChromeClock { get; init; }
 }

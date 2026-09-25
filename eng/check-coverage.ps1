@@ -464,7 +464,17 @@ try {
     # sobre Domain, Application, Integration y UiTests, que lo leyó 94/91 → 100/100, y confirmado por
     # el artefacto del run 35510164184: el artefacto CONFIRMA, no descubre, que es para lo que existe
     # esa previsualización.
-    $debtRatchet = 185
+    #
+    # 184 el 2026-09-25, por mejora: ShellView.axaml.cs llega a 100/97 y sale de la lista. ENG-018 le
+    # dio el puntero y la puerta lo leyó mejorando (76 → 80) sin llegar al listón; en vez de copiar un
+    # suelo de un run que aún no existía, se quitaron las guardas que nada podía tomar — dos
+    # comprobaciones de nulo en un manejador que sólo se engancha a un modelo que existe, dos
+    # FindControl sobre controles del propio marcado y una pregunta al coordinador cuya respuesta el
+    # modelo ya garantiza — y se cubrieron las tres que sí se toman: quitar el contexto, cambiar de
+    # modo sin ventana y cerrar el reproductor mientras se espera un cambio de modo. Queda la pantalla
+    # sin nombre de ScreenOf, que su comentario ya declara inalcanzable. Leído con
+    # preview-coverage-floors sobre UiTests sola, que es la lectura que el paseo no puede tapar.
+    $debtRatchet = 184
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

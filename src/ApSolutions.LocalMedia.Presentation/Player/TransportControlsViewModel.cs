@@ -121,6 +121,13 @@ public sealed class TransportControlsViewModel : INotifyPropertyChanged
 
     public ICommand ToggleMuteCommand { get; }
 
+    /// <summary>
+    /// How far one notch of the wheel, or one press of the volume keys, moves the level. The prototype
+    /// moves its volume by five on the arrows, and the wheel and the keys agree so that neither of
+    /// them is the one that surprises.
+    /// </summary>
+    public const int VolumeStepPercent = 5;
+
     public static double MinimumVolumePercent => VolumeBoostPolicy.MinimumPercent;
 
     public static double MaximumVolumePercent => VolumeBoostPolicy.MaximumBoostPercent;
