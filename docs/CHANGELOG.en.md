@@ -75,6 +75,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   of what already ships, and costs more. On the way a written claim fell: there was no 13 % ceiling
   without a step, only a bound taken over the wrong samples. A test fails if the candidate ever beats
   what ships. Nothing in the program changes (`ENG-022`).
+- **Moving the brightness, contrast and gamma curve behind the upscaler is measured and not done,
+  with the decision guarded.** The bands that appear in the shadows when gamma is raised come from
+  the file itself: they are its own tonal steps, stretched by the curve. Moving the curve behind the
+  upscaler and dithering it does not remove them; it softens them a little in some scenes and makes
+  them worse in others, and what it gains is under one level of average tone, which cannot be seen.
+  Removing bands takes a dedicated filter, not this. A test fails if that alternative ever wins.
+  Nothing in the program changes (`ENG-023`).
 - **The tool this repository recommends for auditing its own checks no longer breaks one of them.**
   Running that audit in a separate working copy turned the evidence-link check red, because it swept
   the copies of the repository other sessions keep open inside the tree and read their documents as

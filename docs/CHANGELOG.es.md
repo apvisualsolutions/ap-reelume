@@ -78,6 +78,13 @@ evidencia, es [FEATURES.md](FEATURES.md).
   sin escalón no había un techo del 13 %, sino una acotación hecha sobre muestras equivocadas. Una
   prueba falla si algún día el candidato supera a lo que se usa. No cambia nada del programa
   (`ENG-022`).
+- **Mover la curva de brillo, contraste y gamma detrás del reescalado está medido y no se hace, con
+  la decisión vigilada.** Las bandas que aparecen en las sombras al subir la gamma vienen del propio
+  fichero: son sus escalones de tono, que la curva estira. Llevar la curva detrás del reescalado y
+  difuminarla no las quita, sólo las suaviza algo en unas escenas y las empeora en otras; lo que
+  gana es menos de un nivel de tono medio, que no se ve. Lo que quita bandas es un filtro específico,
+  no esto. Una prueba falla si algún día esa alternativa gana. No cambia nada del programa
+  (`ENG-023`).
 - **La herramienta que este repositorio recomienda para auditar sus propias comprobaciones ya no
   rompe una de ellas.** Correr esa auditoría en una copia de trabajo aparte ponía roja la
   comprobación de enlaces de evidencia, porque barría también las copias del repositorio que otras

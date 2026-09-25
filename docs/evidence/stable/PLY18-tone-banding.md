@@ -46,6 +46,10 @@ nivel de diferencia repartido sobre esa área vuelve a leerse como banda, con ot
 `ENG-023` con lo que exige: llevar la curva de tono al shader, que sólo corre cuando el reescalado
 está activo — así que hay que decidir qué pasa cuando no lo está.
 
+**Medido el 2026-09-25 y no construido** (`ENG023-tone-curve-ordering.md`): la banda que se ve al
+subir la gamma es el escalón de 8 bits del propio fichero estirado por la curva, y un difuminado
+detrás del escalado tampoco la quita; lo que gana es menos de un nivel de tono medio.
+
 ## El diagnóstico bueno, y quién lo encontró
 
 Pedido el control que sólo él podía hacer —el fichero es suyo—: abrir el mismo vídeo en VLC y subirle

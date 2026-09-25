@@ -23,8 +23,9 @@ namespace ApSolutions.LocalMedia.Domain.Tests.Playback;
 /// wide. But the pattern lives in the resolution of the decoded frame and the screen is four times
 /// that, so an 8×8 cell becomes a 32×32 block of screen pixels — one level spread over an area large
 /// enough to read as banding of its own. <b>Dither has to be the last step before the screen and there
-/// it was the first.</b> `ENG-023` carries that ordering; it needs the curve to move behind the
-/// scaling, which is a different piece of work.
+/// it was the first.</b> Moving the curve behind the scaling was measured on 2026-09-25 and not built
+/// (`ENG-023`): the band is the file's own step stretched by the curve, which a dither cannot remove,
+/// and <c>ToneCurveOrderingCandidateTests</c> keeps that decision measured.
 /// </para>
 /// <para>
 /// <b>What survived is the rounding, which was its own defect.</b> The old table truncated, so a curve

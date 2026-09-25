@@ -266,8 +266,9 @@ public sealed class PackedYuvConverterTests
     /// </para>
     /// <para>
     /// So the conversion paints every pixel of a given level the same, and this is what says so. The
-    /// banding is not fixed by pretending it is gone — it is registered as `ENG-023`, whose fix is to
-    /// dither <b>after</b> the scaling rather than before, which is where a dither belongs.
+    /// ordering was measured on 2026-09-25 (`ENG-023`): the band a raised gamma shows is the file's own
+    /// eight-bit step stretched by the curve, and a dither after the scaling cannot remove it either —
+    /// so flat stays flat and nothing is dithered.
     /// </para>
     /// </remarks>
     [Theory]
