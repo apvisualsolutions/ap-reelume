@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
 using ApSolutions.LocalMedia.Application.Continuity;
+using ApSolutions.LocalMedia.Application.Lifecycle;
 using ApSolutions.LocalMedia.Application.Playback;
 using ApSolutions.LocalMedia.Application.Storage;
 using Avalonia.Controls;
@@ -41,6 +42,9 @@ public sealed class ApplicationHost : IAsyncDisposable
     private PlaybackSessionHooks? _sessionHooks;
 
     private bool _disposed;
+
+    // The window is what builds the tray icon, so only then is there an icon to let go of.
+    private IDisposable? _windowTray;
 
     private ApplicationHost(ServiceProvider services, IAppDataPaths paths)
     {
@@ -110,8 +114,11 @@ public sealed class ApplicationHost : IAsyncDisposable
     /// Attaches the lifecycle behaviour to the main window: the close button asks the policy what it
     /// means, and the tray only appears once someone has turned it on.
     /// </summary>
-    public void ConfigureWindow(Window window) =>
+    public void ConfigureWindow(Window window)
+    {
         CompositionRoot.ConfigureWindow(this, _services, window);
+        _windowTray = _services.GetRequiredService<ITrayService>() as IDisposable;
+    }
 
     /// <summary>
     /// Begins a playback session's teardown record. Whatever the previous session left running ends
@@ -146,6 +153,14 @@ public sealed class ApplicationHost : IAsyncDisposable
         }
 
         _disposed = true;
+
+        // ENG-020. The tray icon belongs to the interface thread, and it goes first, before anything
+        // below can yield. The player's teardown waits for the media it released to rest, and from
+        // there the container's own release resumes on a pool thread: the icon threw there, and the
+        // application ended on that exception after a session that had worked. Program releases from
+        // the interface thread once the loop has stopped, so this is the last moment the icon can
+        // still be let go on the thread that owns it.
+        _windowTray?.Dispose();
 
         // The session's loop and handlers go before the services they were feeding: a tick landing
         // on a disposed tracker would be an exception raised by the teardown itself.

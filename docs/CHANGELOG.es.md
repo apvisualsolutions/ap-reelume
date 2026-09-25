@@ -24,6 +24,10 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Arreglado
 
+- **Cerrar la aplicación después de ver un vídeo ya no termina en un fallo.** Al salir, el icono de
+  la bandeja se retiraba desde un hilo que no era el suyo y el programa acababa con una excepción,
+  aunque todo hubiera funcionado bien. Ahora se retira lo primero, en el hilo que le corresponde,
+  antes de que el cierre se ponga a esperar al reproductor (`ENG-020`).
 - **Los controles del reproductor se comportan como los de cualquier reproductor.** Se ocultan solos
   a los tres segundos de no mover el ratón mientras la película avanza —no con un panel abierto, ni
   con el ratón encima de un botón, ni en pausa—, y el puntero se oculta con ellos. Un clic sobre la

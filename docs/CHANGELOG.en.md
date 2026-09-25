@@ -24,6 +24,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- **Closing the application after watching a video no longer ends in a failure.** On exit the tray
+  icon was removed from a thread that did not own it, and the program ended on an exception even
+  though everything had worked. It is now removed first, on its own thread, before the shutdown
+  starts waiting for the player (`ENG-020`).
 - **The player's controls behave like any player's.** They hide by themselves three seconds after the
   mouse stops while the film plays — not with a panel open, not with the mouse on a button, not while
   paused — and the pointer hides with them. A click on the picture pauses and resumes, the wheel

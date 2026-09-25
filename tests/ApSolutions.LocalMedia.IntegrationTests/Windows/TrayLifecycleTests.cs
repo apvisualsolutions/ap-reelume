@@ -164,6 +164,33 @@ public sealed class TrayLifecycleTests
         tray.Dispose();
     }
 
+    /// <summary>
+    /// ENG-020. Releasing the icon from a thread that does not own it is what closing the
+    /// application did: the container's teardown resumes wherever its last await left it, and the
+    /// icon belongs to the interface thread. It threw, and the process ended on an exception after a
+    /// session that had worked. The icon still has to go, so the work is handed to its own thread.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task The_real_tray_adapter_can_be_let_go_from_a_thread_that_does_not_own_it()
+    {
+        var tray = new WindowsTrayService("AP Reelume", "Open", "Exit");
+        tray.Show();
+        var interfaceThread = Environment.CurrentManagedThreadId;
+        var releasingThread = interfaceThread;
+
+        var failure = await Record.ExceptionAsync(() => Task.Run(() =>
+        {
+            releasingThread = Environment.CurrentManagedThreadId;
+            tray.Dispose();
+        }));
+
+        Assert.NotEqual(interfaceThread, releasingThread);
+        Assert.Null(failure);
+        Assert.Throws<ObjectDisposedException>(tray.Show);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        Assert.False(tray.IsVisible);
+    }
+
     [AvaloniaFact]
     public void The_real_tray_adapter_carries_its_menu_and_refuses_empty_labels()
     {
