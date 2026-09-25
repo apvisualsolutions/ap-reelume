@@ -68,6 +68,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- **The edge-directed upscaler is measured and not built, with the decision guarded.** Seven
+  families were measured against the same synthesised truth, through a harness that reproduces the
+  player's figures exactly. The best, a kernel steered along the edge, removes the tonal step beside
+  edges entirely and keeps their sharpness, but lands 34.9 % closer to the truth against the 35.7 %
+  of what already ships, and costs more. On the way a written claim fell: there was no 13 % ceiling
+  without a step, only a bound taken over the wrong samples. A test fails if the candidate ever beats
+  what ships. Nothing in the program changes (`ENG-022`).
 - **The tool this repository recommends for auditing its own checks no longer breaks one of them.**
   Running that audit in a separate working copy turned the evidence-link check red, because it swept
   the copies of the repository other sessions keep open inside the tree and read their documents as

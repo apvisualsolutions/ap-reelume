@@ -70,6 +70,14 @@ evidencia, es [FEATURES.md](FEATURES.md).
 
 ### Cambiado
 
+- **El reescalador guiado por bordes está medido y no se construye, con la decisión vigilada.** Se
+  midieron siete familias contra la misma verdad sintética, con un arnés que reproduce exactas las
+  cifras del reproductor. La mejor, un núcleo orientado a lo largo del canto, quita por completo el
+  escalón de tono junto a los bordes y mantiene su nitidez, pero queda un 34,9 % más cerca de la
+  verdad contra el 35,7 % de lo que ya se usa, y cuesta más. De paso cayó una afirmación escrita:
+  sin escalón no había un techo del 13 %, sino una acotación hecha sobre muestras equivocadas. Una
+  prueba falla si algún día el candidato supera a lo que se usa. No cambia nada del programa
+  (`ENG-022`).
 - **La herramienta que este repositorio recomienda para auditar sus propias comprobaciones ya no
   rompe una de ellas.** Correr esa auditoría en una copia de trabajo aparte ponía roja la
   comprobación de enlaces de evidencia, porque barría también las copias del repositorio que otras

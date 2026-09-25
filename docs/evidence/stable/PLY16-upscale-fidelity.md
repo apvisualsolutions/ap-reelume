@@ -184,6 +184,11 @@ Lo que consigue nitidez sin escalón es interpolar **a lo largo** del canto en v
 familia dirigida por bordes, que es lo que hace la primera pasada de FSR y que no se copia por la
 atribución. Registrado como `ENG-022` con su coste por medir.
 
+> **Corregido el 2026-09-25**: el techo del 13 % no era de acotar, sino de acotar a muestras ya
+> remuestreadas por el cúbico. Acotando a los cuatro texeles de origen el escalón es 0 y se llega al
+> 30 %, y un núcleo orientado a lo largo del canto al 34,9 % — todavía por debajo del 35,7 % de esta
+> cadena, así que no se construye. Las cifras y la decisión, en `ENG022-edge-directed-upscale.md`.
+
 ## Lo que queda abierto
 
 - **Lanczos-3 sigue siendo el techo de la familia de núcleos fijos**: en el barrido dio 11,91 contra los 12,60 del cúbico
