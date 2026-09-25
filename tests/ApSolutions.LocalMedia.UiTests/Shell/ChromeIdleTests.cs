@@ -93,6 +93,52 @@ public sealed class ChromeIdleTests
         window.Close();
     }
 
+    /// <summary>
+    /// A movement on a paused film, or with no player at all, starts no clock. The test above pauses
+    /// after the movement, so the clock it stops was already running; this one moves after, which is
+    /// what somebody does to reach the play button. Found blind by gate-auditor.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task A_movement_on_a_paused_film_or_with_no_player_starts_no_clock()
+    {
+        var clock = new ManualClock();
+        var (window, viewModel, player) = await ShowPlayingSessionWithPlayerAsync(clock);
+        player.ApplySessionState(PlaybackState.Paused, failure: null);
+        Dispatcher.UIThread.RunJobs();
+
+        window.MouseMove(OverThePicture, RawInputModifiers.None);
+        clock.Advance(TimeSpan.FromSeconds(10));
+        Assert.True(viewModel.IsChromeRevealed);
+
+        await viewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
+        Dispatcher.UIThread.RunJobs();
+        window.MouseMove(new Point(OverThePicture.X + 5, OverThePicture.Y), RawInputModifiers.None);
+        clock.Advance(TimeSpan.FromSeconds(10));
+        Assert.True(viewModel.IsChromeRevealed);
+        window.Close();
+    }
+
+    /// <summary>
+    /// A key counts as a movement, which is what ADR-0014 says and nothing pressed one. Found blind by
+    /// gate-auditor: a key that only revealed, without starting the count again, passed everything.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task A_key_starts_the_count_again_as_a_movement_does()
+    {
+        var clock = new ManualClock();
+        var (window, viewModel) = await ShowPlayingSessionAsync(clock);
+
+        window.MouseMove(OverThePicture, RawInputModifiers.None);
+        clock.Advance(TimeSpan.FromSeconds(2));
+        window.KeyPress(Key.F24, RawInputModifiers.None, PhysicalKey.F24, null);
+        clock.Advance(TimeSpan.FromSeconds(2));
+        Assert.True(viewModel.IsChromeRevealed);
+
+        clock.Advance(TimeSpan.FromSeconds(1));
+        Assert.False(viewModel.IsChromeRevealed);
+        window.Close();
+    }
+
     [AvaloniaFact]
     public async Task An_open_panel_keeps_the_chrome_because_somebody_is_reading_it()
     {
@@ -140,6 +186,40 @@ public sealed class ChromeIdleTests
         window.MouseMove(OverThePicture, RawInputModifiers.None);
         clock.Advance(TimeSpan.FromSeconds(3));
         Assert.False(viewModel.IsChromeRevealed);
+        window.Close();
+    }
+
+    /// <summary>
+    /// The same for every other piece of chrome a pointer can rest on. Only the transport was tried,
+    /// so taking the other names out of the view's list passed everything — found blind by
+    /// gate-auditor. The panel column is not here: it is only drawn with a panel open, and an open
+    /// panel already keeps the chrome by itself.
+    /// </summary>
+    [AvaloniaTheory]
+    [InlineData("TitleBarSurface")]
+    [InlineData("NavigationRailSurface")]
+    [InlineData("PlayerHeaderSurface")]
+    public async Task A_pointer_resting_on_any_piece_of_chrome_keeps_it(string surfaceName)
+    {
+        var clock = new ManualClock();
+        var (window, viewModel) = await ShowPlayingSessionAsync(clock);
+        window.MouseMove(OverThePicture, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+        var surface = window.GetVisualDescendants()
+            .OfType<Control>()
+            .Single(control => control.Name == surfaceName);
+        var point = surface.TranslatePoint(
+            new Point(surface.Bounds.Width / 2, surface.Bounds.Height / 2),
+            window)!.Value;
+
+        // The point has to land on the surface, or the pointer rests on the picture and the test
+        // would pass for the wrong reason.
+        var hit = window.InputHitTest(point) as Visual;
+        Assert.Contains(surface, hit!.GetSelfAndVisualAncestors());
+
+        window.MouseMove(point, RawInputModifiers.None);
+        clock.Advance(TimeSpan.FromSeconds(10));
+        Assert.True(viewModel.IsChromeRevealed);
         window.Close();
     }
 
@@ -195,14 +275,16 @@ public sealed class ChromeIdleTests
         var (window, viewModel) = await ShowPlayingSessionAsync(clock);
         var stage = window.GetVisualDescendants().OfType<Panel>().Single(panel => panel.Name == "PlayerStage");
 
+        // By its name and not by being there: any cursor set would pass a check for one, and an arrow
+        // is exactly what must not be left over the picture. Found blind by gate-auditor.
         Assert.False(viewModel.IsChromeRevealed);
-        Assert.NotNull(stage.Cursor);
+        Assert.Equal(nameof(StandardCursorType.None), stage.Cursor?.ToString());
 
         window.MouseMove(OverThePicture, RawInputModifiers.None);
         Assert.Null(stage.Cursor);
 
         clock.Advance(TimeSpan.FromSeconds(3));
-        Assert.NotNull(stage.Cursor);
+        Assert.Equal(nameof(StandardCursorType.None), stage.Cursor?.ToString());
         window.Close();
     }
 

@@ -127,6 +127,33 @@ public sealed class PlayerViewInputTests
     }
 
     /// <summary>
+    /// A click and a wheel that land on the drawn frame count as the picture too. Without a frame the
+    /// surface takes no hit test, so the real click above lands on the panel around it, and taking
+    /// the surface out of what counts as the picture passed everything — found blind by
+    /// gate-auditor. Once a film draws, the frame is what a person clicks.
+    /// </summary>
+    [AvaloniaFact]
+    public void A_click_and_a_wheel_on_the_drawn_frame_count_as_the_picture()
+    {
+        var coordinator = new RecordingCoordinator();
+        var model = new PlayerViewModel(coordinator)
+        {
+            Transport = new TransportControlsViewModel(new ControlPlayback(new SilentEngine())),
+        };
+        var (window, view, _) = Mount(model);
+        model.ApplySessionState(PlaybackState.Playing, failure: null);
+        var frame = view.GetControl<Control>("VideoSurface");
+        var before = model.Transport!.VolumePercent;
+
+        Assert.True(Click(view, frame).Handled);
+        Assert.True(Wheel(view, deltaY: -1, source: frame).Handled);
+
+        Assert.Equal(["pause"], coordinator.Calls);
+        Assert.Equal(before - TransportControlsViewModel.VolumeStepPercent, model.Transport.VolumePercent);
+        window.Close();
+    }
+
+    /// <summary>
     /// A click on a button of the bar is the button's: the tap it raises reaches the player on its
     /// way up, and toggling there as well would pause a film somebody only asked to skip.
     /// </summary>
@@ -196,8 +223,10 @@ public sealed class PlayerViewInputTests
         Assert.False(Wheel(view, deltaY: 1).Handled);
 
         var (withTransport, transportView, model) = Mount(withTransport: true);
+        // The volume is the whole assertion: the event arrives marked handled by this test, so asking
+        // whether it is handled afterwards would only read back what was written.
         var before = model.Transport!.VolumePercent;
-        Assert.True(Wheel(transportView, deltaY: 1, alreadyHandled: true).Handled);
+        _ = Wheel(transportView, deltaY: 1, alreadyHandled: true);
         Assert.Equal(before, model.Transport.VolumePercent);
 
         withTransport.Close();

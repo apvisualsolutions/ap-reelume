@@ -118,6 +118,33 @@ recorría. Se quitó la primera y se cubrió la segunda: **34 de 34**. El artefa
 ese run coincide con la lista del árbol en todo menos esa fila, lo que confirma también que
 `ShellView.axaml.cs` salió. El hueco de la previsualización queda como `ENG-050`.
 
+## La auditoría de puertas, al día siguiente / The gate audit
+
+`gate-auditor` sobre las pruebas de esta tanda, en una copia aislada y mutando el código de
+producción, encontró **dos puertas ciegas y cuatro débiles**. Las seis se corrigen con prueba y con
+el mutante que las burlaba visto morir. / `gate-auditor` found **two blind gates and four weak ones**;
+all six are fixed, each with the mutant that fooled it now seen killed.
+
+| Hallazgo / Finding | Mutante / Mutant | Antes / Before | Ahora / Now |
+| --- | --- | --- | --- |
+| Escena de reloj del paseo, **ciega** | `ChromeClock = null` en `CompositionRoot` | verde: a los 18,7 s el fin del primer episodio ocultaba los controles | roja con su propio mensaje: plazo de 2 s, control negativo con el reloj apagado y `IsPlaying` sin cambios |
+| El reloj arranca en pausa, **ciega** | quitar `&& IsPlaying` en `NoteActivity` | 1.500 verdes | roja: `A_movement_on_a_paused_film_or_with_no_player_starts_no_clock` |
+| Puntero oculto | `StandardCursorType.Arrow` | verde (sólo `NotNull`) | roja: se afirma el nombre `None` |
+| Superficies que sostienen los controles | quitar tres nombres de la lista | verde (sólo se probaba el transporte) | 3 rojas: `A_pointer_resting_on_any_piece_of_chrome_keeps_it`, con el punto comprobado por `InputHitTest` |
+| Clic y rueda sobre el fotograma | quitar `source == VideoSurface` | verde (el clic real caía en el panel) | roja: `A_click_and_a_wheel_on_the_drawn_frame_count_as_the_picture` |
+| Una tecla reinicia la cuenta | `NoteActivity` → `RevealChrome` | verde (nada pulsaba una tecla) | roja: `A_key_starts_the_count_again_as_a_movement_does` |
+
+Además se quitó una aserción que sólo releía lo que la prueba escribía (`Handled` en la rueda ya
+gastada). La columna del panel queda fuera de la prueba de superficies a propósito: sólo se dibuja
+con un panel abierto, y un panel abierto ya sostiene los controles por sí mismo. / A tautological
+assertion was removed; the panel column is left out on purpose, since it is only drawn with a panel
+open.
+
+`UiTests` completa: la primera pasada dio **un rojo que no se registró por su nombre** y las dos
+siguientes, del mismo binario, 1.506 de 1.506. No se atribuye a nadie; la firma conocida de esa
+suite es `ENG-040`. / Full `UiTests`: one unnamed red in the first pass, then 1,506 of 1,506 twice
+from the same binary; not attributed.
+
 ## Pendiente / Open
 
 `ENG-049`: en la ventana, revelar y ocultar cambia el tamaño del vídeo, y ahora pasa más a menudo.

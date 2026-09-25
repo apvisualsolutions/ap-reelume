@@ -5025,11 +5025,42 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // And left alone over the picture it goes away again by itself, on the application's own
         // clock and the real engine (ENG-018). A short timeout rather than the three seconds, because
         // what is measured is that the clock is wired, not how long it is — that is the UI suite's.
+        //
+        // Within two seconds and with the film still playing, and after a control with the clock off.
+        // The walk's usual sixty seconds outlast this twelve-second sample, and the end of the first
+        // episode — the next one starting — hides the chrome too: with the clock unplugged this wait
+        // still passed, at 18,7 s. Found blind by gate-auditor on 2026-09-25.
+        var sessionChanges = 0;
+        void CountSessionChanges(object? sender, System.ComponentModel.PropertyChangedEventArgs args)
+        {
+            _ = sender;
+            if (args.PropertyName == nameof(PlayerViewModel.IsPlaying))
+            {
+                sessionChanges++;
+            }
+        }
+
+        var watched = host.ViewModel.Player!.Player;
+        watched.PropertyChanged += CountSessionChanges;
+        await RevealChromeAgainAsync(host);
+        await PumpForAsync(TimeSpan.FromSeconds(1));
+        Assert.True(
+            host.ViewModel.IsChromeRevealed,
+            "the chrome went away with the clock off, so what puts it away is not the clock");
+
         host.ViewModel.ChromeIdleTimeout = TimeSpan.FromMilliseconds(200);
         await RevealChromeAgainAsync(host);
-        await WaitForAsync(
-            () => Task.FromResult(!host.ViewModel.IsChromeRevealed),
-            "the chrome never went away by itself with the mouse still over a playing film");
+        var bound = Stopwatch.StartNew();
+        while (host.ViewModel.IsChromeRevealed && bound.Elapsed < TimeSpan.FromSeconds(2))
+        {
+            await PumpForAsync(TimeSpan.FromMilliseconds(50));
+        }
+
+        watched.PropertyChanged -= CountSessionChanges;
+        Assert.False(
+            host.ViewModel.IsChromeRevealed,
+            "the chrome did not go away by itself within two seconds with the mouse over a playing film");
+        Assert.Equal(0, sessionChanges);
         host.ViewModel.ChromeIdleTimeout = Timeout.InfiniteTimeSpan;
         await RevealChromeAsync(host);
 
@@ -6604,6 +6635,19 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         {
             Dispatcher.UIThread.RunJobs();
             await Task.Delay(50, TestContext.Current.CancellationToken);
+        }
+
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>Lets the dispatcher and the real clock run for a while, and asks nothing.</summary>
+    private static async Task PumpForAsync(TimeSpan duration)
+    {
+        var elapsed = Stopwatch.StartNew();
+        while (elapsed.Elapsed < duration)
+        {
+            Dispatcher.UIThread.RunJobs();
+            await Task.Delay(25, TestContext.Current.CancellationToken);
         }
 
         Dispatcher.UIThread.RunJobs();
