@@ -149,6 +149,36 @@ suelta y la anterior sobre el vídeo completo; dentro de cada tabla el camino es
 conservan el enrejado del fondo, y el propio alisa algo más la tela. El 106 % se miró y esta vez no es
 posterizado. **Coste: 6,6 ms por fotograma de luma en serie**, a 720×404.
 
+## Las herramientas que ya existen, revisadas el 2026-09-26
+
+El propietario preguntó, con razón, si no había ya fórmulas y herramientas hechas para esto antes de
+escribir un filtro propio. Revisadas en su fuente:
+
+- **La reducción de ruido estándar de Direct3D 11** (`D3D11_VIDEO_PROCESSOR_FILTER_NOISE_REDUCTION`,
+  documentación de Microsoft). Las dos tarjetas del equipo la declaran. Medida con una copia de
+  laboratorio de `WindowsVideoUpscaleProbe`, fuera del árbol, sobre fotogramas reales del fichero y
+  con secuencias de 48 fotogramas: **Intel no cambia un solo byte** a ningún nivel, ni en YUY2 ni en
+  NV12; **NVIDIA** baja los bloques de 1,46 a 1,20 pero **se lleva la mitad del detalle** (48 %). No
+  sirve.
+- **El reductor de OptiX** quita el ruido de Monte Carlo de las imágenes trazadas por rayos, según
+  su página de NVIDIA. No es para vídeo comprimido.
+- **NVIDIA Maxine, SDK de efectos de vídeo: «Artifact Reduction».** Según su guía, «reduce los
+  artefactos del codificador —bloques, halos, ruido de mosquito— de un vídeo de baja tasa de bits
+  conservando el detalle», con dos modos, optimizado para H.264, y exige una tarjeta RTX. **Es la
+  herramienta hecha para este problema.** Su licencia, leída en los términos de NVIDIA para
+  productos de IA: distribuirlo dentro de un producto exige una licencia empresarial de pago, y el
+  acceso gratuito del programa de desarrolladores prohíbe incluirlo en un producto. **La vía que usa
+  OBS es otra**: el usuario instala el componente de NVIDIA desde su centro de descargas (v0.7.6,
+  783 MB para la serie 50) y el programa sólo lo llama. **Sin medir todavía**: su calidad sobre este
+  fichero, si ese componente trae el filtro de artefactos, y qué permite su licencia a un programa
+  de terceros.
+- **La transformada de dominio de Gastal y Oliveira** (ACM TOG 30(4), SIGGRAPH 2011): el prototipo
+  propio de arriba es, en esencia, su filtro recursivo, que también ofrece OpenCV como su filtro que
+  preserva bordes. Según la FAQ de los autores sirve para quitar ruido de poco a medio, y filtrando
+  cada fotograma por separado no deja artefactos temporales. **No consta patente**: Google Patents
+  no devuelve ninguna a nombre de sus autores sobre filtrado que preserva bordes. Si se construye un
+  filtro propio, se escribe desde el artículo y se cita, no desde un diseño inventado.
+
 ## Límites, y lo que falta antes de construir
 
 - **El fichero real es uno solo, y un Xvid.** Un fichero H.264 de otra fuente puede pedir otra
