@@ -26,7 +26,7 @@ public sealed class CatalogItemViewModel(CatalogItem item, string? posterFile = 
     public string? PosterFile { get; private set; } = posterFile;
 
     /// <summary>
-    /// Draws another cover on this same card. A frame taken in the background (LIB-021) arrives while
+    /// Draws another cover on this same card. A frame taken in the background arrives while
     /// the grid is on screen, and replacing the card would pull it from under whoever is pressing it.
     /// </summary>
     public void ShowPoster(string? posterFile)

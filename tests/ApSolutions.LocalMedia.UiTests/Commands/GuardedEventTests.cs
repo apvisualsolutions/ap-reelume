@@ -10,7 +10,7 @@ namespace ApSolutions.LocalMedia.UiTests.Commands;
 /// The other half of the same defect: work an event started rather than a button.
 /// </summary>
 /// <remarks>
-/// ARQ-004. A handler whose signature returns <see langword="void"/> has no task for anybody to await
+/// A handler whose signature returns <see langword="void"/> has no task for anybody to await
 /// either, so a failure inside it goes exactly where a command's used to go — the interface thread,
 /// with nothing waiting for it. There were three of these: a catalogue click, a route change, and a
 /// folder leaving the library.

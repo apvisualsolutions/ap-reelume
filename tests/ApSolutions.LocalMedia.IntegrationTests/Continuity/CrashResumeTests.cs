@@ -263,7 +263,7 @@ public sealed class CrashResumeTests
             RepositoryLayout.Root,
             "artifacts",
             "test-results",
-            "T25",
+            "crash-resume",
             "green",
             "forced-close-trials.csv");
         _ = Directory.CreateDirectory(Path.GetDirectoryName(report)!);

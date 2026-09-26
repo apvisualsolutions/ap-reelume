@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.PackagingTests;
 /// Where the updater looks, checked against where the releases actually are.
 /// </summary>
 /// <remarks>
-/// The maintainer and the repository are the entire address, and a wrong one has no symptom anybody would
+/// The account and the repository are the entire address, and a wrong one has no symptom anybody would
 /// notice. GitHub answers 404, the absence of a release is a settled answer rather than a failure,
 /// and the application tells everybody they are up to date — forever, quietly, and with every test
 /// still green, because every other test supplies its own server.
@@ -30,7 +30,7 @@ public sealed class UpdateSourceTests
     // The comparison of the declared address against the published one lived here, reading the
     // constants out of the composition root's text with a pattern. It moved to
     // CompositionDescriptorTests (AccessibilityTests), which resolves the update source the
-    // application actually builds and asserts the address on the object (ARQ-006).
+    // application actually builds and asserts the address on the object.
 
     /// <summary>
     /// Both changelogs point at the same place. They are maintained as a pair, and a release address

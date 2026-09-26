@@ -6,7 +6,7 @@ using ApSolutions.LocalMedia.Application.Metadata;
 namespace ApSolutions.LocalMedia.Windows.Metadata;
 
 /// <summary>
-/// Starts the frame pass of LIB-021 when the window opens and when a scan ends, and tells the grid
+/// Starts the cover frame pass when the window opens and when a scan ends, and tells the grid
 /// when a batch took something.
 /// </summary>
 /// <remarks>

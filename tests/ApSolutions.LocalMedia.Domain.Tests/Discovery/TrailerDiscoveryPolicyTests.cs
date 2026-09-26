@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Discovery;
 
 /// <summary>
-/// Which file next to a film is its trailer (LIB-014).
+/// Which file next to a film is its trailer.
 /// </summary>
 /// <remarks>
 /// A trailer plays here only when it is already a file on the disk, next to the film, in one of the

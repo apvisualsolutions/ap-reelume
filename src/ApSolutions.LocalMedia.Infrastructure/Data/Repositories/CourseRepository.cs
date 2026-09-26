@@ -9,13 +9,13 @@ using Microsoft.Data.Sqlite;
 namespace ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 
 /// <summary>
-/// Courses and their lessons, and the depth a root declares (CRS-001, migration 0022).
+/// Courses and their lessons, and the depth a root declares (migration 0022).
 /// </summary>
 /// <remarks>
 /// Saving replaces a course's lessons rather than merging them, because re-reading a folder is the
 /// whole answer to what is in it: a lesson that is gone from the disk has to be gone from the list,
 /// and merging would leave it there forever. What survives the replacement is progress, which does
-/// not live here — it hangs off the file identity of LIB-009 and is untouched by this table.
+/// not live here — it hangs off the file identity the catalogue keeps and is untouched by this table.
 /// </remarks>
 public sealed class CourseRepository : ICourseRepository, ICourseRootDeclarationStore
 {

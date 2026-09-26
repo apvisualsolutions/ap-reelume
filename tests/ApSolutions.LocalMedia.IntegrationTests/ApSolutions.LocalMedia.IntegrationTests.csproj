@@ -29,7 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <!--
-      The approved media matrix, linked from the media suite rather than copied. PLY-004's loopback
+      The approved media matrix, linked from the media suite rather than copied. The audio loopback
       tests need a real audio output, and a real output means the default LibVLC instance rather than
       the headless one; the media suite asserts that exactly one native instance exists in its
       process, so a second option set has to live somewhere else. It lives here because this suite

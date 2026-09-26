@@ -12,7 +12,7 @@ namespace ApSolutions.LocalMedia.Presentation.Player;
 
 /// <summary>
 /// Brightness, contrast and gamma while the film is on screen, stored for the scope the person is
-/// in and pushed at the engine the instant a control moves (PLY-018, ADR-0012).
+/// in and pushed at the engine the instant a control moves.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -52,7 +52,7 @@ public sealed class PictureAdjustmentViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     public ICommand ResetCommand { get; }
 
     public static double MinimumBrightness => PictureAdjustment.MinimumBrightness;

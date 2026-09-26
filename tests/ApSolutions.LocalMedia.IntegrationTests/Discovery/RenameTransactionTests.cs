@@ -95,7 +95,7 @@ public sealed class RenameTransactionTests
     }
 
     /// <summary>
-    /// WIN-004: a rename that hits a file another program holds open used to write "IOException"
+    /// A rename that hits a file another program holds open used to write "IOException"
     /// into the audit and say nothing on screen. The audit now names the situation, and the
     /// preview surface tells the person what to do about it — with a real file held by a real
     /// handle, the way a player or an indexer holds one.

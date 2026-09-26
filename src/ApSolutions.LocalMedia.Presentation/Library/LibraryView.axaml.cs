@@ -24,8 +24,8 @@ public sealed partial class LibraryView : UserControl
 
     /// <summary>The room between two rows of covers, which the density row chooses separately.</summary>
     /// <remarks>
-    /// The prototype gives its grid two gaps, not one — 12/10, 18/16 and 26/22 by density
-    /// (<c>design/AP Reelume.dc.html:3549</c>) — and the row gap is the larger of each pair.
+    /// The prototype gives its grid two gaps, not one — 12/10, 18/16 and 26/22 by density —
+    /// and the row gap is the larger of each pair.
     /// </remarks>
     public static readonly StyledProperty<double> RowGapProperty =
         AvaloniaProperty.Register<LibraryView, double>(nameof(RowGap), 18);

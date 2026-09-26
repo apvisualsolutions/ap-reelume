@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 
 /// <summary>
-/// The refusal of the frame pass's launcher (LIB-021), which is the one arm the assembled walk
+/// The refusal of the frame pass's launcher, which is the one arm the assembled walk
 /// cannot take: there the composition root always hands it the pass it wraps.
 /// </summary>
 /// <remarks>

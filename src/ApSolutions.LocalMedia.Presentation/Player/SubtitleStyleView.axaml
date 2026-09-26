@@ -17,7 +17,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
        section of that page shares. Without it this one started 158 px left of the others. -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
   <StackPanel x:Name="SubtitleStyleSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
-    <!-- UX-010: inside the group and in its heading row, never under the six row-cards. -->
+    <!-- The reset sits inside the group and in its heading row, never under the six row-cards. -->
     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
       <TextBlock
           FontSize="{DynamicResource FontSizeSubtitle}"

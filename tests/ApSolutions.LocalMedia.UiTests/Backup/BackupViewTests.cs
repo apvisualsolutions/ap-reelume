@@ -268,7 +268,7 @@ public sealed class BackupViewTests
     }
 
     /// <summary>
-    /// §4's one addition to this view: where the active database lives, reachable without a
+    /// The redesign's one addition to this view: where the active database lives, reachable without a
     /// failure. Handed in by the composition; a build without host paths paints no block.
     /// </summary>
     [Fact]
@@ -415,7 +415,7 @@ public sealed class BackupViewTests
     /// <remarks>
     /// <para>
     /// The status block was <c>AccentSubtleBrush</c> whatever it said, so "there was not enough room
-    /// on the disk" was painted exactly like "done". §4 asks for the failed state to read as one.
+    /// on the disk" was painted exactly like "done". The redesign asks for the failed state to read as one.
     /// </para>
     /// <para>
     /// <b>Cancelled is deliberately not a failure.</b> Its own string says nothing was left

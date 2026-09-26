@@ -67,7 +67,7 @@ public sealed class PictureAdjustmentOnRealFramesTests
             matrix,
             new PictureAdjustment(Brightness: 0d, Contrast: 1d, Gamma: 1.6d).BuildLookup());
 
-        var directory = Path.Combine("artifacts", "test-results", "PLY-018");
+        var directory = Path.Combine("artifacts", "test-results", "picture-adjustment");
         Directory.CreateDirectory(directory);
         File.WriteAllBytes(Path.Combine(directory, "frame-plain.bgra"), plain);
         File.WriteAllBytes(Path.Combine(directory, "frame-lifted.bgra"), lifted);

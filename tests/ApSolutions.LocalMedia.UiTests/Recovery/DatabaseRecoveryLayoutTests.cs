@@ -24,14 +24,14 @@ namespace ApSolutions.LocalMedia.UiTests.Recovery;
 /// <para>
 /// It was painting the failure on <c>AccentSubtleBrush</c> — the surface this tree uses for "here is
 /// something to consider" — while being the one screen in the application that exists because
-/// something broke. §4 gives it <c>DangerSurfaceBrush</c>, and it is right: the detail is not a note,
+/// something broke. The redesign gives it <c>DangerSurfaceBrush</c>, and it is right: the detail is not a note,
 /// it is the reason the application could not start.
 /// </para>
 /// <para>
 /// The two paths are what somebody reads to go and find their backup by hand, so they are fixed-width
 /// and they wrap rather than being cut. <b>Measured on 2026-08-22 with a 105-character UNC path in the
 /// 720 column:</b> <c>Wrap</c> and <c>WrapWithOverflow</c> lay out identically — 686 x 33, ending at
-/// x=776 in a 900 window — because a backslash is a break opportunity, so §4's worry about overflow
+/// x=776 in a 900 window — because a backslash is a break opportunity, so the redesign's worry about overflow
 /// does not materialise here. <c>WrapWithOverflow</c> is what the row asks for and what it gets; this
 /// is written down so nobody later "fixes" it back believing it makes a difference.
 /// </para>
@@ -63,7 +63,7 @@ public sealed class DatabaseRecoveryLayoutTests
     /// Both paths are fixed-width, wrap, and stay inside the narrowest window the application allows.
     /// </summary>
     /// <remarks>
-    /// The geometry half is the point of the measurement: this is the screen §4 calls the worst case,
+    /// The geometry half is the point of the measurement: this is the screen the redesign calls the worst case,
     /// so it is fed a real UNC path rather than a short one and asked where its right edge lands.
     /// </remarks>
     [AvaloniaFact]
@@ -96,7 +96,7 @@ public sealed class DatabaseRecoveryLayoutTests
     /// </summary>
     /// <remarks>
     /// A level one, because this is not a section of anything: it is its own window, shown when the
-    /// database will not open, and NEXT-SESSION records that the shell deliberately has no route to it.
+    /// database will not open, and the shell deliberately has no route to it.
     /// </remarks>
     [AvaloniaFact]
     public void The_actions_wrap_and_the_screen_owns_its_heading()

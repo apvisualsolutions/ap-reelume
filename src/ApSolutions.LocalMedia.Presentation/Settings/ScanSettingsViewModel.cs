@@ -15,20 +15,21 @@ namespace ApSolutions.LocalMedia.Presentation.Settings;
 /// </summary>
 /// <remarks>
 /// <b>Both controls were painted, toggled and reset long before either governed anything</b> — two
-/// fields on this class with no store behind them and no reader anywhere in <c>src/</c>, which is
-/// ENG-010. They read and write the port now, with no field of their own on purpose: a field that
-/// remembers its own value looks exactly like one the application reads, and that is how this got
-/// through a redesign, a walk and a UX-010 audit without anybody noticing.
+/// fields on this class with no store behind them and no reader anywhere in <c>src/</c>. They read and
+/// write the port now, with no field of their own on purpose: a field that remembers its own value
+/// looks exactly like one the application reads, and that is how this got through a redesign, a walk
+/// and an audit of every reset button without anybody noticing.
 /// </remarks>
 public sealed class ScanSettingsViewModel : INotifyPropertyChanged
 {
-    /// <summary>Watching local roots is on to begin with, and is what UX-010's reset puts back.</summary>
+    /// <summary>Watching local roots is on to begin with, and is what the group's reset puts
+    /// back.</summary>
     public const bool DefaultWatchLocalRoots = true;
 
     /// <summary>
-    /// What UX-010's reset puts back, taken from the one place the interval lives rather than
+    /// What the group's reset puts back, taken from the one place the interval lives rather than
     /// written again here. This constant used to say thirty while the sweep ran every fifteen, and
-    /// nobody could notice because the screen governed nothing (ENG-044).
+    /// nobody could notice because the screen governed nothing.
     /// </summary>
     public static readonly int DefaultFallbackIntervalMinutes =
         (int)ScanWatchPolicy.DefaultSweepInterval.TotalMinutes;
@@ -43,7 +44,7 @@ public sealed class ScanSettingsViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     public ICommand RestoreDefaultsCommand { get; }
 
     public bool WatchLocalRoots

@@ -136,7 +136,7 @@ public sealed class UpdateSurfaceTests
     }
 
     /// <summary>
-    /// §4's four grammars, read from the one classification the surface dresses by: up to date is
+    /// The redesign's four grammars, read from the one classification the surface dresses by: up to date is
     /// the positive, a guardian's refusal is the warning with the reason as the headline and the
     /// rule's identifier behind the technical-detail fold, an unreachable source is the failure,
     /// and everything else is neutral process wearing none of the three.
@@ -895,7 +895,7 @@ public sealed class UpdateSurfaceTests
         null));
 
     /// <summary>
-    /// UX-010, measured on the stored setting: this switch decides whether the application makes a
+    /// Restoring the defaults, measured on the stored setting: this switch decides whether the application makes a
     /// connection nobody asked for, so a reset that only moved the box would leave it connecting.
     /// </summary>
     [Fact]

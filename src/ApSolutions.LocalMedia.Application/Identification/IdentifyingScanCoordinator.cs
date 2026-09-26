@@ -25,7 +25,7 @@ public sealed class IdentifyingScanCoordinator : IScanCoordinator
 
     /// <param name="scanFinished">
     /// Told when every hand-off is done, and only told: whoever listens starts its own work rather
-    /// than making the scan wait for it. The frame pass of LIB-021 is the listener, and running it
+    /// than making the scan wait for it. The cover frame pass is the listener, and running it
     /// here would add minutes of decoding to every scan's summary.
     /// </param>
     public IdentifyingScanCoordinator(

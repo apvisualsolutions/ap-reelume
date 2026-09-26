@@ -28,8 +28,7 @@ public enum CourseThumbnailAction
 }
 
 /// <summary>
-/// Which frame of which lesson becomes a course's picture, and when the one stored stops being it
-/// (CRS-006).
+/// Which frame of which lesson becomes a course's picture, and when the one stored stops being it.
 /// </summary>
 /// <remarks>
 /// <b>Every decision here is separated from the decoder on purpose.</b> Taking a frame needs LibVLC
@@ -38,8 +37,8 @@ public enum CourseThumbnailAction
 /// machine is excluded from coverage. Putting the arithmetic behind the decoder is what would make
 /// this look untestable.
 /// <para>
-/// <b>The numbers come from a measurement rather than from taste</b> — «docs/evidence/stable/
-/// CRS-thumbnail-spike.md», 2026-09-03, against real decoding.
+/// <b>The numbers come from a measurement rather than from taste</b>, taken on 2026-09-03
+/// against real decoding.
 /// </para>
 /// </remarks>
 public static class CourseThumbnailPolicy

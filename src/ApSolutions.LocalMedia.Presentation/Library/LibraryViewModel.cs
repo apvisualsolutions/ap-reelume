@@ -45,7 +45,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     /// the use case itself, for the same reason the detail cards take one: the presentation layer
     /// does not get to know what an artwork store is. Absent, every card draws the generated art it
     /// drew before, which is what keeps every existing test of this view model standing. It takes the
-    /// provider's field and the picked cover's field (LIB-021), and which one draws is its answer.
+    /// provider's field and the picked cover's field, and which one draws is its answer.
     /// </param>
     public LibraryViewModel(
         ICatalogQueryService queryService,
@@ -172,7 +172,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 
                 // The clear button is bound to a predicate over this, so it has to be told: a command
                 // that never announces is asked once at construction and keeps that first answer,
-                // which is the defect ARQ-004 went through twenty-four classes to remove.
+                // which is the defect it took replacing twenty-four command classes to remove.
                 _clearSearch.RaiseCanExecuteChanged();
                 OnPropertyChanged(nameof(IsFiltersDirty));
             }
@@ -223,7 +223,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     /// Setting it re-runs the query, because the drop-down applies as a choice is made — the Apply
     /// button this replaced was a control whose whole job was repeating what this one had already
     /// said. Through <see cref="RefreshCommand"/> rather than a bare call, so a failure lands in the
-    /// command's catch instead of on the application (ARQ-004). The binding pushing the current
+    /// command's catch instead of on the application. The binding pushing the current
     /// value back at attach is a no-op: same value, no change, no query. And only once something
     /// has loaded: before the first <see cref="LoadAsync"/> there is nothing to re-run, and a
     /// constructor initializer that queried would eat a page the host was about to ask for.
@@ -399,7 +399,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
     public ScanProgressViewModel ScanProgress { get; }
 
     /// <summary>
-    /// The roots this library cannot read right now. ADR-0010 puts the notice here and nowhere else:
+    /// The roots this library cannot read right now. The notice goes here and nowhere else:
     /// it belongs where the affected titles are and where somebody can do something about it.
     /// </summary>
     public RootNoticeViewModel RootNotices { get; }
@@ -474,7 +474,7 @@ public sealed class LibraryViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// Looks the covers of the cards already loaded up again, without asking the catalogue: a frame
-    /// taken in the background (LIB-021) reaches the grid this way, and re-querying would put whoever
+    /// taken in the background reaches the grid this way, and re-querying would put whoever
     /// is scrolling back at the top. The cards stay the same ones and only their picture changes, so
     /// a card somebody is pressing is never swapped for another.
     /// </summary>

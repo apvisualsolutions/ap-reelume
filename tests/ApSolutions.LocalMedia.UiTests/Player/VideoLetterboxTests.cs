@@ -19,7 +19,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// </summary>
 /// <remarks>
 /// It was drawn across the whole of its bounds, so a 16:9 episode in a window somebody had made
-/// taller came out taller — reported by the maintainer on 2026-08-25, in the player and in the
+/// taller came out taller — reported on 2026-08-25, in the player and in the
 /// picture-in-picture alike. The arithmetic is <c>VideoFitPolicy</c>'s and is measured there; what is
 /// measured here is that the surface pays it, which is the half a policy cannot assert about itself.
 /// </remarks>

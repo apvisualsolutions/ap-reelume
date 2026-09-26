@@ -8,7 +8,7 @@
     actually drawn.
 
 .DESCRIPTION
-    ENG-013 removes code from the engine — every third-party library whose recipe says GPL, and
+    Building the engine without GPL removes code from it — every third-party library whose recipe says GPL, and
     VLC's own GPL modules — and the claim that "nothing the program plays today depends on them"
     is only a claim until the rebuilt tree plays it. Three of the libraries it loses decoded
     formats the application promises: a52 (AC-3), dca (DTS), faad2 (AAC) and mad (MP3). After the

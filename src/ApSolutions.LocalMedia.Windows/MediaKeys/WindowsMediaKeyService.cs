@@ -88,7 +88,7 @@ public sealed class WindowsMediaKeyService : IMediaKeySource, IDisposable
     /// ceiling.
     /// </summary>
     /// <remarks>
-    /// ARQ-005. This used to block on the pump's signal with <c>GetAwaiter().GetResult()</c> while
+    /// This used to block on the pump's signal with <c>GetAwaiter().GetResult()</c> while
     /// holding <c>_sync</c>, and it is called from the interface thread every time a video opens. Two
     /// things followed. The window stopped answering until a thread running native registration code
     /// answered back; and a pump that never signalled left the interface thread waiting forever while

@@ -17,7 +17,7 @@ public sealed record CourseLessonProgress(
     LessonId Id,
 
     /// <summary>
-    /// LIB-009's identity, and <see langword="null"/> when the catalogue has not seen the file.
+    /// The file identity the catalogue keeps, and <see langword="null"/> when the catalogue has not seen the file.
     /// Without it a lesson can neither be played nor marked, so the row refuses both rather than
     /// failing when pressed.
     /// </summary>
@@ -31,7 +31,7 @@ public sealed record CourseLessonProgress(
     WatchStatus Status);
 
 /// <summary>
-/// Where somebody left a course off (CRS-002): the lesson, the minute, and whether they were part
+/// Where somebody left a course off: the lesson, the minute, and whether they were part
 /// way through it or had not started it.
 /// </summary>
 /// <remarks>
@@ -54,7 +54,7 @@ public sealed record CourseThread(
     public bool IsCourseFinished => Lesson is null;
 }
 
-/// <summary>What a course card says without opening it (CRS-003).</summary>
+/// <summary>What a course card says without opening it.</summary>
 public sealed record CourseSummary(int WatchedLessons, int TotalLessons, TimeSpan Remaining)
 {
     public bool IsFinished => TotalLessons > 0 && WatchedLessons == TotalLessons;
@@ -68,7 +68,7 @@ public sealed record CourseSummary(int WatchedLessons, int TotalLessons, TimeSpa
 }
 
 /// <summary>
-/// The thread a course keeps for itself (CRS-002), read from progress that already exists.
+/// The thread a course keeps for itself, read from progress that already exists.
 /// </summary>
 /// <remarks>
 /// The rule is the one a person would use: the thread points at the <b>first lesson in watching

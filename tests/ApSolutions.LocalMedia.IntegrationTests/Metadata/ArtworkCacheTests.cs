@@ -108,7 +108,7 @@ public sealed class ArtworkCacheTests
     }
 
     /// <summary>
-    /// SEC-004: artwork addresses come from provider metadata, and the promise only covers the
+    /// Artwork addresses come from provider metadata, and the promise only covers the
     /// declared host. An address anywhere else is refused before a single byte is asked for.
     /// </summary>
     [Fact]
@@ -130,7 +130,7 @@ public sealed class ArtworkCacheTests
     }
 
     /// <summary>
-    /// SEC-005: a poster bigger than the ceiling is refused mid-stream, and whatever artwork the
+    /// A poster bigger than the ceiling is refused mid-stream, and whatever artwork the
     /// title already had stays in place.
     /// </summary>
     [Fact]

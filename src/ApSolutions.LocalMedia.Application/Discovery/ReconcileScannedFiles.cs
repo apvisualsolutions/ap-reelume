@@ -13,8 +13,8 @@ public sealed record ReconcileScannedFilesResult(
     int FailedCount);
 
 /// <summary>
-/// Runs reconciliation over what a scan catalogued, so a moved file keeps being the entity it was
-/// (LIB-002/003). This is the caller the audit found missing: <c>ReconcileScanResults</c> was
+/// Runs reconciliation over what a scan catalogued, so a moved file keeps being the entity it was.
+/// This is the caller the audit found missing: <c>ReconcileScanResults</c> was
 /// registered and tested, scans discovered moved files as strangers, and nothing joined the two.
 /// </summary>
 /// <remarks>

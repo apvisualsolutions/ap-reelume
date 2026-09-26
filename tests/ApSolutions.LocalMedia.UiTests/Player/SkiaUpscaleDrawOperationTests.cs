@@ -18,7 +18,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// That PLY-016's drawing operation never leaves the screen blank, whichever way it fails.
+/// That the video enhancement's drawing operation never leaves the screen blank, whichever way it fails.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -156,7 +156,7 @@ public sealed class SkiaUpscaleDrawOperationTests
     /// <b>The whole suite was blind to this until 2026-09-13.</b> Naming the other byte order swaps
     /// red and blue in every enlarged video, and the mutant survived all 1,437 tests because every
     /// test picture here was grey and the only one with colour anywhere was pure green — the single
-    /// colour that is identical in both orders. The mutation check found it.
+    /// colour that is identical in both orders. The gate auditor found it.
     /// </para>
     /// <para>
     /// The capture's own order is read from the frame rather than assumed, because it is one of two
@@ -244,7 +244,7 @@ public sealed class SkiaUpscaleDrawOperationTests
     /// side of an edge lighter and the dark side darker; on a picture that is already 0 and 255 the
     /// excess clamps away invisibly, so raising the strength from 0.6 to 1.0 changes nothing a
     /// saturated edge can show. It is this tree's own lesson — «un primario saturado no mide» — and
-    /// the mutation check found it here on 2026-09-13.
+    /// the gate auditor found it here on 2026-09-13.
     /// </para>
     /// <para>
     /// So the edge is grey against grey, 64 against 192, where there is room on both sides for the
@@ -253,10 +253,10 @@ public sealed class SkiaUpscaleDrawOperationTests
     /// </para>
     /// <para>
     /// <b>The ceiling was cut to 14 for half an hour and then put back, and why is worth keeping.</b>
-    /// The maintainer reported tonal squares around lettering, this step measured 16, and the obvious move
-    /// was to make the bound tighter than what he had objected to. It was the wrong move because the
-    /// diagnosis was wrong: he then found that <b>his gamma was at 1.5 and at 1.0 the squares stop</b>,
-    /// so the artefact was banding from an 8-bit tone curve (`ENG-021`) and this step was never in it.
+    /// Tonal squares were reported around lettering, this step measured 16, and the obvious move
+    /// was to make the bound tighter than what had been objected to. It was the wrong move because the
+    /// diagnosis was wrong: it then turned out that <b>the display gamma was at 1.5 and at 1.0 the squares stop</b>,
+    /// so the artefact was banding from an 8-bit tone curve and this step was never in it.
     /// A ceiling set to exclude somebody else's defect excludes good settings for nothing.
     /// </para>
     /// <para>

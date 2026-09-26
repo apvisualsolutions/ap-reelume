@@ -213,7 +213,7 @@ public sealed class ShellPlayerWindowTests
         // file has none of them, so what is left is the one that is always there.
         //
         // One and not three since 2026-08-25: full screen and the floating window are in the
-        // transport bar now, which is where the maintainer looked for them, and they are not in both
+        // transport bar now, which is where people look for them, and they are not in both
         // places. Two buttons answering to «Pantalla completa» on one screen is a name that names
         // neither, and the walk says so out loud — it refuses a click it cannot aim.
         var header = view.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PlayerHeaderSurface");
@@ -230,7 +230,7 @@ public sealed class ShellPlayerWindowTests
         // The pills are declared even here, and every one of them is a player-pill: a session that
         // grew a track list must not find a pill wearing the wrong grammar.
         //
-        // Six since 2026-09-01, when «Lecciones» arrived (CRS-004). It is declared like the other
+        // Six since 2026-09-01, when «Lecciones» arrived. It is declared like the other
         // five and drawn like them only when the session has it — and this session is a loose file,
         // which is not a lesson, so the sixth is exactly as absent as the rest.
         Assert.Equal(

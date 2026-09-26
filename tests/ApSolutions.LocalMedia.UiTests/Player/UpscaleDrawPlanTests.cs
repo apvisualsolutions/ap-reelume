@@ -10,7 +10,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// The decisions PLY-016's drawing takes, asserted away from the canvas that carries them out.
+/// The decisions the video enhancement's drawing takes, asserted away from the canvas that carries them out.
 /// </summary>
 /// <remarks>
 /// This is the half of <see cref="SkiaUpscaleDrawOperation"/> that runs anywhere, split out under
@@ -166,7 +166,7 @@ public sealed class UpscaleDrawPlanTests
     /// asserts the number and not the family. Fidelity rises with <c>C</c> — 28,1 % at 0.5, 33,2 % at
     /// 0.7, <b>35,7 % here</b> — and so does the step the resample leaves beside an edge: 9 levels, 13,
     /// 16, against a ceiling of 22 in <c>SkiaUpscaleDrawOperationTests</c>. It spent half an hour at 0.7
-    /// chasing an artefact that turned out to be an 8-bit tone curve (`ENG-021`) and not this.
+    /// chasing an artefact that turned out to be an 8-bit tone curve and not this.
     /// </para>
     /// <para>
     /// <b>Catmull-Rom is named as what it is not</b>, measured at the strength that ships: it lands

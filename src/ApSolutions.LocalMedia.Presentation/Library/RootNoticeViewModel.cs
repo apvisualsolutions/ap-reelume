@@ -32,14 +32,14 @@ public sealed class RootNoticeRowViewModel(LibraryRootId id, string path, RootAv
 }
 
 /// <summary>
-/// What the Library says about roots it cannot read, which ADR-0010 puts here and nowhere else: the
+/// What the Library says about roots it cannot read, which goes here and nowhere else: the
 /// notice goes where the affected titles are and where somebody can act, not chasing them through
 /// the player and the settings.
 /// </summary>
 /// <remarks>
 /// It describes a STATE — the drive is out for as long as it is out — so it takes space and pushes,
-/// which is the whole of the ADR's first point. The titles stay marked one by one as they already
-/// were; this is the sentence that explains why.
+/// which is the first thing the rule for notices says. The titles stay marked one by one as they
+/// already were; this is the sentence that explains why.
 /// <para>
 /// The scan is what learns it, and it already wrote it to the root's own row before this existed.
 /// What was missing was saying it out loud: the event died inside the method.

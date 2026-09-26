@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.Application.Metadata;
 
 /// <summary>
 /// Takes a frame of its own video for every title with no picked cover and no provider poster, and
-/// keeps it where <see cref="ResolveTitlePoster"/> looks (LIB-021, ADR-0009).
+/// keeps it where <see cref="ResolveTitlePoster"/> looks.
 /// </summary>
 /// <remarks>
 /// <para>

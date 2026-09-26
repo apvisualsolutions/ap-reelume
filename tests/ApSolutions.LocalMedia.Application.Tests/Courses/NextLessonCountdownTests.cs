@@ -16,7 +16,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Courses;
 
 /// <summary>
-/// The lesson chain (CRS-004): which lesson comes next, the wait that PLY-011 owns, and the file
+/// The lesson chain: which lesson comes next, the wait the episode chain owns, and the file
 /// confirmed at zero rather than trusted from when the offer was made.
 /// </summary>
 public sealed class NextLessonCountdownTests
@@ -129,7 +129,8 @@ public sealed class NextLessonCountdownTests
 
     /// <summary>
     /// The drive pulled out while the countdown ran. The file is re-read at zero, so it is found now
-    /// rather than trusted from when the offer was made — T28's rule, kept by the course chain.
+    /// rather than trusted from when the offer was made — the episode chain's rule, kept by the course
+    /// chain.
     /// </summary>
     [Fact]
     public async Task A_lesson_whose_file_disappears_during_the_wait_is_never_opened()

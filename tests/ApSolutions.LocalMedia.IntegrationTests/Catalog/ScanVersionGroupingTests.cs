@@ -16,8 +16,8 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Catalog;
 
 /// <summary>
-/// The end-to-end walk LIB-008 demands: two real copies of the same film scanned into a real SQLite
-/// catalogue form one version group without anybody's intervention, the group is reachable from
+/// The end-to-end walk version grouping demands: two real copies of the same film scanned into a real
+/// SQLite catalogue form one version group without anybody's intervention, the group is reachable from
 /// either copy, a pinned preference survives the next scan, and no file is deleted or hidden.
 /// </summary>
 [Trait("Category", "Integration")]

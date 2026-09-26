@@ -66,9 +66,9 @@ distribuyendo el aviso de la versión anterior.
 
 ## Lo que sigue abierto
 
-El paquete lleva las licencias; el dictamen jurídico de `REL-004` sigue pendiente y es de quien
+El paquete lleva las licencias; un dictamen jurídico profesional sigue pendiente y es de quien
 publica, no de quien programa. Desde el 2026-09-18 el motor es una compilación propia sin GPL, así
 que ningún plugin necesita ya la oferta del §3 de la GPL-2.0. El punto que le queda es bajo qué
 apartado del §6 de la LGPL-2.1 queda amparada la forma en que LibVLC viaja aquí —biblioteca dinámica
 modificada, con su código fuente adjunto, y sustituible—. La `LGPL-3.0` de gmp, nettle y live555 se
-leyó el 2026-09-18 (`ENG-028`) y la conclusión está en `LEGAL`.
+leyó el 2026-09-18, y la conclusión está al final de los [avisos de terceros](../THIRD-PARTY-NOTICES.es.md).

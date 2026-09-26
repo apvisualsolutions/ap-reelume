@@ -12,13 +12,13 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Data;
 
 /// <summary>
-/// The join that answers a course card (CRS-002, CRS-003), against the real store.
+/// The join that answers a course card, against the real store.
 /// </summary>
 /// <remarks>
 /// The point of measuring this rather than reasoning about it is the key: the reader finds progress
-/// by composing <c>'title:' || course_id || '/episode:' || lesson_id</c> in SQL, and PLY-008 writes
-/// that same text from <see cref="ContentKey"/> in C#. Two places compose one string, so a test has
-/// to write through one and read through the other.
+/// by composing <c>'title:' || course_id || '/episode:' || lesson_id</c> in SQL, and playback progress
+/// writes that same text from <see cref="ContentKey"/> in C#. Two places compose one string, so a test
+/// has to write through one and read through the other.
 /// </remarks>
 [Trait("Category", "Integration")]
 public sealed class CourseLessonReaderTests

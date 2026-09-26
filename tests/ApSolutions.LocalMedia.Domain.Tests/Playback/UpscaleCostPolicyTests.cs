@@ -8,7 +8,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Playback;
 
 /// <summary>
-/// What a measured enlargement costs, and whether that cost fits inside one frame (PLY-016).
+/// What a measured enlargement costs, and whether that cost fits inside one frame.
 /// </summary>
 /// <remarks>
 /// The arithmetic is here and the measuring is not, for the reason <see cref="UpscalePolicy"/>

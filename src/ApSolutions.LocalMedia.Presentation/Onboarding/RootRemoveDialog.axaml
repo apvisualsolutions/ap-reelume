@@ -4,7 +4,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
 -->
 <!--
 The question asked before a folder's catalogue is deleted. It floats over the shell behind a scrim,
-and that is a third shape neither ADR-0010 category covers: it is not a state that lasts as long as
+and that is a third shape neither category of notice covers: it is not a state that lasts as long as
 a condition, and not an event already over. It is a question, and until it is answered the rest of
 the application is not an offer.
 

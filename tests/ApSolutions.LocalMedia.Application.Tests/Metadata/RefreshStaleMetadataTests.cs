@@ -12,8 +12,8 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Metadata;
 
 /// <summary>
-/// LIB-016. The switch is off until somebody turns it on, and off has to mean nothing happens at
-/// all — not a request that gets discarded afterwards.
+/// The automatic refresh switch is off until somebody turns it on, and off has to mean nothing happens
+/// at all — not a request that gets discarded afterwards.
 /// </summary>
 public sealed class RefreshStaleMetadataTests
 {

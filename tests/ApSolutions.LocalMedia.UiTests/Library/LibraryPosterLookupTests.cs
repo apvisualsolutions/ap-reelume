@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Library;
 
 /// <summary>
-/// The grid hands each card's two cover fields to whoever resolves the picture (LIB-021).
+/// The grid hands each card's two cover fields to whoever resolves the picture.
 /// </summary>
 /// <remarks>
 /// Which of the two draws is <c>ResolveTitlePoster</c>'s order, tested where it lives. What this
@@ -47,14 +47,14 @@ public sealed class LibraryPosterLookupTests
 
         await viewModel.LoadAsync(TestContext.Current.CancellationToken);
 
-        // LIB-021: the title's own order travels with the lookup, or an override set on one title
+        // The title's own order travels with the lookup, or an override set on one title
         // would be stored and never drawn — which is this repository's characteristic defect.
         Assert.Equal((id, "/provider.jpg", chosen, "Frame,Personal,Provider"), asked);
         Assert.Equal(@"C:\personal-artwork\cover.png", Assert.Single(viewModel.Items).PosterFile);
     }
 
     /// <summary>
-    /// A frame taken in the background (LIB-021) reaches the cards already on screen without asking
+    /// A frame taken in the background reaches the cards already on screen without asking
     /// the catalogue again: re-querying would put whoever is scrolling back at the top.
     /// </summary>
     [Fact]

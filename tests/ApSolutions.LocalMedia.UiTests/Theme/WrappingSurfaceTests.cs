@@ -14,7 +14,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// <remarks>
 /// <para>
 /// A horizontal <c>StackPanel</c> holding buttons whose labels are translated is the shape that has
-/// drawn a control off the side of the window <b>seven times</b> in this repository. §4 asks for
+/// drawn a control off the side of the window <b>seven times</b> in this repository. The redesign asks for
 /// <c>WrapPanel</c> by name wherever it appears, and this is the table of the ones that have been
 /// decided, so a row added later cannot quietly be a <c>StackPanel</c> again.
 /// </para>

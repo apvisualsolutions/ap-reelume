@@ -26,14 +26,14 @@ namespace ApSolutions.LocalMedia.Application.Metadata;
 /// person sees their own cover was carried by a private method no test could reach.
 /// </para>
 /// <para>
-/// <b>The order is <see cref="CoverOrderPolicy"/>'s, and since 2026-09-18 the picked cover wins</b>
-/// (LIB-021, ADR-0009). Until then the provider was asked first and the two shared one field, which
+/// <b>The order is <see cref="CoverOrderPolicy"/>'s, and since 2026-09-18 the picked cover wins.</b>
+/// Until then the provider was asked first and the two shared one field, which
 /// is how choosing a cover overwrote the provider's and restoring the provider's fields overwrote the
 /// choice. Now each has its own field, and this walks the order: the first origin with a file on
 /// disk draws, so a picked file that went missing falls through to the provider's.
 /// </para>
 /// <para>
-/// <b>Which order that is stopped being fixed on 2026-09-20</b> (ADR-0009 decision 4). A title that
+/// <b>Which order that is stopped being fixed on 2026-09-20.</b> A title that
 /// carries one of its own is walked by it; every other title follows the general setting, asked for
 /// here rather than at the two call sites, so the rule that decides which picture a person sees
 /// stays in one place.
@@ -66,7 +66,7 @@ public sealed class ResolveTitlePoster(IArtworkStore artwork, IAppDataPaths path
     /// the machine.
     /// </remarks>
     /// <param name="personalCover">
-    /// The picked cover's own field (LIB-021). <paramref name="posterPath"/> is still read as a
+    /// The picked cover's own field. <paramref name="posterPath"/> is still read as a
     /// personal cover too, for a row stored before the field existed that nothing has re-saved yet.
     /// </param>
     /// <param name="coverOrder">

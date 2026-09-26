@@ -13,7 +13,7 @@ namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 /// Waiting for the startup the application actually performs.
 /// </summary>
 /// <remarks>
-/// ARQ-005. <c>CreateShell</c> hands back a container holding the startup view and prepares the
+/// <c>CreateShell</c> hands back a container holding the startup view and prepares the
 /// database off the interface thread, so a walk that wants the shell has to wait for it instead of
 /// assuming it arrived. The wait is bounded, and what it says when the bound expires is the point: a
 /// timeout that only reports "it never came" diagnoses nothing, so this one names whatever was left

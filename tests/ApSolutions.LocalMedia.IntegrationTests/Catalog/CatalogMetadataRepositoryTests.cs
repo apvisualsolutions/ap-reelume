@@ -151,7 +151,7 @@ public sealed class CatalogMetadataRepositoryTests
     }
 
     /// <summary>
-    /// LIB-021: the picked cover has its own column, so writing the provider's poster again — which
+    /// The picked cover has its own column, so writing the provider's poster again — which
     /// is what every refresh does — leaves it where it was.
     /// </summary>
     [Fact]
@@ -177,13 +177,13 @@ public sealed class CatalogMetadataRepositoryTests
     }
 
     /// <summary>
-    /// LIB-021: the order one title overrides the general one with makes the round trip, and a title
+    /// The order one title overrides the general one with makes the round trip, and a title
     /// that never set one reads back as none rather than as an order of its own.
     /// </summary>
     /// <remarks>
     /// It writes twice on purpose. A test that only stores once and reads it back stays green with
-    /// the upsert's assignment removed — measured on the column next door by a mutation audit on
-    /// 2026-09-18, where only the five-minute walk noticed.
+    /// the upsert's assignment removed — measured by mutating the column next door, where only the
+    /// five-minute walk noticed.
     /// </remarks>
     [Fact]
     public async Task A_titles_own_cover_order_is_stored_and_can_be_changed_and_removed()
@@ -230,7 +230,7 @@ public sealed class CatalogMetadataRepositoryTests
     /// <summary>
     /// Picking another cover replaces the first one. The test above only shows the field stays; with
     /// the upsert's personal_cover assignment removed it stayed green, and only the five-minute walk
-    /// noticed (a mutation audit, 2026-09-18).
+    /// noticed.
     /// </summary>
     [Fact]
     public async Task Picking_another_cover_replaces_the_first()
@@ -253,7 +253,7 @@ public sealed class CatalogMetadataRepositoryTests
     }
 
     /// <summary>
-    /// Before LIB-021 a picked cover was stored in <c>poster_path</c> as an absolute path. Such a row
+    /// A picked cover used to be stored in <c>poster_path</c> as an absolute path. Such a row
     /// is read as a picked cover and the provider field comes back empty, so the next save writes the
     /// two apart — the move happens on read, with the one rule that knows what a cover name is.
     /// </summary>

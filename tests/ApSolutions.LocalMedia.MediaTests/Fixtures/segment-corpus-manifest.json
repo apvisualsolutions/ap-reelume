@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "provenanceStatement": "Every episode is synthesised from deterministic tone sequences and colour frames by the local ffmpeg build, following the frozen subspec in docs/specs/automatic-segment-detection.es.md. No user or third-party media is ever involved.",
+  "provenanceStatement": "Every episode is synthesised from deterministic tone sequences and colour frames by the local ffmpeg build. No user or third-party media is ever involved.",
   "generator": {
     "sampleRateHz": 22050,
     "toneSeconds": 2.5,

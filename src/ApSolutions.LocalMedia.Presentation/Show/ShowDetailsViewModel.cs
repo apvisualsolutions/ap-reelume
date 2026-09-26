@@ -76,7 +76,7 @@ public sealed class ShowDetailsViewModel : INotifyPropertyChanged
     public ICommand SelectSeasonCommand { get; }
 
     /// <summary>
-    /// Opens the provider's trailer in the browser (LIB-015). A series has no single file to hang a
+    /// Opens the provider's trailer in the browser. A series has no single file to hang a
     /// local trailer on, so unlike a film this card offers only this one — and it leaves the
     /// application, because playing YouTube inside would need a route their terms do not allow.
     /// </summary>

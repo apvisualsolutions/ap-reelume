@@ -15,7 +15,7 @@ namespace ApSolutions.LocalMedia.Presentation.Library;
 /// <remarks>
 /// <para>
 /// <b>The prototype's artwork is not artwork.</b> Measured on 2026-08-22 by reading its own source:
-/// every cover in <c>design/AP Reelume.dc.html</c> is four CSS gradients built from a single hue —
+/// every cover in the design is four CSS gradients built from a single hue —
 /// <c>linear-gradient(200deg, hsl(H 38% 30%), hsl(H+34 46% 12%))</c> under a radial glow, a diagonal
 /// hatch and a ring. There is not one image in it. So the wall of colour that makes the prototype
 /// look like what it looks like costs no network, no TMDB token and no file on disk, and none of the

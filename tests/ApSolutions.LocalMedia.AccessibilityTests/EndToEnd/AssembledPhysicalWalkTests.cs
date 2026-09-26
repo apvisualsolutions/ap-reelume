@@ -60,8 +60,8 @@ namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 /// the package seals — with real files on a real disk, a real SQLite catalogue, and the real LibVLC
 /// engine decoding real frames. Nothing is stubbed and nothing is built by the test except the
 /// media files themselves, which come from FFmpeg's synthetic generators. What headless cannot
-/// prove — a picture on a physical screen, TMDB answering over the network — is written down as
-/// the ten-minute script in docs/evidence/stable/audit-walkthrough.md.
+/// prove — a picture on a physical screen, TMDB answering over the network — is left to a
+/// ten-minute manual walkthrough.
 /// </para>
 /// </summary>
 [Collection(AssembledShellSuites.Name)]
@@ -115,7 +115,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// LIB-021 as lived: a film nobody gave a cover and no provider knows reaches the grid with a
+    /// Frame covers as lived: a film nobody gave a cover and no provider knows reaches the grid with a
     /// frame of its own video, taken by the pass the window starts, with nobody pressing anything.
     /// </summary>
     /// <remarks>
@@ -189,7 +189,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// LIB-002/003 and LIB-008 as lived, not as wired: the watchers start with the window the way
+    /// Watching and version grouping as lived, not as wired: the watchers start with the window the way
     /// <c>ConfigureWindow</c> starts them for a person, the startup scan catalogues what was already
     /// in the folder, a file dropped afterwards is catalogued with nobody pressing anything, and the
     /// two copies reach one version group that the card can open.
@@ -201,7 +201,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         var watched = Path.Combine(_dataRoot, "watched");
         Directory.CreateDirectory(watched);
         File.Copy(sample, Path.Combine(watched, "Dune.2021.1080p.mp4"));
-        // ENG-044, and this single argument is the ratchet. It used to say
+        // The live-watching setting, and this single argument is the ratchet. It used to say
         // `Startup | Continuous` — a policy NO entry point in the application produces — so the
         // scene proved the watching slice works when something switches it on, never that anything
         // does. Nothing did: the flag was assigned nowhere in src/. This is what a folder added the
@@ -318,9 +318,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// PLY-014 and BUG-008 as lived: a real video decoding through the session the card opened, the
-    /// space bar pausing and resuming it through the assembled chain, and a marker saved mid-session
-    /// making the skip offer appear on the playhead without closing and reopening anything.
+    /// Shortcuts and live markers as lived: a real video decoding through the session the card opened,
+    /// the space bar pausing and resuming it through the assembled chain, and a marker saved
+    /// mid-session making the skip offer appear on the playhead without closing and reopening anything.
     /// </summary>
     [AvaloniaFact(Timeout = 120_000)]
     public async Task The_keys_pause_the_playing_video_and_a_marker_saved_mid_session_offers_the_skip()
@@ -379,9 +379,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// PLY-011 as lived: the first episode decodes to its own end, the engine's ended state raises
-    /// the offer with the next episode's name, and "play now" chains the session onto the second
-    /// file — two episodes, one sitting, no hands.
+    /// Next-episode playback as lived: the first episode decodes to its own end, the engine's ended
+    /// state raises the offer with the next episode's name, and "play now" chains the session onto the
+    /// second file — two episodes, one sitting, no hands.
     /// </summary>
     [AvaloniaFact(Timeout = 120_000)]
     public async Task The_end_of_an_episode_offers_the_next_and_play_now_chains_the_session()
@@ -425,7 +425,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// LIB-006 as lived, and with the mouse: a title somebody identified, its card opened, its
+    /// Identification as lived, and with the mouse: a title somebody identified, its card opened, its
     /// editor opened, and "Refresh from provider" <em>clicked</em> — after which the entry shows
     /// what the provider says.
     /// </summary>
@@ -483,7 +483,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Refresh from provider never brought the provider's answer into the editor");
         Assert.Equal("La llegada", editor.Title);
 
-        // LIB-021: this one title can be taken off the general cover order from here. The four rows
+        // This one title can be taken off the general cover order from here. The four rows
         // share the list's accessible name — one identity for the walk's inventory — so the row is
         // told apart by its help text, the way the version radios are. The text is resolved from the
         // dictionary rather than written here: this machine speaks Spanish and the runner English.
@@ -540,11 +540,11 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             Assert.True(read());
         }
 
-        // LIB-018's own button, pressed with the mouse like everything else. The dialog it would open
-        // on somebody's machine is the one thing no harness can answer, so a run with a data root of
-        // its own takes the cover out of that root's handover folder — the same exit the external
-        // link launcher already uses, and the reason this control can be pressed at all rather than
-        // added to the pending list.
+        // The personal cover's own button, pressed with the mouse like everything else. The dialog it
+        // would open on somebody's machine is the one thing no harness can answer, so a run with a data
+        // root of its own takes the cover out of that root's handover folder — the same exit the
+        // external link launcher already uses, and the reason this control can be pressed at all rather
+        // than added to the pending list.
         var handoff = Path.Combine(_dataRoot, "handoff");
         Directory.CreateDirectory(handoff);
         var chosenCover = Path.Combine(handoff, "portada.png");
@@ -553,9 +553,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             [0x89, (byte)'P', (byte)'N', (byte)'G', 0x0D, 0x0A, 0x1A, 0x0A],
             TestContext.Current.CancellationToken);
 
-        // Since LIB-021 the choice has a field of its own, so what is read back is that field and not
-        // the provider's poster: until 2026-09-18 this scene asserted that the chosen path landed in
-        // the poster field and stayed locked, which was the defect ADR-0009 closes.
+        // The choice has a field of its own, so what is read back is that field and not the
+        // provider's poster: this scene once asserted that the chosen path landed in the poster
+        // field and stayed locked, which was the defect the separate field closes.
         var providerPoster = editor.PosterPath;
         await PressAsync(
             host,
@@ -614,11 +614,11 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Equal("La llegada", editor.Title);
 
         // ...except the cover somebody picked, which is not a provider field and has nothing to be
-        // restored from. Restoring clears every lock, and until LIB-021 that is what erased the choice
-        // and orphaned its file (ADR-0009). Read from the stored row and from the editor as it was
-        // reloaded, not from the editor's memory: a first version of this line asserted the editor's
-        // own property, and it stayed green with the reload removed because the property still held
-        // what the picker had put there.
+        // restored from. Restoring clears every lock, and before the separate field that is what
+        // erased the choice and orphaned its file. Read from the stored row and from the editor as it
+        // was reloaded, not from the editor's memory: a first version of this line asserted the
+        // editor's own property, and it stayed green with the reload removed because the property still
+        // held what the picker had put there.
         var restoredRow = await metadata.GetAsync(new TitleId(fileId), TestContext.Current.CancellationToken);
         Assert.Equal(picked, restoredRow?.Metadata.PersonalCover);
         Assert.Equal(picked, editor.PersonalCover);
@@ -710,7 +710,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.NotNull(appearance);
         Assert.Equal(ThemePreference.System, appearance!.CurrentPreference);
 
-        // The language, in its own destination since 2026-09-13 (UX-010), so the walk goes there
+        // The language, in its own destination, so the walk goes there
         // through the rail like a person does. The buttons reload every string in the application,
         // including the ones the walk finds its controls by. That is fine — the anchor is resolved
         // against whatever is loaded now — but the pair is pressed together so the rest of the scene
@@ -882,10 +882,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         appearance.Density = InterfaceDensity.Comfortable;
         appearance.Rounding = CornerRounding.Soft;
 
-        // UX-010, and it is reachable for exactly the reason it sits in the heading row: everything
-        // below the accent tint on this page is past the first viewport, so a reset under the
-        // controls would be one the harness could never press. The tint above was moved, so there is
-        // something to come back from, and the probe is the option the service holds.
+        // Restore defaults, and it is reachable for exactly the reason it sits in the heading row:
+        // everything below the accent tint on this page is past the first viewport, so a reset under
+        // the controls would be one the harness could never press. The tint above was moved, so there
+        // is something to come back from, and the probe is the option the service holds.
         Assert.NotEqual(new AppearanceOptions().TintPercent, appearance.TintPercent);
         await PressAsync(
             host,
@@ -910,7 +910,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             () => scan!.WatchLocalRoots,
             "clicking the local-watching box never changed whether local roots are watched");
 
-        // UX-010, after the box rather than before it for the reason the whole batch shares: with
+        // Restore defaults, after the box rather than before it for the reason every reset shares: with
         // nothing moved, the reset answers with the value it already had. This section shares its
         // destination with the library's folders, which are not a group, so this is the only control
         // on screen saying these words — which is what lets the walk resolve it.
@@ -1016,9 +1016,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.True(lifecycle.StartWithWindows);
         Assert.False(lifecycle.IsStartupConsentPending);
 
-        // UX-010, and the probe is the registry rather than the screen for the same reason Grant's
-        // is: this reset has to reach outside the application's own settings, or the machine keeps
-        // starting it at sign-in while the switch says otherwise.
+        // Restore defaults, and the probe is the registry rather than the screen for the same reason
+        // Grant's is: this reset has to reach outside the application's own settings, or the machine
+        // keeps starting it at sign-in while the switch says otherwise.
         await PressAsync(
             host,
             "RestoreDefaultsAction",
@@ -1111,8 +1111,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 Directory.GetFiles(diagnostics),
                 file => Path.GetFileName(file) == privacy.ExportedFileName);
 
-            // UX-010, and this one only ever takes a consent away. It is pressed last because the
-            // two boxes above are what give it something to withdraw, and the probe is the consent
+            // Restore defaults, and this one only ever takes a consent away. It is pressed last because
+            // the two boxes above are what give it something to withdraw, and the probe is the consent
             // the store holds rather than the box on screen.
             var consent = host.Application.Services
                 .GetRequiredService<ApSolutions.LocalMedia.Application.Privacy.IPrivacySettings>();
@@ -1132,12 +1132,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// The last of the fourth batch: the recommendation threshold and the shortcut map. Four
-    /// controls, and the two that are not a checkbox — a slider and a button whose work happens in
-    /// the catalogue — are the reason this batch is worth pressing at all.
+    /// The recommendation threshold and the shortcut map. Four controls, and the two that are not a
+    /// checkbox — a slider and a button whose work happens in the catalogue — are the reason these
+    /// are worth pressing at all.
     /// </summary>
     /// <summary>
-    /// LIB-021, ADR-0009 decision 4: the order every cover is looked for in is moved with the mouse
+    /// The general cover order: the order every cover is looked for in is moved with the mouse
     /// and put back, and what is measured is the stored setting rather than the list on screen — a
     /// panel that reorders itself and stores nothing looks right and survives closing as it was.
     /// </summary>
@@ -1239,8 +1239,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Apply never recalculated anything");
         Assert.Equal(0, recommendations.RecalculatedCount);
 
-        // UX-010, and this group's reset APPLIES rather than only moving the slider — in here the
-        // slider alone governs nothing. The probe is the threshold in force, read off the use case
+        // Restore defaults, and this group's reset APPLIES rather than only moving the slider — in here
+        // the slider alone governs nothing. The probe is the threshold in force, read off the use case
         // the library is scored with, so a reset that stopped at the view model would not satisfy it.
         var threshold = host.Application.Services.GetRequiredService<ConfigureWatchedThreshold>();
         Assert.NotEqual(WatchStatePolicy.DefaultWatchedThreshold, threshold.Current);
@@ -1267,7 +1267,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking Atajos de teclado in the settings index never opened its section");
         Assert.Equal(SettingsSection.Shortcuts, host.ViewModel.CurrentSettingsSection);
 
-        // UX-010: the one key every group's reset says it with, folded in here on 2026-09-13. The
+        // Restore defaults: the one key every group's reset says it with, folded in here. The
         // identity the ledger records changes from ShortcutSettingsRestore to RestoreDefaultsAction
         // and the count does not, because the button is the same button in the same view.
         await PressAsync(
@@ -1280,7 +1280,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// LIB-012 as lived: the three controls of the rename surface, pressed with the mouse, with the
+    /// Renaming as lived: the three controls of the rename surface, pressed with the mouse, with the
     /// effect read off <b>the file system</b> rather than off the screen.
     /// </summary>
     /// <remarks>
@@ -1996,10 +1996,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.Equal(folder, await RootPathsAsync(factory));
         Assert.Null(onboarding.FailureKey);
 
-        // ENG-044, and this is the half no scene had: the folder is in the catalogue, but does the
-        // application follow it? The sister scene proves a root carrying this policy gets watched;
-        // what nothing proved is that the real Add button produces such a policy. Between the two,
-        // a folder added with the mouse is followed — and the day somebody changes onboarding to
+        // The live-watching setting, and this is the half no scene had: the folder is in the catalogue,
+        // but does the application follow it? The sister scene proves a root carrying this policy gets
+        // watched; what nothing proved is that the real Add button produces such a policy. Between the
+        // two, a folder added with the mouse is followed — and the day somebody changes onboarding to
         // hand out Manual alone, this fails here instead of shipping silent.
         var added = Assert.Single(
             await new LibraryRootRepository(factory).ListAsync(TestContext.Current.CancellationToken));
@@ -2058,8 +2058,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking the scan consent never granted it");
 
         // With the folder added and its consent given, the first run is over: ShowsOnboarding puts
-        // the inline form away, and managing the folder is Settings' job now — the redistribution
-        // the maintainer decided. The same keys resolve there, on the only surface that shows them.
+        // the inline form away, and managing the folder is Settings' job now — that is where it was
+        // redistributed. The same keys resolve there, on the only surface that shows them.
         Assert.False(
             host.ViewModel.ShowsOnboarding,
             "The first-run form stayed on screen after the first run was over.");
@@ -2214,9 +2214,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     /// The rest of the library, fetched by pressing for it.
     /// </summary>
     /// <remarks>
-    /// <b>Until 2026-09-04 there was nothing to press.</b> The model has paged by cursor since T7 —
+    /// <b>Until 2026-09-04 there was nothing to press.</b> The model had long paged by cursor —
     /// fifty to a page, with `HasMore` and `LoadMoreCommand` — and no view bound any of it, so a
-    /// library of more than fifty titles had fifty reachable ones. `LIB-004` promises ten thousand.
+    /// library of more than fifty titles had fifty reachable ones. The library promises ten thousand.
     /// <para>
     /// Fifty-one titles and not two, because the button only exists when there is a second page: a
     /// scene seeded with the usual handful would walk past a control that was never there, and pass.
@@ -2275,13 +2275,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// The scan is stopped from outside, which is what LIB-002 promises and what nothing offered.
+    /// The scan is stopped from outside, which is what the library promises and what nothing offered.
     /// </summary>
     /// <remarks>
     /// The view model has had <c>CanCancel</c> and a complete <c>Cancel()</c> since scanning existed,
     /// and the progress row drew the dot, the sentence and the count — and no button. The audit of
-    /// 2026-09-04 called it "cancellable from inside and not from outside", which is this house's
-    /// defect in its plainest form.
+    /// 2026-09-04 called it "cancellable from inside and not from outside": built and never
+    /// reachable, in its plainest form.
     /// <para>
     /// The scene starts a real scan and holds it open with a token source of its own, because a
     /// button that can only be pressed while work is in flight needs work in flight: the cancel is
@@ -2452,7 +2452,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// The provider's trailer offer (LIB-015), pressed with the mouse on both cards — and the
+    /// The provider's trailer offer, pressed with the mouse on both cards — and the
     /// address each press would have opened, read back.
     /// </summary>
     /// <remarks>
@@ -3126,7 +3126,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking «back to 1×» never brought the session back to normal speed");
         Assert.Equal(1.0, transport.SpeedMultiplier);
 
-        // The gear, and everything behind it (PLY-018, ADR-0012). It is pressed from the bar and read
+        // The gear, and everything behind it. It is pressed from the bar and read
         // off the player's own model, and it is here rather than in a scene of its own because the
         // panel makes the band taller while it is open: opening it moves every button beside it, the
         // same way «Volver a 1×» appearing does, and a scene that left it open would be pressing the
@@ -3182,7 +3182,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "dragging the gamma never changed the gamma the session carries");
         Assert.False(picture.IsNeutral, "none of the three controls moved, so the reset has nothing to do.");
 
-        // «Restaurar valores por defecto» (UX-010), which is absent while there is nothing to come
+        // «Restaurar valores por defecto», which is absent while there is nothing to come
         // back from — so the three above are what puts it on the screen, and pressing it takes it off
         // again. The same grammar the speed reset follows, and the same reason the scene has to spend
         // something before it can press the thing that gives it back.
@@ -3200,10 +3200,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking back never returned the gear to its list of groups");
         Assert.Equal(PlayerSettingsGroup.None, settings.Group);
 
-        // The two groups that came down from Settings on 2026-09-13 (ADR-0012). They are pressed
+        // The two groups that came down from Settings into the player. They are pressed
         // here rather than on the settings page they left, and their probes are the same facades the
-        // chaining code reads: a switch that moves and writes nothing is exactly the defect this
-        // application keeps finding in itself, and only the store can tell the two apart.
+        // chaining code reads: a switch that moves and writes nothing looks exactly like one that
+        // works, and only the store can tell the two apart.
         var chain = host.Application.Services.GetRequiredService<StartNextEpisodeCountdown>();
         var countdown = settings.NextEpisode;
         Assert.NotNull(countdown);
@@ -3225,7 +3225,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking the countdown length never changed the stored wait");
         Assert.Equal(countdown.CountdownSeconds, chain.CountdownSeconds);
 
-        // UX-010, after the slider so there is something to come back from.
+        // Restore defaults, after the slider so there is something to come back from.
         Assert.NotEqual(PlaybackSettingsViewModel.DefaultCountdownSeconds, chain.CountdownSeconds);
         await PressAsync(host, "RestoreDefaultsAction", () => chain.CountdownSeconds,
             "clicking restore default values never put the countdown back to its factory length");
@@ -3258,8 +3258,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "clicking close never gave the band's height back to the picture");
         Assert.False(settings.IsOpen);
 
-        // The bar's own two mode buttons, which is where the maintainer looked for them on 2026-08-25 and
-        // where they were not. Pressed from the bar and read off the shell's mode, because a button
+        // The bar's own two mode buttons, which is where a person looks for them and where they once
+        // were not. Pressed from the bar and read off the shell's mode, because a button
         // that only changed its own look would leave the picture exactly where it was. There is one
         // of each on screen and not two: the pair that used to sit in the header above the picture
         // went with these arriving, since one name for two buttons is a name that names neither.
@@ -4205,7 +4205,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                     == true),
             "something opened, but it was not the trailer");
 
-        // A trailer is not a catalogue row, which is the whole of LIB-014.
+        // A trailer is not a catalogue row, which is the whole point of trailer discovery.
         Assert.Equal(1, await CountAsync(factory, "media_files"));
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
     }
@@ -4781,7 +4781,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     [AvaloniaFact(Timeout = 120_000)]
     public async Task The_subtitle_style_is_chosen_with_the_mouse_and_kept()
     {
-        // Reached through the player since 2026-09-13 (ADR-0012) rather than through the settings
+        // Reached through the player rather than through the settings
         // index: the right font size is the one that reads over a film, so the group moved into the
         // gear. Everything below this is the scene it already was.
         var sample = await RequireSampleAsync("walk-subtitles.mp4", durationSeconds: 30);
@@ -4947,10 +4947,10 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // the track choices, so saving it has to leave the rest as it was.
         Assert.Equal(chosen.FontFamily, stored.SubtitleStyle.FontFamily);
 
-        // UX-010, last because everything above is what gives it something to undo, and the probe is
-        // the stored style — the very field that was being written wrong all the way down this
-        // scene. ResetAsync had been here since the style was written with nothing calling it; this
-        // is the press that feeds it.
+        // Restore defaults, last because everything above is what gives it something to undo, and the
+        // probe is the stored style — the very field that was being written wrong all the way down this
+        // scene. ResetAsync had been here since the style was written with nothing calling it; this is
+        // the press that feeds it.
         await PressAsync(
             host,
             "RestoreDefaultsAction",
@@ -5023,13 +5023,13 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Assert.True(host.ViewModel.Player!.Player.AreControlsRevealed);
 
         // And left alone over the picture it goes away again by itself, on the application's own
-        // clock and the real engine (ENG-018). A short timeout rather than the three seconds, because
+        // clock and the real engine. A short timeout rather than the three seconds, because
         // what is measured is that the clock is wired, not how long it is — that is the UI suite's.
         //
         // Within two seconds and with the film still playing, and after a control with the clock off.
         // The walk's usual sixty seconds outlast this twelve-second sample, and the end of the first
         // episode — the next one starting — hides the chrome too: with the clock unplugged this wait
-        // still passed, at 18,7 s. Found blind by a mutation audit on 2026-09-25.
+        // still passed, at 18,7 s. Found blind by mutating the clock.
         var sessionChanges = 0;
         void CountSessionChanges(object? sender, System.ComponentModel.PropertyChangedEventArgs args)
         {
@@ -5491,9 +5491,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             TestContext.Current.CancellationToken);
         Assert.Contains("updates.automaticCheckEnabled", stored, StringComparison.Ordinal);
 
-        // UX-010, pressed after the box for the reason the whole batch shares: with nothing turned
-        // on, the reset answers with the value it already had. The probe is the stored setting, so
-        // a reset that only unchecked the box would not satisfy it.
+        // Restore defaults, pressed after the box for the reason every reset shares: with nothing
+        // turned on, the reset answers with the value it already had. The probe is the stored setting,
+        // so a reset that only unchecked the box would not satisfy it.
         await PressAsync(
             host,
             "RestoreDefaultsAction",
@@ -6194,8 +6194,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         window.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
 
-        // <b>And a rendered frame after it, because a hit test does not read the tree</b> — `ENG-026`,
-        // five reds in CI on runs that changed no code. The harness decides where a click is safe by
+        // <b>And a rendered frame after it, because a hit test does not read the tree</b> — five
+        // reds in CI on runs that changed no code. The harness decides where a click is safe by
         // asking InputHitTest (IsOnAPicture, the beside-click's description), and that answers from
         // the last RENDERED frame: measured in HeadlessHitTestFrameTests, a control laid out over the
         // point is still reported as the one beneath it. The input helpers render a frame themselves,
@@ -6366,7 +6366,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     }
 
     /// <summary>
-    /// Whether a click at this point lands on a playing picture, which pauses it since ENG-018.
+    /// Whether a click at this point lands on a playing picture, which a click now pauses.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -6493,7 +6493,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
             // Last, the gap between this button and its neighbour on the same row. The mini
             // player's five buttons sit in one band under the picture, and since a click on the
-            // picture pauses (ENG-018) the band's own background between them is the only place in
+            // picture pauses it, the band's own background between them is the only place in
             // that window a click does nothing. Last so that no scene that already had a point
             // somewhere else is moved.
             new Vector(-(step.X / 2) - 4, 0), new Vector((step.X / 2) + 4, 0),
@@ -6774,12 +6774,12 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
                 + $"failed={surfaces.Player.HasFailed} path={surfaces.Player.MediaPath}";
 
     /// <summary>
-    /// The courses destination, pressed with the mouse (CRS-001..CRS-005): marking a folder, opening
+    /// The courses destination, pressed with the mouse: marking a folder, opening
     /// a course, carrying on with its thread, and marking one lesson watched by hand.
     /// </summary>
     /// <remarks>
     /// The mark is the one press whose effect is a row rather than a surface, and it is the one that
-    /// matters most here: it is what says a lesson's progress is PLY-008's progress. It is asserted
+    /// matters most here: it is what says a lesson's progress is playback progress. It is asserted
     /// on the watch state the store holds, not on the glyph, because a glyph would prove the row
     /// redrew itself and nothing about what was written down.
     /// </remarks>
@@ -6867,7 +6867,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         Dispatcher.UIThread.RunJobs();
 
         // Marking a lesson watched by hand, asserted on the store rather than on the glyph: what
-        // this press claims is that a lesson's progress is the progress PLY-008 already keeps.
+        // this press claims is that a lesson's progress is the progress playback already keeps.
         var watchStates = new WatchStateRepository(factory);
         var key = CourseProgressKey.For(courseId, firstLesson);
         var row = details!.Modules[0].Lessons[0];
@@ -6920,7 +6920,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             recordAs: "{Binding ActionText}");
         Assert.True(host.ViewModel.IsPlayerVisible);
 
-        // The player's «Lecciones» panel (CRS-004), which only exists because the session that just
+        // The player's «Lecciones» panel, which only exists because the session that just
         // opened is a lesson. Two things are asserted that no unit test can see: that the pill is
         // there at all — the shell asked the catalogue whether this file is a lesson and got an
         // answer — and that a row inside the column is reachable with a real mouse.
@@ -6945,7 +6945,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         await host.ViewModel.ClosePlayerAsync(TestContext.Current.CancellationToken);
 
-        // And the gesture that makes any of the above possible (CRS-001, ADR-0006 amendment 1): the
+        // And the gesture that makes any of the above possible, pointing at one folder: the
         // dialog's course half, the folder pointed at, and the neighbours answered for. Left until
         // last because it writes courses, and everything above counts them.
         Navigate(host, AppRoute.Courses);
@@ -7194,7 +7194,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
     {
         var (application, window, settled) = Mount(height, activationPath);
 
-        // ARQ-005: the shell arrives after the database is ready, not with it, so the walk waits
+        // The shell arrives after the database is ready, not with it, so the walk waits
         // for it. The wait names what stood in its place if it never comes.
         var shell = Assert.IsType<ShellView>(settled);
         var viewModel = Assert.IsType<ShellViewModel>(shell.DataContext);
@@ -7202,7 +7202,7 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // The chrome would go away three seconds after the last movement, and every scene here
         // moves the mouse once and then presses on a real session, on a runner whose pace nobody
         // controls. A chrome that left in between would fail a scene for a reason that is not what
-        // it measures, so the clock is off here — except in the one scene that is about it (ENG-018).
+        // it measures, so the clock is off here — except in the one scene that is about it.
         viewModel.ChromeIdleTimeout = Timeout.InfiniteTimeSpan;
         return new ShellHost(
             application,

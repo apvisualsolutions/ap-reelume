@@ -165,7 +165,7 @@ public sealed class TrayLifecycleTests
     }
 
     /// <summary>
-    /// ENG-020. Releasing the icon from a thread that does not own it is what closing the
+    /// Releasing the icon from a thread that does not own it is what closing the
     /// application did: the container's teardown resumes wherever its last await left it, and the
     /// icon belongs to the interface thread. It threw, and the process ended on an exception after a
     /// session that had worked. The icon still has to go, so the work is handed to its own thread.

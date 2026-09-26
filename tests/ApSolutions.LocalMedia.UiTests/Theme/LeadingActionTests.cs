@@ -128,7 +128,7 @@ public sealed class LeadingActionTests
         ["AudioOutputView"] = null,
         ["SubtitleStyleView"] = null,
         ["ShortcutSettingsView"] = null,
-        // The gear and its one group so far (ADR-0012). Neither leads with anything, and for the
+        // The gear and its one group so far. Neither leads with anything, and for the
         // two reasons already in the list above: the menu is a row of mutually exclusive choices,
         // and the picture group is a block of controls on a panel whose heading is the accent.
         // Accenting «Restaurar valores por defecto» would paint the undo as the thing to do.
@@ -149,7 +149,7 @@ public sealed class LeadingActionTests
         ["PrivacySettingsView"] = null,
         ["ScanSettingsView"] = null,
         ["CoverOrderSettingsView"] = null,
-        // UX-010 gave the language a destination of its own. Two mutually exclusive options and a
+        // The language has a destination of its own. Two mutually exclusive options and a
         // reset: nothing here is the thing to do, and accenting the undo would point at it.
         ["LanguageSettingsView"] = null,
         ["LifecycleSettingsView"] = null,
@@ -190,7 +190,7 @@ public sealed class LeadingActionTests
         // Onboarding, recovery, credits, updates
         ["RootOnboardingView"] = "RootAddAction",
         // The same decision in its floating frame: acting on the folder is the point of the dialog.
-        // Named rather than keyed since CRS-001, because the dialog has two halves and its one
+        // Named rather than keyed since courses arrived, because the dialog has two halves and its one
         // action says «Añadir carpeta» or «Marcar como curso» depending on which is chosen. Two
         // accented buttons would have been a screen with two leading actions, which this refuses.
         ["AddRootDialogView"] = "AddOrMarkAction",

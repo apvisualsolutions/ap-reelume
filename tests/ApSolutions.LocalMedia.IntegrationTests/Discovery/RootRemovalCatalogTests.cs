@@ -13,8 +13,8 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Discovery;
 
 /// <summary>
-/// Removing a folder deletes its catalogue, and the maintainer decided so on 2026-09-06 against the
-/// prototype, which promises the opposite. What these tests defend is the boundary: the rows that
+/// Removing a folder deletes its catalogue, which was decided deliberately against the prototype,
+/// which promises the opposite. What these tests defend is the boundary: the rows that
 /// belong to the folder go, and nothing else does.
 ///
 /// The pair that matters is <see cref="A_title_whose_only_files_were_in_the_removed_root_leaves_with_its_marks_and_progress"/>

@@ -6,7 +6,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Shell;
 
 /// <summary>
-/// The reachability gate reads what a file says, not what it once said (ARQ-013).
+/// The reachability gate reads what a file says, not what it once said.
 /// </summary>
 /// <remarks>
 /// A commented-out reference used to count as a reference, and that is the worst way for this gate

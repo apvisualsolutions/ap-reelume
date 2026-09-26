@@ -168,7 +168,7 @@ public sealed class PlaybackInputTests
     }
 
     /// <summary>
-    /// ARQ-005. Starting used to block on the pump's signal with no ceiling and while holding the
+    /// Starting used to block on the pump's signal with no ceiling and while holding the
     /// lock, from the interface thread, every time a video opened. A pump that never answered took
     /// the window with it — and the stop that could have rescued it could not get in, because the
     /// thread that would never return was holding the door.

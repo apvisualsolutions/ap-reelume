@@ -97,7 +97,7 @@ public sealed class PlayerViewDesignTests
     /// <para>
     /// It used to wear <c>ShellSurfaceBrush</c> — the same surface as everything else the shell draws
     /// — so the one screen that has to say "this did not work" looked exactly like the one that says
-    /// what codec is in use. §4 gives it <c>DangerSurfaceBrush</c> with a border and a glyph.
+    /// what codec is in use. The redesign gives it <c>DangerSurfaceBrush</c> with a border and a glyph.
     /// </para>
     /// <para>
     /// The glyph is asserted to <b>differ from the warning's</b>, which is the whole point of having
@@ -194,7 +194,7 @@ public sealed class PlayerViewDesignTests
     /// <para>
     /// Three of these already carry explicit alignment, which was the correction of 2026-08-17 after
     /// the walk found the resume offer drawn at <b>1280×1400</b> over a 1280×1400 stage with its two
-    /// buttons in the corner. Alignment stops the stretch in the axis it names; §4 adds the width cap,
+    /// buttons in the corner. Alignment stops the stretch in the axis it names; the redesign adds the width cap,
     /// which is what keeps a long sentence from making the card as wide as the film.
     /// </para>
     /// <para>
@@ -453,7 +453,7 @@ public sealed class PlayerViewDesignTests
     /// <remarks>
     /// It was the medium radius until 2026-08-25, which on a 44 by 44 target is a square with its
     /// corners taken off: «todos los botones o son redondos o son píldoras, pero nunca cuadrados».
-    /// <b>The maintainer withdrew that rule on 2026-09-01</b> — an element matches the prototype, and the
+    /// <b>That rule was withdrawn on 2026-09-01</b> — an element matches the prototype, and the
     /// prototype draws <c>pbtn</c> at <c>borderRadius: 8</c>, which is this scale's medium — so the
     /// chrome buttons are back to the radius they had before it. ButtonShapeTests carries the
     /// pairing and reads the number out of the design rather than restating it.

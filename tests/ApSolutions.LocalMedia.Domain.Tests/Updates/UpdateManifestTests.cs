@@ -99,7 +99,7 @@ public sealed class UpdateManifestTests
     }
 
     /// <summary>
-    /// SEC-003: a hash nobody signed vouches for nothing — it arrived in the same unsigned answer
+    /// A hash nobody signed vouches for nothing — it arrived in the same unsigned answer
     /// as the package it describes. The refusal names the signature so whoever publishes releases
     /// looks for the signing step, not for a missing hash that is right there.
     /// </summary>

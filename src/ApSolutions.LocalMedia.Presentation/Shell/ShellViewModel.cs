@@ -707,7 +707,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     public bool IsLibrarySection => CurrentSettingsSection == SettingsSection.Library;
 
-    /// <summary>Where the cover order is moved for the whole library (LIB-021).</summary>
+    /// <summary>Where the cover order is moved for the whole library.</summary>
     public bool IsCoversSection => CurrentSettingsSection == SettingsSection.Covers;
 
     public bool IsRecommendationsSection => CurrentSettingsSection == SettingsSection.Recommendations;
@@ -728,7 +728,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// <summary>
     /// The first-run surface, only while it is the first run: no folders yet, or a consent still
     /// owed for the folder just added. With a populated library the folders live in Settings and
-    /// the grid owns the Library route — the redistribution the maintainer decided on 2026-08-23.
+    /// the grid owns the Library route.
     /// </summary>
     public bool ShowsOnboarding =>
         Onboarding is { } onboarding
@@ -814,7 +814,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     public bool HasMarkerPanel => HasMarkers || HasDetectedReview;
 
     /// <summary>
-    /// Whether this session is a lesson at all (CRS-004), which is what makes the pill and the panel
+    /// Whether this session is a lesson at all, which is what makes the pill and the panel
     /// <b>absent</b> rather than disabled outside a course.
     /// </summary>
     /// <remarks>
@@ -884,7 +884,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// <b>It comes back on a movement of the mouse or a key, and goes away again after
     /// <see cref="ChromeIdleTimeout"/> without either</b> — while the film plays, with no panel open
     /// and the pointer resting on the picture rather than on a control. That is what every player
-    /// does, and what the maintainer asked for on 2026-09-13 (ENG-018).
+    /// does.
     /// </para>
     /// <para>
     /// Until 2026-09-25 no timer put it away, and the reason was written here: a clock would be a
@@ -915,17 +915,16 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>In fullscreen they never do</b>, and that is the whole of what the maintainer reported twice.
-    /// The second time, on 2026-09-13: «la app entera se pone en pantalla completa, pero el vídeo
-    /// sigue en su marco, se ve el menú todo». Measured from the assembled shell: the picture came
-    /// back <b>1856 wide inside a 1920 window</b> and <b>1171 tall inside 1280</b> — the rail taking
-    /// 64 and the two headers 109.
+    /// <b>In fullscreen they never do.</b> Before this, the whole application went full screen while
+    /// the video stayed in its frame with every menu showing. Measured from the assembled shell: the
+    /// picture came back <b>1856 wide inside a 1920 window</b> and <b>1171 tall inside 1280</b> — the
+    /// rail taking 64 and the two headers 109.
     /// </para>
     /// <para>
-    /// It is not a new rule, it is <c>ADR-0010</c> applied where nobody had: <b>a state takes space
+    /// It is not a new rule, it is the notices rule applied where nobody had: <b>a state takes space
     /// and an event floats</b>. Embedded, the chrome is a state and standing beside the picture is
     /// right. In fullscreen it is an event, so it may appear over the picture but never take a pixel
-    /// from it — which is what every other player does and what «como cualquier reproductor» meant.
+    /// from it — which is what every other player does.
     /// </para>
     /// <para>
     /// Revealing happens on a pointer move in both modes, and so does the clock that takes it away
@@ -1085,10 +1084,11 @@ public sealed class ShellViewModel : INotifyPropertyChanged
     /// </summary>
     /// <remarks>
     /// The prototype puts a number there and this rail had none, which is the last of the eight
-    /// differences the maintainer's comparison turned up. What made it worth doing rather than faking:
-    /// <c>ReviewInboxChanged</c> has been published by <c>ResolveMatch</c> and <c>RejectMatch</c>
-    /// since they were written and <b>subscribed to by nobody</b> — the whole application event bus
-    /// had a publisher and no listener in the product. The badge is the first thing that listens.
+    /// differences a side-by-side comparison with the prototype turned up. What made it worth doing
+    /// rather than faking: <c>ReviewInboxChanged</c> has been published by <c>ResolveMatch</c> and
+    /// <c>RejectMatch</c> since they were written and <b>subscribed to by nobody</b> — the whole
+    /// application event bus had a publisher and no listener in the product. The badge is the first
+    /// thing that listens.
     /// </remarks>
     public int ReviewPendingCount
     {
@@ -1221,7 +1221,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// Escape steps back one layer: the gear, then the side panel, then fullscreen or the mini player
-    /// back to embedded, then the player itself (ENG-018).
+    /// back to embedded, then the player itself.
     /// </summary>
     /// <remarks>
     /// The order is the prototype's, read from its key handler. Until 2026-09-25 Escape only did the
@@ -1380,7 +1380,7 @@ public sealed class ShellViewModel : INotifyPropertyChanged
         }
 
         // A removed folder leaves the catalog, so the library on screen reloads to say so
-        // (LIB-A01); the videos on disk were never part of the removal.
+        // too; the videos on disk were never part of the removal.
         if (args.PropertyName == nameof(RootOnboardingViewModel.RemovedRootId)
             && Onboarding is { RemovedRootId: not null }
             && Library is { } reloaded)

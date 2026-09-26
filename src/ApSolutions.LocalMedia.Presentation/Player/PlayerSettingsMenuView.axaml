@@ -15,7 +15,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     Drawn over the picture and never floated. Nothing inside a Flyout can be pressed by the
     autonomous walk — a flyout's content lands in a popup root of its own, which is why every entry
     of eng/walk-pending.txt is a flyout child — so putting the player's options in one would take all
-    of them out of that coverage at a stroke (ADR-0012).
+    of them out of that coverage at a stroke.
 
     A width and not a star, because this sits on top of the picture rather than beside it: a panel as
     wide as the window would be a page, and the thing underneath is what somebody is looking at.
@@ -52,9 +52,8 @@ SPDX-License-Identifier: LicenseRef-APSolutions
             CommandParameter="{x:Static player:PlayerSettingsGroup.Picture}"
             Content="{DynamicResource PlayerSettingsGroupPicture}" />
         <!--
-          The two groups that came down from Settings on 2026-09-13 (ADR-0012). They keep the
-          resource keys they had there rather than gaining names of their own: it is the same group,
-          and a second key for one idea is what UX-010 exists to stop.
+          The two groups that came down from Settings. They keep the resource keys they had there
+          rather than gaining names of their own: it is the same group, and one idea keeps one key.
         -->
         <Button
             x:Name="PlayerSettingsNextEpisodeEntry"

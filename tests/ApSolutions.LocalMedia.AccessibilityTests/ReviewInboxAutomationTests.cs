@@ -52,7 +52,7 @@ public sealed class ReviewInboxAutomationTests
                 RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
-                "T14",
+                "review-inbox",
                 $"review-uia-{cultureName}.txt");
             Directory.CreateDirectory(Path.GetDirectoryName(treePath)!);
             File.WriteAllLines(treePath, controls.Select(control =>

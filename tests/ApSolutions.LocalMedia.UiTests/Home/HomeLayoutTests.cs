@@ -129,7 +129,7 @@ public sealed class HomeLayoutTests
     /// </summary>
     /// <remarks>
     /// <b>What the 2026-08-22 approval changed, and why.</b> The hero grew 122 px when it became the
-    /// one §4 describes, so <c>LibraryEntryBottom</c> moves in all thirty-six records, and in six of
+    /// one the redesign describes, so <c>LibraryEntryBottom</c> moves in all thirty-six records, and in six of
     /// them — 1366x768 at 200%, a viewport 384 logical px tall — the library block stops fitting in
     /// the first screenful. That is a real loss and it is approved rather than hidden: the
     /// prototype's own hero is <b>398 px tall</b>, so nothing that looks like the approved design
@@ -140,7 +140,7 @@ public sealed class HomeLayoutTests
     public async Task Home_matches_its_approved_structural_baseline_across_every_combination()
     {
         var actual = new List<LayoutRecord>();
-        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T30");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "home-layout");
         Directory.CreateDirectory(captures);
 
         foreach (var (widthPixels, heightPixels) in new[] { (1366, 768), (3840, 2160) })
@@ -167,7 +167,7 @@ public sealed class HomeLayoutTests
             RepositoryLayout.Root,
             "artifacts",
             "test-results",
-            "T30",
+            "home-layout",
             "home-layout-actual.json");
         Directory.CreateDirectory(Path.GetDirectoryName(actualPath)!);
         await File.WriteAllTextAsync(
@@ -180,7 +180,6 @@ public sealed class HomeLayoutTests
             "tests",
             "ApSolutions.LocalMedia.UiTests",
             "Baselines",
-            "T30",
             "home-layout.json");
         Assert.True(
             File.Exists(baselinePath),
@@ -347,7 +346,7 @@ public sealed class HomeLayoutTests
         var year = Assert.Single(blocks, block => block.Text == "2016");
 
         // One line, ended by an ellipsis: a second line pushed this card's year below the year of
-        // the card beside it, and a rail of cards read as a ragged edge (owner, 2026-08-24).
+        // the card beside it, and a rail of cards read as a ragged edge (2026-08-24).
         Assert.Equal(TextWrapping.NoWrap, title.TextWrapping);
         Assert.Equal(TextTrimming.CharacterEllipsis, title.TextTrimming);
         Assert.Equal(
@@ -421,7 +420,7 @@ public sealed class HomeLayoutTests
     /// </para>
     /// <para>
     /// Its <b>position</b> is asserted and not merely its existence, because a rule about where
-    /// something sits passes either way if all it checks is that the thing is there. §4 puts the bar
+    /// something sits passes either way if all it checks is that the thing is there. The redesign puts the bar
     /// "at the foot of each poster", so what is asserted is that it is inside the artwork, aligned to
     /// its bottom, and as wide as the artwork is: under the card it would be a fourth line of text
     /// rather than a rule across the picture. It used to be the last child of the card, which is

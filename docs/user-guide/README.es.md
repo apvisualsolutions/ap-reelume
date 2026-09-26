@@ -50,7 +50,7 @@ están enumeradas en la declaración de privacidad.
 ## La ficha de un título
 
 Desde la ficha puede reproducir, marcar como visto o no visto, poner favorito, guardar para más
-tarde y valorar de 1 a 10. También:
+tarde y valorar de 1 a 5 estrellas. También:
 
 - **Editar metadatos.** Lo que edite queda bloqueado: una actualización remota posterior no lo pisa.
 - **Previsualizar renombrado.** Muestra qué haría antes de hacerlo. Si hay conflicto, no se ejecuta.

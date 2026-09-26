@@ -7,10 +7,10 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// The next-episode countdown existed, was tested end to end (T28), and appeared nowhere: the use
+/// The next-episode countdown existed, was tested end to end, and appeared nowhere: the use
 /// case was never registered, <c>NextEpisodeViewModel.Offer</c> was called from nowhere, and the
 /// engine did not even report that the media had ended — the application had no moment to offer
-/// anything at (PLY-011).
+/// anything at.
 /// </summary>
 public sealed class NextEpisodeWiringTests
 {

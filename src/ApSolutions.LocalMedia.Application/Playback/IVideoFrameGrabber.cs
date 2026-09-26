@@ -16,8 +16,8 @@ namespace ApSolutions.LocalMedia.Application.Playback;
 /// </para>
 /// <para>
 /// <b>It was called <c>ICourseFrameGrabber</c> until 2026-09-18</b>, because a course card was the
-/// first thing that wanted a frame. ADR-0009 made the frame the third origin of any cover — film,
-/// series or course — and said that what belongs to courses is only the wrapper, so the port is named
+/// first thing that wanted a frame. The frame then became the third origin of any cover — film,
+/// series or course — and what belongs to courses is only the wrapper, so the port is named
 /// for what it does rather than for its first caller.
 /// </para>
 /// </remarks>

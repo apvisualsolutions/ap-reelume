@@ -9,7 +9,7 @@ using ApSolutions.LocalMedia.Domain.Metadata;
 
 namespace ApSolutions.LocalMedia.Presentation.Settings;
 
-/// <summary>One origin as a row of the list that can be moved (LIB-021).</summary>
+/// <summary>One origin as a row of the list that can be moved.</summary>
 /// <param name="Origin">Which of the three places a cover can come from.</param>
 /// <param name="NameKey">
 /// The resource key of its name, not the name. The language is changed while the application runs,
@@ -19,8 +19,8 @@ namespace ApSolutions.LocalMedia.Presentation.Settings;
 public sealed record CoverOriginRow(CoverOrigin Origin, string NameKey);
 
 /// <summary>
-/// Moving the order every title's cover is looked for in, for the whole library (ADR-0009 decision
-/// 4). A title can override it from its own editor.
+/// Moving the order every title's cover is looked for in, for the whole library. A title can override
+/// it from its own editor.
 /// </summary>
 /// <remarks>
 /// It reorders with two buttons over the selected row rather than by dragging, and that is not a
@@ -75,7 +75,7 @@ public sealed class CoverOrderSettingsViewModel : INotifyPropertyChanged
 
     public ICommand MoveDownCommand => _moveDown;
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     public ICommand RestoreDefaultsCommand { get; }
 
     private static IEnumerable<CoverOriginRow> Rows(IReadOnlyList<CoverOrigin> order) =>

@@ -54,7 +54,7 @@ public sealed class PosterCardShapeTests
     /// The tick is 20 across and sits 7 px inside the cover's top and right edges.
     /// </summary>
     /// <remarks>
-    /// <c>design/AP Reelume.dc.html:313</c> puts it at <c>top:6px;right:6px</c> with
+    /// The prototype puts it at <c>top:6px;right:6px</c> with
     /// <c>width/height:20</c> inside a cover whose hairline is 1 px, which is 7 from the outer edge.
     /// The tree drew 22 at 8 (9 from the outer edge) until this was measured.
     /// </remarks>
@@ -135,7 +135,7 @@ public sealed class PosterCardShapeTests
     /// The track is three pixels of white at a quarter over the artwork, not a grey plate.
     /// </summary>
     /// <remarks>
-    /// <c>design/AP Reelume.dc.html:312</c> paints <c>rgba(255,255,255,.25)</c> across the foot of
+    /// The prototype paints <c>rgba(255,255,255,.25)</c> across the foot of
     /// the cover and fills it with the accent. The tree painted <c>ControlFillBrush</c>, which is
     /// opaque, so the artwork stopped at the bar instead of showing through it.
     ///
@@ -233,7 +233,7 @@ public sealed class PosterCardShapeTests
     /// An unreachable medium veils the whole cover and writes in white at its foot.
     /// </summary>
     /// <remarks>
-    /// <c>design/AP Reelume.dc.html:311</c> is <c>inset:0</c> with <c>rgba(9,12,16,.55)</c>, white at
+    /// The prototype's is <c>inset:0</c> with <c>rgba(9,12,16,.55)</c>, white at
     /// 11 px in 600, at <c>padding:8</c> from the bottom left. The tree drew an amber pill in the
     /// corner, which is a different sentence: the pill says a badge is attached to the card, the veil
     /// says the cover itself is out of reach.
@@ -386,7 +386,7 @@ public sealed class PosterCardShapeTests
     /// The kind chip is a 10,5 px word on a tint at .62, and what shows through it is blurred.
     /// </summary>
     /// <remarks>
-    /// <c>design/AP Reelume.dc.html:2374</c>: <c>top/left 8</c>, <c>padding 3px 9px 3px 7px</c>,
+    /// The prototype: <c>top/left 8</c>, <c>padding 3px 9px 3px 7px</c>,
     /// <c>rgba(9,12,16,.62)</c>, <c>backdrop-filter: blur(8px)</c>, <c>#fff</c>, 10,5 px in 600. The
     /// tree carried 12 px at a normal weight on a flat .72 tint.
     ///
@@ -457,7 +457,7 @@ public sealed class PosterCardShapeTests
 
             // And it is the artwork from BEHIND THE CHIP, at the place the chip stands. A blur put
             // down 24 px off its own box is just as flat and, over the synthetic hatch, carries the
-            // same mean — the gate audit of this batch walked out through exactly that hole — so the
+            // same mean — an audit of this gate walked out through exactly that hole — so the
             // brush's two rects are read as well: its own box out of the artwork, and that box put
             // back where the bleed leaves room for it.
             var backdrop = Assert.IsType<VisualBrush>(

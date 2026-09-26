@@ -13,10 +13,10 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Shell;
 
 /// <summary>
-/// Escape steps back one layer at a time, the way the prototype's own handler does (ENG-018).
+/// Escape steps back one layer at a time, the way the prototype's own handler does.
 /// </summary>
 /// <remarks>
-/// The prototype's order is written in its source (<c>design/AP Reelume.dc.html</c>, the key handler):
+/// The prototype's order is written in its own key handler:
 /// an open panel first, then fullscreen or the mini player back to embedded, then the player itself.
 /// Until 2026-09-25 this application did only the middle step, so Escape did nothing at all with a
 /// panel open in the window or with the film simply playing embedded.

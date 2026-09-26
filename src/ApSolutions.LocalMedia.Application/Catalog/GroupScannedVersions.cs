@@ -13,12 +13,12 @@ public sealed record GroupScannedVersionsResult(int GroupedCount, int HeldForCon
 
 /// <summary>
 /// Finds the duplicates a scan surfaced and turns them into version groups. This is the caller the
-/// audit found missing (LIB-008): <c>GroupMediaVersions</c> had a repository, a policy, and tests,
+/// audit found missing: <c>GroupMediaVersions</c> had a repository, a policy, and tests,
 /// and nothing in the application ever invoked it, so groups were never created on their own.
 /// </summary>
 /// <remarks>
 /// Two files are the same content when their parsed names say so and the grouping policy agrees —
-/// the same rule T15 proved. A set whose durations differ materially is left for a person
+/// the same rule the grouping tests proved. A set whose durations differ materially is left for a person
 /// (<c>ConfirmationRequired</c>), no file is ever deleted or hidden, and a stored preferred version
 /// survives every later scan because <c>GroupMediaVersions</c> merges instead of replacing.
 /// </remarks>

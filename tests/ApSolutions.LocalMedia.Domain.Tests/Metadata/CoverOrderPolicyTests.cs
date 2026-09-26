@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Metadata;
 
 /// <summary>
-/// The order in which a title's covers are asked for (ADR-0009): the one somebody picked wins, the
+/// The order in which a title's covers are asked for: the one somebody picked wins, the
 /// provider's follows.
 /// </summary>
 public sealed class CoverOrderPolicyTests

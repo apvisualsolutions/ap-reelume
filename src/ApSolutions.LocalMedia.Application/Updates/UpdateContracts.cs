@@ -16,7 +16,7 @@ public sealed record InstalledRelease(string Version, string Runtime);
 public interface IUpdateSettings
 {
     /// <summary>
-    /// Off until somebody says otherwise, and what UX-010's reset puts back. It is named on the port
+    /// Off until somebody says otherwise, and what the settings reset puts back. It is named on the port
     /// so the store and the reset cannot disagree about which of them holds the default.
     /// </summary>
     const bool AutomaticCheckEnabledByDefault = false;

@@ -196,9 +196,9 @@ public sealed class AutomaticSegmentDetectorUnitTests
         new(Guid.Parse(FormattableString.Invariant($"d3ec0001-0000-4000-8000-0000000000{index + 1:x2}")));
 
     /// <summary>
-    /// BUG-009's other half: the detector clamps what it emits to the episode it measured, so a
-    /// recurring window that runs past a short episode's end is trimmed at the source instead of
-    /// stored as a range no playback can reach.
+    /// The other half of keeping markers inside the episode: the detector clamps what it emits to the
+    /// episode it measured, so a recurring window that runs past a short episode's end is trimmed at
+    /// the source instead of stored as a range no playback can reach.
     /// </summary>
     [Fact]
     public async Task A_detected_range_never_outruns_the_episode_it_was_measured_in()

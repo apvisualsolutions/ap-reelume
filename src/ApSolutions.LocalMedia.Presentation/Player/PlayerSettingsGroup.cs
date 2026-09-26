@@ -4,7 +4,7 @@
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
 /// <summary>
-/// Which group of options the gear is showing, if any (ADR-0012).
+/// Which group of options the gear is showing, if any.
 /// </summary>
 /// <remarks>
 /// <see cref="None"/> is the list itself rather than the absence of a group, the same way
@@ -16,13 +16,13 @@ public enum PlayerSettingsGroup
     /// <summary>The first level: the list of groups.</summary>
     None = 0,
 
-    /// <summary>Brightness, contrast and gamma (PLY-018).</summary>
+    /// <summary>Brightness, contrast and gamma.</summary>
     Picture,
 
     /// <summary>
-    /// How long the next episode waits before it starts on its own. It came down from Settings on
-    /// 2026-09-13 (ADR-0012): the number somebody wants is the one they arrive at having just sat
-    /// through an episode, which is not a question anybody answers on a settings page.
+    /// How long the next episode waits before it starts on its own. It came down from Settings because
+    /// the number somebody wants is the one they arrive at having just sat through an episode, which is
+    /// not a question anybody answers on a settings page.
     /// </summary>
     NextEpisode,
 

@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// Choosing an audio output reaches the engine (AUD-A01): the surface existed, the adapter that
+/// Choosing an audio output reaches the engine: the surface existed, the adapter that
 /// pauses, routes, resumes and stores existed, and nothing joined them — a pick on screen changed
 /// nothing about where the sound went.
 /// </summary>

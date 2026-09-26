@@ -62,7 +62,7 @@ public sealed class MetadataEditorTests
             Assert.All(editableControls, control =>
                 Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(control))));
 
-            // LIB-021: the cover source is a row of options, and each row says the list's name out
+            // The cover source is a row of options, and each row says the list's name out
             // loud plus its own choice in the help text — the shape the audio device list has. All
             // four are asserted here rather than in the layout tests, which show this view with no
             // data context and would find an empty list and pass.
@@ -83,7 +83,7 @@ public sealed class MetadataEditorTests
                 RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
-                "T16",
+                "metadata-editor",
                 $"metadata-editor-{cultureName}.png");
             Directory.CreateDirectory(Path.GetDirectoryName(artifactPath)!);
             frame.Save(artifactPath, PngBitmapEncoderOptions.Default);
@@ -229,7 +229,7 @@ public sealed class MetadataEditorTests
     /// <summary>The refresh as the composition root builds it: resolving through the provider.</summary>
     /// <summary>
     /// The editor files an imported cover in its own field and saves it there, leaving the provider's
-    /// poster and its lock exactly as they were (LIB-021, ADR-0009).
+    /// poster and its lock exactly as they were.
     /// </summary>
     /// <remarks>
     /// <b>Until 2026-09-18 this test asserted the defect.</b> It was called «an imported cover reaches
@@ -433,7 +433,7 @@ public sealed class MetadataEditorTests
     }
 
     /// <summary>
-    /// LIB-021, ADR-0009 decision 4: this one title can override the general cover order, and can
+    /// This one title can override the general cover order, and can
     /// be put back on it.
     /// </summary>
     [AvaloniaFact]

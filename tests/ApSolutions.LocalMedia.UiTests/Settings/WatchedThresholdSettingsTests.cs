@@ -14,7 +14,7 @@ namespace ApSolutions.LocalMedia.UiTests.Settings;
 
 /// <summary>
 /// The watched threshold is a continuity rule, and the recommendation settings are where a person
-/// decides what counts as watched (CNT-A01). The surface shows the threshold in force, applies a
+/// decides what counts as watched. The surface shows the threshold in force, applies a
 /// new one through the use case that clamps and recalculates, and says how many states moved.
 /// </summary>
 public sealed class WatchedThresholdSettingsTests
@@ -32,7 +32,7 @@ public sealed class WatchedThresholdSettingsTests
     }
 
     /// <summary>
-    /// UX-010, and it is asserted on what is in force rather than on the slider: in this group the
+    /// Restoring the defaults, asserted on what is in force rather than on the slider: in this group the
     /// slider alone changes nothing, so a reset that only moved it would leave 75 % governing the
     /// library while the screen read 90 %.
     /// </summary>

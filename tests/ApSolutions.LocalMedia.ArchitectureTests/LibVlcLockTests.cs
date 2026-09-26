@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.ArchitectureTests;
 
 /// <summary>
 /// The engine the application ships is the one built without GPL code, pinned by hash, and nothing
-/// can bring VideoLAN's NuGet package back in (ENG-013).
+/// can bring VideoLAN's NuGet package back in.
 /// </summary>
 public sealed partial class LibVlcLockTests
 {
@@ -129,8 +129,8 @@ public sealed partial class LibVlcLockTests
     /// <summary>
     /// Outputs, and anything under a top-level dot folder. The second is measured, not tidiness: the
     /// first run of this test named ten files under <c>.runner/_work</c>, a self-hosted runner's
-    /// checkout of an older commit sitting inside this one — and <c>.local/</c> holds worktrees the
-    /// same way. Neither is the tree being built.
+    /// checkout of an older commit sitting inside this one — and a dot folder of worktrees holds
+    /// whole copies the same way. Neither is the tree being built.
     /// </summary>
     private static bool IsBuildOutput(string root, string path)
     {

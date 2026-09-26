@@ -13,11 +13,12 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Courses;
 
 /// <summary>
-/// Declaring a course from the folder somebody pointed at (CRS-001, ADR-0006 amendment 1).
+/// Declaring a course from the folder somebody pointed at.
 /// </summary>
 /// <remarks>
-/// What these hold to is the amendment's claim: the derived depth is the same number that used to be
-/// typed, and nothing beyond the named folder is marked until a person has said yes to it.
+/// What these hold to is the claim that justifies pointing at one folder: the derived depth is the same
+/// number that used to be typed, and nothing beyond the named folder is marked until a person has said
+/// yes to it.
 /// </remarks>
 public sealed class DeclareCourseFolderTests
 {
@@ -47,7 +48,7 @@ public sealed class DeclareCourseFolderTests
 
     /// <summary>
     /// With nothing catalogued the parent becomes the root at depth 1, which is what puts the
-    /// siblings the amendment offers to mark next at the same level as the pointed-at folder.
+    /// siblings offered to be marked next at the same level as the pointed-at folder.
     /// </summary>
     [Fact]
     public async Task With_no_root_holding_it_the_parent_is_added_as_a_root_that_is_not_scanned()

@@ -10,12 +10,10 @@ namespace ApSolutions.LocalMedia.DocumentationTests;
 /// </summary>
 /// <remarks>
 /// An exclusion is only real while nothing quietly implements it. These checks read the shipped
-/// interface — the resource dictionaries the user actually sees — and the public documents, and fail
-/// when an excluded capability appears as though it were a feature. The excluded words also have to
-/// stay *documented* as excluded: a boundary nobody wrote down is a boundary the next task will cross
-/// without noticing.
+/// interface — the resource dictionaries the user actually sees — and the database schema, and fail
+/// when an excluded capability appears as though it were a feature.
 /// </remarks>
-public sealed class ScopeBoundaryTests
+public sealed partial class ScopeBoundaryTests
 {
     /// <summary>
     /// Each exclusion, with the strings that would betray it in the interface. The words are the ones
@@ -26,21 +24,21 @@ public sealed class ScopeBoundaryTests
         { "cuentas y sesión remota / accounts and remote sessions", ["IniciarSesion", "SignIn", "CrearCuenta", "CreateAccount", "Contrasena", "Password"] },
         { "sincronización entre equipos / cross-device sync", ["Sincronizar", "Sync", "Nube", "Cloud"] },
         { "reproducción simultánea de varios vídeos / simultaneous multi-video playback", ["SegundaSesion", "SecondSession", "MultiReproductor", "MultiPlayer"] },
-        // Narrowed on 2026-08-30 by ADR-0006, and narrowed rather than dropped. Until then this
-        // row banned the words "Curso", "Course", "Leccion" and "Lesson" outright, which also
-        // banned cataloguing a folder of numbered videos that is already on the disk — the thing
-        // this application exists to do. What the roadmap sentence actually protects is the
-        // platform: the markers are now the words the product would have to use if it enrolled
-        // anybody, certified anything, or kept a study record. "Badge" is deliberately not among
-        // them: ten existing keys carry it, starting with UnavailableBadge.
+        // Narrowed rather than dropped when courses arrived. This row used to ban the words
+        // "Curso", "Course", "Leccion" and "Lesson" outright, which also banned cataloguing a folder
+        // of numbered videos that is already on the disk — the thing this application exists to do.
+        // What the exclusion actually protects is the platform: the markers are the words the
+        // product would have to use if it enrolled anybody, certified anything, or kept a study
+        // record. "Badge" is deliberately not among them: ten existing keys carry it, starting with
+        // UnavailableBadge.
         { "formación como plataforma / training as a platform", ["Matricula", "Enrolment", "Enrollment", "Certificado", "Certificate", "Diploma", "Cuestionario", "Quiz", "Racha", "Streak", "ProgresoFormacion", "TrainingProgress", "PorcentajeFormacion", "CompletionPercent", "EstadisticasEstudio", "StudyStatistics"] },
         { "gestión de vídeos ajena a la biblioteca / video management beyond the library", ["Convertir", "Transcode", "Recortar", "Trim", "Exportar vídeo", "Export video"] },
         // "Note" is deliberately not a marker on its own: it matches RestoreFindingNotEnoughSpace and
         // every Notice in the licence strings, which are not this capability.
         { "notas personales en la línea de tiempo / personal timeline notes", ["TimelineNote", "PersonalNote", "NotaPersonal", "NotaLineaTiempo", "BookmarkNote"] },
         { "listas personalizadas / custom lists", ["ListaPersonalizada", "CustomList", "Playlist"] },
-        // The excluded passthrough is the audio one. VideoStatusHdrPassthrough is PLY-003's HDR10
-        // path, which this release does implement, so the marker names the audio capability instead.
+        // The excluded passthrough is the audio one. VideoStatusHdrPassthrough is the HDR10 path,
+        // which this release does implement, so the marker names the audio capability instead.
         { "Dolby Vision y passthrough de audio / Dolby Vision and audio passthrough", ["DolbyVision", "DolbyAtmos", "DtsPassthrough", "AudioPassthrough", "BitstreamPassthrough"] },
         { "macOS y Linux", ["macOS", "Linux"] },
     };
@@ -72,41 +70,6 @@ public sealed class ScopeBoundaryTests
     }
 
     /// <summary>
-    /// The exclusions are written down where someone deciding what to build next would look.
-    /// </summary>
-    [Fact]
-    public void The_roadmap_states_what_this_release_does_not_do()
-    {
-        foreach (var language in new[] { "es", "en" })
-        {
-            var path = RepositoryLayout.PathFromRoot($"docs/roadmap/README.{language}.md");
-            Assert.True(File.Exists(path), $"docs/roadmap/README.{language}.md is missing.");
-            var text = File.ReadAllText(path);
-
-            foreach (var id in new[] { "UX-007", "UX-008", "PLY-013", "PLY-015", "PRD-003" })
-            {
-                Assert.True(
-                    text.Contains(id, StringComparison.Ordinal),
-                    $"The {language} roadmap does not account for {id}.");
-            }
-        }
-    }
-
-    /// <summary>
-    /// The two commitments the product refuses outright keep their refusal, in the matrix and in the
-    /// specification. Anything else is a scope change, and a scope change is a decision, not an edit.
-    /// </summary>
-    [Fact]
-    public void The_refused_commitments_keep_their_refusal()
-    {
-        foreach (var (id, expected) in new[] { ("UX-008", "OUT_OF_SCOPE"), ("PLY-015", "OUT_OF_SCOPE") })
-        {
-            var row = Assert.Single(FeatureMatrix.Rows, candidate => candidate.Id == id);
-            Assert.Equal(expected, row.Status);
-        }
-    }
-
-    /// <summary>
     /// No database table, and therefore no schema, exists for something the release excludes. The
     /// interface can be changed back; a table that shipped cannot.
     /// </summary>
@@ -120,10 +83,10 @@ public sealed class ScopeBoundaryTests
         foreach (var file in Directory.EnumerateFiles(migrations, "*.sql"))
         {
             var text = File.ReadAllText(file);
-            // "courses" left this list on 2026-08-30 with ADR-0006, which made a course a third
-            // kind of title; "lessons" never joined it. What replaces them is the schema a course
-            // platform would need and this one must never grow: an enrolment, a certificate, a
-            // quiz, a streak. A table that shipped cannot be changed back.
+            // "courses" left this list when a course became a third kind of title; "lessons" never
+            // joined it. What replaces them is the schema a course platform would need and this one
+            // must never grow: an enrolment, a certificate, a quiz, a streak. A table that shipped
+            // cannot be changed back.
             foreach (var table in new[] { "accounts", "sessions", "sync_", "playlists", "custom_lists", "notes", "enrolments", "enrollments", "certificates", "quizzes", "streaks" })
             {
                 if (text.Contains($"CREATE TABLE {table}", StringComparison.OrdinalIgnoreCase))

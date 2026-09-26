@@ -8,7 +8,7 @@ using ApSolutions.LocalMedia.TestSupport;
 namespace ApSolutions.LocalMedia.ArchitectureTests;
 
 /// <summary>
-/// One owner for the native LibVLC instance, and one place that counts it (BUG-010).
+/// One owner for the native LibVLC instance, and one place that counts it.
 /// </summary>
 /// <remarks>
 /// <c>LibVlcFactory</c> states that the process keeps exactly one native instance per option set,
@@ -62,7 +62,7 @@ public sealed class NativeInstanceOwnershipTests
     /// rule rather than by reading, and named rather than exempted quietly — because its unification
     /// was not the same change: its <c>DisposeAsync</c> awaits the release of its media before it
     /// lets go of the player, and that order is what keeps the native teardown from crashing. It
-    /// left the list on 2026-08-14 (BUG-011), once the factory learnt to flush on request.
+    /// left the list on 2026-08-14, once the factory learnt to flush on request.
     /// </remarks>
     [Fact]
     public void The_deferred_release_queue_has_one_implementation_and_it_survives_a_throwing_dispose()

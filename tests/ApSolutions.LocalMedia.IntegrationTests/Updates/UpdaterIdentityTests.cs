@@ -11,7 +11,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Updates;
 
 /// <summary>
-/// What the updater tells GitHub it is (ARQ-014).
+/// What the updater tells GitHub it is.
 /// </summary>
 /// <remarks>
 /// The User-Agent announced <c>AP-Reelume-Updater/1.0</c> while the product declared <c>0.1.0</c>: a

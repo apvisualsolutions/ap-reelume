@@ -13,7 +13,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// The player's «Lecciones» panel (CRS-004): the course beside the picture, the row being played
+/// The player's «Lecciones» panel: the course beside the picture, the row being played
 /// marked, and every other one a press away.
 /// </summary>
 /// <remarks>

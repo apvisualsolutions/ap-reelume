@@ -112,7 +112,7 @@ public static class SegmentDetectionPolicy
     /// <summary>
     /// A result is storable when its range makes sense and its confidence carries weight. Manual
     /// markers always validated against the episode's duration; when a caller knows it, a detection
-    /// past the end is refused by the same rule instead of being judged blind (BUG-009).
+    /// past the end is refused by the same rule instead of being judged blind.
     /// </summary>
     private static bool IsStorable(DetectedSegment segment, TimeSpan? duration) =>
         segment.Confidence >= MinimumConfidence

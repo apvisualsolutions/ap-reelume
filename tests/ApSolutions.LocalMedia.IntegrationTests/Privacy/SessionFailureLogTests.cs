@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Privacy;
 /// Where a failure goes when no surface knows how to show it.
 /// </summary>
 /// <remarks>
-/// ARQ-004. Twenty-four command surfaces ran their work through <c>async void</c> and caught nothing,
+/// Twenty-four command surfaces ran their work through <c>async void</c> and caught nothing,
 /// and only two of them own any error state at all. So catching the failure is not enough on its own:
 /// something has to hold what the surface cannot say, or the fix is only a quieter way to lose it.
 /// <para>

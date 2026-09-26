@@ -15,7 +15,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// <remarks>
 /// <para>
 /// The Appearance page lets a person pick the accent, and the first version of that changed four
-/// tokens and almost nothing on screen — the maintainer reported it as "ni slider ni checks ni nada".
+/// tokens and almost nothing on screen: no slider, no check box, nothing.
 /// The cause is a shape this repository already knows: Fluent's controls read their own resource
 /// names, and the token file points those at the accent with a <b>static</b> reference, which
 /// resolves once when the dictionary loads and never looks again.

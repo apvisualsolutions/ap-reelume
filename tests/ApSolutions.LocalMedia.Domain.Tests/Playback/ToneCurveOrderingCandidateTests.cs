@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Playback;
 
 /// <summary>
-/// The tone curve moved behind the enlargement and dithered there, which `ENG-023` asked for,
+/// The tone curve moved behind the enlargement and dithered there, as was once proposed,
 /// measured against what ships and left unbuilt because of what the measurement said.
 /// </summary>
 /// <remarks>
@@ -32,17 +32,16 @@ namespace ApSolutions.LocalMedia.Domain.Tests.Playback;
 /// <b>So it is not built</b>, and the question of what happens with the enlargement off goes away
 /// with it: a shader on every frame and a second place where the curve can live, for less than one
 /// level of averaged tone that a screen cannot show. What removes a band stretched out of the source
-/// is a debanding filter, not a dither; and what the maintainer actually saw around lettering was
-/// compression noise lifted by the gamma (`ENG-021`), which is `ENG-024`'s denoiser.
+/// is a debanding filter, not a dither; and what actually showed around lettering was
+/// compression noise lifted by the gamma, which is a denoiser's job.
 /// </para>
 /// <para>
 /// <b>The model is grey and one-dimensional on purpose</b>: a luma curve on a grey pixel is the whole
 /// of the arithmetic — <c>PackedYuvConverter</c> adds the same luma to all three channels — and a
 /// ramp is where banding lives. Two enlargements are used and each for what it can show: linear for
 /// the averaged tone, and repetition for the band, because a linear ×4 splits any step of up to four
-/// levels into steps of one and would hide the band it is asked about — the mutation check measured
-/// exactly that blindness in the first draft of this file. The player's sharpened cubic lies between
-/// the two. Figures are in <c>docs/evidence/stable/ENG023-tone-curve-ordering.md</c>.
+/// levels into steps of one and would hide the band it is asked about — mutating the first draft of
+/// this file showed exactly that blindness. The player's sharpened cubic lies between the two.
 /// </para>
 /// </remarks>
 public sealed class ToneCurveOrderingCandidateTests
@@ -74,7 +73,7 @@ public sealed class ToneCurveOrderingCandidateTests
 
     /// <summary>
     /// Every scene: slow shadow ramp, the whole range, an almost flat patch, the deepest blacks and a
-    /// mid shadow, under gammas either side of one — 1.5 is what the maintainer had on.
+    /// mid shadow, under gammas either side of one — 1.5 is the setting the band was seen at.
     /// </summary>
     /// <remarks>
     /// The flat patch and the deepest blacks are left out at gamma 0.7, and that is measured rather
@@ -124,7 +123,7 @@ public sealed class ToneCurveOrderingCandidateTests
             candidate >= Math.Min(shipping, 2d),
             $"At gamma {gamma} over {low}–{high}, the dithered candidate reads a band of {candidate:F2} "
                 + $"levels against the shipping chain's {shipping:F2}: it now removes the band, so "
-                + "ENG-023 is worth reopening.");
+                + "moving the curve behind the enlargement is worth reopening.");
     }
 
     /// <summary>
@@ -174,8 +173,8 @@ public sealed class ToneCurveOrderingCandidateTests
         Assert.True(
             candidateWorst > shippingWorst - 0.25,
             $"The candidate's worst averaged error is {candidateWorst:F2} levels against the shipping "
-                + $"chain's {shippingWorst:F2}: it now wins by a quarter of a level or more, so ENG-023 "
-                + "is worth reopening.");
+                + $"chain's {shippingWorst:F2}: it now wins by a quarter of a level or more, so moving "
+                + "the curve behind the enlargement is worth reopening.");
     }
 
     /// <summary>
@@ -183,7 +182,7 @@ public sealed class ToneCurveOrderingCandidateTests
     /// </summary>
     /// <remarks>
     /// Every mistake that weakens the candidate strengthens the decision above, so without this the
-    /// comparison only looks one way — the mutation check showed that dropping the dither, or biasing
+    /// comparison only looks one way — mutating it showed that dropping the dither, or biasing
     /// the candidate by 0,4 of a level, left every other test green. Measured: 0,33 against 0,96.
     /// </remarks>
     [Fact]
@@ -206,7 +205,7 @@ public sealed class ToneCurveOrderingCandidateTests
     /// <remarks>
     /// Without this the comparison above could hold because the averaged error cannot tell two chains
     /// apart. Measured at 1,47 against 0,85; the margin of 0,4 is below that on purpose, and the
-    /// gentler mutants the mutation check tried are caught by the comparison instead.
+    /// gentler mutants that were tried are caught by the comparison instead.
     /// </remarks>
     [Fact]
     public void Truncating_the_curve_reads_clearly_worse_on_the_same_yardstick()
@@ -314,8 +313,8 @@ public sealed class ToneCurveOrderingCandidateTests
             }
         }
 
-        // A scene every chain paints flat measures nothing and passes anyway; the mutation check found
-        // two such rows in the first draft of this file.
+        // A scene every chain paints flat measures nothing and passes anyway; the first draft of
+        // this file had two such rows.
         Assert.True(
             ideal.Max() - ideal.Min() > 1d,
             $"Gamma {gamma} over {low}–{high} paints a range of {ideal.Max() - ideal.Min():F2} levels, "

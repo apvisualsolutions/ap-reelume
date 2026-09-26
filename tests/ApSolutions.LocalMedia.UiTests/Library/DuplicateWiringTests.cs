@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Library;
 
 /// <summary>
-/// Duplicates as versions existed as parts and never as a behaviour (LIB-008): the grouping use
+/// Duplicates as versions existed as parts and never as a behaviour: the grouping use
 /// case had a repository, a policy, and tests, and nothing in the application ever invoked it, so
 /// version groups were never created on their own — the review surface compared versions that only
 /// a test could have stored.

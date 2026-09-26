@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Metadata;
 
 /// <summary>
-/// Which titles need a frame for a cover, and from which video (LIB-021). Seeded with SQL straight
+/// Which titles need a frame for a cover, and from which video. Seeded with SQL straight
 /// into the migrated schema, because what is under test is a query across five tables and the rows
 /// it must and must not answer are clearer written out than built through five repositories.
 /// </summary>
@@ -111,7 +111,7 @@ public sealed class TitleFrameSourceRepositoryTests
 
     /// <summary>
     /// Identifying a film does not delete its scanned row, so the same file is both a title and a
-    /// scanned entry; it is asked for once. A mutation audit measured on 2026-09-18 that no test held this:
+    /// scanned entry; it is asked for once. Mutating the query showed that no test held this:
     /// the scanned branch's «no title claims it» condition could be removed and all seven stayed green.
     /// </summary>
     [Fact]

@@ -4,8 +4,8 @@
 namespace ApSolutions.LocalMedia.Domain.Discovery;
 
 /// <summary>
-/// What an error from a live watcher means for the watching. The distinction is the whole of
-/// BUG-012: an overflow is the operating system saying "I dropped changes you will never see",
+/// What an error from a live watcher means for the watching. The distinction is the whole
+/// point: an overflow is the operating system saying "I dropped changes you will never see",
 /// which asks for a full pass over the root and for the watching to go on. Everything else — a root
 /// that stopped answering, a handle that closed — really is the end of that watcher.
 /// </summary>

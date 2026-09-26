@@ -11,7 +11,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Playback;
 
 /// <summary>
-/// PLY-016's measurement, run against whatever cards this machine has. It answers the question the
+/// The upscaling measurement, run against whatever cards this machine has. It answers the question the
 /// feature was blocked on: which picture format the video processor takes, and whether the vendor's
 /// super resolution changes a single pixel when it is switched on.
 /// </summary>
@@ -25,7 +25,7 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Playback;
 [SupportedOSPlatform("windows")]
 public sealed class WindowsVideoUpscaleProbeTests
 {
-    /// <summary>720p into a 4K screen, which is the case the maintainer widened the feature to cover.</summary>
+    /// <summary>720p into a 4K screen, which is a case the feature was widened to cover.</summary>
     private const int SourceWidth = 1280;
     private const int SourceHeight = 720;
 
@@ -159,7 +159,7 @@ public sealed class WindowsVideoUpscaleProbeTests
     }
 
     /// <summary>
-    /// What every card offers with nobody switching anything on. This is the floor under PLY-016:
+    /// What every card offers with nobody switching anything on. This is the floor under upscaling:
     /// these filters belong to Direct3D rather than to a graphics card company, so they need no
     /// vendor application, no user setting and no licence.
     /// </summary>
@@ -181,8 +181,7 @@ public sealed class WindowsVideoUpscaleProbeTests
                 + "what an unread capabilities struct looks like.");
 
             // Offered and measured means the picture has to change; offered and unchanged would be
-            // a filter that reports itself and does nothing, which is the defect this house is
-            // named after.
+            // a filter that reports itself and does nothing: built, and never doing its job.
             Assert.Contains("EDGE_ENHANCEMENT", probe.Filters.Offered);
 
             // Declared and asked for stopped being the same thing when the level became a policy: a
@@ -284,7 +283,7 @@ public sealed class WindowsVideoUpscaleProbeTests
         }
 
         Assert.NotEmpty(rows);
-        var directory = RepositoryLayout.PathFromRoot("artifacts", "test-results", "PLY-016");
+        var directory = RepositoryLayout.PathFromRoot("artifacts", "test-results", "upscale-probe");
         Directory.CreateDirectory(directory);
         File.WriteAllLines(
             Path.Combine(directory, "d3d11-upscale-matrix.csv"),
@@ -304,7 +303,7 @@ public sealed class WindowsVideoUpscaleProbeTests
 
     private static void Write(IReadOnlyList<AdapterUpscaleProbe> probes, UpscaleDecision decision)
     {
-        var directory = RepositoryLayout.PathFromRoot("artifacts", "test-results", "PLY-016");
+        var directory = RepositoryLayout.PathFromRoot("artifacts", "test-results", "upscale-probe");
         Directory.CreateDirectory(directory);
         var rows = new List<string>
         {
@@ -366,7 +365,7 @@ public sealed class WindowsVideoUpscaleProbeTests
 
     /// <summary>
     /// What one enlarged frame costs on each adapter, and whether it leaves room for the rest of the
-    /// frame (PLY-016, and the figure PLY-018's criterion owes).
+    /// frame, which is also the figure the picture adjustment's criterion owes.
     /// </summary>
     /// <remarks>
     /// <para>

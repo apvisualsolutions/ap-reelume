@@ -267,7 +267,7 @@ public sealed class KeyboardJourneyTests
 
     private static void WriteEvidence(string fileName, StringBuilder content)
     {
-        var directory = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T33");
+        var directory = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "keyboard-journey");
         Directory.CreateDirectory(directory);
         File.WriteAllText(Path.Combine(directory, fileName), content.ToString());
     }

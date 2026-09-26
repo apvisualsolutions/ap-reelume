@@ -224,7 +224,7 @@ public sealed class ArtworkPickerViewModel : INotifyPropertyChanged
     /// no async relay of its own on this path and one command does not earn a dependency.
     /// </summary>
     /// <remarks>
-    /// <b>The owner raises the change rather than the command subscribing to it.</b> The first
+    /// <b>The owning view model raises the change rather than the command subscribing to it.</b> The first
     /// version added a handler to <c>PropertyChanged</c> inside the event's own <c>add</c> and left
     /// <c>remove</c> empty — a subscription per listener that nothing could ever release, and the
     /// owner outlives the command's listeners. Coverage is what pointed at it: two branches nobody

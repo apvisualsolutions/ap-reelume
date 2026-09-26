@@ -202,7 +202,7 @@ public sealed class MsixLifecycleTests
 
     /// <summary>
     /// Every container the product declares reaches the "Open with…" menu. Declaring them in the
-    /// manifest and never seeing Windows register them would leave `SYS-002` resting on a file
+    /// manifest and never seeing Windows register them would leave the file associations resting on a file
     /// nobody read back.
     /// </summary>
     [Fact]

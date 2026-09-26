@@ -21,64 +21,25 @@ namespace ApSolutions.LocalMedia.UiTests.Courses;
 /// prototype puts it.
 /// </summary>
 /// <remarks>
-/// The third view of the corner batch and the first whose shape was a decision rather than a
+/// The third view measured against the prototype and the first whose shape was a decision rather than a
 /// measurement: the prototype keeps «Marcar una carpeta como curso…» inside the empty box while
 /// there is nothing, and drops it to the foot in the plain button once there is something. The tree
 /// had it at the head and accented in both states, with a reason written against exactly that. The
-/// owner chose the prototype on 2026-09-03, so the reason is gone from the markup rather than left
+/// prototype was chosen on 2026-09-03, so the reason is gone from the markup rather than left
 /// there contradicting what the file does.
 /// <para>
 /// <b>One thing the design draws is deliberately absent, and it is not an oversight.</b> Each card
 /// there opens with a 16:9 picture — the prototype's generated gradient, which stands in for artwork
 /// it cannot ship. A course is detected from a folder and never looked up, so that panel would be a
 /// placeholder for ever unless the picture came from the video itself.
-/// <b>Whether it can is now measured and the answer is yes</b> — «docs/evidence/stable/CRS-thumbnail-spike.md»,
-/// a frame in 137 ms and about 460 ms per file with a seek — but whether this application should
-/// open files it was never asked to play is the maintainer's decision and is still open. Nothing here
+/// <b>Whether it can is now measured and the answer is yes</b> — a frame in 137 ms and about
+/// 460 ms per file with a seek — but whether this application should open files it was never asked
+/// to play is a product decision and is still open. Nothing here
 /// asserts the panel's absence, because an assertion would make that look settled.
 /// </para>
 /// </remarks>
-public sealed class CoursesScreenTests
+public sealed partial class CoursesScreenTests
 {
-    /// <summary>Each number this screen draws, what it is, and how it is found in the design.</summary>
-    /// <remarks>
-    /// Anchored to a neighbouring declaration rather than to the value: 14 is the grid's gap and also
-    /// the card's own horizontal padding, and 8 is the empty box's corner, its inner gap and its
-    /// hairline's own radius elsewhere.
-    /// </remarks>
-    private static readonly (string What, double Value, string Pattern)[] Pairings =
-    [
-        ("the section's stacking", 18, @"data-screen-label=""Cursos"" style=""display:flex;flex-direction:column;gap:(?<value>[0-9]+)px"),
-        ("the intro's size", 13, @"margin:6px 0 0;color:var\(--text2,\#5B6675\);font-size:(?<value>[0-9]+)px;max-width:820px"),
-        ("the intro's greatest width", 820, @"margin:6px 0 0;color:var\(--text2,\#5B6675\);font-size:13px;max-width:(?<value>[0-9]+)px"),
-        ("the empty box's corner", 8, @"border:1px dashed var\(--border-strong,\#8A97A6\);border-radius:(?<value>[0-9]+)px;padding:48px 24px"),
-        ("the empty box's heading", 16, @"align-items:center;gap:8px""[^>]*>\s*<div style=""font-size:(?<value>[0-9]+)px;font-weight:600"">\{\{ crsEmptyT"),
-        ("the empty box's sentence", 13, @"font-size:(?<value>[0-9]+)px;color:var\(--text2,\#5B6675\);max-width:540px;text-wrap:pretty"">\{\{ crsEmptyB"),
-        ("that sentence's greatest width", 540, @"font-size:13px;color:var\(--text2,\#5B6675\);max-width:(?<value>[0-9]+)px;text-wrap:pretty"">\{\{ crsEmptyB"),
-        ("the grid's gap", 14, @"grid-template-columns:repeat\(auto-fill,minmax\(300px,1fr\)\);gap:(?<value>[0-9]+)px"),
-        ("the card's title", 14, @"font-size:(?<value>[0-9]+)px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"">\{\{ cc\.title"),
-        ("the card's folder", 11, @"ui-monospace,monospace;font-size:(?<value>[0-9]+)px;color:var\(--text2,\#5B6675\)[^>]*>\{\{ cc\.root"),
-        ("the gap under the card's title", 2, @"white-space:nowrap;margin-top:(?<value>[0-9]+)px"">\{\{ cc\.root"),
-        ("the card's meta", 12, @"<div style=""font-size:(?<value>[0-9]+)px;color:var\(--text2,\#5B6675\)"">\{\{ cc\.meta"),
-        ("the detection note", 12, @"<div style=""font-size:(?<value>[0-9]+)px;color:var\(--text2,\#5B6675\);max-width:820px;text-wrap:pretty"">\{\{ crsNote"),
-    ];
-
-    /// <summary>The numbers this screen's classes draw are the ones the design writes.</summary>
-    [Fact]
-    public void The_numbers_this_screen_draws_are_the_ones_the_design_writes()
-    {
-        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-
-        foreach (var (what, value, pattern) in Pairings)
-        {
-            var match = Regex.Match(design, pattern, RegexOptions.None, TimeSpan.FromSeconds(5));
-
-            Assert.True(match.Success, $"the design no longer draws {what}, so this screen is paired with nothing.");
-            Assert.Equal(
-                value,
-                double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture));
-        }
-    }
 
     /// <summary>The screen the view builds draws them.</summary>
     [AvaloniaFact]
@@ -129,9 +90,6 @@ public sealed class CoursesScreenTests
     [AvaloniaFact]
     public void The_empty_state_is_dashed()
     {
-        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-        Assert.Matches(@"border:1px dashed var\(--border-strong,\#8A97A6\);border-radius:8px", design);
-
         var view = new CoursesView();
         var window = new Window { Width = 1200, Height = 900, Content = view };
 

@@ -3,7 +3,7 @@
   SPDX-License-Identifier: LicenseRef-APSolutions
 
   Copies the LibVLC tree libvlc.lock.json pins into the output, in place of the
-  VideoLAN.LibVLC.Windows NuGet package (ENG-013). The shape is that package's on purpose: the
+  VideoLAN.LibVLC.Windows NuGet package, which carried GPL plugins. The shape is that package's on purpose: the
   same libvlc\win-<arch>\ folders, chosen by $(Platform) the same way, as Content with
   PreserveNewest. So LibVLCSharp's Core.Initialize() finds the engine where it always did, the
   content flows to every project that references Infrastructure as it always did, and the
@@ -39,7 +39,7 @@
   <!--
     Every build, not only the ones that fetch. FetchLibVlc is skipped whenever its markers are newer
     than the lock file, so the "unpinned" warning fetch-libvlc.ps1 prints could not be relied on to
-    reach anyone: a mutation audit set a marker to unpinned with the lock pinned, built, and got silence.
+    reach anyone: a marker set to unpinned with the lock pinned built in silence.
     This reads the markers themselves.
   -->
   <Target Name="WarnOnUnpinnedLibVlc" AfterTargets="FetchLibVlc" BeforeTargets="BeforeBuild" Condition="'$(LibVlcArchitectures)' != ''">

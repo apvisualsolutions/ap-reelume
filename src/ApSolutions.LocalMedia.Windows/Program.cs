@@ -17,7 +17,7 @@ internal static class Program
     {
         var host = ApplicationHost.Create(new AppDataPaths());
 
-        // ARQ-004. The net goes up before anything is asked to run. What a command surface can show,
+        // The net goes up before anything is asked to run. What a command surface can show,
         // it shows; what reaches the top of the process instead ends as a code rather than as the end
         // of the process. It is installed here because this is the only place that owns the process.
         using var failures = new ProcessFailureHandlers(
@@ -38,7 +38,7 @@ internal static class Program
         }
         finally
         {
-            // ARQ-001. What the application took, it gives back: the media player, the audio
+            // What the application took, it gives back: the media player, the audio
             // adapter, the tray icon, the hardware key registrations and the clients the updater and
             // the metadata provider hold. Windows would reclaim all of it anyway — that is the point.
             // Leaning on the operating system to undo what this process did is not a teardown, it is

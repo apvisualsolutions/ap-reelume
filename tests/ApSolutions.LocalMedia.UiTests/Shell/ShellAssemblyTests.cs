@@ -62,7 +62,7 @@ public sealed class ShellAssemblyTests
 
     /// <summary>
     /// The add dialog's two halves share one path box, so they also have to share the kind the root
-    /// half detects from it (CRS-001).
+    /// half detects from it.
     /// </summary>
     /// <remarks>
     /// Reading it once when the shell is built would freeze it at <c>Local</c>, which is what every
@@ -624,7 +624,7 @@ public sealed class ShellAssemblyTests
     }
 
     /// <summary>
-    /// Six since 2026-08-30, when Courses became a destination of its own (CRS-003). The list is
+    /// Six since 2026-08-30, when Courses became a destination of its own. The list is
     /// asserted in order rather than by count: the rail is written by hand in the AXAML, and a route
     /// that entered the enum somewhere the rail does not draw it would still pass a count.
     /// </summary>

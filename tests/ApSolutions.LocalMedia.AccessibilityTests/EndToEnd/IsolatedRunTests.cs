@@ -336,7 +336,7 @@ public sealed class IsolatedRunTests : IDisposable
     }
 
     /// <summary>
-    /// The same rule at the cover picker (LIB-018): an isolated run answers out of its own handover
+    /// The same rule at the cover picker: an isolated run answers out of its own handover
     /// folder, and the run that owns the profile is still the one Windows asks.
     /// </summary>
     /// <remarks>

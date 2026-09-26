@@ -47,8 +47,8 @@ public sealed class ExplanationCodeTests
     /// <remarks>
     /// The <c>(?&lt;!cref=)</c> is not decoration and it loosens nothing. A cross-reference in
     /// documentation is a quoted string that starts with the same word, and on 2026-08-28 one of
-    /// them made this fail asking for a dictionary entry for a class name. That is the shape ARQ-013
-    /// fixed seen from the other side: a gate reading source as text and believing a comment. What
+    /// them made this fail asking for a dictionary entry for a class name. That is the shape the
+    /// reachability gate had to fix, seen from the other side: a gate reading source as text and believing a comment. What
     /// it still catches is what it is for — a code literal written into the domain with no words
     /// behind it.
     /// </remarks>

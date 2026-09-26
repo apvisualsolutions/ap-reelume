@@ -47,8 +47,8 @@ public sealed class RootWatchCoordinator
 
         // Who gets a live watcher is ScanWatchPolicy's decision, not a flag read here: the per-root
         // Continuous flag is one of its two answers, and the setting a person can actually reach is
-        // the other (ENG-044). A root that said «only when I ask» is still not followed behind its
-        // owner's back. The fallback scheduler reads the policy on its own, so it always gets the
+        // the other. A root that said «only when I ask» is still not followed behind the
+        // person's back. The fallback scheduler reads the policy on its own, so it always gets the
         // root.
         var watcher = ScanWatchPolicy.ShouldWatchLive(
             root.Kind,

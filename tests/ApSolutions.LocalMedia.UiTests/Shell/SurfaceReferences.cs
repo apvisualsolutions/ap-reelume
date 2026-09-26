@@ -8,7 +8,7 @@ namespace ApSolutions.LocalMedia.UiTests.Shell;
 /// <summary>
 /// Whether one surface names another, read from what the file says rather than from what it once
 /// said. Used by <see cref="SurfaceReachabilityTests"/> to build the graph it walks, and separated
-/// from it so the reading itself can be measured (ARQ-013).
+/// from it so the reading itself can be measured.
 /// </summary>
 internal static class SurfaceReferences
 {

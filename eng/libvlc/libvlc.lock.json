@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "comment": [
-    "The LibVLC the application ships (ENG-013): the trees libvlc-nogpl.yml built without GPL code,",
+    "The LibVLC the application ships: the trees libvlc-nogpl.yml built without GPL code,",
     "promoted by libvlc-publish.yml to a prerelease of this repository and pinned here by the SHA-512",
     "of each asset as published. The build is not reproducible byte for byte, so the hash of what was",
     "verified is the only thing that can name it. fetch-libvlc.ps1 refuses any other bytes, and the",

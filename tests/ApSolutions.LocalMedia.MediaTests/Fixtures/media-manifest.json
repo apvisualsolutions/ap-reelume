@@ -10,7 +10,7 @@
   "samples": [
     {
       "id": "mp4-h264-aac",
-      "relativePath": "T19/mp4-h264-aac.mp4",
+      "relativePath": "codec-matrix/mp4-h264-aac.mp4",
       "container": "MP4",
       "videoCodec": "H.264",
       "audioCodec": "AAC",
@@ -27,7 +27,7 @@
     },
     {
       "id": "mkv-hevc-eac3",
-      "relativePath": "T19/mkv-hevc-eac3.mkv",
+      "relativePath": "codec-matrix/mkv-hevc-eac3.mkv",
       "container": "Matroska",
       "videoCodec": "HEVC",
       "audioCodec": "E-AC-3",
@@ -44,7 +44,7 @@
     },
     {
       "id": "avi-mpeg4-mp3",
-      "relativePath": "T19/avi-mpeg4-mp3.avi",
+      "relativePath": "codec-matrix/avi-mpeg4-mp3.avi",
       "container": "AVI",
       "videoCodec": "MPEG-4 Part 2",
       "audioCodec": "MP3",
@@ -61,7 +61,7 @@
     },
     {
       "id": "mov-h264-pcm",
-      "relativePath": "T19/mov-h264-pcm.mov",
+      "relativePath": "codec-matrix/mov-h264-pcm.mov",
       "container": "QuickTime",
       "videoCodec": "H.264",
       "audioCodec": "PCM S16LE",
@@ -78,7 +78,7 @@
     },
     {
       "id": "webm-vp9-opus",
-      "relativePath": "T19/webm-vp9-opus.webm",
+      "relativePath": "codec-matrix/webm-vp9-opus.webm",
       "container": "WebM",
       "videoCodec": "VP9",
       "audioCodec": "Opus",
@@ -95,7 +95,7 @@
     },
     {
       "id": "mkv-av1-opus",
-      "relativePath": "T19/mkv-av1-opus.mkv",
+      "relativePath": "codec-matrix/mkv-av1-opus.mkv",
       "container": "Matroska",
       "videoCodec": "AV1",
       "audioCodec": "Opus",
@@ -112,7 +112,7 @@
     },
     {
       "id": "mkv-h264-no-audio",
-      "relativePath": "T19/mkv-h264-no-audio.mkv",
+      "relativePath": "codec-matrix/mkv-h264-no-audio.mkv",
       "container": "Matroska",
       "videoCodec": "H.264",
       "audioCodec": null,
@@ -129,7 +129,7 @@
     },
     {
       "id": "mkv-dual-audio-spanish-first",
-      "relativePath": "T20/mkv-dual-audio-spanish-first.mkv",
+      "relativePath": "tracks-and-subtitles/mkv-dual-audio-spanish-first.mkv",
       "container": "Matroska",
       "videoCodec": "H.264",
       "audioCodec": "E-AC-3 5.1 (spa) + AAC stereo (eng)",
@@ -141,7 +141,7 @@
       "subtitleTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libx264", "eac3", "aac", "srt" ],
-      "companionTextPath": "T20/spanish-first.srt",
+      "companionTextPath": "tracks-and-subtitles/spanish-first.srt",
       "companionText": "1\n00:00:00,500 --> 00:00:02,500\nPista interna en español\n",
       "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=440:duration=3 -f lavfi -i sine=frequency=880:duration=3 -i \"{{companion}}\" -map 0:v -map 1:a -map 2:a -map 3:s -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a:0 eac3 -ac:a:0 6 -c:a:1 aac -b:a:1 64k -c:s srt -metadata:s:a:0 language=spa -metadata:s:a:1 language=eng -metadata:s:s:0 language=spa -t 3",
       "expectedOutcome": "Playable",
@@ -150,7 +150,7 @@
     },
     {
       "id": "mkv-dual-audio-english-first",
-      "relativePath": "T20/mkv-dual-audio-english-first.mkv",
+      "relativePath": "tracks-and-subtitles/mkv-dual-audio-english-first.mkv",
       "container": "Matroska",
       "videoCodec": "H.264",
       "audioCodec": "AAC stereo (eng) + E-AC-3 5.1 (spa)",
@@ -162,7 +162,7 @@
       "subtitleTracks": 1,
       "hdr": false,
       "requiredEncoders": [ "libx264", "eac3", "aac", "srt" ],
-      "companionTextPath": "T20/english-first.srt",
+      "companionTextPath": "tracks-and-subtitles/english-first.srt",
       "companionText": "1\n00:00:00,500 --> 00:00:02,500\nInternal Spanish track\n",
       "recipe": "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 -f lavfi -i sine=frequency=880:duration=3 -f lavfi -i sine=frequency=440:duration=3 -i \"{{companion}}\" -map 0:v -map 1:a -map 2:a -map 3:s -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a:0 aac -b:a:0 64k -c:a:1 eac3 -ac:a:1 6 -c:s srt -metadata:s:a:0 language=eng -metadata:s:a:1 language=spa -metadata:s:s:0 language=spa -t 3",
       "expectedOutcome": "Playable",
@@ -171,7 +171,7 @@
     },
     {
       "id": "mkv-audio-stereo",
-      "relativePath": "T23/mkv-audio-stereo.mkv",
+      "relativePath": "audio-channels/mkv-audio-stereo.mkv",
       "container": "Matroska",
       "videoCodec": "H.264",
       "audioCodec": "AAC stereo",
@@ -188,7 +188,7 @@
     },
     {
       "id": "mkv-audio-51",
-      "relativePath": "T23/mkv-audio-51.mkv",
+      "relativePath": "audio-channels/mkv-audio-51.mkv",
       "container": "Matroska",
       "videoCodec": "H.264",
       "audioCodec": "E-AC-3 5.1",
@@ -205,7 +205,7 @@
     },
     {
       "id": "mkv-audio-71",
-      "relativePath": "T23/mkv-audio-71.mkv",
+      "relativePath": "audio-channels/mkv-audio-71.mkv",
       "container": "Matroska",
       "videoCodec": "H.264",
       "audioCodec": "FLAC 7.1",
@@ -223,7 +223,7 @@
     },
     {
       "id": "mkv-audio-71-tones",
-      "relativePath": "T23/mkv-audio-71-tones.mkv",
+      "relativePath": "audio-channels/mkv-audio-71-tones.mkv",
       "container": "Matroska",
       "videoCodec": "H.264",
       "audioCodec": "FLAC 7.1",
@@ -241,7 +241,7 @@
     },
     {
       "id": "mkv-hevc-hdr10",
-      "relativePath": "T22/mkv-hevc-hdr10.mkv",
+      "relativePath": "hdr/mkv-hevc-hdr10.mkv",
       "container": "Matroska",
       "videoCodec": "HEVC Main 10 HDR10",
       "audioCodec": null,
@@ -259,7 +259,7 @@
     },
     {
       "id": "mkv-hevc-sdr",
-      "relativePath": "T22/mkv-hevc-sdr.mkv",
+      "relativePath": "hdr/mkv-hevc-sdr.mkv",
       "container": "Matroska",
       "videoCodec": "HEVC Main",
       "audioCodec": null,
@@ -277,7 +277,7 @@
     },
     {
       "id": "mkv-avs2-unsupported",
-      "relativePath": "T19/mkv-avs2-unsupported.mkv",
+      "relativePath": "codec-matrix/mkv-avs2-unsupported.mkv",
       "container": "Matroska",
       "videoCodec": "AVS2",
       "audioCodec": null,
@@ -295,7 +295,7 @@
     },
     {
       "id": "mp4-truncated",
-      "relativePath": "T19/mp4-truncated.mp4",
+      "relativePath": "codec-matrix/mp4-truncated.mp4",
       "container": "MP4",
       "videoCodec": "H.264",
       "audioCodec": "AAC",

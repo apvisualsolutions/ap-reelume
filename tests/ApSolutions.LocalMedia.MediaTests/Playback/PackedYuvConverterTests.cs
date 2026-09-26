@@ -197,9 +197,9 @@ public sealed class PackedYuvConverterTests
     [Fact]
     public void An_identity_table_leaves_the_conversion_byte_for_byte_as_it_was()
     {
-        // PLY-018's acceptance criterion, measured on the pixels rather than on the policy. The
-        // table here is written out rather than asked of PictureAdjustment on purpose: what this
-        // file tests is the conversion, and «the neutral setting builds the identity» is a claim
+        // The picture adjustment's acceptance criterion, measured on the pixels rather than on the
+        // policy. The table here is written out rather than asked of PictureAdjustment on purpose: what
+        // this file tests is the conversion, and «the neutral setting builds the identity» is a claim
         // about the policy, measured where the policy lives.
         const int Width = 4;
         const int Height = 2;
@@ -257,16 +257,15 @@ public sealed class PackedYuvConverterTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>This is the guard on a mistake that shipped for twenty minutes on 2026-09-13.</b> The tone
-    /// curve bands a gradient, the textbook fix is to dither the fraction across neighbouring pixels,
-    /// and it was built — and the maintainer saw it at once: «ahora aparecen un montón de cuadraditos en toda
-    /// la imagen». The pattern lives in the resolution of the decoded frame and the screen is four times
-    /// that, so an 8×8 cell becomes a 32×32 block: one level of difference spread over an area large
-    /// enough to read as banding of its own.
+    /// <b>This is the guard on a mistake that shipped briefly.</b> The tone curve bands a gradient,
+    /// the textbook fix is to dither the fraction across neighbouring pixels, and it was built — and
+    /// it was visible at once: small squares all over the picture. The pattern lives in the resolution
+    /// of the decoded frame and the screen is four times that, so an 8×8 cell becomes a 32×32 block:
+    /// one level of difference spread over an area large enough to read as banding of its own.
     /// </para>
     /// <para>
     /// So the conversion paints every pixel of a given level the same, and this is what says so. The
-    /// ordering was measured on 2026-09-25 (`ENG-023`): the band a raised gamma shows is the file's own
+    /// ordering was measured too: the band a raised gamma shows is the file's own
     /// eight-bit step stretched by the curve, and a dither after the scaling cannot remove it either —
     /// so flat stays flat and nothing is dithered.
     /// </para>

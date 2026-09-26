@@ -24,8 +24,8 @@ public sealed record LocalSeriesPlacement(
 /// This is the rule the catalogue was missing entirely. <c>MediaNameParser</c> has read
 /// <c>S01E01</c>, <c>1x04</c>, «Temporada 1 Episodio 2» and <c>Cap.803</c> since it was written, and
 /// nothing ever asked it where the episode belonged: every scanned file became one loose card of its
-/// own. The maintainer put two shows on the disk on 2026-08-25 — eight seasons and seventy-four episodes
-/// of one, three and twenty-five of the other — and got a hundred and two cards.
+/// own. Two real shows put on a disk on 2026-08-25 — one of eight seasons, the other of three —
+/// came out as a hundred-odd loose cards.
 /// </para>
 /// <para>
 /// <b>It is the folder that names a series, not the file.</b>

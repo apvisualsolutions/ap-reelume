@@ -19,7 +19,7 @@ public sealed class SegmentDetectionSettingsViewModel : INotifyPropertyChanged
     private readonly Action<bool> _writeEnabled;
 
     /// <summary>
-    /// The factory value this group's «Restaurar valores por defecto» puts back (UX-010). It is the
+    /// The factory value this group's «Restaurar valores por defecto» puts back. It is the
     /// use case's own constant rather than a second copy of the word «false».
     /// </summary>
     public const bool DefaultEnabled = DetectSeriesSegments.EnabledByDefault;
@@ -33,7 +33,7 @@ public sealed class SegmentDetectionSettingsViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     /// <remarks>
     /// Always executable, where the picture group offers its own only while something is away from
     /// neutral: this group is one switch, so «there is nothing to undo» and «it is already off» are

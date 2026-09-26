@@ -10,12 +10,12 @@ using ApSolutions.LocalMedia.Application.Events;
 namespace ApSolutions.LocalMedia.Presentation.Library;
 
 /// <summary>
-/// What the Library says while a scan runs, and it says it two ways (ADR-0010).
+/// What the Library says while a scan runs, and it says it two ways.
 /// </summary>
 /// <remarks>
 /// A scan somebody launched by hand gets the strip: it describes a state, so it takes space and
 /// pushes the grid down, and it carries the cancel button. A scan that starts on its own gets the
-/// pulse in the header instead, where the space is already spent — the ADR's fifth point is that a
+/// pulse in the header instead, where the space is already spent — the rule for notices is that a
 /// shift nobody asked for is not paid for, and that is the whole difference between the two.
 /// <para>
 /// Until 2026-09-05 the second case drew NOTHING. <c>Begin</c> is the only thing that ever set
@@ -106,7 +106,7 @@ public sealed class ScanProgressViewModel : INotifyPropertyChanged
         private set => SetField(ref _hasFinished, value);
     }
 
-    /// <summary>Stops the scan. Its guard reads state that moves, so it announces (ARQ-004).</summary>
+    /// <summary>Stops the scan. Its guard reads state that moves, so it announces.</summary>
     public ICommand CancelCommand => _cancel;
 
     public void Begin(CancellationTokenSource cancellation)

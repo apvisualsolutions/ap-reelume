@@ -15,7 +15,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The maintainer saw it before any gate did: the words inside the pills are not vertically centred. They
+/// A person saw it before any gate did: the words inside the pills are not vertically centred. They
 /// are not, and the cause is a default nobody wrote. <c>ContentControl.VerticalContentAlignment</c>
 /// starts at <c>Stretch</c>, this repository's own <c>Button</c> style sets a height, a radius and a
 /// padding and never touches the alignment, and a stretched <c>TextBlock</c> fills its whole box and

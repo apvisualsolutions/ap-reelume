@@ -3,7 +3,8 @@
 
 <#
 .SYNOPSIS
-    Downloads VideoLAN.LibVLC.Windows — the reference every ENG-013 check measures itself against —
+    Downloads VideoLAN.LibVLC.Windows — the reference every check of the GPL-free engine measures
+    itself against —
     and accepts it only if its bytes are the ones pinned here.
 
 .DESCRIPTION
@@ -15,7 +16,7 @@
 
     Until 2026-09-18 it also read the application's packages.lock.json for the version. That stops
     being possible the day the application ships the rebuilt tree instead of this package, which is
-    the whole point of ENG-013, so the version is now held against the VLC tag build-nogpl.sh builds:
+    the whole point of building the engine without GPL, so the version is now held against the VLC tag build-nogpl.sh builds:
     the day the build moves to another VLC, this refuses to compare against the old reference
     instead of doing it quietly.
 

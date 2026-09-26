@@ -13,7 +13,7 @@ public readonly record struct UpscaleCost(TimeSpan PerFrame, double FrameBudgetS
 
 /// <summary>
 /// Whether an enlargement a card can do is one it can afford, kept away from the card that carries
-/// it out (PLY-016).
+/// it out.
 /// </summary>
 /// <remarks>
 /// <para>

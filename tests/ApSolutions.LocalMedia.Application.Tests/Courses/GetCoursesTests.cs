@@ -9,7 +9,7 @@ using Xunit;
 
 namespace ApSolutions.LocalMedia.Application.Tests.Courses;
 
-/// <summary>The courses grid and one opened course (CRS-002, CRS-003).</summary>
+/// <summary>The courses grid and one opened course.</summary>
 public sealed class GetCoursesTests
 {
     private static readonly LibraryRootId RootId = new(Guid.NewGuid());

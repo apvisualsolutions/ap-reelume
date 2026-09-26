@@ -40,8 +40,8 @@ public sealed class GitHubReleaseUpdateProvider : IUpdateSource
     /// <summary>
     /// How this application introduces itself to GitHub. The brand is the public name; the number is
     /// read from the assembly rather than written here, because a version typed by hand drifts from
-    /// the one the product declares and nobody notices — it announced 1.0 against a declared 0.1.0
-    /// until ARQ-014. The build metadata after '+' is dropped: it identifies a commit, and the other
+    /// the one the product declares and nobody notices — it once announced 1.0 against a declared
+    /// 0.1.0. The build metadata after '+' is dropped: it identifies a commit, and the other
     /// end is being told which release is asking.
     /// </summary>
     private static readonly ProductInfoHeaderValue Identity = new(
@@ -140,7 +140,7 @@ public sealed class GitHubReleaseUpdateProvider : IUpdateSource
     }
 
     /// <summary>
-    /// One megabyte is the ceiling on "what is the latest release?" (SEC-005). A source that
+    /// One megabyte is the ceiling on "what is the latest release?". A source that
     /// answers more is not answering the question, whatever its bytes would have parsed as, and it
     /// is cut off at the ceiling rather than buffered whole to find out.
     /// </summary>

@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Courses;
 
 /// <summary>
-/// The thread a course keeps for itself (CRS-002), and the summary a card draws (CRS-003).
+/// The thread a course keeps for itself, and the summary a card draws.
 /// </summary>
 public sealed class CourseThreadPolicyTests
 {
@@ -167,8 +167,9 @@ public sealed class CourseThreadPolicyTests
     }
 
     /// <summary>
-    /// The key is PLY-008's, in the shape it already has: course where a title goes, lesson where an
-    /// episode goes. A film's key has no episode part and is not a lesson's.
+    /// The key is the one playback progress already uses, in the shape it already has: course where a
+    /// title goes, lesson where an episode goes. A film's key has no episode part and is not a
+    /// lesson's.
     /// </summary>
     [Fact]
     public void A_lesson_stores_its_progress_under_the_key_the_store_already_has()

@@ -13,7 +13,7 @@ namespace ApSolutions.LocalMedia.Application.Tests.Identification;
 
 /// <summary>
 /// The caller the audit found missing: the scan produced files and nothing handed them to
-/// identification, so the review inbox stayed empty forever (LIB-006/007).
+/// identification, so the review inbox stayed empty forever.
 /// </summary>
 public sealed class IdentifyScannedFilesTests
 {
@@ -112,7 +112,7 @@ public sealed class IdentifyScannedFilesTests
     }
 
     /// <summary>
-    /// The automatic half of LIB-007. A match the scorer trusts on its own reaches the catalogue
+    /// The automatic half of identification. A match the scorer trusts on its own reaches the catalogue
     /// without anybody confirming it — which is the whole reason the threshold exists, and the half
     /// that until now was calculated and dropped.
     /// </summary>

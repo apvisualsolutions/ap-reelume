@@ -23,7 +23,7 @@ namespace ApSolutions.LocalMedia.UiTests.Metadata;
 /// </summary>
 /// <remarks>
 /// <para>
-/// §4 asks for the three messages as blocks with a glyph — conflict and unidentified on
+/// The redesign asks for the three messages as blocks with a glyph — conflict and unidentified on
 /// <c>WarningSurfaceBrush</c>, no provider answer as a neutral fact — and notes "the way they can
 /// overlap today". <b>Measured: they cannot.</b> All three are assigned in one method from one
 /// <c>result.Outcome</c>, so exactly one is ever true. The document flagged a risk that the code had

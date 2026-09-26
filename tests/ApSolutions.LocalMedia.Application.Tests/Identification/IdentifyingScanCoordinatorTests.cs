@@ -65,7 +65,7 @@ public sealed class IdentifyingScanCoordinatorTests
 
         Assert.Same(summary, returned);
 
-        // And the scan says it finished only after all of them (LIB-021): the frame pass it starts
+        // And the scan says it finished only after all of them: the frame pass it starts
         // asks which titles still have no cover, and naming and series grouping decide which cards
         // exist at all.
         Assert.Equal(4, handOffsWhenFinished);

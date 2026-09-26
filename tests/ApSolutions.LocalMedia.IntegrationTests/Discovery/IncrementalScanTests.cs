@@ -38,7 +38,7 @@ public sealed class IncrementalScanTests
 
         Assert.NotNull(repository.GetConstructor([factory.GetType()]));
         Assert.NotNull(enumerator.GetConstructor(Type.EmptyTypes));
-        // The probe takes the factory that owns the one native instance (BUG-010); a parameterless
+        // The probe takes the factory that owns the one native instance; a parameterless
         // one would be a probe that built a second.
         Assert.NotNull(probe.GetConstructor(
             [RequireType("ApSolutions.LocalMedia.Infrastructure.Playback.LibVlcFactory")]));

@@ -14,15 +14,15 @@ namespace ApSolutions.LocalMedia.AccessibilityTests;
 
 /// <summary>
 /// That a headless hit test answers from the last rendered frame and not from the visual tree, which
-/// is the mechanism behind `ENG-026` and the reason the walk renders a frame before it chooses where
-/// to click.
+/// is the mechanism behind a run of intermittent reds and the reason the walk renders a frame before it
+/// chooses where to click.
 /// </summary>
 /// <remarks>
 /// <para>
 /// <b>What it cost.</b> The assembled walk failed five times on runs that changed no code, the last
 /// three in <c>The_players_transport_is_operated_with_the_mouse</c> with one message: the point beside
 /// Pause was chosen with the home view under it and clicked on the player. The harness decides that a
-/// point is safe — not on a picture, which pauses since `ENG-018` — by asking <c>InputHitTest</c>, and
+/// point is safe — not on a picture, which a click pauses — by asking <c>InputHitTest</c>, and
 /// that answer came from a frame drawn before the player appeared. The input helpers render a frame
 /// themselves, so the click that followed saw the player, landed on the film and paused it.
 /// </para>
@@ -39,9 +39,9 @@ namespace ApSolutions.LocalMedia.AccessibilityTests;
 /// asserted the stale half — that after layout the hit test still names the old element — and it
 /// failed inside the full suite: there the real render timer sometimes ticks on its own during the
 /// test, and the hit test comes back current. A test that depends on the timer not ticking is the
-/// kind of intermittent red this file exists to end, so the stale half lives in
-/// <c>docs/evidence/stable/ENG026-hit-test-stale-frame.md</c> with its numbers, and what is asserted
-/// here is what the walk relies on: after a capture, the hit test always names what is on screen.
+/// kind of intermittent red this file exists to end, so the stale half stays a measurement and
+/// not an assertion, and what is asserted here is what the walk relies on: after a capture, the hit
+/// test always names what is on screen.
 /// </para>
 /// </remarks>
 public sealed class HeadlessHitTestFrameTests

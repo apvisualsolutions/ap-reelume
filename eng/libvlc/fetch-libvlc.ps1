@@ -4,7 +4,7 @@
 <#
 .SYNOPSIS
     Puts the LibVLC tree libvlc.lock.json pins where the build copies it from, and accepts it only if
-    its bytes are the ones pinned (ENG-013).
+    its bytes are the ones pinned.
 
 .DESCRIPTION
     Until 2026-09-18 LibVLC came from the VideoLAN.LibVLC.Windows NuGet package, which carries GPL

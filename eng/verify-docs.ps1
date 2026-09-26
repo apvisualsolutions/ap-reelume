@@ -1,36 +1,105 @@
 # SPDX-FileCopyrightText: 2026 AP Solutions
 # SPDX-License-Identifier: LicenseRef-APSolutions
 
+<#
+.SYNOPSIS
+    Checks the published documentation: every localized document has its counterpart, and every
+    relative link resolves to something that is published too.
+
+.DESCRIPTION
+    The documents checked are the Markdown files under docs/ and at the root of the repository that
+    git would publish: what it tracks plus what it would add, minus what it ignores. A working copy
+    can hold files that never leave the machine, and a link that resolves only because one of those
+    sits next to it is a link that breaks for everybody else. Outside a git work tree (an exported
+    source archive, for one) the files on disk are the published set.
+
+    A link is checked against that same set, not against the disk, so a published document pointing
+    at an unpublished file fails here exactly as it would fail for a reader.
+
+    An empty docs/ would otherwise pass every check by having nothing to check, so there is a floor
+    on how many documents were read.
+#>
 [CmdletBinding()]
-param()
+param(
+    # The fewest Markdown files under docs/ a real run reads. The user guide, troubleshooting,
+    # privacy, the changelog and the release notices are seven pairs today.
+    [int]$MinimumDocuments = 12,
+
+    # The fewest localized (.es.md / .en.md) files under docs/ a real run reads.
+    [int]$MinimumLocalized = 12
+)
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$docsRoot = Join-Path $repoRoot 'docs'
 $errors = [System.Collections.Generic.List[string]]::new()
 
-$localizedFiles = Get-ChildItem -LiteralPath $docsRoot -Recurse -File |
-    Where-Object { $_.Name -match '\.(es|en)\.md$' }
+function ConvertTo-RepositoryPath([string]$path) {
+    [IO.Path]::GetRelativePath($repoRoot, $path).Replace('\', '/')
+}
 
-foreach ($file in $localizedFiles) {
-    $counterpartName = if ($file.Name.EndsWith('.es.md', [StringComparison]::OrdinalIgnoreCase)) {
-        $file.Name.Substring(0, $file.Name.Length - 6) + '.en.md'
-    }
-    else {
-        $file.Name.Substring(0, $file.Name.Length - 6) + '.es.md'
-    }
+# ------------------------------------------------------------------ what is published
+$published = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+$source = 'files on disk'
+$insideGit = $false
+if (Get-Command git -ErrorAction SilentlyContinue) {
+    $probe = & git -c safe.directory=* -C $repoRoot rev-parse --is-inside-work-tree 2>$null
+    $insideGit = ($LASTEXITCODE -eq 0 -and "$probe".Trim() -eq 'true')
+}
 
-    $counterpart = Join-Path $file.DirectoryName $counterpartName
-    if (-not (Test-Path -LiteralPath $counterpart -PathType Leaf)) {
-        $relative = [IO.Path]::GetRelativePath($repoRoot, $file.FullName)
-        $errors.Add("Missing bilingual counterpart for $relative")
+if ($insideGit) {
+    $listed = & git -c safe.directory=* -c core.quotepath=off -C $repoRoot ls-files --cached --others --exclude-standard
+    if ($LASTEXITCODE -ne 0) { throw 'git ls-files failed, so the published set is unknown.' }
+    foreach ($path in $listed) {
+        if ($path -and (Test-Path -LiteralPath (Join-Path $repoRoot $path) -PathType Leaf)) {
+            [void]$published.Add($path)
+        }
+    }
+    $source = 'git'
+}
+else {
+    $skipped = '^(artifacts|\.git|\.vs|\.vendor)/|(^|/)(bin|obj)/'
+    foreach ($file in Get-ChildItem -LiteralPath $repoRoot -Recurse -File -Force) {
+        $path = ConvertTo-RepositoryPath $file.FullName
+        if ($path -notmatch $skipped) { [void]$published.Add($path) }
     }
 }
 
-$markdownFiles = Get-ChildItem -LiteralPath $docsRoot -Recurse -Filter '*.md' -File
+if ($published.Count -eq 0) { throw "The published set read from $source is empty." }
+
+function Test-Published([string]$path) {
+    if ($published.Contains($path)) { return $true }
+    $prefix = $path.TrimEnd('/') + '/'
+    foreach ($entry in $published) {
+        if ($entry.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) { return $true }
+    }
+    $false
+}
+
+$markdownFiles = @($published |
+    Where-Object { $_ -match '\.md$' -and ($_ -match '^docs/' -or $_ -notmatch '/') } |
+    Sort-Object)
+$docsMarkdown = @($markdownFiles | Where-Object { $_ -match '^docs/' })
+$localizedFiles = @($docsMarkdown | Where-Object { $_ -match '\.(es|en)\.md$' })
+
+# ------------------------------------------------------------------ bilingual pairs
+foreach ($path in $localizedFiles) {
+    $counterpart = if ($path.EndsWith('.es.md', [StringComparison]::OrdinalIgnoreCase)) {
+        $path.Substring(0, $path.Length - 6) + '.en.md'
+    }
+    else {
+        $path.Substring(0, $path.Length - 6) + '.es.md'
+    }
+
+    if (-not $published.Contains($counterpart)) {
+        $errors.Add("Missing bilingual counterpart for $path")
+    }
+}
+
+# ------------------------------------------------------------------ relative links
 $linkPattern = [regex]'\[[^\]]+\]\((?<target>[^)]+)\)'
-foreach ($file in $markdownFiles) {
-    $content = Get-Content -LiteralPath $file.FullName -Raw
+foreach ($path in $markdownFiles) {
+    $fullPath = Join-Path $repoRoot $path
+    $content = Get-Content -LiteralPath $fullPath -Raw
     foreach ($match in $linkPattern.Matches($content)) {
         $target = $match.Groups['target'].Value.Trim().Trim('<', '>')
         if ($target -match '^(https?://|mailto:|#)') {
@@ -43,63 +112,26 @@ foreach ($file in $markdownFiles) {
         }
 
         $decodedTarget = [Uri]::UnescapeDataString($relativeTarget)
-        $resolvedTarget = [IO.Path]::GetFullPath((Join-Path $file.DirectoryName $decodedTarget))
-        if (-not (Test-Path -LiteralPath $resolvedTarget)) {
-            $relativeFile = [IO.Path]::GetRelativePath($repoRoot, $file.FullName)
-            $errors.Add("Broken link in ${relativeFile}: $target")
+        $resolved = [IO.Path]::GetFullPath((Join-Path (Split-Path -Parent $fullPath) $decodedTarget))
+        $resolvedPath = ConvertTo-RepositoryPath $resolved
+        if ($resolvedPath.StartsWith('..') -or -not (Test-Published $resolvedPath)) {
+            $errors.Add("Broken or unpublished link in ${path}: $target")
         }
     }
 }
 
-$featureMatrixPath = Join-Path $docsRoot 'FEATURES.md'
-$featureMatrix = Get-Content -LiteralPath $featureMatrixPath -Raw
-$featureIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|')
-$mvpIds = [regex]::Matches($featureMatrix, '(?m)^\| (?<id>[A-Z0-9]+-[0-9]+) \|.*\| MVP \|')
-# 75 since 2026-09-18, when LIB-021 gave ADR-0009 its row: a cover's three origins and their order
-# were decided on 2026-09-05 and never entered the matrix, so no count saw that zero lines of src/
-# carried them. A decision without a row is scope nobody is tracking.
-#
-# 74 since 2026-09-12 (evening), when UX-010 was opened: the maintainer asked for a way to put any group
-# of options back the way it came, and a first count found TWO reset controls in the whole
-# application. That count was short, and both halves of the sentence it produced were wrong:
-# measured on 2026-09-13 by the gate itself there are FOUR — «back to 1x» on the speed, «restore the
-# provider's fields» on one title's record, «restore default values» on the picture, and «restore
-# initial values» on the shortcuts, which IS in a settings section. The fourth is the one a grep
-# misses: its button is already named RestoreDefaultsButton while saying a different key, which is
-# why the gate asserts the key. Its gate is a closed list that fails from both sides, so the next
-# panel somebody writes cannot be born without the button.
-#
-# 73 since 2026-09-12 (evening), when PLY-018 was opened against POST_STABLE: the maintainer's own
-# library turned out to be the case nothing covered. A real episode measured 720x404 in a 2003 codec
-# at 1.5 Mbit/s, and its mean luma across five scenes ran between 28 and 69 out of 235 — the picture
-# is not soft, it is crushed into black, and no row promised a person could do anything about that.
-# Upscaling was being built for a defect the maintainer does not have.
-#
-# 72 since 2026-09-12, when PLY-017 was opened against STABLE and not MVP: the MVP manifest is a
-# closed record of 46 commitments with the tasks that built them, and a row born today has no task to
-# name — inventing one would falsify the record. The colour defect showed that NO row promised a
-# video would be decoded with the colour space it belongs to, which is why nothing caught it for as
-# long as it lasted. A defect that no row covers is a defect no register is watching.
-# 71 since 2026-09-03, and it took three sessions in one day to get there. 65 came from 2026-08-30,
-# when ADR-0006 was accepted and CRS-001..005 arrived. Then CRS-006 (a course card's picture, taken
-# from the video) and LIB-018 (setting your own cover) made it 67. Then the rail menu was measured
-# and rejected as UX-009, and the three gaps it had been covering entered on their own: LIB-019
-# (rescanning a root on request), LIB-020 (filtering the review inbox and the duplicate groups) and
-# CRS-007 (filtering the courses grid). The count is asserted rather than left open so that a row
-# added to the matrix has to be added here too, which is where somebody notices that the manifest and
-# the localised documents need it as well.
-if ($featureIds.Count -ne 75) {
-    $errors.Add("Expected 75 feature IDs, found $($featureIds.Count).")
+# ------------------------------------------------------------------ the floor
+if ($docsMarkdown.Count -lt $MinimumDocuments) {
+    $errors.Add("Only $($docsMarkdown.Count) Markdown file(s) under docs/ were read from $source; at least $MinimumDocuments are expected.")
 }
-if ($mvpIds.Count -ne 46) {
-    $errors.Add("Expected 46 MVP feature IDs, found $($mvpIds.Count).")
+if ($localizedFiles.Count -lt $MinimumLocalized) {
+    $errors.Add("Only $($localizedFiles.Count) localized file(s) under docs/ were read from $source; at least $MinimumLocalized are expected.")
 }
 
 if ($errors.Count -gt 0) {
-    $errors | ForEach-Object { Write-Error $_ }
+    $errors | ForEach-Object { Write-Error $_ -ErrorAction Continue }
     exit 1
 }
 
-# The counts are read back from what was just measured. They used to be written into the sentence by
-# hand, so raising the ratchet to 57 left the gate checking one number and announcing another.
-Write-Output "Documentation verification passed: $($markdownFiles.Count) Markdown files, $($localizedFiles.Count) localized files, $($featureIds.Count) feature IDs, $($mvpIds.Count) MVP IDs."
+# The counts are read back from what was just measured, never written into the sentence by hand.
+Write-Output "Documentation verification passed ($source): $($markdownFiles.Count) Markdown files, $($docsMarkdown.Count) under docs/, $($localizedFiles.Count) localized."

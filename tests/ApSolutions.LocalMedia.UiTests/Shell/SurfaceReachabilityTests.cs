@@ -19,8 +19,8 @@ namespace ApSolutions.LocalMedia.UiTests.Shell;
 /// root can hand to the main window — the startup view it shows while the database is being made
 /// ready, the shell, and the recovery screen it shows instead when the database cannot be opened.
 /// <para>
-/// ARQ-005 added the third one, and this suite is what noticed: a view was built with an accessible
-/// name and nothing in the presentation project reached it, which is this repository's characteristic
+/// The recovery screen is the third one, and this suite is what noticed when it arrived: a view was
+/// built with an accessible name and nothing in the presentation project reached it, which is this repository's characteristic
 /// defect. It is a root rather than an orphan because the window holds it directly, the same way it
 /// holds the other two.
 /// </para>
@@ -30,43 +30,42 @@ public sealed class SurfaceReachabilityTests
     private static readonly string[] Roots = ["StartupView", "ShellView", "DatabaseRecoveryView"];
 
     /// <summary>
-    /// The fourteen surfaces ADR-0003 found built, tested, and unreachable. Each one is named on its
+    /// The fourteen surfaces an audit found built, tested, and unreachable. Each one is named on its
     /// own so a failure says which promise is still not in the application.
     /// </summary>
-    public static TheoryData<string, string, string> DeclaredSurfaces() => new()
+    public static TheoryData<string, string> DeclaredSurfaces() => new()
     {
-        { "RootOnboardingView", "LIB-001", "añadir una carpeta a la biblioteca / add a library folder" },
-        { "ScanSettingsView", "LIB-002", "ajustes de escaneo / scan settings" },
-        { "ReviewInboxView", "LIB-007", "bandeja de revisión / review inbox" },
-        { "DuplicateReviewView", "LIB-008", "duplicados como versiones / duplicates as versions" },
-        { "MetadataEditorView", "LIB-011", "editor de metadatos y arte / metadata and artwork editor" },
-        { "RenamePreviewView", "LIB-012", "renombrado seguro / safe rename" },
-        { "PlayerView", "PLY-001", "reproductor integrado / embedded player" },
-        { "AudioOutputView", "PLY-004", "salida de audio / audio output" },
-        { "TrackSelectorView", "PLY-005", "pistas de audio y subtítulos / audio and subtitle tracks" },
-        { "ResumePromptView", "PLY-008", "reanudar donde se dejó / resume where it was left" },
-        { "MarkerEditorView", "PLY-012", "marcadores manuales / manual markers" },
-        { "ShortcutSettingsView", "PLY-014", "atajos configurables / configurable shortcuts" },
-        { "CreditsView", "PRD-005", "créditos y atribución TMDB / credits and TMDB attribution" },
-        { "SubtitleStyleView", "A11Y-002", "estilo de subtítulos / subtitle styling" },
+        { "RootOnboardingView", "añadir una carpeta a la biblioteca / add a library folder" },
+        { "ScanSettingsView", "ajustes de escaneo / scan settings" },
+        { "ReviewInboxView", "bandeja de revisión / review inbox" },
+        { "DuplicateReviewView", "duplicados como versiones / duplicates as versions" },
+        { "MetadataEditorView", "editor de metadatos y arte / metadata and artwork editor" },
+        { "RenamePreviewView", "renombrado seguro / safe rename" },
+        { "PlayerView", "reproductor integrado / embedded player" },
+        { "AudioOutputView", "salida de audio / audio output" },
+        { "TrackSelectorView", "pistas de audio y subtítulos / audio and subtitle tracks" },
+        { "ResumePromptView", "reanudar donde se dejó / resume where it was left" },
+        { "MarkerEditorView", "marcadores manuales / manual markers" },
+        { "ShortcutSettingsView", "atajos configurables / configurable shortcuts" },
+        { "CreditsView", "créditos y atribución TMDB / credits and TMDB attribution" },
+        { "SubtitleStyleView", "estilo de subtítulos / subtitle styling" },
     };
 
     [Theory]
     [MemberData(nameof(DeclaredSurfaces))]
     public void Every_surface_the_product_declares_is_reachable_from_the_application(
         string surface,
-        string featureId,
         string commitment)
     {
         var graph = SurfaceGraph.Load();
 
         Assert.True(
             graph.Contains(surface),
-            $"{surface} does not exist in the presentation project, so {featureId} has nothing to reach.");
+            $"{surface} does not exist in the presentation project, so {commitment} has nothing to reach.");
         Assert.True(
             graph.IsReachable(surface),
             $"{surface} is built and tested but unreachable from the application, "
-            + $"so {featureId} ({commitment}) is not delivered.");
+            + $"so {commitment} is not delivered.");
     }
 
     /// <summary>
@@ -111,20 +110,20 @@ public sealed class SurfaceReachabilityTests
 
     // The textual assertion that identification's provider, candidate source, and artwork cache
     // are registered lived here — and its artwork half was satisfied by a dead registration since
-    // T39B, the third time a textual assertion was satisfied by dead text. It moved to
+    // then, the third time a textual assertion was satisfied by dead text. It moved to
     // CompositionDescriptorTests (AccessibilityTests), which asserts against the registered
-    // IServiceCollection descriptors instead of the file's characters — the start of ARQ-006.
+    // IServiceCollection descriptors instead of the file's characters.
 
     // The textual assertions that playback starts from a title card through the coordinator, and
     // that the automatic update check runs on a singleton surface, lived here as matches on the
     // composition root's text. They moved to CompositionDescriptorTests (AccessibilityTests),
-    // which asserts the registered descriptors instead (ARQ-006); the card actually opening a
+    // which asserts the registered descriptors instead; the card actually opening a
     // session is walked by the assembled physical walk with real decoding.
 
     /// <summary>
     /// Reaching a surface is not the same as feeding it. The status overlay was reachable and stayed
     /// blank through a real playback, because the composition root built the view model and nothing
-    /// ever handed it what the engine had decided — so `PLY-003`'s indicator did not exist in the
+    /// ever handed it what the engine had decided — so the HDR indicator did not exist in the
     /// application, only in its tests.
     /// </summary>
     [Fact]
@@ -140,7 +139,7 @@ public sealed class SurfaceReachabilityTests
     /// A preference nothing reads is not a preference. The window startup must ask the update
     /// surface for its automatic check; the singleton half of the old assertion moved to the
     /// descriptors, but the invocation lives in startup code no descriptor can express, so this
-    /// half stays textual until the startup path leaves the file (ARQ-001 / ARQ-006 steps 2-3).
+    /// half stays textual until the startup path leaves the file.
     /// </summary>
     [Fact]
     public void The_window_startup_asks_the_update_surface_for_its_automatic_check()

@@ -9,7 +9,7 @@ namespace ApSolutions.LocalMedia.Domain.Playback;
 public readonly record struct UpscaleDecision(bool ShouldUpscale, int TargetWidth, int TargetHeight);
 
 /// <summary>
-/// PLY-016's decision, kept away from the graphics card that carries it out. Which picture gains
+/// The upscaling decision, kept away from the graphics card that carries it out. Which picture gains
 /// from being enlarged is arithmetic that runs on any machine; whether a particular card can do the
 /// enlarging is not, and the two are deliberately separate.
 /// </summary>

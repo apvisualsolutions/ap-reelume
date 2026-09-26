@@ -26,8 +26,8 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// package's README both prescribe <c>Segoe Fluent Icons</c> — "los iconos son glifos de Segoe
 /// Fluent Icons", chosen because the font ships with Windows and costs no download. The prototype
 /// itself does something else: every pictogram in it is an SVG of 24 by 24 with
-/// <c>stroke-width:1.6</c> and round caps, a line drawing. The maintainer looked at the built application
-/// and said the player's icons are not the prototype's, and he is right: a solid Fluent glyph and a
+/// <c>stroke-width:1.6</c> and round caps, a line drawing. Looking at the built application, the
+/// player's icons were plainly not the prototype's: a solid Fluent glyph and a
 /// thin stroked drawing are two different alphabets.
 /// </para>
 /// <para>
@@ -55,7 +55,7 @@ public sealed class TransportGlyphTests
     /// </summary>
     /// <remarks>
     /// The two mode buttons were <b>not on this table</b> until 2026-08-28, and they had been on the
-    /// bar since 2026-08-25. That is the shape of the gap this batch was for: the icons had a gate
+    /// bar since 2026-08-25. That is the shape of the gap this table closes: the icons had a gate
     /// over their <em>shapes</em> — <c>PrototypeIconTests</c> compares all thirty-five against the
     /// prototype's own path data — and a gate over which glyph each button carried that listed
     /// eleven buttons of thirteen. A picture on a button nothing names is a picture nothing checks,
@@ -249,12 +249,12 @@ public sealed class TransportGlyphTests
     }
 
     /// <summary>
-    /// The transport's own five take the target area §4 asked for on their own row.
+    /// The transport's own five take the target area the redesign asked for on their own row.
     /// </summary>
     /// <remarks>
     /// Measured on 2026-08-21: three of these sat at <c>MinWidth 0</c> and <c>MinHeight 36</c> and
     /// wore no class at all. The 36 to 44 rise of 2026-08-21 landed on <c>player-chrome</c>, and this
-    /// is the one view §4 names by name that <b>was not wearing it</b> — so the change was recorded
+    /// is the one view the redesign names by name that <b>was not wearing it</b> — so the change was recorded
     /// as done while the buttons somebody presses to skip and to silence stayed at 36. A glyph needs
     /// a square target more than a word does, which is why the two arrive together. The two mode
     /// buttons joined the table on 2026-08-28 and were already wearing it.
@@ -270,7 +270,7 @@ public sealed class TransportGlyphTests
             Assert.Contains("player-chrome", button.Classes);
             Assert.True(
                 button.MinWidth >= 44 && button.MinHeight >= 44,
-                $"{name} measures {button.MinWidth}x{button.MinHeight}, under the 44 §4 asks of this view.");
+                $"{name} measures {button.MinWidth}x{button.MinHeight}, under the 44 the redesign asks of this view.");
         }
     }
 

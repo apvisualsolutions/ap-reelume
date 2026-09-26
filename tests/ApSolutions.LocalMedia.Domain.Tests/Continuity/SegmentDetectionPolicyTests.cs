@@ -53,7 +53,7 @@ public sealed class SegmentDetectionPolicyTests
     }
 
     /// <summary>
-    /// BUG-009: manual markers always validated against the episode's duration and detections were
+    /// Manual markers always validated against the episode's duration and detections were
     /// judged with <c>duration: null</c>. When the caller knows how long the file runs, a detection
     /// past its end is not a marker — it is a range no playback can ever reach.
     /// </summary>

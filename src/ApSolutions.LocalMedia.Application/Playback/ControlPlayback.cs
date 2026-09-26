@@ -39,7 +39,7 @@ public sealed class ControlPlayback : IDisposable
     /// <param name="persistSpeed">
     /// Called with the clamped multiplier after every speed change, because the speed is a
     /// preference and not a moment: it belongs to how this person watches, so it has to survive the
-    /// application closing (ENG-011). It receives what the engine was told and never what was asked
+    /// application closing. It receives what the engine was told and never what was asked
     /// for, exactly like the seek above.
     /// </param>
     public ControlPlayback(

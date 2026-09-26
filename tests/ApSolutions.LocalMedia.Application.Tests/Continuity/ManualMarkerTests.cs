@@ -224,7 +224,7 @@ public sealed class ManualMarkerTests
     [Fact]
     public void The_manual_path_cannot_fabricate_a_detected_origin()
     {
-        // Until T43 this test asserted that no detection type existed anywhere. Detection exists
+        // This test once asserted that no detection type existed anywhere. Detection exists
         // now, by plan; what must stay true forever is that the manual path is manual: the command
         // exposes no origin for a caller to set, and the shared model keeps the confidence field
         // detection writes.

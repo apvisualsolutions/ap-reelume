@@ -9,8 +9,8 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Continuity;
 
 /// <summary>
-/// The wait both continuity chains hold (PLY-011, CRS-004): its length, its announcement each
-/// second, and the two ways it can end.
+/// The wait both continuity chains hold, the next episode and the next lesson: its length, its
+/// announcement each second, and the two ways it can end.
 /// </summary>
 /// <remarks>
 /// Exercised directly rather than only through the two chains above it. Driven from them, the arms

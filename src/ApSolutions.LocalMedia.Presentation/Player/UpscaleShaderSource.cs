@@ -6,7 +6,7 @@ using SkiaSharp;
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
 /// <summary>
-/// The arithmetic PLY-016's portable link runs on the drawing canvas, written as SkSL.
+/// The arithmetic the enlargement chain's portable link runs on the drawing canvas, written as SkSL.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -36,7 +36,7 @@ namespace ApSolutions.LocalMedia.Presentation.Player;
 /// sharpened less … higher overall natural visual sharpness with fewer artifacts» — so the arithmetic
 /// here clamps the sharpened pixel between the lightest and darkest of the five it read. Measured: at
 /// the shipped settings the edge overshoots <b>16</b> levels with this bound and <b>29</b> without,
-/// against a ceiling of 22 that the mutation check set on 2026-09-13. Deleting the two lines turns that
+/// against a ceiling of 22 that a test holds. Deleting the two lines turns that
 /// gate red, so this is guarded and not merely intended.
 /// </para>
 /// <para>
@@ -64,10 +64,10 @@ public static class UpscaleShaderSource
     /// <b>Measured rather than chosen by eye, and measured twice.</b> The first reading only had the
     /// ramp width to go on: across a hard edge enlarged four times, 0.3 left the ramp at <b>4</b>
     /// pixels — the composition's own width — while 0.6 brought it to <b>2</b>, profile
-    /// <c>3,86,169,252</c>. So 0.6 shipped on 2026-09-13, and the maintainer said it was still soft.
+    /// <c>3,86,169,252</c>. So 0.6 shipped, and the picture still looked soft.
     /// </para>
     /// <para>
-    /// <b>He was right, and the ramp width is why.</b> Its perfect score is zero, which is what
+    /// <b>It was, and the ramp width is why.</b> Its perfect score is zero, which is what
     /// nearest-neighbour gives, so it rewards a hard threshold and cannot say whether the picture
     /// came back <i>faithful</i>. Against a synthesised truth — <c>VideoUpscaleFidelityTests</c> —
     /// this number wants the opposite of what the ramp wanted. Measured in that harness with the

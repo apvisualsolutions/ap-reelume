@@ -21,7 +21,7 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Privacy;
 /// The claim this suite defends is narrow and checkable: the application makes no connection it was not
 /// asked to make, and every HTTP client it can build has a declared purpose.
 /// <para>
-/// The observation happens inside the process, over the .NET event sources, exactly as ADR-0002 decided:
+/// The observation happens inside the process, over the .NET event sources, by design:
 /// no proxy, no certificate, no elevation. It sees what this process does, not what the machine does.
 /// </para>
 /// </summary>
@@ -140,9 +140,9 @@ public sealed class NetworkPrivacyTests
     }
 
     /// <summary>
-    /// LIB-016's acceptance, measured rather than read: with the automatic refresh off, a pass opens
-    /// nothing at all. The same child then turns it on and the canary counts one request per stale
-    /// entry, so the zero above is a zero and not a blind spot.
+    /// The automatic refresh's acceptance, measured rather than read: with the automatic refresh off, a
+    /// pass opens nothing at all. The same child then turns it on and the canary counts one request per
+    /// stale entry, so the zero above is a zero and not a blind spot.
     /// </summary>
     [Fact]
     public async Task The_automatic_refresh_switched_off_opens_no_connection()
@@ -194,9 +194,9 @@ public sealed class NetworkPrivacyTests
         }
         else if (string.Equals(phase, "refresh", StringComparison.Ordinal))
         {
-            // LIB-016, both halves in one child: the pass with the switch off, whose count is
-            // reported as the payload length, and then the same pass with it on, so the zero above
-            // is a measured zero rather than a blind one.
+            // The automatic refresh, both halves in one child: the pass with the switch off, whose
+            // count is reported as the payload length, and then the same pass with it on, so the zero
+            // above is a measured zero rather than a blind one.
             var settings = new SwitchableAutoRefresh(enabled: false);
             var repository = new TwoStaleEntries();
             var pass = new RefreshStaleMetadata(
@@ -241,7 +241,7 @@ public sealed class NetworkPrivacyTests
     /// </summary>
     /// <remarks>
     /// The third list is the boring one: XML namespaces and licence addresses that nothing ever
-    /// opens. The second arrived with the provider trailer (LIB-015), and it is separate from the
+    /// opens. The second arrived with the provider trailer, and it is separate from the
     /// first on purpose — declaring <c>www.youtube.com</c> as a network purpose would claim a
     /// connection this application never makes and would widen the check the network canary trusts,
     /// while leaving it out of the registry entirely would put a real privacy decision in a list of
@@ -530,7 +530,7 @@ public sealed class NetworkPrivacyTests
     }
 
     /// <summary>
-    /// A local server that answers the least possible and counts everything, as in T32. It is a raw
+    /// A local server that answers the least possible and counts everything. It is a raw
     /// TCP listener rather than an <see cref="HttpListener"/> on purpose: the latter resolves a name
     /// while binding, and that resolution would show up in the very measurement being taken.
     /// </summary>

@@ -18,7 +18,7 @@ namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 /// The application as something that can be let go of.
 /// </summary>
 /// <remarks>
-/// ARQ-001. The composition root kept its provider in a static field nothing ever released, so the
+/// The composition root kept its provider in a static field nothing ever released, so the
 /// process handed LibVLC, SQLite, the tray icon and the hotkey registrations to Windows to reclaim.
 /// That is not a teardown, and it had a second cost that these tests are mostly about: two
 /// applications could not exist at once in one process, because the second overwrote the first's
@@ -92,7 +92,7 @@ public sealed class ApplicationHostTests : IDisposable
     }
 
     /// <summary>
-    /// ENG-020. The window's tray icon is let go on the thread that releases the application, and
+    /// The window's tray icon is let go on the thread that releases the application, and
     /// before anything in the teardown can yield. <c>Program</c> releases from the interface thread
     /// after the loop has stopped, so a release left to the container resumed on a pool thread and
     /// threw there; handing it back to the interface thread instead would leave it to a loop that
@@ -165,7 +165,7 @@ public sealed class ApplicationHostTests : IDisposable
     }
 
     /// <summary>
-    /// ARQ-010. A registration naming a dependency nobody registered is a defect whether or not the
+    /// A registration naming a dependency nobody registered is a defect whether or not the
     /// container is asked about it, so the only question is when it gets heard. Left to resolution it
     /// waits for the first screen that happens to need it — which is a person's screen, in a corner no
     /// test opened. This asserts the container refuses to hand back a provider it already knows is
@@ -187,9 +187,9 @@ public sealed class ApplicationHostTests : IDisposable
     }
 
     /// <summary>
-    /// The check that was already on before ARQ-010, pinned here because it now travels in the same
-    /// options object as the new one: a singleton that captures a scoped service outlives what it
-    /// captured, and the container is the only thing positioned to notice.
+    /// The check that was already on before the build-time validation, pinned here because it now
+    /// travels in the same options object as the new one: a singleton that captures a scoped service
+    /// outlives what it captured, and the container is the only thing positioned to notice.
     /// </summary>
     [Fact]
     public void A_scoped_service_resolved_from_the_root_is_still_refused()
@@ -219,7 +219,8 @@ public sealed class ApplicationHostTests : IDisposable
     /// <summary>A dependency deliberately left out of the collection under test.</summary>
     private sealed class UnregisteredDependency;
 
-    /// <summary>A registration that names it anyway, which is the defect ARQ-010 wants heard early.</summary>
+    /// <summary>A registration that names it anyway, which is the defect the build-time validation
+    /// wants heard early.</summary>
     private sealed class NeedsSomethingNobodyRegistered(UnregisteredDependency dependency)
     {
         public UnregisteredDependency Dependency { get; } = dependency;

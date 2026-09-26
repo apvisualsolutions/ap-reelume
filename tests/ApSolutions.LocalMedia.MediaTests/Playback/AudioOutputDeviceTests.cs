@@ -10,8 +10,8 @@ using Xunit;
 namespace ApSolutions.LocalMedia.MediaTests.Playback;
 
 /// <summary>
-/// Routing the session's audio to a render endpoint, against a real engine decoding real media
-/// (AUD-A01). The engine joins the catalog's Windows identifiers to LibVLC's own by their common
+/// Routing the session's audio to a render endpoint, against a real engine decoding real media.
+/// The engine joins the catalog's Windows identifiers to LibVLC's own by their common
 /// endpoint suffix, and an identifier nobody announces is a no-op — losing a device mid-session
 /// must never kill the session.
 /// </summary>

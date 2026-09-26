@@ -29,7 +29,7 @@ public sealed class VideoStatusOverlayTests
     /// <remarks>
     /// <para>
     /// All six lines used to share one surface, so "HDR10 is passing through" — a video playing exactly
-    /// as asked — looked identical to "this fell back to software". §4 splits them: the four facts read
+    /// as asked — looked identical to "this fell back to software". The redesign splits them: the four facts read
     /// as quiet caption text, the two warnings take the warning surface and the glyph.
     /// </para>
     /// <para>
@@ -150,7 +150,7 @@ public sealed class VideoStatusOverlayTests
     public void The_overlay_is_named_and_captured_in_both_languages()
     {
         Assert.NotNull(Avalonia.Application.Current);
-        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T22");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "video-status-overlay");
         Directory.CreateDirectory(captures);
 
         foreach (var cultureName in new[] { "es-ES", "en-US" })

@@ -85,7 +85,7 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
-    /// The gear over the picture and the groups inside it (ADR-0012); absent in a session that has
+    /// The gear over the picture and the groups inside it; absent in a session that has
     /// no options to offer, which is what keeps the button off the bar rather than dimming it.
     /// </summary>
     public PlayerSettingsMenuViewModel? Settings { get; }
@@ -130,10 +130,10 @@ public sealed class PlayerViewModel : INotifyPropertyChanged
     /// Changes which window the picture is in. Installed by the composition root, like the gestures.
     /// </summary>
     /// <remarks>
-    /// The transport bar needs the two mode buttons the maintainer asked for — full screen and
-    /// picture-in-picture, «en la barra de controles» — and the bar travels: the same control is
-    /// handed to the mini window, where there is no shell above it to reach up to. So the surface
-    /// carries the commands and the composition fills them, exactly as it fills the gestures.
+    /// The transport bar needs its two mode buttons — full screen and picture-in-picture, on the
+    /// control bar itself — and the bar travels: the same control is handed to the mini window, where
+    /// there is no shell above it to reach up to. So the surface carries the commands and the
+    /// composition fills them, exactly as it fills the gestures.
     /// </remarks>
     public Func<PlaybackMode, Task>? ModeHandler
     {

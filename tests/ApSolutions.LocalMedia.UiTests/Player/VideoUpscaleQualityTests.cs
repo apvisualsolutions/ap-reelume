@@ -22,7 +22,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// </summary>
 /// <remarks>
 /// <para>
-/// The maintainer reported on 2026-09-12 that video «still looks bad», and the first guess was cheap:
+/// Video was reported on 2026-09-12 to «still look bad», and the first guess was cheap:
 /// Avalonia's default interpolation is <c>LowQuality</c> and nothing in this tree sets anything
 /// else, so asking for <c>HighQuality</c> looked like a one-line win. <b>Measured, it is not.</b>
 /// Across a hard edge enlarged four times the profiles are
@@ -32,14 +32,14 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// <para>
 /// So this file archives a negative result and guards it. The softness of an enlarged picture is not
 /// a renderer setting anybody forgot to flip — it is what enlarging without a real upscaler looks
-/// like, and removing it is `PLY-016`'s job and nothing else's. The day one of Avalonia's modes
+/// like, and removing it is the video enhancement's job and nothing else's. The day one of Avalonia's modes
 /// becomes genuinely sharper than another, the first test here goes red and somebody revisits.
 /// </para>
 /// <para>
 /// <b>What the ramp width here cannot say, and where the other half lives.</b> Less is better, so its
 /// perfect score is zero — and zero is what nearest-neighbour gives, as the second test below states
 /// outright. A yardstick whose best score belongs to the worst filter cannot be optimised against:
-/// on 2026-09-13 a candidate that scored well on it looked worse, and the maintainer had already said so.
+/// on 2026-09-13 a candidate that scored well on it looked worse, and it had already been seen to.
 /// <see cref="VideoUpscaleFidelityTests"/> measures the other question — how far the enlarged picture
 /// landed from the picture it should have been — and the two together are what pin the chain's
 /// numbers. Neither alone is a criterion.
@@ -109,7 +109,7 @@ public sealed class VideoUpscaleQualityTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// «Without the user touching anything» is the whole of what the maintainer asked for, and it rests on
+    /// «Without the user touching anything» is the whole of what was asked for, and it rests on
     /// one default value. <b>This test exists because nothing else here can see that value.</b> Every
     /// other test in this file sets the property explicitly, so flipping the default to <c>false</c>
     /// would leave all of them green with the feature off for everybody — measured by flipping it.
@@ -146,7 +146,7 @@ public sealed class VideoUpscaleQualityTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The half of PLY-016's acceptance criterion a person notices first when it is wrong. Asserted
+    /// The half of the enhancement's acceptance criterion a person notices first when it is wrong. Asserted
     /// against <c>LowQuality</c> and not against a remembered number: the claim is «the same as the
     /// composition gives», so the composition is what it is compared to.
     /// </para>
@@ -357,8 +357,8 @@ public sealed class VideoUpscaleQualityTests
     /// <remarks>
     /// <paramref name="upscale"/> defaults to <c>false</c> so the three tests above keep measuring
     /// what they were written to measure — <b>Avalonia's own filter</b>. The enhancement ships on,
-    /// so leaving it on here would have quietly turned those three into measurements of `PLY-016`'s
-    /// chain instead, and the hard-step control would have gone red for the wrong reason.
+    /// so leaving it on here would have quietly turned those three into measurements of the
+    /// enhancement's chain instead, and the hard-step control would have gone red for the wrong reason.
     /// </remarks>
     private static int Ramp(BitmapInterpolationMode mode, bool? upscale = false) =>
         Profile(mode, upscale).Count(value => value > 8 && value < 247);

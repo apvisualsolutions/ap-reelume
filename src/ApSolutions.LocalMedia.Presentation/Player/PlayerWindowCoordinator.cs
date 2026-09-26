@@ -32,11 +32,11 @@ public sealed record PlayerWindowGeometry(double X, double Y, double Width, doub
 /// </summary>
 /// <remarks>
 /// <b>Fullscreen is both</b>: the window is sized to the screen in logical units AND put into
-/// <c>WindowState.FullScreen</c>. It was only the first until 2026-09-02, and the maintainer reported the
-/// consequence — the Windows taskbar stayed on top of the picture. A window merely as large as the
-/// screen is not a fullscreen window: the taskbar is drawn over ordinary windows whatever their
-/// size, and steps aside only for that state. Measured on a 2560x1440 display whose working area is
-/// 1392 tall: 48 px of taskbar over the video.
+/// <c>WindowState.FullScreen</c>. It used to be only the first, and the consequence showed on screen —
+/// the Windows taskbar stayed on top of the picture. A window merely as large as the screen is not a
+/// fullscreen window: the taskbar is drawn over ordinary windows whatever their size, and steps aside
+/// only for that state. Measured on a 2560x1440 display whose working area is 1392 tall: 48 px of
+/// taskbar over the video.
 /// <para>
 /// The sizing stays, and the reason it was written alone is worth keeping: on a scaled display the
 /// state was measured to deliver a client size in physical pixels while rendering still applied the
@@ -238,7 +238,7 @@ public sealed class PlayerWindowCoordinator
         // to the screen is not: Windows draws the taskbar over any ordinary window, whatever its
         // size, and only ever gets out of the way for a window in this state. Measured on
         // 2026-09-02 on a 2560x1440 display whose working area is 1392 tall — 48 px of taskbar that
-        // sat on top of the picture the whole time, which is what the maintainer reported.
+        // sat on top of the picture the whole time.
         //
         // The geometry above is not made redundant by it: it is what the window goes back to when
         // the mode is left, and it is what decides WHICH screen this happens on.

@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.Application.Events;
 /// How a scan is going, and — since 2026-09-05 — who asked for it.
 /// </summary>
 /// <remarks>
-/// The trigger travels because ADR-0010 makes the answer depend on it: a scan somebody launched by
+/// The trigger travels because the answer depends on it: a scan somebody launched by
 /// hand may push the content down, and one that starts on its own may not. The enum has existed in
 /// this layer since scanning did; what was missing was the trip to the screen, so the surface had no
 /// way to tell the two apart and drew neither.
@@ -26,7 +26,7 @@ public sealed record ScanProgressChanged(
 
 /// <summary>
 /// A root stopped being readable, or started again. Published where the scan already learns it, so
-/// the Library can say it in the one place the affected titles live (ADR-0010).
+/// the Library can say it in the one place the affected titles live.
 /// </summary>
 public sealed record RootAvailabilityChanged(
     LibraryRootId RootId,

@@ -16,7 +16,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Discovery;
 
 /// <summary>
-/// The moved-file half of LIB-002/003, walked for real: real files on a real disk, scanned by the
+/// The moved-file half of watching, walked for real: real files on a real disk, scanned by the
 /// real coordinator into real SQLite, with reconciliation running in the shared pipeline. A moved
 /// file keeps being the entity it was; a copy stays a copy; an ambiguous match waits for a person
 /// in the review inbox and survives a rescan.

@@ -8,7 +8,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Metadata;
 
 /// <summary>
-/// The general cover order as it survives closing the application (LIB-021, ADR-0009 decision 4).
+/// The general cover order as it survives closing the application.
 /// </summary>
 /// <remarks>
 /// The store is the real one over a temporary file rather than a double, which is how the lifecycle

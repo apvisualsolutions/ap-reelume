@@ -123,12 +123,7 @@ public sealed class UpdateHandoverTests
 
     private static JsonElement Report()
     {
-        var path = Path.Combine(
-            RepositoryLayout.Root,
-            "docs",
-            "evidence",
-            "stable",
-            "updater-handover.json");
+        var path = Path.Combine(RepositoryLayout.Root, "eng", "sandbox", "updater-handover.json");
         if (!File.Exists(path))
         {
             throw new FileNotFoundException(

@@ -34,7 +34,7 @@ namespace ApSolutions.LocalMedia.UiTests.Settings;
 /// whose sections are peers.
 /// </para>
 /// <para>
-/// §4 describes that geometry as "the same skeleton" and names three views for it. Assembled, the
+/// The redesign describes that geometry as "the same skeleton" and names three views for it. Assembled, the
 /// reading is different: <b>the skeleton belongs to every section, and the level-1 heading belongs to
 /// the page</b>, which had none at all. The destination is already called "Settings" in the navigation
 /// rail, so the page's own heading is that same string rather than a new one.
@@ -110,7 +110,7 @@ public sealed class SettingsPageStructureTests
     /// The headings of the settings page, found by walking the panel that holds its sections.
     /// </summary>
     /// <remarks>
-    /// <b>This asked the maintainer's class name whether it ended in "SettingsView", and that was blind.</b>
+    /// <b>This asked the owning view's class name whether it ended in "SettingsView", and that was blind.</b>
     /// Three of the ten sections are views from elsewhere mounted on this page — the subtitle style,
     /// the updater and the credits — so the filter measured seven, found them consistent, and passed
     /// while three started 158 px to the left. The panel is named now and this walks it: a section

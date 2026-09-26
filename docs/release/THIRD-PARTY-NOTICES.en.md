@@ -71,8 +71,8 @@ publishes. What is in it and where each text came from is in
 
 **That sentence is an obligation, not a courtesy**, and this section exists to meet it. FreeType is
 distributed under **two mutually exclusive licences** and one must be chosen: the **FreeType License**
-(FTL), BSD-like, or the **GPL-2.0**. AP Solutions chooses the **FTL**, decided by the maintainer on
-2026-09-14, because the other route is incompatible with a proprietary licence — and FreeType's own
+(FTL), BSD-like, or the **GPL-2.0**. AP Solutions chooses the **FTL**, decided on 2026-09-14,
+because the other route is incompatible with a proprietary licence — and FreeType's own
 `LICENSE.TXT` says the FTL "is suited to products which don't use the GNU General Public License".
 
 The price of that route is its advertising clause, which asks literally to "acknowledge somewhere in
@@ -81,7 +81,7 @@ your documentation that you have used the FreeType code". That is what the box a
 **And it arrives by two paths, one of them from before this decision**: today it comes inside Skia's
 native assets — its full text is in
 [`licenses/NOTICE-Skia-HarfBuzz-natives.txt`](licenses/NOTICE-Skia-HarfBuzz-natives.txt) — and since
-2026-09-18 also inside LibVLC, which is built without GPL (`ENG-013`) and uses it to draw subtitle
+2026-09-18 also inside LibVLC, which is built without GPL and uses it to draw subtitle
 text. The acknowledgement is written once and covers both.
 
 ### The .NET runtime
@@ -94,8 +94,8 @@ what puts several hundred Microsoft-licensed files inside the package.
 
 ### LibVLC, its core and its plugins
 
-**Since 2026-09-18 the engine is not VideoLAN's package but a build of our own without GPL**
-(`ENG-013`). It is built from the same VLC release, 3.0.23, with VideoLAN's build script and build
+**Since 2026-09-18 the engine is not VideoLAN's package but a build of our own without GPL.**
+It is built from the same VLC release, 3.0.23, with VideoLAN's build script and build
 images, third-party libraries configured with `--disable-gpl`, and FreeType under its FTL. Every plugin
 whose source code is GPL is then removed, and a gate demands that none is left. **Teletext decoding
 is not built either**, because both of VLC's decoders carry GPL code: `libzvbi_plugin` links the zvbi
@@ -119,19 +119,19 @@ VideoLAN's package carried them too: GNU MP and GNU Nettle inside `libgnutls`, `
 Nettle are offered under a dual licence, LGPL-3.0 or GPL-2.0, and the LGPL is the one used. Their
 copyright notices and the detail are in `licenses/NOTICE-VideoLAN.txt`, and the texts in
 `licenses/LGPL-3.0.txt` and `licenses/GPL-3.0.txt`, because the LGPL-3.0 is written on top of the
-GPL-3.0 and asks for both. How that licence fits a proprietary program was read on 2026-09-18
-(`ENG-028`) and is in `LEGAL`.
+GPL-3.0 and asks for both. How that licence fits a proprietary program is answered at the end of this
+document.
 
 **And «everything is LGPL-2.1» is VLC's licence, not the inventory of what its plugins carry
 inside.** Besides those three, other third-party libraries are linked in under licences of their own
-— SRT, for one, is MPL-2.0 — and that full inventory has not been made (`ENG-029`).
+— SRT, for one, is MPL-2.0 — and that full inventory has not been made yet.
 
 **What was there before, and why it had to change.** The `VideoLAN.LibVLC.Windows` 3.0.23.1 package
 carried fourteen GPL plugins on x64 and eleven on ARM64. `libavcodec_plugin.dll` and
 `libswscale_plugin.dll` were GPL because their FFmpeg was built with `--enable-gpl`. Eleven more were
 because their source code is GPL, among them `liblua`, `libdeinterlace` and `libhqdn3d`, and
-`libts_plugin.dll` because it links aribb24. The list comes from `eng/libvlc/scan-plugin-licenses.ps1`
-(evidence `audit-eng027-plugin-gpl-sources.md`). One more on each architecture carries GPL code its
+`libts_plugin.dll` because it links aribb24. The list comes from `eng/libvlc/scan-plugin-licenses.ps1`.
+One more on each architecture carries GPL code its
 source code does not show, which is why that list did not name it: `libzvbi_plugin.dll`, through the
 zvbi library it links.
 
@@ -153,8 +153,8 @@ does not offer, a deinterlacing algorithm that is not the default and a colour c
 of our own closed.** It costs no formats: the decoding library is permissive by default, and what was
 copyleft were optional pieces enabled at build time — a legacy post-processing filter and some
 optimisations — **with no decoder among them**. Measured on real Windows x64 and ARM64: the fourteen
-promised codecs decode with the same figures as VideoLAN's package, subtitles included (evidence
-`ENG013-reproducible-build.md`).
+promised codecs decode with the same figures as VideoLAN's package, subtitles included
+(`eng/libvlc/decode-probe.ps1` measures it on every build of the engine).
 
 **The licence texts now travel.** LGPL-2.1 (§6), GPL-2.0 (§1), and Apache-2.0 (§4a) each require a
 copy of the licence to accompany a binary distribution, and MIT and BSD-3-Clause require their
@@ -223,11 +223,11 @@ copied during the tests.
 ## What this document does not settle
 
 This file states what each component declares and how those declarations fit together. It is written
-by the people who assembled the software, not by a lawyer, and two questions stay open until the
-professional legal opinion under REL-004 answers them. **The first was closed by engineering on
+by the people who assembled the software, not by a lawyer, and two questions stay open until a
+professional legal opinion answers them. **The first was closed by engineering on
 2026-09-18**: since 2026-09-13 it had been a finding — the GPL plugins in VideoLAN's package were not
 compatible with the program's own licence and blocked release — and since 2026-09-18 the engine is
-built without them. The `LGPL-3.0` of three libraries was read the same day (`ENG-028`): both that licence and the
+built without them. The `LGPL-3.0` of three libraries was read the same day: both that licence and the
 LGPL-2.1 ask that the program may be modified for one's own use and reverse engineered to debug that,
 and `LICENSE` has permitted it since then through an express exception. The
 second is still a question: which subsection of

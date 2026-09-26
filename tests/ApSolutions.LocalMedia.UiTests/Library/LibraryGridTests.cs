@@ -26,7 +26,7 @@ namespace ApSolutions.LocalMedia.UiTests.Library;
 /// <para>
 /// The grid is the prototype's <c>repeat(auto-fill, minmax(148px, 1fr))</c>, and it arrived in two
 /// halves. The reflow came on 2026-08-22; the stretch on 2026-09-11, when fixed cards of 148 left
-/// 160 px empty at 1600 where the prototype fills the row with nine. §4 once asked for a minimum of
+/// 160 px empty at 1600 where the prototype fills the row with nine. The redesign once asked for a minimum of
 /// 180, and the prototype's code, which is what the tree follows, says 148.
 /// </para>
 /// <para>

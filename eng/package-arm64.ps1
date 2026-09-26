@@ -178,7 +178,7 @@ function Read-TrxCounters {
     package carries neither libsvtav1 nor libxavs2, so two samples are never generated, and one more
     test skips because that build muxes the HDR sample without its colour-transfer metadata. THE X64
     RUNNER SKIPS THE SAME ONES: five in this suite, read from the run of 743af9a. The gap belongs to
-    the ffmpeg package and is identical on both architectures, so tying PRD-003's unblocking to
+    the ffmpeg package and is identical on both architectures, so tying the ARM64 release to
     Chocolatey shipping an AV1 encoder would be a bar nobody can reach and nobody chose.
 
     So the line is that SOMETHING RAN AND PASSED: a suite that executed nothing measured nothing,

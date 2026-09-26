@@ -215,7 +215,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="PrivacyNoHostsDescription">Nothing leaves this machine.</x:String>
   <x:String x:Key="DiagnosticsEmptyFieldsNotice">Paths, file names, titles and history are listed empty so you can see they are not collected, not that they are omitted.</x:String>
   <x:String x:Key="TransportSpeedResetAction">Back to 1×</x:String>
-  <!-- The button that puts a group back is ONE key for all of them by decision (UX-010, ADR-0012),
+  <!-- The button that puts a group back is ONE key for all of them by decision,
        so that the groups cannot drift apart even in translation — comparing the text would let two
        keys with the same words through, which is exactly how «Volver a 1×» and «Restaurar campos
        del proveedor» came to live side by side for the same idea.
@@ -238,7 +238,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="ScanSettingsDescription">AP Reelume watches your folders and adds whatever turns up in them. If watching fails or the system interrupts it, it goes back over them every so often.</x:String>
   <x:String x:Key="ScanSettingsWatchLocal">Watch changes in local roots</x:String>
   <x:String x:Key="ScanSettingsFallbackMinutes">Recovery interval in minutes</x:String>
-  <!-- LIB-021, ADR-0009. The names of the three origins are one key each and are read from two
+  <!-- The names of the three origins are one key each and are read from two
        screens — the general order and one title's override — because they are one idea: two keys
        for the same words are how «Volver a 1×» and «Restaurar campos del proveedor» came to say the
        same thing differently. They are composed as "CoverOrigin" + the enum member, which is a shape
@@ -763,7 +763,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="PlayerVersionsEmptyDescription">There is nothing to choose between for this title.</x:String>
   <x:String x:Key="ShortcutsEmptyTitle">No shortcuts assigned</x:String>
   <x:String x:Key="ShortcutsEmptyDescription">The system media keys still work.</x:String>
-  <!-- Courses (CRS-001..CRS-005). Forty-two keys, and the design package's own header says
+  <!-- Courses. Forty-two keys, and the design's own header says
        forty-one: its "course card and its thread" group is labelled 15 and enumerates 16, because
        two of its rows pack a pair of keys into one cell and one pair was counted once. Counted
        from the document rather than read off its heading. -->
@@ -809,11 +809,11 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="AddCourseHelp">A course is a folder of numbered videos that you study in order. Lessons take the file-name order, subfolders become modules, and progress is kept per lesson. Nothing is copied, moved, or renamed — and it is NOT a scan root.</x:String>
   <x:String x:Key="AddCourseConfirmAction">Mark as course</x:String>
   <x:String x:Key="AddCourseDoneNotice">Folder marked as a course. Lessons take the file-name order and progress is kept per lesson. Nothing was copied.</x:String>
-  <!-- CRS-001, the dialog that consumes the five above. AddCourseNeighboursQuestionFormat is the
-       owner's own sentence, written on 2026-08-31: it asks about the fact and not about the action,
-       which is the signal ADR-0006 decision 2 says belongs to the user. Do not reword it.
-       AddCourseShape is a tree in the monospaced face rather than a picture — the maintainer's call, and
-       there is no binary to keep, nothing to translate twice, and it scales with the type. -->
+  <!-- The course dialog, which consumes the five above. AddCourseNeighboursQuestionFormat asks
+       about the fact and not about the action, because that fact is the signal that belongs to the
+       user. Do not reword it.
+       AddCourseShape is a tree in the monospaced face rather than a picture: there is no binary to
+       keep, nothing to translate twice, and it scales with the type. -->
   <x:String x:Key="AddAsLabel">CATALOGUE AS</x:String>
   <x:String x:Key="AddAsRootOption">Media root</x:String>
   <x:String x:Key="AddCourseShapeLabel">What a course looks like</x:String>

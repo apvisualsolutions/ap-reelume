@@ -23,7 +23,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// </summary>
 /// <remarks>
 /// <para>
-/// §4 asks that <c>○ ◐ ●</c> stay and gain "the same optical size as the Fluent glyphs", and the
+/// The redesign asks that <c>○ ◐ ●</c> stay and gain "the same optical size as the Fluent glyphs", and the
 /// measurement says why. On 2026-08-22, at <c>FontSizeBody</c>: a Fluent glyph renders <b>14 wide by
 /// 14 tall</b> — an icon font fills its em box — and <c>●</c> renders <b>9 wide</b>. The circle was
 /// reading at <b>64%</b> of the icon's size, which is what makes it look like a stray character rather
@@ -37,15 +37,15 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// </para>
 /// <para>
 /// <b>Every text block that paints one of the three takes the same class</b>, since three at one size
-/// and ten at another is the inconsistency this batch keeps finding. They were thirteen in three files
+/// and ten at another is the inconsistency this redesign keeps finding. They were thirteen in three files
 /// — the watch status control, the navigation rail and the appearance pills — and the rail's five went
 /// with its words when it became 64 px of pictograms, while the scan's pulsing dot joined them. The
 /// floor below is what the count is held to; it is not a census.
 /// </para>
 /// <para>
 /// <b>Ten since 2026-09-11, and the ones that left were never states.</b> Every option pill carried a
-/// <c>●</c> or a <c>○</c> beside its word to say whether it was the chosen one, and the maintainer read it
-/// as a radio button dropped inside a pill; the prototype never draws one. The pills say it with their
+/// <c>●</c> or a <c>○</c> beside its word to say whether it was the chosen one, and it read as a
+/// radio button dropped inside a pill; the prototype never draws one. The pills say it with their
 /// own edge now (<see cref="OptionPillTests"/>), and what stays here is what these circles are for:
 /// the progress of something watched, and the scan that is running.
 /// </para>

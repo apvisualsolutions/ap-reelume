@@ -28,7 +28,7 @@ public sealed class WindowsDisplayCapabilityTests
             RepositoryLayout.Root,
             "artifacts",
             "test-results",
-            "T22",
+            "display-capabilities",
             "green",
             "display-capabilities.csv");
         Directory.CreateDirectory(Path.GetDirectoryName(report)!);

@@ -9,7 +9,7 @@ namespace ApSolutions.LocalMedia.Domain.Tests.Playback;
 /// <summary>
 /// The rule the player draws by. What is asserted is the <b>shape</b>, not the numbers: a box whose
 /// ratio differs from the picture's is a stretched picture whatever its size, and that is the defect
-/// the maintainer reported on 2026-08-25 — an episode drawn into a resized window came out taller.
+/// that was seen — an episode drawn into a resized window came out taller.
 /// </summary>
 public sealed class VideoFitPolicyTests
 {

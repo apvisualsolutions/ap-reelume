@@ -43,8 +43,8 @@ public sealed class OrphanedResourceTests
     /// Keys with no consumer that are kept on purpose, each with the reason it is kept.
     /// </summary>
     /// <remarks>
-    /// <b>A key belongs here only when something already written says it will be drawn</b> — a row
-    /// in the scope record, or a finding in an audit that names it. Everything else goes: on
+    /// <b>A key belongs here only when something already decided says it will be drawn</b> — an
+    /// approved piece of scope, or a finding in an audit that names it. Everything else goes: on
     /// 2026-09-05 eight strings were deleted rather than parked here, among them a second «Mini
     /// reproductor» and a second «Pantalla completa» left behind by a player header the application
     /// no longer has. The list shrinks by drawing what is in it, never by adding to it because a
@@ -52,13 +52,13 @@ public sealed class OrphanedResourceTests
     /// </remarks>
     private static readonly Dictionary<string, string> KeptWithoutConsumer = new(StringComparer.Ordinal)
     {
-        // CRS-007 is DESIGN_APPROVED in docs/FEATURES.md: the Courses filter menu is scope that has
-        // not been started, and its three words were translated when the row was written.
-        ["CoursesMenuAll"] = "CRS-007, DESIGN_APPROVED",
-        ["CoursesMenuFinished"] = "CRS-007, DESIGN_APPROVED",
-        ["CoursesMenuThreadPending"] = "CRS-007, DESIGN_APPROVED",
+        // The Courses filter menu is approved and not started, and its three words were translated
+        // when it was approved.
+        ["CoursesMenuAll"] = "the courses filter menu, approved and not started",
+        ["CoursesMenuFinished"] = "the courses filter menu, approved and not started",
+        ["CoursesMenuThreadPending"] = "the courses filter menu, approved and not started",
 
-        // The library summary the maintainer decided on 2026-09-05 to bring back as an out-of-reach
+        // The library summary it was decided on 2026-09-05 to bring back as an out-of-reach
         // notice rather than as the card that was deleted on 2026-08-23. The count of unavailable
         // media is the one number that has no other home; the rest of the card's words wait with it
         // so the decision is taken once, with all of them on the table.

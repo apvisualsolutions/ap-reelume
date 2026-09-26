@@ -291,7 +291,7 @@ public sealed class SqliteBootstrapTests
 
         // The claim under test is the durability of the committed transaction, not how fast a
         // shared runner's disk settles after a hard kill: that reopen answered a transient
-        // "disk I/O error" twice on runners and never locally (CI-005). Three attempts, one second
+        // "disk I/O error" twice on runners and never locally. Three attempts, one second
         // apart, only around this reopen — an assertion failure is not retried, and a disk that
         // still errors on the third attempt fails the test with its own exception.
         SqliteException? transient = null;

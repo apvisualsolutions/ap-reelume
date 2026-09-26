@@ -97,7 +97,7 @@ public static partial class CompositionRoot
     /// closing closes.
     /// </summary>
     /// <remarks>
-    /// ARQ-006 left this here on purpose, and ARQ-001 took it out and put it back. The extraction
+    /// The module split left this here on purpose, and the host rework took it out and put it back. The extraction
     /// compiled and the assembled walks stayed green, and then the coverage gate measured it:
     /// 70,89 % of lines and 28,57 % of branches. It resolves ten services from the container, so
     /// reaching the tray path, both closing branches and the loose-activation catch means handing it
@@ -112,7 +112,7 @@ public static partial class CompositionRoot
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(window);
 
-        // Where the window was is part of what the application remembers (WIN-003): the stored
+        // Where the window was is part of what the application remembers: the stored
         // placement is applied before anything shows, followed while the window moves, and written
         // once when it closes — whatever path closes it.
         services.GetRequiredService<MainWindowPlacement>().Attach(window);
@@ -178,7 +178,7 @@ public static partial class CompositionRoot
         }
 
         // The watchers start with the window: continuous roots are followed from the first minute,
-        // startup-policy roots get the scan their owner asked for, and manual roots are left alone.
+        // startup-policy roots get the scan they were set up for, and manual roots are left alone.
         services.GetRequiredService<RootWatchBackground>().Start();
 
         // The automatic check, if somebody has turned it on. Without this the preference would be a
@@ -188,13 +188,13 @@ public static partial class CompositionRoot
         PostSafely(() => services.GetRequiredService<UpdateViewModel>()
             .CheckAutomaticallyAsync(CancellationToken.None));
 
-        // LIB-016. One pass over the oldest entries, if somebody turned it on. It is posted like the
+        // One pass over the oldest entries, if somebody turned it on. It is posted like the
         // update check — after the window exists — and it reads the switch itself, so with it off,
         // which is the default, this opens no connection and does not even read the catalogue.
         PostSafely(() => services.GetRequiredService<RefreshStaleMetadata>()
             .ExecuteAsync(CancellationToken.None));
 
-        // LIB-021. The titles left with no cover since the last launch get a frame of their own
+        // The titles left with no cover since the last launch get a frame of their own
         // video; a scan that ends later asks again through the coordinator.
         services.GetRequiredService<Metadata.TitleFramePass>().Request();
 
@@ -256,9 +256,9 @@ public static partial class CompositionRoot
     }
 
     /// <summary>
-    /// Everything the product declares, as an inspectable collection (ARQ-006, step 1 — started
-    /// when ART-A01 retired the artwork registration and the textual reachability assertion had to
-    /// stop trusting the file's text). Registering runs nothing: tests assert against these
+    /// Everything the product declares, as an inspectable collection (started when
+    /// the artwork registration was retired and the textual reachability assertion had to stop
+    /// trusting the file's text). Registering runs nothing: tests assert against these
     /// descriptors instead of against source code as a string.
     /// </summary>
     public static IServiceCollection AddLocalMedia(
@@ -310,7 +310,7 @@ public static partial class CompositionRoot
     /// <remarks>
     /// The host is not a parameter here and does not need to be: the surfaces that have to reach it
     /// take it from the accessor its own container publishes, which is what replaced the static field
-    /// ARQ-001 removed.
+    /// nothing could release.
     /// </remarks>
     internal static Control FinishShell(IServiceProvider services, IAppDataPaths paths)
     {
@@ -342,8 +342,8 @@ public static partial class CompositionRoot
                     // The destination the application opens on arrives the same way every other one
                     // does. NavigationService starts on Home and raises nothing, so the shell's
                     // arrival handler — the only thing that reads Home — never ran until somebody
-                    // left Home and came back: the maintainer opened the application on a library of 102
-                    // scanned files and found it blank. Announcing the route that is already current
+                    // left Home and came back: the application opened on a library of about a hundred
+                    // scanned files and showed it blank. Announcing the route that is already current
                     // makes the first destination an arrival rather than an initial value.
                     var navigation = services.GetRequiredService<INavigationService>();
                     navigation.Navigate(navigation.CurrentRoute);
@@ -413,7 +413,7 @@ public static partial class CompositionRoot
     /// Makes the database ready off the interface thread, and says why not when it will not be.
     /// </summary>
     /// <remarks>
-    /// ARQ-005. <see cref="MigrationRunner.MigrateAsync"/> is written with real awaits and yields at
+    /// <see cref="MigrationRunner.MigrateAsync"/> is written with real awaits and yields at
     /// none of them — <c>Microsoft.Data.Sqlite</c> implements its <c>Async</c> surface synchronously
     /// because SQLite has no asynchronous I/O — so awaiting it here would leave the interface thread
     /// exactly as blocked as the <c>GetAwaiter().GetResult()</c> it replaced, while looking fixed.
@@ -436,8 +436,7 @@ public static partial class CompositionRoot
 
                 // The runner already proved integrity before touching anything, on this very start.
                 // Asking SQLite the same question twice doubles the slowest part of opening a large
-                // library; the second check only runs when a migration actually rewrote the file
-                // (BUG-012).
+                // library; the second check only runs when a migration actually rewrote the file.
                 if (migrationRunner.AppliedMigrationCount > 0)
                 {
                     var integrity = await integrityChecker.CheckAsync(CancellationToken.None)
@@ -515,7 +514,7 @@ public static partial class CompositionRoot
         var setPersonalState = provider.GetRequiredService<SetPersonalState>();
         var versionGroups = provider.GetRequiredService<IMediaVersionGroupRepository>();
 
-        // The synopsis was stored, merged and editable long before any card could show it (LIB-013).
+        // The synopsis was stored, merged and editable long before any card could show it.
         // It is read here, next to the watch state and the versions, because a details view model in
         // this application never queries: it shows what somebody already read for it.
         var catalogMetadata = provider.GetRequiredService<ICatalogMetadataRepository>();
@@ -529,7 +528,7 @@ public static partial class CompositionRoot
                     request with { MediaFileId = request.MediaFileId ?? new MediaFileId(movieDetails!.TitleId.Value) },
                     CancellationToken.None)
                 : Task.CompletedTask,
-            // The toggle was built with a null handler (CNT-A01): every mark a person made on the
+            // The toggle was built with a null handler: every mark a person made on the
             // card went nowhere. A chosen status is recorded as a manual override; choosing none
             // hands the state back to the automatic rules under the threshold in force. The control
             // then shows what the repository holds, never what the click hoped.
@@ -565,7 +564,7 @@ public static partial class CompositionRoot
             // A trailer is a file the person already has, so it opens the way a file dropped on the
             // application opens: as a loose session. That path refuses an extension outside the
             // approved list and writes no catalogue row, which is exactly what a trailer must not
-            // become (LIB-014). Nothing is downloaded and nothing is streamed. It goes through the
+            // become. Nothing is downloaded and nothing is streamed. It goes through the
             // shell for the reason the activation does: a session with no surfaces is a video nobody
             // can see or stop.
             onPlayTrailer: async path =>
@@ -576,7 +575,7 @@ public static partial class CompositionRoot
                 }
             },
 
-            // The provider's trailer goes the other way (LIB-015): out of the application and into
+            // The provider's trailer goes the other way: out of the application and into
             // whatever browser the person uses. The address arrives already composed by
             // TrailerLinkPolicy from a key that passed its alphabet and its length, and the launcher
             // refuses anything that is not https on its own host. Nothing here connects to YouTube.
@@ -613,10 +612,10 @@ public static partial class CompositionRoot
             // agree, so the wrapper was never buying anything.
             provider.GetRequiredService<ResolveTitlePoster>().Find,
             // The notices strip's other half. A root that cannot be read is announced where the
-            // affected titles are (ADR-0010), and until this line the event was published to nobody.
+            // affected titles are, and until this line the event was published to nobody.
             provider.GetRequiredService<RootNoticeViewModel>());
 
-        // LIB-021. A batch of frames reaches the cards already on screen, on the interface thread,
+        // A batch of frames reaches the cards already on screen, on the interface thread,
         // without re-querying: re-querying would put whoever is scrolling back at the top.
         provider.GetRequiredService<Metadata.TitleFramePass>().FramesTaken +=
             (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(library.RefreshPosters);
@@ -782,13 +781,13 @@ public static partial class CompositionRoot
             Shortcuts = provider.GetRequiredService<ShortcutSettingsViewModel>(),
             SubtitleStyle = provider.GetRequiredService<SubtitleStyleViewModel>(),
             MiniPlayerPlacement = provider.GetRequiredService<IMiniPlayerPlacementStore>(),
-            // The clock that puts the chrome away after a while without the mouse (ENG-018). The
+            // The clock that puts the chrome away after a while without the mouse. The
             // application's own, so the shell reads the same time everything else does.
             ChromeClock = provider.GetRequiredService<IClock>(),
             SegmentDetection = new SegmentDetectionSettingsViewModel(
             () => provider.GetRequiredService<DetectSeriesSegments>().IsEnabled,
             enabled => provider.GetRequiredService<DetectSeriesSegments>().SetEnabled(enabled)),
-            // The surface PLY-011's criterion promised and ContinuityCountdown's comment
+            // The surface the next-episode countdown promised and ContinuityCountdown's comment
             // already claimed existed. The same facade the player reads at chaining time, so
             // there is one stored length and not a second copy that can drift from it.
             PlaybackSettings = new PlaybackSettingsViewModel(
@@ -914,7 +913,7 @@ public static partial class CompositionRoot
     /// plan describes what would happen, and only an explicit confirmation executes it.
     /// </summary>
     /// <remarks>
-    /// LIB-012: what this asked for used to be the name the file already had, which
+    /// What this asked for used to be the name the file already had, which
     /// <see cref="RenamePolicy"/> correctly discards, so the plan was always empty and neither
     /// button could ever run. The name now comes from the entry — what a provider identified when
     /// somebody identified it, and what the parser reads off the file name when nobody has, since a
@@ -1093,8 +1092,8 @@ public static partial class CompositionRoot
     }
 
     /// <summary>
-    /// The gear over the picture, with the groups that are decided while watching inside it
-    /// (ADR-0012). Absent when the engine has no pixels of its own to adjust, which is what keeps
+    /// The gear over the picture, with the groups that are decided while watching inside it.
+    /// Absent when the engine has no pixels of its own to adjust, which is what keeps
     /// the button off the bar instead of dimming it.
     /// </summary>
     /// <remarks>
@@ -1163,7 +1162,7 @@ public static partial class CompositionRoot
         // the answer from before anybody looked.
         PlayerVersionsViewModel? versions = null;
 
-        // An episode belongs to its show, and the T29 model stores markers per series; a file that
+        // An episode belongs to its show, and the marker model stores markers per series; a file that
         // is not an episode keeps its own identifier as its series, which is what movies already do.
         // It is read before the player is built because the gear's picture group has to be told
         // which scope it stores in, and that scope is this one.
@@ -1200,7 +1199,7 @@ public static partial class CompositionRoot
             provider.GetRequiredService<ControlPlayback>().SeekAsync(position, CancellationToken.None));
 
         // What the skip button follows is recomposed after every marker mutation, so a marker made
-        // mid-playback works without closing and reopening the episode (BUG-008). The editor's own
+        // mid-playback works without closing and reopening the episode. The editor's own
         // list reloads with it, and the composition rule stays the tested one.
         MarkerEditorViewModel? markers = null;
         async Task RefreshSessionMarkersAsync()
@@ -1216,10 +1215,10 @@ public static partial class CompositionRoot
         }
 
         // The overlay's buttons reach the countdown that is actually running: "play now" skips the
-        // wait and "cancel" ends it. Resolved bare, both buttons only hid the card (PLY-011).
+        // wait and "cancel" ends it. Resolved bare, both buttons only hid the card.
         var nextEpisode = new NextEpisodeViewModel(action => HandleNextEpisodeActionAsync(host, action));
 
-        // CRS-004. The file is asked whether it is a lesson rather than the request being trusted to
+        // The file is asked whether it is a lesson rather than the request being trusted to
         // say so: the countdown opens the next one with an id and nothing else, and so does picking
         // the thread up from home. Absent for every session that is not one, which is what makes the
         // pill and the 320 px column absent rather than disabled.
@@ -1236,7 +1235,7 @@ public static partial class CompositionRoot
 
         // One router per session: keyboard and media keys resolve into the same action exactly
         // once, which is what stops a media key the focused window also sees as a key press from
-        // toggling playback twice (ARQ-002).
+        // toggling playback twice.
         var router = new InputCommandRouter((command, token) =>
             ExecutePlaybackInputAsync(host, provider, player, transport, command, token));
         var shortcuts = provider.GetRequiredService<ShortcutMap>();
@@ -1350,7 +1349,7 @@ public static partial class CompositionRoot
         var fileScopeKey = mediaFileId.Value.ToString("D");
         var seriesScopeKey = episodeEntry is not null ? seriesId.Value.ToString("D") : null;
 
-        // The stored choices are applied the moment the media is open (PLY-A01): the use case
+        // The stored choices are applied the moment the media is open: the use case
         // resolves file over series over global and falls back by language when a named track is
         // absent. Registered, tested end to end, and invoked by nobody — the audit's house defect.
         AppliedPlaybackPreference? applied = null;
@@ -1377,7 +1376,7 @@ public static partial class CompositionRoot
 
         // The transport keeps its own copy of the speed — it is what the screen reads — and the
         // engine has just been told the resolved one. Without this line the two disagree and the
-        // screen lies in both directions (ENG-011). It is the consumer that makes AdoptSpeedAsync
+        // screen lies in both directions. It is the consumer that makes AdoptSpeedAsync
         // exist: a method nobody calls would be this repository's own house defect again.
         if (applied is { } preference)
         {
@@ -1429,7 +1428,7 @@ public static partial class CompositionRoot
                 PostSafely(() => OfferNextEpisodeAsync(host, provider, episodeEntry, nextEpisode));
             }
 
-            // And the end of a lesson offers the next lesson (CRS-004), never both: a file is an
+            // And the end of a lesson offers the next lesson, never both: a file is an
             // episode or a lesson, and a course folder inside a series root would otherwise run two
             // countdowns over one picture.
             else if (args.CurrentState == PlaybackState.Ended && lessonSession is not null)
@@ -1450,7 +1449,7 @@ public static partial class CompositionRoot
         tracks.Load(snapshot.Tracks, applied?.Audio, applied?.Subtitle);
         sessionTracks = tracks;
 
-        // The output choice reaches the engine (AUD-A01): the stored global device is applied to
+        // The output choice reaches the engine: the stored global device is applied to
         // the session that just opened, and a person's pick goes through the adapter that pauses,
         // routes, resumes, and stores — the surface then shows the machine's answer. A session
         // that failed to open simply has nothing to route; the preference stays for the next one.
@@ -1567,7 +1566,7 @@ public static partial class CompositionRoot
             capabilities,
             capabilities is { HardwareAccelerationRequested: true, HardwareAccelerationActive: false });
 
-        // The live session offers its other versions (VSW-A01): the action exists only when the
+        // The live session offers its other versions: the action exists only when the
         // playing title has a version group, and it goes through the use case that writes the old
         // position first and asks before a transfer the policy will not make alone. After a switch
         // the surfaces are rebuilt for the file now playing — the freshly recorded state is what
@@ -1735,7 +1734,7 @@ public static partial class CompositionRoot
     /// nothing is registered for `.msix` — a clean Windows with no App Installer — this returns null
     /// without throwing, and the update is refused. Where an App Installer exists it returns a
     /// process and the installer appears, so a refusal cannot be reported while an install is
-    /// starting. Both halves are archived in docs/evidence/stable/updater-handover.json.
+    /// starting. Both halves were measured.
     /// </remarks>
     /// <summary>
     /// Ends the application, when there is a desktop lifetime to end.
@@ -1895,7 +1894,7 @@ public static partial class CompositionRoot
             .GetRequiredService<ILibraryRootRepository>()
             .ListAsync(CancellationToken.None)).GetAwaiter().GetResult().Count);
 
-        // What the machine actually did, not what a constant claimed it would (ARQ-009). The
+        // What the machine actually did, not what a constant claimed it would. The
         // acceleration answer is the engine's own for the last media it opened — false before
         // anything has played, which is the truthful reading of "no evidence".
         var acceleration = Read(() => provider
@@ -1931,8 +1930,8 @@ public static partial class CompositionRoot
     /// </summary>
     /// <summary>
     /// What went wrong, from the two places that know: the rename audit the database keeps between
-    /// runs, and this session's own failures (ARQ-004) — the commands whose surface had nowhere to
-    /// show a failure, and whatever reached the top of the process. Before ARQ-004 the report could
+    /// runs, and this session's own failures — the commands whose surface had nowhere to
+    /// show a failure, and whatever reached the top of the process. Before those were recorded the report could
     /// only ever describe renames, which made a quiet application look like a healthy one.
     /// </summary>
     private static IReadOnlyList<DiagnosticsErrorSample> ReadRecordedErrors(IServiceProvider provider) =>
@@ -2043,7 +2042,7 @@ public static partial class CompositionRoot
     }
 
     /// <summary>
-    /// Asks which image to use as a cover (LIB-018). The dialog offers exactly the containers the
+    /// Asks which image to use as a cover. The dialog offers exactly the containers the
     /// allow-list approves, and a cancelled dialog answers null, which adds nothing.
     /// </summary>
     /// <remarks>
@@ -2201,10 +2200,10 @@ public static partial class CompositionRoot
         var control = provider.GetRequiredService<ControlPlayback>();
         var shell = provider.GetRequiredService<ShellHost>().Shell;
 
-        // Stop ends a running countdown, whichever input asked for it (PLY-011, CRS-004).
+        // Stop ends a running countdown, whichever input asked for it.
         //
-        // T28 measured cancellation from all three origins -- keyboard, mouse, media key -- but it
-        // measured them against a router whose callback the test wrote itself. This is the
+        // The countdown's tests measured cancellation from all three origins -- keyboard, mouse,
+        // media key -- but they measured them against a router whose callback the test wrote itself. This is the
         // application's callback, and until 2026-09-01 not one of its ten arms touched the
         // countdown: the only Cancel() in src/ was the overlay's two buttons. So in the real
         // application Stop closed the session and the countdown kept running underneath, opening
@@ -2251,7 +2250,7 @@ public static partial class CompositionRoot
                 await shell.TogglePlaybackModeAsync(PlaybackMode.Mini, cancellationToken)
                     .ConfigureAwait(true);
                 break;
-            // Escape steps back one layer rather than only leaving fullscreen (ENG-018): the gear, the
+            // Escape steps back one layer rather than only leaving fullscreen: the gear, the
             // panel, the window mode, and then the player itself, in the prototype's order.
             case PlaybackInputCommand.ExitOverlayMode when shell is not null:
                 await shell.EscapeAsync(cancellationToken).ConfigureAwait(true);
@@ -2355,7 +2354,7 @@ public static partial class CompositionRoot
     }
 
     /// <summary>
-    /// Offers the next episode when one just ended. The countdown itself is T28's tested use case —
+    /// Offers the next episode when one just ended. The countdown itself is the tested use case —
     /// cancelable, configurable, revalidating the file at zero — and the shell opens whatever was
     /// chosen so the new session gets its tracker, markers, and tracks like any other.
     /// </summary>
@@ -2379,7 +2378,7 @@ public static partial class CompositionRoot
         if (candidate is null)
         {
             // Nothing after this episode: the shell returns to the details, which is the outcome
-            // T28 wrote down for the end of a season.
+            // written down for the end of a season.
             if (shell is not null)
             {
                 await shell.ClosePlayerAsync(CancellationToken.None).ConfigureAwait(true);
@@ -2415,7 +2414,7 @@ public static partial class CompositionRoot
             // The shell rebuilds the session's surfaces — tracker, markers, tracks, resume — around
             // the chosen episode. When the countdown already opened it through the coordinator, the
             // open below replaces that session with the same file; the brief double open is the
-            // price of keeping T28's revalidation-at-zero exactly as tested.
+            // price of keeping the countdown's revalidation-at-zero exactly as tested.
             if (shell is not null)
             {
                 await shell.OpenPlayerAsync(
@@ -2433,7 +2432,7 @@ public static partial class CompositionRoot
     }
 
     /// <summary>
-    /// Offers the next lesson when one just ended (CRS-004), the course chain's half of PLY-011.
+    /// Offers the next lesson when one just ended, the course chain's half of the countdown.
     /// </summary>
     /// <remarks>
     /// The same overlay, the same countdown object and the same five outcomes as the episode chain —

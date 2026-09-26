@@ -10,7 +10,7 @@ namespace ApSolutions.LocalMedia.Application.Personalization;
 public interface IRecommendationSettings
 {
     /// <summary>
-    /// On until somebody turns it off, and what UX-010's reset puts back. Named on the port so the
+    /// On until somebody turns it off, and what the settings reset puts back. Named on the port so the
     /// store and the reset cannot disagree about which of them holds the default.
     /// </summary>
     const bool EnabledByDefault = true;

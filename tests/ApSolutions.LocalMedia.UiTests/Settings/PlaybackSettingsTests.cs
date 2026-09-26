@@ -202,7 +202,7 @@ public sealed class PlaybackSettingsTests
     }
 
     /// <summary>
-    /// UX-010, asserted on the stored seconds rather than on the property: a reset that only moved
+    /// Restoring the defaults, asserted on the stored seconds rather than on the property: a reset that only moved
     /// the slider would come back at the old length after a restart while looking restored.
     /// </summary>
     [Fact]

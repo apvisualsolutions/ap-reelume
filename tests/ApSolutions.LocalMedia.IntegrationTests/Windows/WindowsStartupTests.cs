@@ -13,8 +13,8 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Windows;
 /// The Windows startup entry, against the real registry.
 /// <para>
 /// The tests write under a key of their own rather than the real Run key: a test suite must not leave
-/// anything behind in the key Windows reads at sign-in. The real key is exercised by hand and recorded
-/// in the task evidence, including running the command it holds.
+/// anything behind in the key Windows reads at sign-in. The real key is exercised by hand,
+/// including running the command it holds.
 /// </para>
 /// </summary>
 public sealed class WindowsStartupTests : IDisposable

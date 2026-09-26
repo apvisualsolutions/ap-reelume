@@ -4,7 +4,7 @@ Las cuatro fases que ejecuta Windows —instalar, actualizar, reparar y desinsta
 pueden lanzar desde `verify-package.ps1`: necesitan una máquina limpia, un administrador y una firma.
 Se ejecutan a mano en **Windows Sandbox**, que es una copia de Windows creada de cero al abrirla y
 destruida al cerrarla, y su resultado se archiva en
-[`docs/evidence/mvp/windows-lifecycle.json`](../docs/evidence/mvp/windows-lifecycle.json).
+[`eng/sandbox/windows-lifecycle.json`](sandbox/windows-lifecycle.json).
 
 The four phases Windows performs cannot be launched from `verify-package.ps1`: they need a clean
 machine, an administrator, and a signature. They are run by hand in **Windows Sandbox** — a Windows
@@ -81,18 +81,18 @@ reports.
 4. **Recoger los informes.** El guion les pone ya la versión y el SHA-256 de `Package.appxmanifest`
    y los deja en `artifacts/sandbox/`. **Léalos antes de archivar**: si alguna fase no pasó, el guion
    lo avisa por nombre, y una evidencia que se copia sin mirar es una evidencia que no se midió.
-   Archivar es copiar `windows-lifecycle.json` a `docs/evidence/mvp/` y, si cambió,
-   `updater-handover.json` a `docs/evidence/stable/`. / The script stamps both reports and leaves
+   Archivar es copiar `windows-lifecycle.json` y, si cambió, `updater-handover.json` a
+   `eng/sandbox/`. / The script stamps both reports and leaves
    them in `artifacts/sandbox/`; read them before copying them into place.
 
 ## La entrega del actualizador / The updater's handover
 
-`REL-003` añade una segunda pregunta que este mismo entorno responde: el actualizador entrega el
+El actualizador añade una segunda pregunta que este mismo entorno responde: el actualizador entrega el
 paquete verificado con `ShellExecute` y dice si Windows lo aceptó. Que esa afirmación sea cierta
 depende de lo que devuelva la llamada, y **responde distinto según la máquina**, así que hay que
 medirla en las dos: un Windows sin nada registrado para `.msix` —el sandbox recién creado— y uno con
 instalador de aplicaciones. Lo medido se archiva en
-[`docs/evidence/stable/updater-handover.json`](../docs/evidence/stable/updater-handover.json) y
+[`eng/sandbox/updater-handover.json`](sandbox/updater-handover.json) y
 `UpdateHandoverTests` lo exige.
 
 Dos cosas que aprendió el guion por las malas, y que conviene no repetir: nada dentro del sandbox
@@ -100,7 +100,7 @@ debe esperar por red sin un límite de tiempo —una descarga sin `timeout` lo d
 informe—, y **cada fase va envuelta y el informe se escribe en un `finally`**. Una verificación que
 no deja rastro cuando algo va mal esconde justo lo que se ejecutó para encontrar.
 
-`REL-003` adds a second question this same environment answers: the updater hands the verified
+The updater adds a second question this same environment answers: the updater hands the verified
 package over with `ShellExecute` and reports whether Windows took it. Whether that claim is true
 depends on what the call returns, and it **answers differently per machine**, so both are measured:
 one with nothing registered for `.msix` and one with an App Installer. The result is archived at the

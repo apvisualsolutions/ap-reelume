@@ -49,7 +49,7 @@ public readonly record struct YuvColourMatrix(
 /// </para>
 /// <para>
 /// There is deliberately no way to pass a space in. Preferring what the source declares is the right
-/// answer the day anything in the tree can read it — PLY-016's graphics path will have to tell the
+/// answer the day anything in the tree can read it — the upscaler's graphics path will have to tell the
 /// video processor what it is handed — and this is the one place that will change. Until something
 /// supplies that value, a parameter for it would be a door nobody walks through, which is this
 /// repository's characteristic defect rather than a head start.

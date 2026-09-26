@@ -8,7 +8,7 @@ using ApSolutions.LocalMedia.TestSupport;
 namespace ApSolutions.LocalMedia.ArchitectureTests;
 
 /// <summary>
-/// WIN-002: the Windows host declares its own application manifest. Without one, the process runs
+/// The Windows host declares its own application manifest. Without one, the process runs
 /// under the 260-character path limit on machines that already lifted it — a library under a deep
 /// folder simply loses files — and DPI awareness is whatever the runtime guessed instead of the
 /// per-monitor mode the player's windows are written for.

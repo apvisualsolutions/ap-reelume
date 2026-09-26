@@ -15,7 +15,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Courses;
 
 /// <summary>
-/// An opened course (CRS-002, CRS-005): its header, its modules, its thread, and what marking a
+/// An opened course: its header, its modules, its thread, and what marking a
 /// lesson does to all three.
 /// </summary>
 /// <remarks>
@@ -27,7 +27,7 @@ namespace ApSolutions.LocalMedia.UiTests.Courses;
 /// best single report for a line rather than the union of them, so a guard exercised from
 /// <c>UiTests</c> on one side and <c>IntegrationTests</c> on the other reads 1/2 for ever.
 /// <para>
-/// The second is that marking a lesson is not a write and then a claim: it writes through PLY-008's
+/// The second is that marking a lesson is not a write and then a claim: it writes through the resume
 /// store and re-reads the course, so the thread only moves if the round trip really happened. The
 /// lesson reader here derives each lesson's status from the watch store for exactly that reason —
 /// a stub that returned a fixed list would let the model claim a thread that never moved.
@@ -670,7 +670,7 @@ public sealed class CourseDetailsViewModelTests
 
     /// <summary>
     /// The lessons, with each one's status read back out of the watch store rather than held here.
-    /// That is what makes marking a lesson observable: the model writes through PLY-008 and re-reads
+    /// That is what makes marking a lesson observable: the model writes through the resume store and re-reads
     /// the course, so a thread that moves proves the round trip happened.
     /// </summary>
     private sealed class StubLessons(CountingWatchStates states) : ICourseLessonReader

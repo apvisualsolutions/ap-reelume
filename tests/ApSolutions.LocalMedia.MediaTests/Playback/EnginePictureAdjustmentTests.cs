@@ -16,12 +16,12 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 /// <remarks>
 /// <see cref="PictureAdjustmentTests"/> proves the table is right and
 /// <see cref="PackedYuvConverterTests"/> proves the conversion reads it. Neither proves the engine
-/// ever hands one over, which is the defect this house is named after — and the only way to tell is
-/// to decode something and look at what comes out.
+/// ever hands one over, which is the defect of a feature built and never fed — and the only way to tell
+/// is to decode something and look at what comes out.
 /// </remarks>
 public sealed class EnginePictureAdjustmentTests
 {
-    private const string SampleRelativePath = "PLY16/mpeg2-480p-noisy.mkv";
+    private const string SampleRelativePath = "low-res-enhancement/mpeg2-480p-noisy.mkv";
 
     private const string SampleRecipe =
         "-f lavfi -i testsrc2=size=720x480:rate=25,noise=alls=10:allf=t -t 6 " +
@@ -49,8 +49,8 @@ public sealed class EnginePictureAdjustmentTests
     [Fact]
     public async Task The_neutral_adjustment_leaves_the_engine_publishing_what_it_published_before()
     {
-        // The control, and the acceptance criterion of PLY-018 measured at the far end: an engine
-        // that quietly applied something of its own would pass the test above just as well.
+        // The control, and the acceptance criterion of the picture adjustment measured at the far end:
+        // an engine that quietly applied something of its own would pass the test above just as well.
         Assert.SkipWhen(MediaToolchain.EncoderPath is null, MediaToolchain.MissingEncoderReason);
         var path = await MediaToolchain.EnsureSampleAsync(
             SampleRelativePath, SampleRecipe, TestContext.Current.CancellationToken);

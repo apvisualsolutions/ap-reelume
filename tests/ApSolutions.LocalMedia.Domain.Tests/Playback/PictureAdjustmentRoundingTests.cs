@@ -12,20 +12,20 @@ namespace ApSolutions.LocalMedia.Domain.Tests.Playback;
 /// <remarks>
 /// <para>
 /// <b>This file is what is left of an attempt that went wrong, and both halves are worth keeping.</b>
-/// On 2026-09-13 the maintainer raised gamma to 1.5 and saw flat patches around lettering. The cause was
+/// With gamma raised to 1.5, flat patches showed around lettering. The cause was
 /// real and it is quantisation: a curve maps 256 levels onto 256 levels, so wherever it is flatter than
 /// one-to-one two neighbouring inputs land on the same output and a gradient loses a step.
 /// </para>
 /// <para>
-/// <b>The textbook answer is dithering, it was built, and he rejected it in twenty minutes</b> —
-/// «ahora aparecen un montón de cuadraditos en toda la imagen». Measured afterwards, the reason is
+/// <b>The textbook answer is dithering, it was built, and it was rejected on sight</b>: it covered
+/// the whole picture in small squares. Measured afterwards, the reason is
 /// ordering and not amplitude: the sharpening does <i>not</i> amplify it, the pattern stays one level
 /// wide. But the pattern lives in the resolution of the decoded frame and the screen is four times
 /// that, so an 8×8 cell becomes a 32×32 block of screen pixels — one level spread over an area large
 /// enough to read as banding of its own. <b>Dither has to be the last step before the screen and there
-/// it was the first.</b> Moving the curve behind the scaling was measured on 2026-09-25 and not built
-/// (`ENG-023`): the band is the file's own step stretched by the curve, which a dither cannot remove,
-/// and <c>ToneCurveOrderingCandidateTests</c> keeps that decision measured.
+/// it was the first.</b> Moving the curve behind the scaling was measured and not built: the band is
+/// the file's own step stretched by the curve, which a dither cannot remove, and
+/// <c>ToneCurveOrderingCandidateTests</c> keeps that decision measured.
 /// </para>
 /// <para>
 /// <b>What survived is the rounding, which was its own defect.</b> The old table truncated, so a curve
@@ -42,8 +42,8 @@ public sealed class PictureAdjustmentRoundingTests
     /// <remarks>
     /// Half a level is the whole claim: it is what «nearest» means, and it is the most a single
     /// eight-bit value can promise. The rows cover the three controls because the defect belonged to
-    /// all three — the maintainer asked on 2026-09-13 whether brightness had it too, and it did, in its own
-    /// form: 0.1 is 25,5 levels, so truncation put the entire picture half a level down.
+    /// all three — brightness had it too, in its own form: 0.1 is 25,5 levels, so truncation put the
+    /// entire picture half a level down.
     /// </remarks>
     [Theory]
     [InlineData(0d, 1d, 1.5d)]
@@ -122,7 +122,7 @@ public sealed class PictureAdjustmentRoundingTests
     }
 
     /// <summary>
-    /// Neutral is the identity exactly, which is what PLY-018 promises by name.
+    /// Neutral is the identity exactly, which is what the picture adjustment promises by name.
     /// </summary>
     /// <remarks>
     /// <b>This is the one the change could have broken, and the reason the fixed point is scaled by

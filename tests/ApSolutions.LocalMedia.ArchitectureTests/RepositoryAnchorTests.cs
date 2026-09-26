@@ -8,11 +8,11 @@ using ApSolutions.LocalMedia.TestSupport;
 namespace ApSolutions.LocalMedia.ArchitectureTests;
 
 /// <summary>
-/// One anchor for the repository root, and one place that finds it (ARQ-012).
+/// One anchor for the repository root, and one place that finds it.
 /// </summary>
 /// <remarks>
 /// The same walk up from the output directory was pasted into fifty-eight files, and it was not even
-/// the same walk: two copies anchored on <c>docs/FEATURES.md</c> and the rest on the solution file,
+/// the same walk: two copies anchored on a document and the rest on the solution file,
 /// so this repository held two definitions of its own root. The shared one is
 /// <c>tests/Shared/RepositoryLayout.cs</c>, linked into every test project from
 /// <c>tests/Directory.Build.targets</c>.

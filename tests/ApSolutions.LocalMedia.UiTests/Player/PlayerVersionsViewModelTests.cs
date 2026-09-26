@@ -14,11 +14,11 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// behind it is incomplete.
 /// </summary>
 /// <remarks>
-/// TST-001's debt. <c>VersionSwitchWiringTests</c> covers the wiring — that a row hands its own
+/// Coverage debt. <c>VersionSwitchWiringTests</c> covers the wiring — that a row hands its own
 /// version to the use case and that an unavailable one cannot be switched to — and left the label
 /// itself untouched, which is where every branch in this file lives. The gap was invisible because
 /// the coverage gate only held files that were new, so this one shipped at 45% of its lines and got
-/// worse in ARQ-004 without anything noticing. It is a watched file now.
+/// worse in a refactor of the commands without anything noticing. It is a watched file now.
 /// </remarks>
 public sealed class PlayerVersionsViewModelTests
 {

@@ -21,7 +21,7 @@ public sealed class ShellAutomationTests
     private const string PresentationAssemblyName = "ApSolutions.LocalMedia.Presentation";
 
     /// <summary>
-    /// Six since 2026-08-30, when Courses joined the rail (CRS-003). Every one of them is walked
+    /// Six since Courses joined the rail. Every one of them is walked
     /// here rather than counted: the assertion inside the loop is that pressing Enter on the
     /// button actually moves the route, so a seventh entry that looked right and navigated
     /// nowhere would still fail.

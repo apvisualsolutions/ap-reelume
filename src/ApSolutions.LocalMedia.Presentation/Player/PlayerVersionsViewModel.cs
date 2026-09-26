@@ -93,7 +93,7 @@ public sealed class PlayerVersionRowViewModel
 }
 
 /// <summary>
-/// The other versions of what is playing (VSW-A01). The surface only exists when the title has a
+/// The other versions of what is playing. The surface only exists when the title has a
 /// version group, and each row hands its switch to the use case that carries progress across.
 /// </summary>
 public sealed class PlayerVersionsViewModel

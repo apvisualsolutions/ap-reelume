@@ -17,7 +17,7 @@ namespace ApSolutions.LocalMedia.Application.Playback;
 /// </para>
 /// <para>
 /// It lived as two private methods of <c>GetCourseThumbnail</c> until 2026-09-18, when the frame
-/// became a cover for films and series too (LIB-021) and a second copy would have been the start of
+/// became a cover for films and series too and a second copy would have been the start of
 /// two formats.
 /// </para>
 /// </remarks>

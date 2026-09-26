@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Courses;
 
 /// <summary>
-/// The order a course is watched in (CRS-001, ADR-0006 decision 4).
+/// The order a course is watched in.
 /// </summary>
 /// <remarks>
 /// The shapes here are the ones measured over a real collection of 595 lessons and not shapes

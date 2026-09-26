@@ -12,7 +12,7 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <NuGetAudit>true</NuGetAudit>
     <NuGetAuditMode>all</NuGetAuditMode>
-    <!-- SEC-007: moderate advisories fail the build too; high alone let known issues ride. -->
+    <!-- Moderate advisories fail the build too; high alone let known issues ride. -->
     <NuGetAuditLevel>moderate</NuGetAuditLevel>
     <LocalMediaPackageIdentity>APSolutions.LocalMedia</LocalMediaPackageIdentity>
     <LocalMediaUriScheme>apsolutions-localmedia</LocalMediaUriScheme>

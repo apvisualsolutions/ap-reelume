@@ -14,7 +14,7 @@ param(
     # workflow, which has already built and walked the package before it gets here.
     [switch]$SkipPackaging,
 
-    # CI-003/CI-005: on shared runners the performance budgets measure the neighbour's workload as
+    # On shared runners the performance budgets measure the neighbour's workload as
     # much as this code, so CI runs them, archives their result, and does not let their verdict
     # block. The budgets stay blocking wherever this switch is absent — the physical harness, where
     # they mean something.
@@ -92,7 +92,7 @@ try {
         Set-Content -LiteralPath (Join-Path $resultsDirectory 'performance-nonblocking.json') -Value (@{
                 outcome  = $performanceOutcome
                 exitCode = $LASTEXITCODE
-                note     = 'Performance budgets are non-blocking on shared runners (CI-003/CI-005); they block on the physical harness via eng/run-performance.ps1.'
+                note     = 'Performance budgets are non-blocking on shared runners; they block on the physical harness via eng/run-performance.ps1.'
             } | ConvertTo-Json) -Encoding utf8NoBOM
         if ($performanceOutcome -ne 'passed') {
             Write-Warning 'Performance budgets failed on this runner; the result is archived and does not block CI.'
@@ -103,12 +103,14 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
     }
 
-    # TST-001: every source file that is new against main must arrive with its coverage. The diff
+    # Every source file that is new against main must arrive with its coverage. The diff
     # is usually empty on CI because main advances by fast-forward with the branch, so the gate's
     # teeth are local, before the push; on a pull request from elsewhere the diff is real.
     & (Join-Path $PSScriptRoot 'check-coverage.ps1') -ResultsDirectory $resultsDirectory
     if ($LASTEXITCODE -ne 0) { throw 'Coverage gate failed.' }
 
+    # The published documentation only: pairs, links and a floor. Nothing here reads a file that a
+    # clean checkout does not have.
     & (Join-Path $PSScriptRoot 'verify-docs.ps1')
     if ($LASTEXITCODE -ne 0) { throw 'Documentation verification failed.' }
 

@@ -23,7 +23,7 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Metadata;
 /// <para>
 /// Every link of this chain had a test of its own the day it was written — the address policy, the
 /// use case, the cache, the view model, the two views — and none of them ran together. That is
-/// exactly the shape this repository's characteristic defect takes: a chain whose every link returns
+/// exactly the shape of a feature registered and never fed: a chain whose every link returns
 /// success and whose end does nothing. <c>ApplyIdentificationTests</c> exists for the same reason on
 /// the metadata row, and its own summary says so.
 /// </para>

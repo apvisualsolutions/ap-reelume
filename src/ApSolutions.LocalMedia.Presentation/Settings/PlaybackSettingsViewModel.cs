@@ -15,8 +15,8 @@ namespace ApSolutions.LocalMedia.Presentation.Settings;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>This surface is what PLY-011 promised and did not have.</b> Its criterion says the countdown
-/// is «cancelable, configurable», and the length has been stored in a preference since T28 — read at
+/// <b>This surface is what the next-episode countdown promised and did not have.</b> It was meant
+/// to be «cancelable, configurable», and the length had long been stored in a preference — read at
 /// playback, with zero switching the whole chain off — while the only thing that ever wrote it was
 /// the tests. <c>ContinuityCountdown</c>'s own comment claimed «the settings surface already reads
 /// and writes» that key. It did not exist.
@@ -28,7 +28,7 @@ namespace ApSolutions.LocalMedia.Presentation.Settings;
 /// the length — off writes zero, on returns to ten, and somebody who wants thirty seconds has
 /// nowhere to ask. A slider alone answers the second question and leaves the first to be inferred
 /// from a zero. So the toggle owns the on/off and the slider appears under it, which is the shape
-/// the maintainer chose on 2026-09-05 with both drawn side by side.
+/// that won with both drawn side by side.
 /// </para>
 /// <para>
 /// <b>The slider never writes zero.</b> Zero is the toggle's word, and a slider that could reach it
@@ -57,7 +57,7 @@ public sealed class PlaybackSettingsViewModel : INotifyPropertyChanged
     public static double MaximumCountdownSeconds => MaximumSeconds;
 
     /// <summary>
-    /// What the toggle restores when the stored length is zero, and what UX-010's reset puts back.
+    /// What the toggle restores when the stored length is zero, and what the group's reset puts back.
     /// It is the use case's own constant rather than a second copy of the number ten: two literals
     /// are two numbers that can disagree, with nothing to say which of them is the default.
     /// </summary>
@@ -80,7 +80,7 @@ public sealed class PlaybackSettingsViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     public ICommand RestoreDefaultsCommand { get; }
 
     /// <summary>Whether the next thing starts on its own; false is the stored zero.</summary>

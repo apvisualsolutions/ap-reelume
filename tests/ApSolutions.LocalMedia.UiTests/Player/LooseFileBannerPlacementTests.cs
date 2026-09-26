@@ -21,7 +21,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// </summary>
 /// <remarks>
 /// <para>
-/// §4 asks for a top band "not overlaid on the video" and, in the same row, for 48 px of height.
+/// The redesign asks for a top band "not overlaid on the video" and, in the same row, for 48 px of height.
 /// <b>Half of that is right and half of it was written blind</b> — the row marks itself "blocked: the
 /// defect measured on 17-08 stops it reaching the screen, so I cannot verify it". Measured on
 /// 2026-08-21: this banner carries a heading, the file's name, a wrapping explanation, its action, and

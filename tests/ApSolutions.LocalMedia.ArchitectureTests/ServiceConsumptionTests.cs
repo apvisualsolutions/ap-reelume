@@ -22,7 +22,7 @@ namespace ApSolutions.LocalMedia.ArchitectureTests;
 /// assertions to <c>IServiceCollection</c> — and it reads three things: the registration chain, the
 /// <c>GetRequiredService</c> calls and where they sit, and the constructor parameters of each
 /// registered implementation. A <c>new</c> next to a registration is not a resolution: the double
-/// ownership ARQ-008 found stays visible to this gate.
+/// ownership an earlier audit found stays visible to this gate.
 /// </remarks>
 public sealed class ServiceConsumptionTests
 {
@@ -117,8 +117,8 @@ public sealed class ServiceConsumptionTests
 
         public static CompositionGraph Load()
         {
-            // The composition is spread across partials by area (ARQ-006 step 2) and, since ARQ-001,
-            // across the host that owns it. Reading fewer files than this would silently shrink the
+            // The composition is spread across partials by area and, since the host took ownership
+            // of the application, across that host too. Reading fewer files than this would silently shrink the
             // graph and let a registration that nothing consumes pass unnoticed — the exact defect
             // this gate exists to catch, and the exact way it has twice been caught out itself.
             var host = RepositoryLayout.PathFromRoot("src/ApSolutions.LocalMedia.Windows");

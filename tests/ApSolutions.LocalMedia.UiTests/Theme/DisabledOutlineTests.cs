@@ -177,7 +177,7 @@ public sealed class DisabledOutlineTests
     /// <remarks>
     /// It used to be drawn in all four themes, and in light and dark that put a dotted rectangle on
     /// top of a grey fill that already said the same thing — 299 of them across the tree with no
-    /// data loaded, which is what the maintainer counted on seven screens. The reason the outline exists
+    /// data loaded, which is what was counted on seven screens. The reason the outline exists
     /// is that the two high contrast palettes have no grey to spend, so that is where it stays.
     /// </remarks>
     private static Window Show(Control control)

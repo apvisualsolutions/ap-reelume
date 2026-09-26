@@ -15,7 +15,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Settings;
 
 /// <summary>
-/// The three settings pages §4 calls "the same skeleton", which they were not.
+/// The three settings pages the redesign calls "the same skeleton", which they were not.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -34,7 +34,7 @@ namespace ApSolutions.LocalMedia.UiTests.Settings;
 /// </remarks>
 public sealed class SettingsSkeletonTests
 {
-    /// <summary>What §4 asks of the skeleton, and what the appearance page already had.</summary>
+    /// <summary>What the redesign asks of the skeleton, and what the appearance page already had.</summary>
     private const double ColumnWidth = 620;
 
     private const double SurfacePadding = 32;
@@ -45,7 +45,7 @@ public sealed class SettingsSkeletonTests
     /// <remarks>
     /// <para>
     /// <b>A section's heading and not a page's.</b> This first asked for level one at
-    /// <c>FontSizeTitle</c>, because §4 says "title 28" and each of these reads like a page on its
+    /// <c>FontSizeTitle</c>, because the redesign says "title 28" and each of these reads like a page on its
     /// own. Assembled, they are not: all seven are stacked in one <c>ScrollViewer</c>, so four of them
     /// claiming level one put four top-level landmarks inside one destination, and giving them a
     /// page's geometry stepped them 158 px away from the other three. The page owns the level one now

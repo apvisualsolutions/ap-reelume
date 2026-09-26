@@ -23,12 +23,11 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// </summary>
 /// <remarks>
 /// <b>This file asserted the opposite until 2026-09-01</b>, and the story is kept because it is what
-/// the rule now guards against. «Todos los botones o son redondos o son píldoras, pero nunca
-/// cuadrados», the maintainer said on 2026-08-25, and two classes were changed to obey it: the player's
-/// chrome and one actually called <c>player-pill</c>. Asked about a third — the lesson row, which
-/// the design draws at 7 — the maintainer withdrew the rule outright: <i>«esa afirmación mía era
-/// equivocada, los botones deben ser al igual que todos los elementos de la app, idénticos al 100 %
-/// al prototipo»</i>. That decision is ADR-0007.
+/// the rule now guards against. On 2026-08-25 the rule was that every button is round or a pill and
+/// never square, and two classes were changed to obey it: the player's chrome and one actually
+/// called <c>player-pill</c>. Asked about a third — the lesson row, which the design draws at 7 —
+/// the rule was withdrawn outright: buttons, like every other element of the application, are
+/// identical to the prototype. That is the shape rule.
 /// <para>
 /// <b>And the first version of this gate was green over corners nobody drew.</b> It read the
 /// <c>CornerRadius</c> written in <c>DesignTokens.axaml</c> and translated <c>CornerRadiusMedium</c>
@@ -45,7 +44,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// number; it is consulted only for whether a class writes a corner at all.
 /// </para>
 /// </remarks>
-public sealed class ButtonShapeTests
+public sealed partial class ButtonShapeTests
 {
     /// <summary>
     /// Each button class, the prototype control it draws, and how that control is found in the
@@ -109,7 +108,7 @@ public sealed class ButtonShapeTests
     /// </summary>
     /// <remarks>
     /// A closed list, and that is the point of it: without one, a class nobody paired is
-    /// indistinguishable from a class nobody had got round to pairing — which is the state ADR-0007
+    /// indistinguishable from a class nobody had got round to pairing — which is the state the shape rule
     /// found ten classes in. Each entry says what was searched for and did not exist, so the next
     /// reader does not repeat the search.
     /// <para>
@@ -204,33 +203,6 @@ public sealed class ButtonShapeTests
     }
 
     /// <summary>
-    /// The radii the table above claims are the ones the design actually writes.
-    /// </summary>
-    /// <remarks>
-    /// Without this half the table would be a second set of numbers copied by hand, which is exactly
-    /// how the withdrawn rule survived a week: it read like a decision and nobody re-read the design
-    /// behind it. Here the design is the source, so a pairing that drifts from it fails on the number
-    /// rather than certifying itself.
-    /// </remarks>
-    [Fact]
-    public void The_pairings_name_the_radius_the_design_writes()
-    {
-        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-
-        foreach (var pairing in Pairings)
-        {
-            var match = Regex.Match(design, pairing.Pattern, RegexOptions.None, TimeSpan.FromSeconds(5));
-
-            Assert.True(
-                match.Success,
-                $"the design no longer draws {pairing.Control}, so {pairing.Selector} is paired with nothing.");
-            Assert.Equal(
-                pairing.Radius,
-                int.Parse(match.Groups["radius"].Value, CultureInfo.InvariantCulture));
-        }
-    }
-
-    /// <summary>
     /// A class the table says writes its own corner writes one, and a class it says does not, does
     /// not.
     /// </summary>
@@ -296,7 +268,7 @@ public sealed class ButtonShapeTests
     /// No button class is left out of both tables.
     /// </summary>
     /// <remarks>
-    /// This is the half ADR-0007 was missing, and its absence is why the batch that wrote it left ten
+    /// This is the half the shape rule was missing, and its absence is why the change that wrote it left ten
     /// classes unpaired without anything going red. A gate over a hand-written list measures only
     /// what somebody remembered to list, and the classes nobody remembers are exactly the ones that
     /// drift.

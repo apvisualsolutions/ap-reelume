@@ -8,7 +8,7 @@ using ApSolutions.LocalMedia.Domain.Courses;
 
 namespace ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 
-/// <summary>The titles that need a frame for a cover, read from the catalogue (LIB-021).</summary>
+/// <summary>The titles that need a frame for a cover, read from the catalogue.</summary>
 public sealed class TitleFrameSourceRepository(SqliteConnectionFactory connectionFactory) : ITitleFrameSources
 {
     private readonly SqliteConnectionFactory _connectionFactory =

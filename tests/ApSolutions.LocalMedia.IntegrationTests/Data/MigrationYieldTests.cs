@@ -8,7 +8,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Data;
 
 /// <summary>
-/// ARQ-005: what <c>MigrateAsync</c> actually does to the thread that calls it.
+/// What <c>MigrateAsync</c> actually does to the thread that calls it.
 /// </summary>
 /// <remarks>
 /// It is written with real awaits throughout, which is not the same as yielding.

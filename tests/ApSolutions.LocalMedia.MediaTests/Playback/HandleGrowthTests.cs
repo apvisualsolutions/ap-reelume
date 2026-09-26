@@ -12,7 +12,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.MediaTests.Playback;
 
 /// <summary>
-/// Pins where the handle growth recorded in the C4 evidence actually comes from. Two paths must hold
+/// Pins where the handle growth recorded by the endurance run actually comes from. Two paths must hold
 /// no handles at all: opening media without playing, and playing with software decoding. What remains
 /// after those two is the hardware decoder's own bookkeeping, which this adapter does not own.
 /// <para>
@@ -21,7 +21,7 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 /// signal being measured.
 /// </para>
 /// <para>
-/// The same child answers a second question since BUG-011: thirty opens and closes leave the shared
+/// The same child answers a second question: thirty opens and closes leave the shared
 /// deferred-release queue empty, which is what states that the engine's teardown actually waited for
 /// its media instead of walking away from them. The counter is process-wide, so this child is the
 /// only place it can be read without the other media suites writing into the same number.

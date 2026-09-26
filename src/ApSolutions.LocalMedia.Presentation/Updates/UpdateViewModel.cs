@@ -83,7 +83,7 @@ public sealed class UpdateViewModel : INotifyPropertyChanged
 
     public ICommand CheckCommand => _checkCommand;
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     public ICommand RestoreDefaultsCommand => _restoreDefaultsCommand;
 
     public ICommand DownloadCommand => _downloadCommand;

@@ -4,7 +4,7 @@
 <#
 .SYNOPSIS
     Turns a build-nogpl.sh install prefix into the LibVLC tree the application ships, and refuses it
-    unless nothing in it is GPL (ENG-013, ENG-027).
+    unless nothing in it is GPL.
 
 .DESCRIPTION
     Four checks, each with a control that proves the instrument can see what it looks for. The
@@ -18,7 +18,7 @@
          the reference's libavcodec carries it.
       3. GPL third-party libraries. contrib/bootstrap writes `GPL := 1` into the Makefile it
          generates in contrib/contrib-<arch> when GPL is on; it must be absent, and
-         `AD_CLAUSES := 1` present (FreeType under the FTL, ENG-025). The presence is also the
+         `AD_CLAUSES := 1` present (FreeType under the FTL). The presence is also the
          control: this check read config.mak until 2026-09-18 — build.sh's compiler flags, where
          bootstrap writes nothing — and "GPL absent" passed on a file that could never contain it.
          Only the AD_CLAUSES half, which demands something, gave it away. Canary for the one such library the shipped package was found
@@ -41,7 +41,7 @@
 
 .PARAMETER Reference
     VideoLAN.LibVLC.Windows for the same version and architecture, as fetch-reference.ps1 expands
-    it, e.g. ref/build/x64. The application no longer ships that package (ENG-013); it stays the
+    it, e.g. ref/build/x64. The application no longer ships that package; it stays the
     reference because it is built as GPL, which is what proves every check here can see.
 
 .PARAMETER Destination

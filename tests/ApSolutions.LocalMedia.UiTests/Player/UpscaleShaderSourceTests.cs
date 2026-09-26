@@ -8,7 +8,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// That PLY-016's sharpening shader compiles, and that a shader which does not says why.
+/// That the video enhancement's sharpening shader compiles, and that a shader which does not says why.
 /// </summary>
 /// <remarks>
 /// The second half is what the first one is worth anything without: a shader that fails to compile

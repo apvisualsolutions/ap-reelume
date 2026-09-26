@@ -21,8 +21,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Shell;
 
 /// <summary>
-/// The chrome goes away by itself after a while without the mouse, the way every player does it
-/// (ENG-018).
+/// The chrome goes away by itself after a while without the mouse, the way every player does it.
 /// </summary>
 /// <remarks>
 /// Until 2026-09-25 a single movement of the mouse brought the chrome back for good — until the next
@@ -96,7 +95,7 @@ public sealed class ChromeIdleTests
     /// <summary>
     /// A movement on a paused film, or with no player at all, starts no clock. The test above pauses
     /// after the movement, so the clock it stops was already running; this one moves after, which is
-    /// what somebody does to reach the play button. Found blind by a mutation audit.
+    /// what somebody does to reach the play button. Found blind by an audit of this gate.
     /// </summary>
     [AvaloniaFact]
     public async Task A_movement_on_a_paused_film_or_with_no_player_starts_no_clock()
@@ -119,8 +118,8 @@ public sealed class ChromeIdleTests
     }
 
     /// <summary>
-    /// A key counts as a movement, which is what ADR-0014 says and nothing pressed one. Found blind by
-    /// a mutation audit: a key that only revealed, without starting the count again, passed everything.
+    /// A key counts as a movement, which is what was decided and nothing pressed one. Found blind by
+    /// an audit of this gate: a key that only revealed, without starting the count again, passed everything.
     /// </summary>
     [AvaloniaFact]
     public async Task A_key_starts_the_count_again_as_a_movement_does()
@@ -191,8 +190,8 @@ public sealed class ChromeIdleTests
 
     /// <summary>
     /// The same for every other piece of chrome a pointer can rest on. Only the transport was tried,
-    /// so taking the other names out of the view's list passed everything — found blind by
-    /// a mutation audit. The panel column is not here: it is only drawn with a panel open, and an open
+    /// so taking the other names out of the view's list passed everything — found blind by an
+    /// audit of this gate. The panel column is not here: it is only drawn with a panel open, and an open
     /// panel already keeps the chrome by itself.
     /// </summary>
     [AvaloniaTheory]
@@ -276,7 +275,7 @@ public sealed class ChromeIdleTests
         var stage = window.GetVisualDescendants().OfType<Panel>().Single(panel => panel.Name == "PlayerStage");
 
         // By its name and not by being there: any cursor set would pass a check for one, and an arrow
-        // is exactly what must not be left over the picture. Found blind by a mutation audit.
+        // is exactly what must not be left over the picture. Found blind by an audit of this gate.
         Assert.False(viewModel.IsChromeRevealed);
         Assert.Equal(nameof(StandardCursorType.None), stage.Cursor?.ToString());
 

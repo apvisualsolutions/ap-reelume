@@ -26,7 +26,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// previews one setting out of five is the house defect with the friendliest possible name.
 /// </para>
 /// <para>
-/// It also sits on the player's surface now rather than the shell's, which is §4's ask and the
+/// It also sits on the player's surface now rather than the shell's, which is the redesign's ask and the
 /// difference between judging a colour against the grey of a settings page and against the black a
 /// film is actually letterboxed into.
 /// </para>

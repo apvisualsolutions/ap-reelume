@@ -80,7 +80,7 @@ $sums | ForEach-Object { $notes.Add($_.Trim()) }
 $notes.Add('```')
 $notes.Add('')
 
-# The detached minisign signature over those exact lines (SEC-003). The updater verifies it against
+# The detached minisign signature over those exact lines. The updater verifies it against
 # the key embedded in the binary before believing any hash above; notes without it are refused by
 # every installation, so prepare-release blocks a release whose notes would carry none.
 $signaturePath = "$sumsPath.minisig"

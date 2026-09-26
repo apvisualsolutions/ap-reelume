@@ -51,7 +51,7 @@ internal sealed record BenchmarkReport(
 
     /// <summary>
     /// Every approved threshold of the frozen subspec this run fails, in words. An empty list is
-    /// what `PLY-013` needs; the sensitivity tests need the opposite.
+    /// what automatic segment detection needs; the sensitivity tests need the opposite.
     /// </summary>
     public IReadOnlyList<string> ThresholdFailures()
     {
@@ -195,11 +195,11 @@ internal static class SegmentBenchmark
             seriesRows);
     }
 
-    /// <summary>Writes the report where the task keeps its evidence, one file per detector and split.</summary>
+    /// <summary>Writes the report under the test results, one file per detector and split.</summary>
     public static void Archive(BenchmarkReport report, string phase)
     {
         ArgumentNullException.ThrowIfNull(report);
-        var directory = Path.Combine(MediaToolchain.RepositoryRoot, "artifacts", "test-results", "T43", phase);
+        var directory = Path.Combine(MediaToolchain.RepositoryRoot, "artifacts", "test-results", "segment-detection", phase);
         _ = Directory.CreateDirectory(directory);
         var name = FormattableString.Invariant(
             $"benchmark-{report.Detector.ToLowerInvariant()}-{report.Split.ToLowerInvariant()}.json");

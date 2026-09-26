@@ -26,10 +26,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space16}">
       <!--
-        UX-010: inside the group and in its heading row, and here the heading row is the only place
-        it can be. This page is the tallest in the application — eleven row-cards — and the walk's
-        hit testing does not follow a scrolled panel, so a button under the controls would be one
-        the harness could never press and would raise a ratchet that only comes down.
+        The reset sits inside the group and in its heading row, and here the heading row is the only
+        place it can be. This page is the tallest in the application — eleven row-cards — and the walk's
+        hit testing does not follow a scrolled panel, so a button under the controls would be one the
+        harness could never press and would raise a ratchet that only comes down.
       -->
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
         <TextBlock
@@ -102,11 +102,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
               <TextBlock Text="{DynamicResource ThemeDark}" />
             </Button>
             <!--
-              The fourth and fifth pills, chosen rather than only inherited — the maintainer revoked the
-              choosable-high-contrast refusal on 2026-08-23. The system's own high contrast still
-              wins over whichever pill is on, and the WrapPanel decides where five fold: with the
-              Spanish labels they break one way and with the English ones another, so no line is
-              fixed by hand.
+              The fourth and fifth pills, chosen rather than only inherited: high contrast can be picked
+              here too. The system's own high contrast still wins over whichever pill is on, and the
+              WrapPanel decides where five fold: with the Spanish labels they break one way and with the
+              English ones another, so no line is fixed by hand.
             -->
             <Button
                 Classes="theme-option"
@@ -165,9 +164,9 @@ SPDX-License-Identifier: LicenseRef-APSolutions
       <!--
         The accent, as the prototype draws it: six circular swatches and the value beside them in a
         fixed-width face. The chosen swatch is ringed, which is a shape and so survives both high
-        contrast dictionaries, where the six fills resolve to the same colour. It carried a state
-        glyph until the maintainer read it as a radio button dropped on a swatch, and every pill row in
-        this tree lost the same circle for the same reason on 2026-09-11.
+        contrast dictionaries, where the six fills resolve to the same colour. It carried a state glyph
+        until it was read as a radio button dropped on a swatch, and every pill row in this tree lost
+        the same circle for the same reason.
 
         The six hexadecimals are written here and in AccentPalette.Presets, and that is not two
         sources: the swatch has to paint the colour it stands for, and a Background bound through a
@@ -557,11 +556,11 @@ SPDX-License-Identifier: LicenseRef-APSolutions
       </Border>
 
       <!--
-        The language used to be the twelfth row-card here, with a heading of its own. It left on
-        2026-09-13 for a destination of its own (UX-010): it is one choice that governs every screen
-        rather than part of dressing the library, and keeping it here would have put a second
-        «Restaurar valores por defecto» on this very screen — two controls answering to one name,
-        which the walk refuses to resolve and neither of which could then be clicked.
+        The language used to be the twelfth row-card here, with a heading of its own. It left for a
+        destination of its own: it is one choice that governs every screen rather than part of dressing
+        the library, and keeping it here would have put a second «Restaurar valores por defecto» on this
+        very screen — two controls answering to one name, which the walk refuses to resolve and neither
+        of which could then be clicked.
       -->
       <!--
         Which of the two sentences this shows is a key the view model picks, the way the recommendation

@@ -16,7 +16,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Settings;
 
 /// <summary>
-/// The last two of §4's settings tranche: a notice that was a plain sentence, and a dump of text
+/// The last two of the redesign's settings pages: a notice that was a plain sentence, and a dump of text
 /// somebody reads before deciding whether to share it.
 /// </summary>
 /// <remarks>
@@ -32,7 +32,7 @@ namespace ApSolutions.LocalMedia.UiTests.Settings;
 /// half.
 /// </para>
 /// <para>
-/// <b>§4's 13 px is refused, with the tree's own rule.</b> The type scale is 28/20/14/12 and has no 13;
+/// <b>The redesign's 13 px is refused, with the tree's own rule.</b> The type scale is 28/20/14/12 and has no 13;
 /// a scalar declared for one consumer is the defect this repository has already named twice, and
 /// <c>FontSizeMono</c> was considered and rejected on exactly that ground. The mono block takes
 /// <c>FontSizeBody</c>, which is a token the markup does not have to write as a number.

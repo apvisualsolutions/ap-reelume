@@ -271,7 +271,7 @@ public sealed class MarkerUiTests
         Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(editor)));
 
         // Only the controls this view declares are its responsibility; the internal parts of a
-        // standard control belong to the framework and are audited end to end in T33.
+        // standard control belong to the framework and are audited end to end elsewhere.
         foreach (var button in editor.GetVisualDescendants().OfType<Button>().Where(b => IsOwnControl(b.Name)))
         {
             Assert.False(
@@ -310,7 +310,7 @@ public sealed class MarkerUiTests
     public void Both_surfaces_are_captured_in_both_languages()
     {
         Assert.NotNull(Avalonia.Application.Current);
-        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T29");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "markers");
         _ = Directory.CreateDirectory(captures);
 
         foreach (var cultureName in new[] { "es-ES", "en-US" })

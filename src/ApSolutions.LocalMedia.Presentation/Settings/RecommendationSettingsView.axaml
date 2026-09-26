@@ -14,7 +14,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
        went with it: a cap wider than the column it sits in is a number nobody can ever spend. -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space8}">
-    <!-- UX-010: inside the group and in its heading row, never under the controls. -->
+    <!-- The reset sits inside the group and in its heading row, never under the controls. -->
     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
       <TextBlock
           FontSize="{DynamicResource FontSizeSubtitle}"
@@ -111,10 +111,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
         </Grid>
       </Border>
       <!--
-        An "Apply" button, which PRD006-parity-matrix.md says this tree does not have: the prototype
-        applies on choosing, and a button whose only job was to repeat what the control beside it
-        already said is the definition of one control too many. That reasoning holds for a
-        preference that is merely stored. This one is not stored: it recomputes.
+        An "Apply" button, which the prototype does not have: the prototype applies on choosing, and a
+        button whose only job was to repeat what the control beside it already said is the definition of
+        one control too many. That reasoning holds for a preference that is merely stored. This one is
+        not stored: it recomputes.
 
         Measured on 2026-09-06. ConfigureWatchedThreshold.ExecuteAsync reads every watch state
         through GetAllAsync and writes back each one whose status changed. The slider above runs
@@ -123,11 +123,9 @@ SPDX-License-Identifier: LicenseRef-APSolutions
 
         The general shape of that mistake has already been paid for here, and the analogy is cited
         rather than borrowed: a command announcing itself inside a progress loop took a walk scene
-        from 4 s to 63 s, in audit-lib002-the-notices-strip.md. That measurement is the notices
-        strip's, not this control's.
+        from 4 s to 63 s. That measurement is the notices strip's, not this control's.
 
-        So the button stays, and this is the reason ADR-0007's third consequence asks to be written
-        beside it.
+        So the button stays, and this is the reason, written beside it.
       -->
       <Button
           Content="{DynamicResource RecommendationSettingsThresholdApply}"

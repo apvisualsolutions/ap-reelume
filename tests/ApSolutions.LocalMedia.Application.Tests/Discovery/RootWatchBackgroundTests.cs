@@ -11,7 +11,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Discovery;
 
 /// <summary>
-/// The caller the watching slice was missing (LIB-002/003): who starts the watchers with the
+/// The caller the watching slice was missing: who starts the watchers with the
 /// application, who adds a freshly scanned root, and who stops everything on the way out.
 /// </summary>
 public sealed class RootWatchBackgroundTests
@@ -100,9 +100,9 @@ public sealed class RootWatchBackgroundTests
     }
 
     /// <summary>
-    /// <b>ENG-044's last mile: a control that only takes effect next launch is the same defect in
-    /// miniature.</b> The whole task was about a switch nobody's code read; a switch read only at
-    /// startup looks identical to a person who ticks the box and sees nothing happen.
+    /// <b>The last mile of the live-watching setting: a control that only takes effect next launch
+    /// is the same defect in miniature.</b> The setting was once a switch nobody's code read; a switch
+    /// read only at startup looks identical to a person who ticks the box and sees nothing happen.
     /// </summary>
     [Fact]
     public async Task Turning_the_setting_on_starts_watching_without_waiting_for_the_next_launch()

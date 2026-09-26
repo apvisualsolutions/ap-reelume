@@ -14,7 +14,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
        section on this page shares. Without it this one started 158 px to the left of the others. -->
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
   <StackPanel x:Name="LifecycleSettingsSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
-    <!-- UX-010: inside the group and in its heading row, never under the controls. -->
+    <!-- The reset sits inside the group and in its heading row, never under the controls. -->
     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
       <TextBlock
           FontSize="{DynamicResource FontSizeSubtitle}"

@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.TestSupport;
+using ApSolutions.LocalMedia.UiTests.Fixtures;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Xunit;
@@ -11,15 +12,14 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Theme;
 
 /// <summary>
-/// The icons are the prototype's, and this reads the prototype to say so.
+/// The icons are the prototype's, and this compares them with the prototype's own strings to say so.
 /// </summary>
 /// <remarks>
 /// <para>
-/// «No sé qué librería de iconos estás usando pero definitivamente la del prototipo me gusta más»,
-/// said on 2026-08-25. They already were — <c>Theme/Icons.axaml</c> converted them on 2026-08-24 —
-/// and «already were» is exactly the kind of claim this repository has watched go stale: the
-/// prototype is a file on the disk, the geometries are another file on the disk, and nothing tied
-/// the two together.
+/// <c>Theme/Icons.axaml</c> converted the prototype's pictograms on 2026-08-24, and "they already
+/// are the prototype's" is exactly the kind of claim that goes stale: the prototype is one file, the
+/// geometries are another, and nothing tied the two together. The prototype's strings are kept in
+/// <see cref="PrototypeValues"/>, which is itself compared with the prototype wherever it is present.
 /// </para>
 /// <para>
 /// <b>What is compared is the path data, character for character.</b> The prototype's <c>icon(n, s)</c>
@@ -30,7 +30,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// gate becomes blind instead of red.
 /// </para>
 /// </remarks>
-public sealed class PrototypeIconTests
+public sealed partial class PrototypeIconTests
 {
     /// <summary>
     /// The prototype's <c>viewBox</c>, which every geometry carries in front of its stroke.
@@ -99,7 +99,7 @@ public sealed class PrototypeIconTests
     [MemberData(nameof(VerbatimShapes))]
     public void A_shape_made_of_paths_is_the_prototypes_own_string(string prototypeName, string tokenKey)
     {
-        var expected = string.Join(' ', PrototypePaths()[prototypeName]);
+        var expected = string.Join(' ', PrototypeValues.IconPaths[prototypeName]);
         var declared = Geometries()[tokenKey];
 
         Assert.True(
@@ -196,10 +196,10 @@ public sealed class PrototypeIconTests
     /// back.
     /// </para>
     /// <para>
-    /// <b>And the number is the prototype's</b>, read from <c>design/</c> rather than listed here, so
-    /// a class invented for this application fails instead of quietly becoming the house style. The
-    /// pattern has to accept an <b>expression</b> as the first argument: on 2026-08-29 a count that
-    /// required a string literal missed ten calls — among them
+    /// <b>And the number is the prototype's</b>, taken from every size its icon function is called
+    /// with, so a class invented for this application fails instead of quietly becoming the house
+    /// style. The sizes were read with a pattern that accepts an <b>expression</b> as the first
+    /// argument: on 2026-08-29 a count that required a string literal missed ten calls — among them
     /// <c>icon(p.playing &amp;&amp; !err ? 'pause' : 'play', 22)</c> — and produced the confident,
     /// false claim that the prototype never used 22. An absence is measured, never inferred from a
     /// pattern that happened to match nothing.
@@ -209,7 +209,7 @@ public sealed class PrototypeIconTests
     public void Every_size_class_is_its_own_number_and_one_the_prototype_spends()
     {
         var classes = SizeClasses();
-        var spent = PrototypeSizes();
+        var spent = PrototypeValues.IconSizes;
 
         // Both sides can go silently empty: a renamed selector, a markup change, a pattern that
         // stopped matching. Two empty sets agree with each other perfectly.
@@ -248,23 +248,6 @@ public sealed class PrototypeIconTests
                 .Select(match => (
                     int.Parse(match.Groups["name"].Value, CultureInfo.InvariantCulture),
                     int.Parse(match.Groups["width"].Value, CultureInfo.InvariantCulture))),
-        ];
-    }
-
-    /// <summary>Every size the prototype passes to <c>icon(n, s)</c>, expressions included.</summary>
-    private static HashSet<int> PrototypeSizes()
-    {
-        var markup = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-
-        return
-        [
-            .. Regex.Matches(
-                markup,
-                @"\bicon\([^)]*,\s*(?<size>\d+)\)",
-                RegexOptions.None,
-                TimeSpan.FromSeconds(2))
-                .Cast<Match>()
-                .Select(match => int.Parse(match.Groups["size"].Value, CultureInfo.InvariantCulture)),
         ];
     }
 
@@ -322,67 +305,6 @@ public sealed class PrototypeIconTests
                 + string.Join(", ", sizes.Select(pair => $"{pair.Key} {pair.Value}"))
                 + ". A reader moves between these five views and compares the same button against "
                 + "itself.");
-    }
-
-    /// <summary>
-    /// And the prototype still draws what this file says it draws.
-    /// </summary>
-    /// <remarks>
-    /// Reading a file for the strings on the left is only worth anything while the file still holds
-    /// them. A prototype replaced by a different one would otherwise leave every comparison above
-    /// passing against a map that had quietly become empty.
-    /// </remarks>
-    [Fact]
-    public void The_prototype_still_holds_the_shapes_this_file_reads()
-    {
-        var paths = PrototypePaths();
-
-        Assert.True(paths.Count >= 30, $"the prototype's icon map yielded only {paths.Count} shapes.");
-        foreach (var (prototype, _) in Verbatim)
-        {
-            Assert.True(paths.ContainsKey(prototype), $"the prototype no longer draws '{prototype}'.");
-        }
-    }
-
-    /// <summary>
-    /// The <c>d</c> attribute of every <c>path</c> in the prototype's icon map, keyed by icon name.
-    /// </summary>
-    /// <remarks>
-    /// The map is one JavaScript object literal of the form <c>name: [p('…'), c(…), rc(…)]</c>, so
-    /// the entries are cut at their names and the path strings read out of each. Anything built from
-    /// a circle or a rectangle simply has fewer strings than shapes, which is what the conversion
-    /// list above is for.
-    /// </remarks>
-    private static Dictionary<string, string[]> PrototypePaths()
-    {
-        var markup = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-        var start = markup.IndexOf("function icon(n, s)", StringComparison.Ordinal);
-        Assert.True(start >= 0, "the prototype no longer declares its icon function.");
-        var mapStart = markup.IndexOf("const m = {", start, StringComparison.Ordinal);
-        var mapEnd = markup.IndexOf("\n  };", mapStart, StringComparison.Ordinal);
-        Assert.True(mapStart >= 0 && mapEnd > mapStart, "the prototype's icon map could not be read.");
-
-        var map = markup[mapStart..mapEnd];
-        var shapes = new Dictionary<string, string[]>(StringComparer.Ordinal);
-        foreach (var entry in Regex.Matches(
-            map,
-            @"(?m)^\s{4}(?<name>\w+):\s*\[(?<body>.*)\],?\s*$",
-            RegexOptions.None,
-            TimeSpan.FromSeconds(2)).Cast<Match>())
-        {
-            shapes[entry.Groups["name"].Value] =
-            [
-                .. Regex.Matches(
-                    entry.Groups["body"].Value,
-                    @"(?:p|E\('path',\s*\{\s*d:)\s*\(?'(?<d>[^']+)'",
-                    RegexOptions.None,
-                    TimeSpan.FromSeconds(2))
-                    .Cast<Match>()
-                    .Select(path => path.Groups["d"].Value),
-            ];
-        }
-
-        return shapes;
     }
 
     /// <summary>Every <c>StreamGeometry</c> the theme declares, keyed by its resource key.</summary>

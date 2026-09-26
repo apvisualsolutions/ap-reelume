@@ -8,8 +8,8 @@
 .DESCRIPTION
     Cutting a release is a dozen conditions that have to hold at once, and the ones that matter are
     the ones nobody remembers: that the repository answers to strangers, that the version was bumped
-    in both places, that the notes the updater reads were generated, that no MVP commitment is
-    unevidenced. This checks them, builds what a release carries, and reports what is still missing.
+    in both places, that the notes the updater reads were generated and signed. This checks them,
+    builds what a release carries, and reports what is still missing.
 
     It never does anything that cannot be undone. It creates no tag, publishes no release, pushes
     nothing, and changes no repository setting. Publishing stays a deliberate act by a person who has
@@ -151,7 +151,7 @@ try {
             }
         }
 
-        # SEC-003: every installation refuses a release whose checksums are not signed by the
+        # Every installation refuses a release whose checksums are not signed by the
         # embedded key, so publishing without the signature ships a version nobody will ever be
         # offered — and worse, one whose hash proves nothing about who published it.
         $sumsFile = Join-Path $packageRoot 'SHA256SUMS.txt'
@@ -181,20 +181,7 @@ try {
         }
     }
 
-    # ---------------------------------------------------------------- the record
-    $matrix = Get-Content -LiteralPath 'docs/FEATURES.md' -Raw
-    # Every release, not just MVP. This asked only about MVP rows until 2026-09-03, which was the
-    # narrower question twice over: the publishing rule of 2026-08-31 counts every commitment, and
-    # what this script decides is whether the STABLE artifact may ship. LIB-013..017 sat VERIFIED
-    # with nothing checking their evidence, and a release gate that reads one release out of three
-    # is a gate that says yes about the part it looked at.
-    $unevidenced = @([regex]::Matches($matrix, '(?m)^\|\s*(?<id>[A-Z][A-Z0-9]{1,4}-[0-9]{3})\s*\|[^|]*\|[^|]*\|\s*VERIFIED\s*\|[^|]*\|(?<evidence>[^|]*)\|') |
-        Where-Object { $_.Groups['evidence'].Value -notmatch '\]\(' } |
-        ForEach-Object { $_.Groups['id'].Value })
-    if ($unevidenced.Count -gt 0) {
-        Add-Blocker "Verified commitments with no linked evidence: $($unevidenced -join ', ')."
-    }
-
+    # ---------------------------------------------------------------- the ARM64 build
     $arm64Matrix = Join-Path $repoRoot 'artifacts/package-arm64/arm64-matrix.json'
     if (Test-Path -LiteralPath $arm64Matrix) {
         Add-Note 'Read artifacts/package-arm64/arm64-matrix.json before deciding whether ARM64 ships. It is built, not certified.'
@@ -219,9 +206,8 @@ Nothing blocks this release. What remains is deliberate and is done by a person:
   2. Create the release on GitHub for $tag, pasting artifacts/package/release-notes.md as the body.
   3. Upload the MSIX, the ZIP, SHA256SUMS.txt and SHA256SUMS.txt.minisig from artifacts/package.
   4. Submit artifacts/package/winget as a pull request to microsoft/winget-pkgs.
-  5. Regenerate docs/evidence/mvp/verification-manifest.json from the published artifact.
 
-The ARM64 artifact is built but is not published until PRD-003 is settled.
+The ARM64 artifact is built but is not published until every phase of its matrix has run on an ARM64 machine.
 "@
 }
 finally {

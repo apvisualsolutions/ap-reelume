@@ -78,7 +78,7 @@ public sealed class WindowsAudioDeviceCatalogTests
             RepositoryLayout.Root,
             "artifacts",
             "test-results",
-            "T23",
+            "audio-endpoints",
             "green",
             "audio-endpoints.csv");
         Directory.CreateDirectory(Path.GetDirectoryName(report)!);

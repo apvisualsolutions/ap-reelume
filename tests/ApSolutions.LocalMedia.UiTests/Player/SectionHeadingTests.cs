@@ -27,7 +27,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// <para>
 /// <b>Measured on the control, not on the resource file.</b> Until 2026-09-02 this read both strings
 /// out of the dictionaries and never built the view, so deleting both heading blocks from
-/// <c>AudioOutputView.axaml</c> left it green — the same defect this batch had just fixed in
+/// <c>AudioOutputView.axaml</c> left it green — the same defect that had just been fixed in
 /// <c>ButtonShapeTests</c>, one file later. What is asserted now is what the panel paints: the
 /// headings that carry the class, their count, and that each one <b>is</b> its label uppercased in
 /// both languages.

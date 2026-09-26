@@ -16,7 +16,7 @@ public enum CatalogTitleKind
     Unidentified,
 
     /// <summary>
-    /// A folder of numbered videos studied in order (ADR-0006, CRS-001). It is a kind of its own and
+    /// A folder of numbered videos studied in order. It is a kind of its own and
     /// not a show with different words, because the kind is what decides whether a title is ever
     /// identified against a remote provider, and a rule that hangs off a name heuristic instead of a
     /// kind is a rule that will be wrong in both directions.

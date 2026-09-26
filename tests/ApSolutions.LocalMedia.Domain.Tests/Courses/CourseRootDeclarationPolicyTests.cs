@@ -7,19 +7,19 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Courses;
 
 /// <summary>
-/// Reading a root and a depth off one pointed-at folder (CRS-001, ADR-0006 amendment 1).
+/// Reading a root and a depth off one pointed-at folder.
 /// </summary>
 /// <remarks>
-/// The amendment's whole claim is that the derived number is the same number that used to be typed,
-/// so these hold it to that: the two root shapes the ADR measured come out as depth 1 and depth 2
-/// from the gesture alone, without a person counting folders in their head.
+/// The whole claim of the gesture is that the derived number is the same number that used to be typed,
+/// so these hold it to that: the two root shapes measured when it was designed come out as depth 1 and
+/// depth 2 from the gesture alone, without a person counting folders in their head.
 /// </remarks>
 public sealed class CourseRootDeclarationPolicyTests
 {
     /// <summary>
     /// The shape of the second measured root: <c>root / category / course</c>. Pointing at the
-    /// course inside a root the catalogue already holds derives 2, which is the number the ADR
-    /// measured returning all 12 courses with their sections.
+    /// course inside a root the catalogue already holds derives 2, which is the number measured
+    /// returning all 12 courses with their sections.
     /// </summary>
     [Fact]
     public void A_course_inside_a_catalogued_root_derives_its_depth_from_the_gesture()
@@ -48,8 +48,8 @@ public sealed class CourseRootDeclarationPolicyTests
     }
 
     /// <summary>
-    /// With nothing catalogued the parent becomes the root, which is what puts the siblings the
-    /// amendment offers to mark next at the same level as the folder that was pointed at.
+    /// With nothing catalogued the parent becomes the root, which is what puts the siblings
+    /// offered to be marked next at the same level as the folder that was pointed at.
     /// </summary>
     [Fact]
     public void With_no_root_holding_it_the_parent_becomes_the_root_at_depth_one()

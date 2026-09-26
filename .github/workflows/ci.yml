@@ -2,7 +2,7 @@ name: CI
 
 on:
   # Working branches only, and main deliberately absent. Main is kept by fast-forward from the branch
-  # with `git push origin feature/...:main`, so every commit it receives has already run here under the
+  # with `git push origin dev:main`, so every commit it receives has already run here under the
   # same SHA — and a check belongs to a commit rather than to a ref, so main shows the result it
   # already earned. Until 2026-08-18 both were listed and every change verified itself twice over an
   # identical tree, which on a 36-to-64-minute job is half the work for no second opinion.
@@ -12,7 +12,8 @@ on:
   # at all. Anything arriving from outside still comes through pull_request below.
   push:
     branches:
-      - feature/**
+      - dev
+      - dev/**
   pull_request:
 
 permissions:
@@ -85,7 +86,7 @@ jobs:
       # below was weaker than what replaced it: a restore resolves packages without ever compiling,
       # which is why `-r win-arm64` passed here for months while the build itself failed outright.
       # -NonBlockingPerformance: the budgets run and their verdict is archived with the test
-      # results, but a shared runner's noise cannot fail the build (CI-003/CI-005). They stay
+      # results, but a shared runner's noise cannot fail the build. They stay
       # blocking on the physical harness, which is where they mean something.
       # Every gate below carries its own ceiling, and their only job is to name which step hung.
       # The job's 90 minutes were already there and can only say the whole job died. The numbers are
@@ -103,13 +104,13 @@ jobs:
       #
       # The saving is real and still available, but it costs collecting coverage from the gate too
       # and merging it here; that is a change to the gate's own script rather than a switch, and it
-      # is not worth doing blind at the end of a batch. What stays is the walk's, below, which costs
+      # is not worth doing blind. What stays is the walk's, below, which costs
       # nothing because the walk's counter never contributed coverage in the first place.
       - name: Verify both architectures
         timeout-minutes: 70
         shell: pwsh
         run: ./eng/verify.ps1 -Configuration Release -Runtime win-x64 -NonBlockingPerformance
-      # The two audit gates used to be manual-only (CI-001/CI-002): the accessibility journey and
+      # The two audit gates used to be manual-only: the accessibility journey and
       # the recovery matrix could regress and CI would stay green. Verify mode fails on any
       # critical or major finding, and each gate has to pass twice in a row to be called clean.
       - name: Accessibility gate
@@ -180,7 +181,7 @@ jobs:
           path: artifacts/test-results
           if-no-files-found: warn
 
-  # PRD-003. The ARM64 matrix has six phases and all six have always read "this build ran on a X64
+  # The ARM64 build. Its matrix has six phases and all six have always read "this build ran on a X64
   # host", because the branch that runs them only runs when the host is ARM64 and there was no such
   # machine. There is one now and it costs nothing: GitHub's `windows-11-arm` hosted runners are free
   # and unlimited on public repositories, and this one has been public since 2026-08-10.
@@ -203,7 +204,7 @@ jobs:
     runs-on: windows-11-arm
     continue-on-error: true
     # The x64 job's 90 minutes are its own; a job carries its own clock, so this one cannot eat into
-    # the margin eng/measure-ci-time.ps1 reports. Sixty was a first guess on a 4-core machine and the
+    # that job's margin. Sixty was a first guess on a 4-core machine and the
     # first native run answered it: nine minutes end to end, six of them in the packaging step. Thirty
     # leaves more than triple the margin and makes a hang announce itself in half an hour rather than
     # in one. The number to watch is the healthy job, as above: if it approaches thirty, the work has

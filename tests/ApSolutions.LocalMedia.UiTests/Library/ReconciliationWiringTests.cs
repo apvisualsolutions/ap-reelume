@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Library;
 
 /// <summary>
-/// Moved-file reconciliation existed as parts and never as a behaviour (LIB-002/003): the use
+/// Moved-file reconciliation existed as parts and never as a behaviour: the use
 /// case, the policy, and the manual flow all had tests, and no scan ever invoked them — a moved
 /// file was catalogued as a stranger and its progress orphaned with the old row.
 /// </summary>

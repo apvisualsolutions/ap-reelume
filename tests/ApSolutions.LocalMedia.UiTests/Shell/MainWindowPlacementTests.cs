@@ -12,7 +12,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Shell;
 
 /// <summary>
-/// WIN-003: the main window opened at the same place and size on every start, whatever the person
+/// The main window opened at the same place and size on every start, whatever the person
 /// had dragged it to. The placement now survives the close the way the playback position does.
 /// </summary>
 public sealed class MainWindowPlacementTests

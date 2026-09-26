@@ -6,8 +6,7 @@ using ApSolutions.LocalMedia.Domain.Metadata;
 namespace ApSolutions.LocalMedia.Application.Metadata;
 
 /// <summary>
-/// The order the covers of the whole library are looked for in, as the one using it left it
-/// (LIB-021, ADR-0009 decision 4).
+/// The order the covers of the whole library are looked for in, as the one using it left it.
 /// </summary>
 /// <remarks>
 /// It is a port of its own and not a pair of calls to the settings store because the order is a

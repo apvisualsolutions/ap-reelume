@@ -71,8 +71,8 @@ paquete publica. Qué contiene y de dónde salió cada texto está en
 
 **Esta frase es una obligación, no una cortesía**, y esta sección existe para cumplirla. FreeType se
 distribuye bajo **dos licencias mutuamente excluyentes** y hay que elegir una: la **FreeType License**
-(FTL), parecida a BSD, o la **GPL-2.0**. AP Solutions elige la **FTL**, decidido por el mantenedor el
-2026-09-14, porque la otra vía es incompatible con una licencia propia — y el propio `LICENSE.TXT` de
+(FTL), parecida a BSD, o la **GPL-2.0**. AP Solutions elige la **FTL**, decidido el 2026-09-14,
+porque la otra vía es incompatible con una licencia propia — y el propio `LICENSE.TXT` de
 FreeType dice que la FTL «is suited to products which don't use the GNU General Public License».
 
 El precio de esa vía es su cláusula de publicidad, que pide literalmente «acknowledge somewhere in
@@ -81,7 +81,7 @@ your documentation that you have used the FreeType code». Eso es lo que hace el
 **Y viaja por dos caminos, uno de ellos desde antes de esta decisión**: hoy llega dentro de los
 recursos nativos de Skia —su texto completo está en
 [`licenses/NOTICE-Skia-HarfBuzz-natives.txt`](licenses/NOTICE-Skia-HarfBuzz-natives.txt)—, y desde el
-2026-09-18 también dentro de LibVLC, que se compila sin GPL (`ENG-013`) y la usa para dibujar el texto
+2026-09-18 también dentro de LibVLC, que se compila sin GPL y la usa para dibujar el texto
 de los subtítulos. El reconocimiento se escribe una vez y cubre los dos.
 
 ### El motor de ejecución de .NET
@@ -94,8 +94,8 @@ comodidad es lo que mete varios cientos de archivos con licencia de Microsoft de
 
 ### LibVLC, su núcleo y sus plugins
 
-**Desde el 2026-09-18 el motor no es el paquete de VideoLAN, sino una compilación propia sin GPL**
-(`ENG-013`). Se construye desde la misma versión de VLC, la 3.0.23, con el guion y las imágenes de
+**Desde el 2026-09-18 el motor no es el paquete de VideoLAN, sino una compilación propia sin GPL.**
+Se construye desde la misma versión de VLC, la 3.0.23, con el guion y las imágenes de
 compilación de VideoLAN, las bibliotecas de terceros configuradas con `--disable-gpl` y FreeType bajo su
 FTL. Después se retira todo plugin cuyo código fuente sea GPL, y una puerta exige que no quede
 ninguno. **Tampoco se compila la decodificación de teletexto**, porque los dos decodificadores de VLC
@@ -120,19 +120,18 @@ y el paquete de VideoLAN también las llevaba: GNU MP y GNU Nettle dentro de `li
 arquitecturas. GMP y Nettle se ofrecen con doble licencia, LGPL-3.0 o GPL-2.0, y se usa la LGPL. Sus
 avisos de copyright y el detalle están en `licenses/NOTICE-VideoLAN.txt`, y los textos en
 `licenses/LGPL-3.0.txt` y `licenses/GPL-3.0.txt`, porque la LGPL-3.0 está escrita sobre la GPL-3.0 y
-pide las dos. Cómo encaja esa licencia con un programa propietario se leyó el 2026-09-18 (`ENG-028`) y
-está en `LEGAL`.
+pide las dos. Cómo encaja esa licencia con un programa propietario se contesta al final de este
+documento.
 
 **Y «todo es LGPL-2.1» es la licencia de VLC, no el inventario de lo que llevan dentro sus
 plugins.** Además de esas tres, van enlazadas otras bibliotecas de terceros con sus propias
-licencias —SRT, por ejemplo, es MPL-2.0—, y ese inventario completo está sin hacer (`ENG-029`).
+licencias —SRT, por ejemplo, es MPL-2.0—, y ese inventario completo está todavía sin hacer.
 
 **Lo que había antes, y por qué hubo que cambiarlo.** El paquete `VideoLAN.LibVLC.Windows` 3.0.23.1
 llevaba catorce plugins GPL en x64 y once en ARM64. `libavcodec_plugin.dll` y
 `libswscale_plugin.dll` lo eran porque su FFmpeg se compiló con `--enable-gpl`. Once más lo eran porque
 su código fuente es GPL, entre ellos `liblua`, `libdeinterlace` y `libhqdn3d`, y `libts_plugin.dll`
-porque enlaza aribb24. La lista sale de `eng/libvlc/scan-plugin-licenses.ps1` (evidencia
-`audit-eng027-plugin-gpl-sources.md`). Uno más en cada arquitectura lleva código GPL que su código
+porque enlaza aribb24. La lista sale de `eng/libvlc/scan-plugin-licenses.ps1`. Uno más en cada arquitectura lleva código GPL que su código
 fuente no enseña, y por eso aquella lista no lo nombraba: `libzvbi_plugin.dll`, por la biblioteca zvbi
 que enlaza.
 
@@ -155,7 +154,7 @@ la compilación propia.** No pierde formatos: la biblioteca que descodifica es p
 lo contagioso eran piezas opcionales que se activan al compilar —un filtro de posprocesado heredado y
 algunas optimizaciones—, **sin ningún decodificador entre ellas**. Medido en Windows x64 y ARM64
 reales: los catorce códecs prometidos decodifican con las mismas cifras que el paquete de VideoLAN,
-subtítulos incluidos (evidencia `ENG013-reproducible-build.md`).
+subtítulos incluidos (`eng/libvlc/decode-probe.ps1` lo mide en cada compilación del motor).
 
 **El texto de las licencias ya viaja.** La LGPL-2.1 (§6), la GPL-2.0 (§1) y la Apache-2.0 (§4a)
 exigen entregar una copia de la licencia con la distribución binaria, y MIT y BSD-3-Clause exigen
@@ -225,11 +224,11 @@ se copia durante las pruebas.
 ## Lo que este documento no resuelve
 
 Este archivo dice qué declara cada componente y cómo encajan esas declaraciones entre sí. Lo escriben
-quienes ensamblaron el programa, no un abogado, y dos preguntas siguen abiertas hasta que el dictamen
-jurídico profesional de REL-004 las responda. **La primera se cerró por ingeniería el 2026-09-18**:
+quienes ensamblaron el programa, no un abogado, y dos preguntas siguen abiertas hasta que un dictamen
+jurídico profesional las responda. **La primera se cerró por ingeniería el 2026-09-18**:
 desde el 2026-09-13 era un hallazgo —los plugins GPL del paquete de VideoLAN no eran compatibles
 con la licencia propia y frenaban la publicación—, y desde el 2026-09-18 el motor se compila sin ellos.
-La `LGPL-3.0` de tres bibliotecas se leyó el mismo día (`ENG-028`): tanto esa licencia como la
+La `LGPL-3.0` de tres bibliotecas se leyó el mismo día: tanto esa licencia como la
 LGPL-2.1 piden que el programa se pueda modificar para uso propio y depurar con ingeniería inversa, y
 `LICENSE` lo permite desde entonces con una excepción expresa. La segunda sigue siendo
 pregunta: bajo qué apartado

@@ -135,7 +135,7 @@ public sealed class MiniPlayerChromeTests
         var (window, view, _) = await ShowPlayingAsync();
         var mini = MiniWindow(view);
         // The medium radius again since 2026-09-01. It was the pill from 2026-08-25, when «nunca
-        // cuadrados» was the rule; the maintainer withdrew that rule the moment it was measured against
+        // cuadrados» was the rule; that rule was withdrawn the moment it was measured against
         // the design, which draws pbtn — these very buttons — at borderRadius: 8.
         var expected = Assert.IsType<CornerRadius>(
             Avalonia.Application.Current!.TryFindResource("CornerRadiusMedium", out var token)

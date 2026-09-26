@@ -30,7 +30,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// <para>
 /// They are not decoration. The tunnelling key handler is the whole fix for «la barra espaciadora
 /// pone pantalla completa» — a focused transport button was answering the space bar by activating
-/// itself — and the double click is the gesture the maintainer reported missing on the same day. Both were
+/// itself — and the double click is the gesture reported missing on the same day. Both were
 /// shipped on the strength of a manual look.
 /// </para>
 /// </remarks>
@@ -86,8 +86,7 @@ public sealed class PlayerViewInputTests
     }
 
     /// <summary>
-    /// One click on the picture pauses a playing film and resumes a paused one, as in every player
-    /// (ENG-018).
+    /// One click on the picture pauses a playing film and resumes a paused one, as in every player.
     /// </summary>
     [AvaloniaFact]
     public void A_click_on_the_picture_pauses_and_the_next_one_resumes()
@@ -129,8 +128,8 @@ public sealed class PlayerViewInputTests
     /// <summary>
     /// A click and a wheel that land on the drawn frame count as the picture too. Without a frame the
     /// surface takes no hit test, so the real click above lands on the panel around it, and taking
-    /// the surface out of what counts as the picture passed everything — found blind by
-    /// a mutation audit. Once a film draws, the frame is what a person clicks.
+    /// the surface out of what counts as the picture passed everything — found blind by an audit
+    /// of this gate. Once a film draws, the frame is what a person clicks.
     /// </summary>
     [AvaloniaFact]
     public void A_click_and_a_wheel_on_the_drawn_frame_count_as_the_picture()
@@ -269,7 +268,7 @@ public sealed class PlayerViewInputTests
     /// </summary>
     /// <remarks>
     /// Found by the walk on 2026-09-25, the day Escape learned to step back through the gear
-    /// (ENG-018): the player hears keys before anything inside it does, so closing the list of
+    /// the player hears keys before anything inside it does, so closing the list of
     /// subtitle families with Escape closed the whole gear as well. A person closing a list does not
     /// mean to close the menu around it.
     /// </remarks>

@@ -13,10 +13,10 @@ namespace ApSolutions.LocalMedia.Infrastructure.FileSystem;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>This used to run for nobody, and that is ENG-044's second half.</b> It asked for
+/// <b>This used to run for nobody.</b> It asked for
 /// <see cref="ScanPolicy.Continuous"/> on its own, and nothing in the application ever assigned that
 /// flag — so for every root a person can create, this emitted the startup pass and broke out. Two
-/// things went quietly with it: the recovery LIB-003 promises for USB and network roots, and the
+/// things went quietly with it: the recovery the application promises for USB and network roots, and the
 /// retry that brings a dead live watcher back, which <c>RootWatchCoordinator</c> feeds from this
 /// very schedule. Who gets swept is now <c>ScanWatchPolicy</c>'s decision, so there is one answer
 /// and not two.

@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Privacy;
 
 /// <summary>
-/// The host rule the allowlists run on (SEC-004). The wildcard is deliberately narrow: one leading
+/// The host rule the allowlists run on. The wildcard is deliberately narrow: one leading
 /// label, subdomains only, never the bare domain — so a declared pattern cannot quietly widen.
 /// </summary>
 public sealed class NetworkPurposeTests

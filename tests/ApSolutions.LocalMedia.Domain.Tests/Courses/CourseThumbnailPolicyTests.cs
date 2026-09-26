@@ -9,8 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Courses;
 
 /// <summary>
-/// Which frame of which lesson becomes a course's picture, and when the stored one stops being it
-/// (CRS-006).
+/// Which frame of which lesson becomes a course's picture, and when the stored one stops being it.
 /// </summary>
 /// <remarks>
 /// <b>Not one of these touches a video, and that is the point of the file existing.</b> Taking a

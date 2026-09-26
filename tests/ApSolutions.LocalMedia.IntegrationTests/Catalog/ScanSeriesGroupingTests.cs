@@ -21,10 +21,9 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Catalog;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Written against the layout the maintainer actually put on the disk on 2026-08-25 — two shows, one with
-/// several seasons and dozens of episodes, under folders named the way anybody names them — because
-/// that is the report: «se muestran todos los capítulos sueltos en la biblioteca». Ninety-nine files
-/// went in and ninety-nine cards came out.
+/// Written against a real layout on a real disk — two shows, one with several seasons and dozens
+/// of episodes, under folders named the way anybody names them — because that is where the defect
+/// showed: every episode appeared loose in the library, one card per file.
 /// </para>
 /// <para>
 /// The whole chain is here rather than mocked, and that is the point: the scan writes the media

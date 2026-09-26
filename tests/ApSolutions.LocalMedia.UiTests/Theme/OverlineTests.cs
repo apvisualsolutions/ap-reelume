@@ -18,18 +18,18 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// prototype draws for the control it stands in for.
 /// </summary>
 /// <remarks>
-/// This is ADR-0007 applied past the buttons: «todos los elementos». The gate has the same two
+/// This is the shape rule applied past the buttons: every element matches the prototype. The gate has the same two
 /// halves <c>ButtonShapeTests</c> has, and for the same reason — the tree draws what the table says,
 /// and the table says what the design draws — because a table of hand-copied numbers is how the
 /// withdrawn shape rule survived a week.
 /// <para>
-/// <b>What measuring first said, on 2026-09-03.</b> The handover called this «the small caps: the
+/// <b>What measuring first said, on 2026-09-03.</b> The working assumption was «the small caps: the
 /// prototype uses it in 35 places and the tree in two». Both halves were short. The tree draws it in
 /// <b>16</b> places across <b>three</b> classes — <c>hero-overline</c>, <c>section-overline</c> and
 /// <c>card-eyebrow</c>, the last of which carries no tracking at all — and the design's 35 places
 /// are not one overline but <b>nine</b> distinct combinations of size, weight and tracking. Putting
 /// one class on 35 sites would have invented a uniformity the design does not have, which is the
-/// same defect ADR-0007 was written about, pointing the other way.
+/// same defect the shape rule was written about, pointing the other way.
 /// </para>
 /// <para>
 /// <b>Tracking is asserted in pixels because that is the unit Avalonia takes.</b> The design writes
@@ -44,7 +44,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// table that fixed them would need one row per place rather than one per shape.
 /// </para>
 /// </remarks>
-public sealed class OverlineTests
+public sealed partial class OverlineTests
 {
     /// <summary>
     /// Each overline class, the prototype control it draws, and how that control is found in the
@@ -141,10 +141,10 @@ public sealed class OverlineTests
             "the prototype opens a menu off each rail destination — filters with counts, «Añadir "
             + "medios», «Gestionar raíces» — and its heading is that destination's name. Measured "
             + "2026-09-03: this tree has no such menu on the rail at all, so there is no heading to "
-            + "style. It draws at 10/700/.16em and belongs to whatever batch builds that menu."),
+            + "style. It draws at 10/700/.16em and belongs to whatever change builds that menu."),
         ("the absent-feature mark", 11,
-            "«LIB-016» beside a settings row: the prototype marking a setting it has drawn but the "
-            + "product has not built, citing the scope row by its identifier. It is the prototype "
+            "A scope identifier beside a settings row: the prototype marking a setting it has drawn "
+            + "but the product has not built, citing it by its identifier. It is the prototype "
             + "talking about itself rather than a part of the application, so there is nothing here "
             + "for it to be — and it draws at 11/700/.12em if that ever changes."),
         ("the course thread's kicker", 10,
@@ -152,7 +152,7 @@ public sealed class OverlineTests
             + "is the one worth naming: the tree draws the text, in the right place, saying the right "
             + "words — as a 20 px semi-bold subtitle, where the design draws a 10 px overline in the "
             + "accent ink and gives the lesson under it the weight instead. Changing only the "
-            + "typography would leave the card half in each design, so it belongs to the batch that "
+            + "typography would leave the card half in each design, so it belongs to the change that "
             + "takes that view against the prototype rather than to this one."),
         ("the speed pill's closed face", 11,
             "«VELOCIDAD» over the transport's speed control. It is drawn here, but not by a "
@@ -217,48 +217,11 @@ public sealed class OverlineTests
     }
 
     /// <summary>
-    /// The numbers the table above claims are the ones the design actually writes.
-    /// </summary>
-    /// <remarks>
-    /// Without this half the table is a second set of hand-copied numbers, and a pairing that drifts
-    /// from the design would certify itself.
-    /// </remarks>
-    [Fact]
-    public void The_pairings_name_what_the_design_writes()
-    {
-        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-
-        foreach (var pairing in Pairings)
-        {
-            var match = Regex.Match(design, pairing.Pattern, RegexOptions.None, TimeSpan.FromSeconds(5));
-
-            Assert.True(
-                match.Success,
-                $"the design no longer draws {pairing.Control}, so {pairing.Selector} is paired with nothing.");
-
-            Assert.Equal(
-                pairing.Size,
-                double.Parse(match.Groups["size"].Value, CultureInfo.InvariantCulture));
-            Assert.Equal(
-                pairing.TrackingEm,
-                double.Parse(match.Groups["track"].Value, CultureInfo.InvariantCulture));
-
-            // A design site with no font-weight is the browser's 400, and the table has to say
-            // Normal for it. Asserting the absence as well as the presence is what stops a row
-            // claiming Bold over a site that never wrote one.
-            var weight = match.Groups["weight"].Success
-                ? (FontWeight)int.Parse(match.Groups["weight"].Value, CultureInfo.InvariantCulture)
-                : FontWeight.Normal;
-            Assert.Equal(pairing.Weight, weight);
-        }
-    }
-
-    /// <summary>
     /// Every overline class the token file declares is in the table, and every row of the table
     /// still exists.
     /// </summary>
     /// <remarks>
-    /// The half ADR-0007 was missing when it left ten button classes unpaired without anything going
+    /// The half the shape rule was missing when it left ten button classes unpaired without anything going
     /// red: a gate over a hand-written list measures only what somebody remembered to list.
     /// </remarks>
     [Fact]
@@ -288,7 +251,7 @@ public sealed class OverlineTests
     /// <remarks>
     /// The table above is about classes; this is about sites, and without it the gate would be green
     /// over every view that draws an overline without asking for one. That is not hypothetical: it
-    /// is the state this batch found <c>TrackSelectorView</c> in, drawing flat headings beside
+    /// is the state <c>TrackSelectorView</c> was found in, drawing flat headings beside
     /// <c>AudioOutputView</c>'s spaced ones <em>in the same panel</em>.
     /// <para>
     /// Capitals are found through the resources rather than the markup because that is where this
@@ -645,7 +608,7 @@ public sealed class OverlineTests
     /// <remarks>
     /// Read by the presence of <c>LetterSpacing</c> rather than by a name ending in «overline»,
     /// because a class that spaces its letters is an overline whatever it is called — and one that
-    /// does not is the shape this batch found <c>card-eyebrow</c> in.
+    /// does not is the shape <c>card-eyebrow</c> was found in.
     /// </remarks>
     private static HashSet<string> OverlineClasses()
     {
@@ -670,7 +633,7 @@ public sealed class OverlineTests
     /// An acronym is not an overline, and <b>nothing about the shape of the string separates the
     /// two</b> — which took two measured attempts to accept. The space does not: «CANALES» and
     /// «ARCHIVO» are single words, and that cut found 5 of 16. Length does not: it drops «FIN» and
-    /// «END», which are headings this batch added, while a four-letter rule keeps nothing it should.
+    /// «END», which are headings added with this gate, while a four-letter rule keeps nothing it should.
     /// Digits do not: they drop «HDR10» and keep «USB», «HDR» and «SDR».
     /// </para>
     /// <para>

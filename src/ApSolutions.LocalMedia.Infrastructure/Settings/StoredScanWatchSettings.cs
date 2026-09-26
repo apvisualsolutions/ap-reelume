@@ -13,7 +13,7 @@ namespace ApSolutions.LocalMedia.Infrastructure.Settings;
 /// difference is the network.</b> Automatic refresh and update checks default to no because an
 /// installation that was never asked has not consented to reaching outside the machine. Watching a
 /// folder reaches nothing: it reads the disk the person already pointed at and asked to have
-/// catalogued. The scope record promises local changes apply within seconds (LIB-003), so an
+/// catalogued. The application promises local changes apply within seconds, so an
 /// installation nobody has configured has to see a new film appear.
 /// </remarks>
 public sealed class StoredScanWatchSettings : IScanWatchSettings

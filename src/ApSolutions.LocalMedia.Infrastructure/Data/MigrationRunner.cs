@@ -50,8 +50,8 @@ public sealed class MigrationRunner : IMigrationRunner, IDisposable
 
     /// <summary>
     /// How many migrations the last run actually applied. Zero means the file was not rewritten,
-    /// which is what lets the startup skip asking SQLite the same integrity question twice
-    /// (BUG-012): the pre-migration check this runner performs on every run already covered it.
+    /// which is what lets the startup skip asking SQLite the same integrity question twice:
+    /// the pre-migration check this runner performs on every run already covered it.
     /// </summary>
     public int AppliedMigrationCount { get; private set; }
 
@@ -148,7 +148,7 @@ public sealed class MigrationRunner : IMigrationRunner, IDisposable
     }
 
     /// <summary>
-    /// A version number lining up is not the same schema (BUG-012): the history carries the
+    /// A version number lining up is not the same schema: the history carries the
     /// checksum each migration was applied with, and a build whose migration text differs from
     /// what actually shaped the file has to refuse it before writing a single row.
     /// </summary>

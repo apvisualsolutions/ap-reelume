@@ -68,7 +68,7 @@ public sealed class MiniPlayerChromeAutomationTests
             // is asserted now is the half that must not move: the name is still the word the key
             // holds, and what the control carries is a drawing rather than that word. That drawing was a
             // Segoe glyph until 2026-08-24 and is a geometry now — the prototype's own line icons, ported
-            // when the maintainer said the two alphabets do not match. What is asked is unchanged in substance.
+            // because the two alphabets did not match. What is asked is unchanged in substance.
             Assert.All(controls, control =>
             {
                 Assert.True(

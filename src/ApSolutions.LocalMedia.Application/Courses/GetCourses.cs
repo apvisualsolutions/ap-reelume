@@ -6,7 +6,7 @@ using ApSolutions.LocalMedia.Domain.Courses;
 namespace ApSolutions.LocalMedia.Application.Courses;
 
 /// <summary>
-/// The lessons of a course with the progress already joined on (CRS-002, CRS-003).
+/// The lessons of a course with the progress already joined on.
 /// </summary>
 /// <remarks>
 /// This is a read model and not a repository: it exists because a course card needs one answer built
@@ -14,7 +14,7 @@ namespace ApSolutions.LocalMedia.Application.Courses;
 /// that says how far in somebody got — and doing that with three round trips per course would be
 /// three round trips per course.
 /// <para>
-/// The status is read and not recomputed. PLY-009 stores it, and a threshold change rewrites every
+/// The status is read and not recomputed. The watched threshold stores it, and a threshold change rewrites every
 /// stored row precisely so that nothing downstream has to re-derive it and get a different answer.
 /// </para>
 /// </remarks>
@@ -29,7 +29,7 @@ public interface ICourseLessonReader
         CancellationToken cancellationToken = default);
 }
 
-/// <summary>One course as the grid draws it (CRS-003).</summary>
+/// <summary>One course as the grid draws it.</summary>
 public sealed record CourseCard(
     CourseId Id,
     string Title,
@@ -45,7 +45,7 @@ public sealed record CourseModuleView(int Number, string? Title, IReadOnlyList<C
         Lessons.Count(lesson => lesson.Status == Domain.Continuity.WatchStatus.Watched);
 }
 
-/// <summary>A course opened: its header, its modules, and its thread (CRS-002, CRS-003).</summary>
+/// <summary>A course opened: its header, its modules, and its thread.</summary>
 public sealed record CourseDetail(
     CourseId Id,
     string Title,

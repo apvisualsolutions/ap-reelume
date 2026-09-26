@@ -9,7 +9,7 @@ namespace ApSolutions.LocalMedia.Presentation.Commands;
 /// A button's work, awaited, with the failure kept instead of thrown at the application.
 /// </summary>
 /// <remarks>
-/// ARQ-004. Every command surface here used to declare a private class of its own implementing
+/// Every command surface here used to declare a private class of its own implementing
 /// <see cref="ICommand"/> with <c>async void Execute</c> — twenty-four of them, six constructor
 /// shapes, and not one catching anything. An <c>async void</c> that throws does not hand the failure
 /// back to its caller: it rethrows it on whatever synchronization context was current, which on the

@@ -269,7 +269,7 @@ public sealed partial class CatalogRepository : ICatalogRepository, ICatalogQuer
                        -- query that answered it would be a second copy of that rule.
                        (SELECT m.poster_path FROM catalog_metadata m WHERE m.title_id = t.id)
                            AS poster_path,
-                       -- And the cover somebody picked, which has its own column since LIB-021.
+                       -- And the cover somebody picked, which has its own column since migration 0024.
                        -- Both are handed over; which one draws is CoverOrderPolicy's order, walked
                        -- by ResolveTitlePoster, never a COALESCE here.
                        (SELECT m.personal_cover FROM catalog_metadata m WHERE m.title_id = t.id)

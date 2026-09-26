@@ -116,7 +116,7 @@ public sealed class PeakLimiterTests
             MediaToolchain.RepositoryRoot,
             "artifacts",
             "test-results",
-            "T21",
+            "peak-limiter",
             "green",
             "limiter-peaks.csv");
         Directory.CreateDirectory(Path.GetDirectoryName(report)!);
@@ -150,12 +150,12 @@ public sealed class PeakLimiterTests
     /// <summary>Decodes the sample to interleaved 16-bit PCM with the local encoder.</summary>
     private static async Task<short[]> DecodeToPcmAsync(string path)
     {
-        var destination = Path.Combine(MediaToolchain.OutputRoot, "T21", "decoded.raw");
+        var destination = Path.Combine(MediaToolchain.OutputRoot, "peak-limiter", "decoded.raw");
         Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
         if (!File.Exists(destination))
         {
             _ = await MediaToolchain.EnsureSampleAsync(
-                "T21/decoded.raw",
+                "peak-limiter/decoded.raw",
                 FormattableString.Invariant(
                     $"-i \"{path}\" -vn -ac 1 -ar {SampleRate} -f s16le -acodec pcm_s16le"),
                 TestContext.Current.CancellationToken);

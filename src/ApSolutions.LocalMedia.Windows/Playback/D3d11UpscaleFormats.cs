@@ -30,7 +30,7 @@ public enum GpuVendor
 public sealed record VideoProcessorFormat(string Name, uint DxgiFormat);
 
 /// <summary>
-/// Everything PLY-016's scaler decides without touching a graphics card: which card it is talking
+/// Everything the upscaler decides without touching a graphics card: which card it is talking
 /// to, what the processor's answer actually said, which format this pipeline should hand over, and
 /// the exact bytes each vendor's extension expects.
 /// </summary>
@@ -194,7 +194,7 @@ public static class D3d11UpscaleFormats
     /// 24.4 % of the picture moved on both of this machine's cards at that level. Any other number
     /// would be a guess wearing a policy's clothes. Whether the maximum is also the level a person
     /// wants to watch is a different question — edge enhancement buys sharpness with haloes — and
-    /// that one is signed off by eye, on real material, by the maintainer.
+    /// that one is signed off by eye, on real material, by a person.
     /// </para>
     /// <para>
     /// Three answers of <see langword="null"/>, and they are not the same «no»: a processor that
@@ -415,7 +415,7 @@ public static class D3d11UpscaleFormats
     /// What a card's answer means, decided here rather than in a person's head.
     /// </summary>
     /// <remarks>
-    /// It was prose in an evidence document until 2026-09-12, which is how «inconclusive» becomes
+    /// It was prose in a measurement report until 2026-09-12, which is how «inconclusive» becomes
     /// «it does not work» a month later. The distinction that matters is the last one: a card that
     /// accepted the request and moved nothing has not refused anything — NVIDIA's driver accepts and
     /// ignores while the feature is off in its own application — so it is never reported as a

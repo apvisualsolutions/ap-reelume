@@ -13,7 +13,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// The five-second promise is only real when the assembly runs the loop that keeps it: the tracker's
 /// periodic write has to be started, the pause and seek moments have to flush, and the position
 /// handler has to be detached when its session ends. The deep audit found the loop invoked from
-/// tests alone (BUG-003) and the handler accumulating once per session (BUG-007).
+/// tests alone and the handler accumulating once per session.
 ///
 /// <para>
 /// The playhead reaches more than the tracker, and each surface it reaches is a wire somebody has to

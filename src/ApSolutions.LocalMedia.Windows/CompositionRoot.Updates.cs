@@ -31,7 +31,7 @@ public static partial class CompositionRoot
     /// because they answer to three different acts.
     /// </summary>
     /// <remarks>
-    /// ARQ-006 step 2. Nothing here runs on its own: the automatic check is off until somebody turns
+    /// Nothing here runs on its own: the automatic check is off until somebody turns
     /// it on, and the launcher is only ever reached through a consent naming the version.
     /// </remarks>
     private static IServiceCollection AddUpdates(this IServiceCollection services) =>
@@ -87,7 +87,6 @@ public static partial class CompositionRoot
     /// How the application looks, which language it speaks, and how it behaves around the desktop:
     /// the tray, sign-in startup, the backdrop, and reduced motion.
     /// </summary>
-    /// <remarks>ARQ-006 step 2.</remarks>
     private static IServiceCollection AddAppearanceAndLifecycle(this IServiceCollection services) =>
         services
             .AddSingleton<IRecommendationSettings, StoredRecommendationSettings>()
@@ -143,7 +142,7 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<IBackdropService>(),
                 provider.GetRequiredService<IReducedMotionService>(),
                 provider.GetRequiredService<IHighContrastService>()))
-            // One answer to "which language?" (BUG-011): the window, the updater's summary, and the
+            // One answer to "which language?": the window, the updater's summary, and the
             // metadata language all read what this service applied, never the machine's culture.
             .AddSingleton<ILanguageService>(provider => new StoredLanguageService(
                 provider.GetRequiredService<ISettingsStore>(),

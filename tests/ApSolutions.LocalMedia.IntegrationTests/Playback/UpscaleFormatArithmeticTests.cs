@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Playback;
 
 /// <summary>
-/// The half of PLY-016's scaler that decides, split from the half that talks to a graphics card so
+/// The half of the upscaler that decides, split from the half that talks to a graphics card so
 /// it can be measured on any machine — the same seam <c>WindowsAudioEndpointConfigurator</c> was cut
 /// along on 2026-09-02.
 /// </summary>
@@ -342,7 +342,7 @@ public sealed class UpscaleFormatArithmeticTests
         Assert.Equal(expected, D3d11UpscaleFormats.CountDifferences(first, second));
 
     /// <summary>
-    /// What a card's answer means. This lived as prose in an evidence document, which is how
+    /// What a card's answer means. This lived as prose in a document, which is how
     /// «inconclusive» quietly becomes «it does not work» a month later.
     /// </summary>
     [Theory]

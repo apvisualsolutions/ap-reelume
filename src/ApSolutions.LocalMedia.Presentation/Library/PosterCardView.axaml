@@ -15,7 +15,7 @@ and the words keep their size when a cover stretches, as they do in the prototyp
 height comes from the grid and not from a Viewbox, which would scale them with it.
 
 This used to say a card could not stretch because "Avalonia has no aspect ratio", and that was
-false, found on 2026-09-11 when the maintainer asked for the documentation to be consulted: there is no
+false, as the framework's documentation shows: there is no
 property like CSS's aspect-ratio, but the height can be set from the width, and here the grid does.
 
 There is no artwork here and there is not going to be in 0.2.0: the application ships with no TMDB
@@ -105,7 +105,7 @@ and a name here would be a second announcement of the same card.
       THE CARD AS THE LIBRARY'S GRID DRAWS IT — the prototype's tile, measured in its own capture on
       2026-09-12 and written here line by line: 10 px from the cover to the title, and three lines
       stacked with nothing between them, whose line boxes are 1.5 times their size and whose third
-      one starts 3 px lower (design/AP Reelume.dc.html:307 and :316-320).
+      one starts 3 px lower.
 
       The rails keep what they had, and that is not laziness: the prototype draws ITS rails
       differently too — a gap of 8, a title at 13 and a subtitle at 11, with no status line at all -

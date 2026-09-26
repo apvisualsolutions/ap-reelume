@@ -8,7 +8,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Discovery;
 
 /// <summary>
-/// ENG-010 and ENG-044. Whether local folders are followed live, and where that answer lives.
+/// Whether local folders are followed live, and where that answer lives.
 /// </summary>
 /// <remarks>
 /// The switch was painted, toggled and reset long before it was stored: it was a field on a
@@ -38,7 +38,7 @@ public sealed class ScanWatchSettingsTests : IDisposable
     /// connection is involved — automatic refresh, update checks — a missing value means no, because
     /// an installation that was never asked has not consented to reaching the network. Watching a
     /// folder on this machine reaches nothing: it reads the disk the person already pointed at. The
-    /// scope record promises local changes apply within seconds, so an installation nobody has
+    /// application promises local changes apply within seconds, so an installation nobody has
     /// configured must still see a new film appear.
     /// </summary>
     [Fact]
@@ -63,7 +63,7 @@ public sealed class ScanWatchSettingsTests : IDisposable
 
     /// <summary>
     /// An installation nobody has configured sweeps at the interval the code ships with, which is
-    /// the one number rather than the two that used to disagree (ENG-044).
+    /// the one number rather than the two that used to disagree.
     /// </summary>
     [Fact]
     public void An_installation_nobody_has_asked_sweeps_at_the_interval_the_code_ships_with() =>
@@ -104,7 +104,7 @@ public sealed class ScanWatchSettingsTests : IDisposable
 
     /// <summary>
     /// The watching restarts when either value moves, so both have to say so. Without this the
-    /// screen would be back where ENG-044 found it: a control that only takes effect next launch.
+    /// screen would be back where it started: a control that only takes effect next launch.
     /// </summary>
     [Fact]
     public void Changing_either_value_tells_whoever_is_listening()

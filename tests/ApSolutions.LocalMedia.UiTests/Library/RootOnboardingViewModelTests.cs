@@ -114,7 +114,7 @@ public sealed class RootOnboardingViewModelTests
     }
 
     /// <summary>
-    /// Removing a folder is a confirmed decision that only touches the catalog (LIB-A01): asking
+    /// Removing a folder is a confirmed decision that only touches the catalog: asking
     /// removes nothing, confirming removes the root alone, and cancelling leaves everything be.
     /// </summary>
     [Fact]

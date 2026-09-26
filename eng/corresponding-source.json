@@ -15,7 +15,7 @@
       "name": "vlc",
       "version": "3.0.23",
       "carriedBy": "libvlc-3.0.23-nogpl.1 (eng/libvlc/libvlc.lock.json)",
-      "note": "The engine is built from the 3.0.23 tag by eng/libvlc/build-nogpl.sh, with the two patches in eng/libvlc/patches (ENG-013). This archive is VLC as VideoLAN publishes it; the libvlc-build entry below is everything this repository added to build it.",
+      "note": "The engine is built from the 3.0.23 tag by eng/libvlc/build-nogpl.sh, with the two patches in eng/libvlc/patches. This archive is VLC as VideoLAN publishes it; the libvlc-build entry below is everything this repository added to build it.",
       "url": "https://download.videolan.org/vlc/3.0.23/vlc-3.0.23.tar.xz",
       "fileName": "vlc-3.0.23.tar.xz",
       "sizeBytes": 26486988,

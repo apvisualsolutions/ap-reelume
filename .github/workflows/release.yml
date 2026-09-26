@@ -1,11 +1,11 @@
 name: Release
 
-# Cutting a release is the same three commands documented in docs/release/RELEASING.en.md. This
-# workflow runs them so the published artifact comes from a clean checkout rather than from whichever
-# machine happened to tag it.
+# Cutting a release is three commands: eng/package-x64.ps1, eng/verify-package.ps1 and
+# eng/package-arm64.ps1. This workflow runs them so the published artifact comes from a clean
+# checkout rather than from whichever machine happened to tag it.
 #
 # It uses one secret: RELEASE_SIGNING_SECRET_KEY, the minisign key that signs SHA256SUMS.txt so the
-# updater can verify the published hashes against the public key embedded in the binary (SEC-003).
+# updater can verify the published hashes against the public key embedded in the binary.
 # The artifact itself stays Authenticode-unsigned on purpose, and docs/release/SMARTSCREEN.en.md says
 # so rather than implying otherwise. It also does not create the GitHub release itself — publishing
 # stays a deliberate act by a person who has read the checks below.
@@ -87,7 +87,7 @@ jobs:
           if ($contents.secretScan.hits -ne 0) { throw 'The payload matched a secret pattern.' }
           Write-Output "Unsigned as declared; $($contents.layoutFileCount) file(s) scanned clean."
 
-      # SEC-003: without this signature every installation refuses the release, and the symptom on
+      # Without this signature every installation refuses the release, and the symptom on
       # every machine is "you already have the most recent version".
       - name: Confirm the checksums are signed and verify
         shell: pwsh

@@ -8,7 +8,7 @@ namespace ApSolutions.LocalMedia.UiTests.Library;
 
 /// <summary>
 /// Identification is what turns a scanned file into something the review inbox can show. The deep
-/// audit found the whole chain registered and never invoked (LIB-006/007): the scan catalogued
+/// audit found the whole chain registered and never invoked: the scan catalogued
 /// files, <c>IdentifyMediaFile</c> waited for a caller that did not exist, and the inbox stayed
 /// empty forever — a screen anybody could open with nothing that could ever arrive in it.
 /// </summary>

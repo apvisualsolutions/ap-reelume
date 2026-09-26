@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.Application.Discovery;
 /// Owns the life of the watchers: every root is handed to <see cref="RootWatchCoordinator"/> when
 /// the application appears, a freshly scanned root joins without waiting for the next launch, and
 /// leaving the application stops everything still running. The deep audit found the whole watching
-/// slice registered and never started (LIB-002/003) — this is the caller it was missing.
+/// slice registered and never started — this is the caller it was missing.
 /// </summary>
 public sealed class RootWatchBackground : IDisposable
 {

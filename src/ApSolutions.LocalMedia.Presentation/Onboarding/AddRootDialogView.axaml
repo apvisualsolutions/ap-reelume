@@ -15,7 +15,7 @@ always carries one, so pills for that branch were controls no person could ever 
 Browse button is absent rather than disabled without a picker, because a dialog no run can open is
 an offer of something that cannot occur.
 
-CRS-001 gave it a second half: «Curso (carpeta de lecciones)». The title, the help and the one action
+Courses gave it a second half: «Curso (carpeta de lecciones)». The title, the help and the one action
 follow MarkCourseViewModel's resource keys rather than swapping two sets of controls, because two
 buttons wearing primary-action is a screen with two leading actions — LeadingActionTests refuses it,
 and it would be right to. The prototype offers four options in a dropdown (auto, movie, series,
@@ -202,9 +202,9 @@ and never fed.
       </Border>
       <StackPanel DataContext="{Binding MarkCourse}" Spacing="{DynamicResource Space12}">
         <!--
-          The shape of a course, as a tree in the monospaced face — the maintainer's call on 2026-08-31,
-          and a picture would be a binary to keep, a second thing to translate, and fixed while the
-          type around it scales. The same face the path box above uses, for the same reason.
+          The shape of a course, as a tree in the monospaced face, because a picture would be a binary
+          to keep, a second thing to translate, and fixed while the type around it scales. The same face
+          the path box above uses, for the same reason.
         -->
         <StackPanel IsVisible="{Binding ShowsShape}" Spacing="{DynamicResource Space4}">
           <TextBlock
@@ -238,10 +238,10 @@ and never fed.
               TextWrapping="Wrap" />
         </Border>
         <!--
-          The neighbours, asked about rather than claimed (ADR-0006 amendment 1). The sentence is the
-          owner's and asks about the FACT — whether they are courses — because that is the one thing
-          the program cannot know and decision 2 says belongs to the user. Both answers are verbs
-          rather than yes/no, which is the shape this application's other two questions already have.
+          The neighbours, asked about rather than claimed. The sentence asks about the FACT — whether
+          they are courses — because that is the one thing the program cannot know and the one signal
+          that belongs to the user. Both answers are verbs rather than yes/no, which is the shape this
+          application's other two questions already have.
         -->
         <StackPanel IsVisible="{Binding IsAskingAboutNeighbours}" Spacing="{DynamicResource Space8}">
           <TextBlock

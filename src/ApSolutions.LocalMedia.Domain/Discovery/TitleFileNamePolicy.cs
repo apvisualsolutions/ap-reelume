@@ -6,7 +6,7 @@ using System.Globalization;
 namespace ApSolutions.LocalMedia.Domain.Discovery;
 
 /// <summary>
-/// What is known about one entry, as far as naming its file goes (LIB-012). Everything is optional
+/// What is known about one entry, as far as naming its file goes. Everything is optional
 /// except the extension, because a catalogue that has not been identified knows almost nothing.
 /// </summary>
 public sealed record TitleNaming(
@@ -18,7 +18,7 @@ public sealed record TitleNaming(
     string Extension = "");
 
 /// <summary>
-/// The file name an entry deserves (LIB-012).
+/// The file name an entry deserves.
 /// </summary>
 /// <remarks>
 /// The convention is the one Plex, Jellyfin and Kodi all read, the same one this project already

@@ -67,13 +67,12 @@ public sealed class AppearanceService : IAppearanceService
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The four tokens are not enough and the maintainer found it before any gate did: "no cambia todos
-    /// los colores de la app — ni slider ni checks ni nada". They were right, and the reason is the
-    /// one this repository already has a name for. Fluent's own controls read their own resource
-    /// names, and the token file points those at the accent with
-    /// <c>&lt;StaticResource ResourceKey="AccentBrush" /&gt;</c> — a <b>static</b> reference, resolved
-    /// once when the dictionary loads. Writing AccentBrush afterwards changes the token and reaches
-    /// none of the twenty redirections hanging off it.
+    /// The four tokens are not enough, and it showed on screen before any gate caught it: the sliders,
+    /// the checks and the rest kept their old colour. The reason is one this repository already has a
+    /// name for. Fluent's own controls read their own resource names, and the token file points those
+    /// at the accent with <c>&lt;StaticResource ResourceKey="AccentBrush" /&gt;</c> — a <b>static</b>
+    /// reference, resolved once when the dictionary loads. Writing AccentBrush afterwards changes the
+    /// token and reaches none of the twenty redirections hanging off it.
     /// </para>
     /// <para>
     /// So every redirection is written too. The list is not maintained by hand: <c>AccentTokenTests</c>
@@ -276,7 +275,7 @@ public sealed class AppearanceService : IAppearanceService
             _ => 8.0,
         };
         // The prototype changes two gaps with its density and not one: 12/10, 18/16 and 26/22, rows
-        // first (design/AP Reelume.dc.html:3549). The gutter above is half the column one; this is
+        // first. The gutter above is half the column one; this is
         // the row one whole, and the library's grid takes the tiles' padding out of it.
         _application.Resources["DensityRowGap"] = options.Density switch
         {

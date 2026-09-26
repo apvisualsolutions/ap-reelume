@@ -1,14 +1,14 @@
 name: LibVLC without GPL - publish
 
-# ENG-013: promotes the trees ONE run of libvlc-nogpl.yml built, verified and decoded to a GitHub
+# Promotes the trees ONE run of libvlc-nogpl.yml built, verified and decoded to a GitHub
 # prerelease, which is where eng/libvlc/libvlc.lock.json pins them by SHA-512 and where the
 # application's build downloads them from.
 #
-# It publishes what was verified, never a rebuild. The build is not reproducible byte for byte
-# (ENG013-reproducible-build.md says so), so a second compilation would be a different tree that no
-# check has seen. That is why it takes a run id and refuses one that did not end in success.
+# It publishes what was verified, never a rebuild. The build is not reproducible byte for byte, so a
+# second compilation would be a different tree that no check has seen. That is why it takes a run id
+# and refuses one that did not end in success.
 #
-# A prerelease on purpose, decided by the maintainer on 2026-09-18: the updater asks for
+# A prerelease on purpose: the updater asks for
 # /releases/latest (GitHubReleaseUpdateProvider), and GitHub documents that endpoint as "the most
 # recent non-prerelease, non-draft release", so this can never be offered as an application update.
 # The tag does not match v*, so it does not start release.yml either.
@@ -173,7 +173,7 @@ jobs:
           set -eu
           D="$RUNNER_TEMP/libvlc-publish/dist"
           cat > "$RUNNER_TEMP/notes.md" <<EOF
-          LibVLC $TAG for Windows x64 and ARM64, built without GPL code (ENG-013). Not an application release.
+          LibVLC $TAG for Windows x64 and ARM64, built without GPL code. Not an application release.
 
           Built, verified (eng/libvlc/verify-nogpl.ps1) and decoded (eng/libvlc/decode-probe.ps1) by run
           https://github.com/$GITHUB_REPOSITORY/actions/runs/$RUN_ID at $BUILD_SHA.

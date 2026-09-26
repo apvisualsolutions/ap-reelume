@@ -21,8 +21,7 @@ public sealed record LessonSession(
     IReadOnlyList<CourseLessonProgress> Lessons);
 
 /// <summary>
-/// Answers whether the file that is playing is a lesson, and hands back the course around it
-/// (CRS-004).
+/// Answers whether the file that is playing is a lesson, and hands back the course around it.
 /// </summary>
 /// <remarks>
 /// It is asked of the file rather than told by the caller, which is the whole design decision here.

@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Discovery;
 
 /// <summary>
-/// BUG-012. The overflow that raised this arrived as an intermittent red on a hosted runner and
+/// The overflow that raised this arrived as an intermittent red on a hosted runner and
 /// does not reproduce on a developer machine — 64 000 file operations produced none, with the
 /// buffer at 8 KiB or at 64 KiB. So the decision it turns on is measured here, where a storm is not
 /// needed to ask the question.

@@ -15,7 +15,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
   <StackPanel x:Name="ShortcutSettingsSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
     <!--
-      UX-010: the button that puts this group back sits inside the group, and in its heading row for
+      The button that puts this group back sits inside the group, and in its heading row for
       the reason PictureAdjustmentView already carries — under a list that grows, it would be pushed
       past the first viewport, and the walk's hit testing does not follow a scrolled panel.
     -->

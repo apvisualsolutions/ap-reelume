@@ -27,7 +27,7 @@ public sealed partial class PlayerView : UserControl
     {
         InitializeComponent();
 
-        // The player answers the keyboard itself: without focus, every shortcut of PLY-014 would
+        // The player answers the keyboard itself: without focus, every keyboard shortcut would
         // depend on whichever control happened to hold it.
         Focusable = true;
         AddHandler(KeyDownEvent, OnKeyDownTunnel, RoutingStrategies.Tunnel);
@@ -49,10 +49,9 @@ public sealed partial class PlayerView : UserControl
     /// A double click on the picture puts it on the whole screen, and takes it back off.
     /// </summary>
     /// <remarks>
-    /// It is the gesture every player has and this one did not: the maintainer reported «el doble clic no
-    /// pone pantalla completa» on 2026-08-25, and there was nothing listening for it. The transport
-    /// bar sits above the picture and handles its own clicks, so a double click that reaches here is
-    /// one aimed at the picture.
+    /// It is the gesture every player has and this one did not: a double click did not go full screen,
+    /// because there was nothing listening for it. The transport bar sits above the picture and handles
+    /// its own clicks, so a double click that reaches here is one aimed at the picture.
     /// </remarks>
     /// <remarks>
     /// <para>
@@ -75,12 +74,11 @@ public sealed partial class PlayerView : UserControl
     }
 
     /// <summary>
-    /// One click on the picture pauses a playing film and resumes a paused one (ENG-018).
+    /// One click on the picture pauses a playing film and resumes a paused one.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Every common player does this and this one did nothing: the maintainer's «el funcionamiento normal
-    /// de estos no es como los de cualquier reproductor», 2026-09-13. A double click still goes to full
+    /// Every common player does this and this one did nothing. A double click still goes to full
     /// screen, and its first click still pauses on the way — which is what the others do too.
     /// </para>
     /// <para>
@@ -137,21 +135,20 @@ public sealed partial class PlayerView : UserControl
     /// The keyboard reaches the session's own shortcuts before anything else can spend the key.
     /// </summary>
     /// <remarks>
-    /// Tunnelling, and that is the whole fix for what the maintainer reported: «la barra espaciadora pone
-    /// pantalla completa» and «el atajo F no funciona». Neither is about the map — space has always
-    /// been play/pause there and F has always been full screen — it is about who hears the key
-    /// first. A button inside the transport bar takes focus the moment it is clicked, and a focused
-    /// button answers the space bar by activating itself; the last button clicked was whichever mode
-    /// button somebody had just used, so space repeated it. Handling on the way down means the
-    /// session answers first and no focused button ever sees a key that belongs to the player.
+    /// Tunnelling, and that is the whole fix for two symptoms: the space bar went full screen, and the
+    /// F shortcut did nothing. Neither is about the map — space has always been play/pause there and F
+    /// has always been full screen — it is about who hears the key first. A button inside the transport
+    /// bar takes focus the moment it is clicked, and a focused button answers the space bar by
+    /// activating itself; the last button clicked was whichever mode button somebody had just used, so
+    /// space repeated it. Handling on the way down means the session answers first and no focused
+    /// button ever sees a key that belongs to the player.
     /// </remarks>
     /// <remarks>
     /// <b>Except Escape while a drop-down inside the player is open</b>, which is the drop-down's.
-    /// Found by the walk on 2026-09-25, the day Escape learned to step back through the gear
-    /// (ENG-018): heard here first, closing the list of subtitle families closed the whole gear
-    /// around it. Asked of the open lists and not of the key's source, because in the assembled
-    /// application the key comes from whatever holds focus, which the first version assumed was the
-    /// list and was not.
+    /// Found by the walk when Escape learned to step back through the gear: heard here first, closing
+    /// the list of subtitle families closed the whole gear around it. Asked of the open lists and not
+    /// of the key's source, because in the assembled application the key comes from whatever holds
+    /// focus, which the first version assumed was the list and was not.
     /// </remarks>
     private void OnKeyDownTunnel(object? sender, KeyEventArgs e)
     {

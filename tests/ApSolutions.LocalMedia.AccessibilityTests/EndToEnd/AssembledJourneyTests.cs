@@ -34,7 +34,7 @@ namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 /// Every other suite constructs the screen it is about to examine. This one asks the composition root
 /// for the shell it would hand to the main window, walks the destinations a person walks, and looks
 /// for the surfaces in the tree that came back. A surface that only exists when a test builds it is
-/// exactly what ADR-0003 found fourteen of.
+/// exactly the defect an audit once found fourteen of.
 /// </para>
 /// </summary>
 [Collection(AssembledShellSuites.Name)]
@@ -93,16 +93,16 @@ public sealed class AssembledJourneyTests : IDisposable
         Show(host, SettingsSection.Recommendations);
         Assert.NotNull(Find<RecommendationSettingsView>(host));
 
-        // The threshold section only exists when the application handed the use case over
-        // (CNT-A01): a hidden section here would mean the settings were assembled without it.
+        // The threshold section only exists when the application handed the use case over:
+        // a hidden section here would mean the settings were assembled without it.
         Assert.True(host.ViewModel.RecommendationSettings!.HasWatchedThreshold);
         Show(host, SettingsSection.Library);
         Assert.NotNull(Find<ScanSettingsView>(host));
         Assert.NotNull(Find<RootManagementView>(host));
         Show(host, SettingsSection.Shortcuts);
         Assert.NotNull(Find<ShortcutSettingsView>(host));
-        // El estilo de subtítulos ya no está aquí: bajó al engranaje del reproductor el
-        // 2026-09-13 (ADR-0012), y su recorrido vive en la escena del engranaje.
+        // El estilo de subtítulos ya no está aquí: vive en el engranaje del reproductor, y su
+        // recorrido está en la escena del engranaje.
         Show(host, SettingsSection.Lifecycle);
         Assert.NotNull(Find<LifecycleSettingsView>(host));
         Show(host, SettingsSection.Privacy);
@@ -267,7 +267,7 @@ public sealed class AssembledJourneyTests : IDisposable
         await host.ViewModel.OpenDuplicatesAsync(TestContext.Current.CancellationToken);
         Assert.False(host.ViewModel.HasDuplicates);
 
-        // One panel, two tabs, one surface materialised at a time - the maintainer's fifth point. The
+        // One panel, two tabs, one surface materialised at a time. The
         // renaming was opened last, so its tab stands in front; the editor is still open behind its
         // header and comes forward when its tab is chosen, the way the player's panel works.
         Dispatcher.UIThread.RunJobs();
@@ -281,7 +281,7 @@ public sealed class AssembledJourneyTests : IDisposable
     }
 
     /// <summary>
-    /// LIB-012: the preview has to contain something to preview. The suite above proved the surface
+    /// The rename preview has to contain something to preview. The suite above proved the surface
     /// opens; it never asked what was on it, and what was on it was nothing — the application asked
     /// to rename each file to the name it already had, which the policy discards as
     /// <see cref="RenameConflictKind.NoChange"/>. A feature whose title is "rename" and whose plan is
@@ -335,7 +335,7 @@ public sealed class AssembledJourneyTests : IDisposable
         Assert.True(host.ViewModel.HasVideoStatus);
 
         // A title with one copy has no version group, so the switch action is absent rather than
-        // an empty list (VSW-A01) — and the confirmation dialog arrives wired but silent.
+        // an empty list — and the confirmation dialog arrives wired but silent.
         Assert.False(host.ViewModel.HasPlayerVersions);
         Assert.True(host.ViewModel.HasVersionSwitch);
         Dispatcher.UIThread.RunJobs();
@@ -374,7 +374,7 @@ public sealed class AssembledJourneyTests : IDisposable
     }
 
     /// <summary>
-    /// The watched toggle was built with a null handler (CNT-A01): every mark went nowhere and the
+    /// The watched toggle was built with a null handler: every mark went nowhere and the
     /// card forgot it on the next load. This walks the mark through the application's own wiring
     /// into SQLite and back: mark, reload, clear — and the state is always what the repository says.
     /// </summary>
@@ -408,7 +408,7 @@ public sealed class AssembledJourneyTests : IDisposable
     }
 
     /// <summary>
-    /// Removing a folder is a decision about the catalog and nothing else (LIB-A01): the library
+    /// Removing a folder is a decision about the catalog and nothing else: the library
     /// route lists the folders, asking removes nothing, and confirming removes the root while
     /// every video stays on disk exactly where it was.
     /// </summary>
@@ -529,7 +529,7 @@ public sealed class AssembledJourneyTests : IDisposable
         Directory.CreateDirectory(_dataRoot);
         var application = ApplicationHost.Create(new AppDataPaths(_dataRoot));
 
-        // ARQ-005: the shell arrives after the database is ready, not with it, so the walk waits
+        // The shell arrives after the database is ready, not with it, so the walk waits
         // for it. The wait names what stood in its place if it never comes.
         var shell = Assert.IsType<ShellView>(AssembledStartup.FinalContent(application.CreateShell()));
         var window = new Window { Width = 1600, Height = 1000, Content = shell };
@@ -560,7 +560,7 @@ public sealed class AssembledJourneyTests : IDisposable
 /// <remarks>
 /// This collection used to disable parallelisation, and the reason was a defect rather than a
 /// property of the tests: the composition root kept its services in a static field, so two
-/// applications in one process each saw the other's. ARQ-001 gave the provider an owner, one per
+/// applications in one process each saw the other's. The provider now has an owner, one per
 /// host, and the switch came off — which is the proof that the ownership is real and not just
 /// tidier. If it ever has to go back, the question to ask first is what became shared again.
 /// </remarks>

@@ -10,7 +10,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Settings;
 
 /// <summary>
-/// The general cover order as somebody moves it (LIB-021, ADR-0009 decision 4).
+/// The general cover order as somebody moves it.
 /// </summary>
 /// <remarks>
 /// Every move stores at once, with no «apply» button, because that is what the other settings groups

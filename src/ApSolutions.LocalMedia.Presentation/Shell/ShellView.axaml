@@ -408,7 +408,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
       Settings, as the prototype's page: the heading, a fixed side index, and one section at a time
       on the right. §7's construction to the letter — no sticky, a Grid whose ScrollViewer lives
       only in the right column — and the side-list styles that were declared in the theme with no
-      consumer finally get their consumer, which is the house defect run backwards.
+      consumer finally get their consumer, which is the declared-and-never-used defect run backwards.
 
       One section at a time is a visibility decision with a measured trap behind it: a section that
       is not open is NOT in the visual tree, so every walk scene that presses inside one opens it
@@ -496,7 +496,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
             </ContentControl>
             <!--
               The language, which shares Appearance's view model and nothing else: it is a group of
-              its own (UX-010) and a destination of its own, so only one «Restaurar valores por
+              its own and a destination of its own, so only one «Restaurar valores por
               defecto» is ever on screen.
             -->
             <ContentControl Margin="48,0" IsVisible="{Binding IsLanguageSection}">
@@ -518,8 +518,8 @@ SPDX-License-Identifier: LicenseRef-APSolutions
               </StackPanel>
             </ContentControl>
             <!--
-              Reproducción y Detección de segmentos vivían aquí hasta el 2026-09-13. Bajaron al
-              engranaje del reproductor (ADR-0012): su valor se decide mirando algo, no en una
+              Reproducción y Detección de segmentos vivían aquí. Bajaron al
+              engranaje del reproductor: su valor se decide mirando algo, no en una
               página de ajustes. Se alcanzan por PlayerSettingsGroup.
             -->
             <ContentControl Margin="48,0" IsVisible="{Binding IsCoversSection}">
@@ -906,7 +906,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
               <TextBlock Text="{DynamicResource PlayerVersionsTitle}" />
             </Button>
             <!--
-              «Lecciones» (CRS-004), and it is the sixth pill rather than a sixth subject: the other
+              «Lecciones», and it is the sixth pill rather than a sixth subject: the other
               five ask about the file that is open and this one asks where it sits in something
               longer. It is last because it is the only one most sessions do not have at all.
 
@@ -925,7 +925,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
             </Button>
             <!--
               The two mode buttons that used to sit here are in the transport bar now, which is where
-              the maintainer looked for them on 2026-08-25 and where every player puts them. They are not
+              anybody looks for them and where every player puts them. They are not
               in both places: two controls answering to «Pantalla completa» on one screen is one name
               for two buttons, which a screen reader cannot tell apart and the walk refuses outright
               — measured, the moment the second one appeared.

@@ -10,7 +10,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Metadata;
 
 /// <summary>
-/// Choosing your own cover (LIB-018): the door that did not exist.
+/// Choosing your own cover: the door that did not exist.
 /// </summary>
 /// <remarks>
 /// The store has known how to import a personal image since the artwork work landed, the backup has
@@ -158,7 +158,7 @@ public sealed class ChooseCoverTests
     /// The application as it is actually composed hands the picker both halves it needs.
     /// </summary>
     /// <remarks>
-    /// <b>This is the assertion the whole batch exists because nobody had.</b> Everything else here
+    /// <b>This is the assertion the whole file exists because nobody had.</b> Everything else here
     /// passes against a picker a test wired itself; what went wrong for months was that the real
     /// composition wired nothing, and no test could tell — a store with no caller and a property
     /// with no writer look exactly like a feature that works, from inside a unit test.

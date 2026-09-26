@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.Domain.Playback;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Why this exists</b>, measured on 2026-09-12 against a real episode out of the maintainer's own
+/// <b>Why this exists</b>, measured on 2026-09-12 against a real episode out of a real
 /// library: the picture was not soft, it was crushed. Five scenes of one file read a mean luma
 /// between 28 and 69 out of 235, and in one of them the brightest pixel anywhere was 97. Enlarging
 /// that more sharply does nothing for it — half the picture is flat black, and no amount of
@@ -20,7 +20,7 @@ namespace ApSolutions.LocalMedia.Domain.Playback;
 /// </para>
 /// <para>
 /// <b>The arithmetic is FFmpeg's <c>eq</c> filter</b> (<c>libavfilter/vf_eq.c</c>,
-/// <c>LGPL-2.1-or-later</c>), deliberately and not by coincidence: the comparison the maintainer looked at
+/// <c>LGPL-2.1-or-later</c>), deliberately and not by coincidence: the comparison that was looked at
 /// and approved was produced by that filter, so anything else here would be a different picture from
 /// the one that was signed off. Its <c>gamma_weight</c> is fixed at 1, which is its own default and
 /// the value that produced those frames; exposing a fourth control that blends the curve back
@@ -119,7 +119,7 @@ public sealed record PictureAdjustment(double Brightness, double Contrast, doubl
             // still comes out byte for byte. Theirs relies on truncation — 256 × v truncated happens to
             // give back the level — which is a scale of 256/255 papering over a rounding this path now
             // does properly. At 255 the neutral curve lands on exact whole numbers, so rounding cannot
-            // move it and PLY-018's promise holds.
+            // move it and the neutral setting's promise holds.
             var v = (Contrast * ((level / 255d) - 0.5d)) + 0.5d + Brightness;
             // Below black is pinned at black and never carried on with, and the reason is measured
             // rather than defensive: taking this branch out and asking for brightness −0.5 at
@@ -181,12 +181,12 @@ public sealed record PictureAdjustment(double Brightness, double Contrast, doubl
     /// <para>
     /// <b>What this deliberately does NOT do is dither, and the reason is measured.</b> Spreading the
     /// fraction across neighbouring pixels is the textbook answer to the banding a tone curve leaves,
-    /// and it was built and shipped for twenty minutes on 2026-09-13. The maintainer saw it immediately:
-    /// «ahora aparecen un montón de cuadraditos en toda la imagen». <b>The pattern lives in the
+    /// and it was built and shipped for twenty minutes on 2026-09-13. It was visible at once:
+    /// small squares appeared all over the picture. <b>The pattern lives in the
     /// resolution of the decoded frame and the screen is four times that</b>, so an 8×8 dither cell
     /// becomes a 32×32 block of screen pixels — one level of difference spread over an area large
     /// enough to read as banding of its own. Dither has to be the last step before the screen and here
-    /// it was the first. And moving it there was measured on 2026-09-25 and not built (`ENG-023`): the
+    /// it was the first. And moving it there was measured on 2026-09-25 and not built: the
     /// band a raised gamma shows is the file's own eight-bit step stretched by the curve, which a dither
     /// cannot remove — that is a debanding filter's job — and what it does buy is under one level of
     /// averaged tone. <c>ToneCurveOrderingCandidateTests</c> fails the day that changes.

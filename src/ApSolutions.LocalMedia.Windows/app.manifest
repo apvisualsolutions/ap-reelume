@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  WIN-002: what this process asks of Windows, written down instead of inherited.
+  What this process asks of Windows, written down instead of inherited.
 
   longPathAware lifts the 260-character ceiling on machines whose policy already allows it: a
   library under a deep NAS folder must not silently lose the files whose paths run long.

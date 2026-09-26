@@ -13,7 +13,7 @@ namespace ApSolutions.LocalMedia.UiTests.Settings;
 /// The scanning group: whether local roots are watched, and how long the fallback sweep waits.
 /// </summary>
 /// <remarks>
-/// <b>These two values governed nothing until ENG-044 closed, and this file's older version said so
+/// <b>These two values governed nothing until 2026-09-20, and this file's older version said so
 /// in its own notes.</b> They were fields on this view model with no store behind them and no reader
 /// anywhere in <c>src/</c> — the house defect, registered and never fed. So the assertions changed
 /// shape: what is measured now is the store, not a field, because a field that remembers its own
@@ -76,8 +76,8 @@ public sealed class ScanSettingsTests
     }
 
     /// <summary>
-    /// UX-010, and both halves at once: restoring one value and leaving the other is what a reset
-    /// written per control looks like from the outside, and it is exactly what the matrix forbids.
+    /// Restoring the defaults, and both halves at once: restoring one value and leaving the other is
+    /// what a reset written per control looks like from the outside, and it is exactly what is not wanted.
     /// </summary>
     [Fact]
     public void Restoring_the_defaults_puts_back_every_value_in_the_group()

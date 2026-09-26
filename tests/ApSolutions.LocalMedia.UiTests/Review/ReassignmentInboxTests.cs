@@ -15,7 +15,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Review;
 
 /// <summary>
-/// The review inbox is where a moved file waits for a person (LIB-002/003): the held offers are
+/// The review inbox is where a moved file waits for a person: the held offers are
 /// listed with their candidates, confirming one hands the old entity its new path, and keeping the
 /// file as new stores its identity so the offer never returns.
 /// </summary>

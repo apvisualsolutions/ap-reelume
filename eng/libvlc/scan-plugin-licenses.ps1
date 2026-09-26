@@ -6,8 +6,8 @@
     Names every LibVLC plugin in a directory that carries GPL code, from the VLC sources that build it.
 
 .DESCRIPTION
-    ENG-014 closed on 2026-09-14 saying three plugins of the shipped package were GPL, and the
-    ENG-013 spike the same day called its own build "without GPL". Both measured one thing: the
+    A first audit closed on 2026-09-14 saying three plugins of the shipped package were GPL, and the
+    spike of the GPL-free build the same day called its own build "without GPL". Both measured one thing: the
     `--enable-gpl` string FFmpeg embeds in its configure line. That string is real, but it only sees
     FFmpeg. VLC's own configure has NO GPL switch at all -- `contrib/bootstrap --disable-gpl` only
     drops third-party libraries -- so a module whose own source file is GPL is built either way and
@@ -130,8 +130,8 @@ if ((Get-Licence $x264) -ne 'GPL') {
 
 # The second control, for the include walk. libi420_rgb_sse2 lists no GPL file of its own and gets
 # GPL code only through #include "i420_rgb_mmx.h"; if the walk stopped following includes, that
-# plugin would come out clean and ship. A mutation audit named the gap on 2026-09-18: the x264 control
-# above proves the licence reader and nothing about the walk.
+# plugin would come out clean and ship. The x264 control above proves the licence reader and
+# nothing about the walk, which is why this one exists.
 $includeOnly = 'libi420_rgb_sse2_plugin'
 if ($declared.ContainsKey($includeOnly)) {
     $direct = @($declared[$includeOnly] | Where-Object { (Get-Licence $_) -eq 'GPL' })

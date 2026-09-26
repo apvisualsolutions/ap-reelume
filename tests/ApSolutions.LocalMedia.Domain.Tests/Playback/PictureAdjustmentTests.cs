@@ -16,9 +16,9 @@ public sealed class PictureAdjustmentTests
     [Fact]
     public void The_neutral_setting_builds_the_identity_so_leaving_it_alone_changes_no_byte()
     {
-        // The acceptance criterion of PLY-018, and the only one a person can check by looking: with
-        // the controls untouched the picture has to be the picture. «Almost identity» would drift
-        // every frame through a conversion that runs on every pixel of every frame.
+        // The acceptance criterion of the picture adjustment, and the only one a person can check by
+        // looking: with the controls untouched the picture has to be the picture. «Almost identity»
+        // would drift every frame through a conversion that runs on every pixel of every frame.
         var table = PictureAdjustment.Neutral.BuildLookup();
 
         Assert.Equal(256, table.Length);
@@ -41,7 +41,7 @@ public sealed class PictureAdjustmentTests
         // measured it.</b> A limited-range picture never contains level 0: its black is 16, and this
         // curve sends it to 45 — which the conversion then turns into 34 on screen, because it takes
         // the 16 back off and applies the range gain. So the letterbox bars DO lift towards grey.
-        // It is what FFmpeg's eq does and what the maintainer looked at and approved, so it is the
+        // It is what FFmpeg's eq does and what was looked at and approved, so it is the
         // behaviour and not a defect; but a comment denying it would have the next reader trust a
         // curve that pins an end no video ever reaches.
         Assert.Equal(0, Level(table, 0));

@@ -14,7 +14,7 @@ namespace ApSolutions.LocalMedia.Infrastructure.Media;
 /// process owns.
 /// </summary>
 /// <remarks>
-/// The instance and the deferred release both belong to <see cref="LibVlcFactory"/> (BUG-010). This
+/// The instance and the deferred release both belong to <see cref="LibVlcFactory"/>. This
 /// class used to keep its own of each, which cost two things: the factory's "exactly one native
 /// instance per option set" was false in any process that both probes and plays — and the count that
 /// states it could not see the second one — and the private release worker had no guard around the

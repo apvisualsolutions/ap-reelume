@@ -68,7 +68,7 @@ public sealed class PrivacySettingsViewModel : INotifyPropertyChanged
 
     public ICommand ExportCommand => _exportCommand;
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     /// <remarks>
     /// This group is two consents, so its factory value is the state of a machine nobody has asked
     /// anything: both off. A restore may therefore only ever take a consent away — somebody putting

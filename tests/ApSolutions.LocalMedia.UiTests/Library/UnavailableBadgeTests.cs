@@ -22,7 +22,7 @@ namespace ApSolutions.LocalMedia.UiTests.Library;
 /// </summary>
 /// <remarks>
 /// <para>
-/// §4 asks for the badge to leave the accent and become <c>WarningSurfaceBrush</c> with a border and a
+/// The redesign asks for the badge to leave the accent and become <c>WarningSurfaceBrush</c> with a border and a
 /// glyph: a USB drive that is unplugged is not something that went wrong, it is something that is not
 /// here. The border and the glyph are what keep it from being colour alone.
 /// </para>
@@ -64,7 +64,7 @@ public sealed class UnavailableBadgeTests
         // The instance, not its ToString: StreamGeometry does not override it — measured by
         // reflection on Avalonia 12.1.1, the declaring type is Object — so comparing two of them as
         // text compares "Avalonia.Media.StreamGeometry" with itself and passes for the star, the
-        // marker or the clock. Found by the gate audit of this same batch.
+        // marker or the clock. Found by an audit of this gate.
         Assert.Same(ResourceValue("IconWarning"), glyph.Data);
         Assert.DoesNotContain(
             badge.GetVisualDescendants().OfType<TextBlock>(),

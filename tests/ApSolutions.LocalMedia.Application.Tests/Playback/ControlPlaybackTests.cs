@@ -73,8 +73,8 @@ public sealed class ControlPlaybackTests
     }
 
     /// <summary>
-    /// ENG-011: the other end of it. The speed reached the engine and stopped there, so closing the
-    /// application forgot it and the person had to choose it again every time. What is handed over
+    /// The other end of the stored speed. The speed reached the engine and stopped there, so closing
+    /// the application forgot it and the person had to choose it again every time. What is handed over
     /// is the CLAMPED value, for the same reason the seek hands its clamped target: what gets stored
     /// has to be what the engine was actually told, never what was asked for.
     /// </summary>

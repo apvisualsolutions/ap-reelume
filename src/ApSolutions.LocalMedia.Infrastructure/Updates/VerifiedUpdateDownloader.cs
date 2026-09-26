@@ -206,7 +206,7 @@ public sealed class VerifiedUpdateDownloader : IUpdateDownloader
 
                     // A server that keeps sending past the declared size is cut off at the excess:
                     // whatever it has in store, it is not the package the release described, and
-                    // there is no reason to keep writing it to find that out (SEC-005).
+                    // there is no reason to keep writing it to find that out.
                     if (received > release.SizeInBytes)
                     {
                         break;
@@ -283,7 +283,7 @@ public sealed class VerifiedUpdateDownloader : IUpdateDownloader
     }
 
     /// <summary>
-    /// Every hop has to stay on a host the allowlist covers (SEC-004). The redirect target is a
+    /// Every hop has to stay on a host the allowlist covers. The redirect target is a
     /// remote server's suggestion, and the address that is actually fetched is a promise the
     /// privacy statement makes — so a hop outside the list is refused, never followed.
     /// </summary>

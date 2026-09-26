@@ -16,22 +16,22 @@ using VlcMediaPlayer = LibVLCSharp.Shared.MediaPlayer;
 namespace ApSolutions.LocalMedia.MediaTests.Playback;
 
 /// <summary>
-/// PLY-016 phase-1 spike. LibVLC 3 documents per-media video-filter options, but nothing here is
-/// believed from documentation: each candidate chain is applied to a real low-resolution sample,
-/// frames are captured from the same RV32 video path the engine publishes through
-/// <see cref="IVideoFrameSource"/>, and the effect is the measured change in Laplacian variance —
-/// the sharpness metric — against the unfiltered baseline, alongside the measured cost. The
-/// baseline run is the archived RED: it records what low-resolution media look like today,
-/// without any enhancement.
+/// Low-resolution enhancement, first spike. LibVLC 3 documents per-media video-filter options,
+/// but nothing here is believed from documentation: each candidate chain is applied to a real
+/// low-resolution sample, frames are captured from the same RV32 video path the engine publishes
+/// through <see cref="IVideoFrameSource"/>, and the effect is the measured change in Laplacian variance
+/// — the sharpness metric — against the unfiltered baseline, alongside the measured cost. The baseline
+/// run is the archived RED: it records what low-resolution media look like today, without any
+/// enhancement.
 /// </summary>
 [Trait("Category", "RealMedia")]
 public sealed class LowResEnhancementSpikeTests
 {
     /// <summary>
     /// DVD-era stand-in: 720×480 MPEG-2 at a starved bitrate with temporal source noise, which is
-    /// the material PLY-016 exists for. Synthetic, generated locally, never redistributed.
+    /// the material upscaling exists for. Synthetic, generated locally, never redistributed.
     /// </summary>
-    private const string DvdEraSampleRelativePath = "PLY16/mpeg2-480p-noisy.mkv";
+    private const string DvdEraSampleRelativePath = "low-res-enhancement/mpeg2-480p-noisy.mkv";
 
     private const string DvdEraSampleRecipe =
         "-f lavfi -i testsrc2=size=720x480:rate=25,noise=alls=10:allf=t -t 6 " +
@@ -39,7 +39,7 @@ public sealed class LowResEnhancementSpikeTests
         "-c:v mpeg2video -b:v 900k -pix_fmt yuv420p -c:a mp2 -b:a 128k -shortest";
 
     /// <summary>The existing low-resolution H.264 sample the smoke suite already exercises.</summary>
-    private const string H264SampleRelativePath = "T18/h264-aac.mp4";
+    private const string H264SampleRelativePath = "smoke/h264-aac.mp4";
 
     private const string H264SampleRecipe =
         "-f lavfi -i testsrc2=size=320x240:rate=15:duration=3 " +
@@ -88,7 +88,7 @@ public sealed class LowResEnhancementSpikeTests
             rows.Add(measurement.ToCsvRow(SampleId(relativePath)));
         }
 
-        WriteMeasurements("red", "PLY16-baseline-engine.csv", rows);
+        WriteMeasurements("red", "low-res-baseline-engine.csv", rows);
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public sealed class LowResEnhancementSpikeTests
             }
         }
 
-        WriteMeasurements("green", "PLY16-candidates.csv", rows);
+        WriteMeasurements("green", "low-res-candidates.csv", rows);
     }
 
     /// <summary>
@@ -147,7 +147,7 @@ public sealed class LowResEnhancementSpikeTests
         Assert.True(sharpened.Frames > 0, "The sharpened control produced no frame.");
         WriteMeasurements(
             "green",
-            "PLY16-control-instance.csv",
+            "low-res-control-instance.csv",
             [
                 "sample,candidate,frames,meanLaplacianVariance,openToFirstFrameMs,cpuCoresBusy,wallSeconds",
                 baseline.ToCsvRow(SampleId(DvdEraSampleRelativePath), "instance-none"),
@@ -174,7 +174,7 @@ public sealed class LowResEnhancementSpikeTests
         Assert.True(sharpened.Frames > 0, "The I420 sharpened control produced no frame.");
         WriteMeasurements(
             "green",
-            "PLY16-control-i420.csv",
+            "low-res-control-i420.csv",
             [
                 "sample,candidate,frames,meanLaplacianVariance,openToFirstFrameMs,cpuCoresBusy,wallSeconds",
                 baseline.ToCsvRow(SampleId(DvdEraSampleRelativePath), "i420-none"),
@@ -246,7 +246,7 @@ public sealed class LowResEnhancementSpikeTests
                 var filterSuffix = instanceOptions.Length == 0 ? "baseline" : "sharpen";
                 WriteMeasurements(
                     "green",
-                    $"PLY16-control-vlc-log-{chromaSuffix}-{filterSuffix}.txt",
+                    $"low-res-control-vlc-log-{chromaSuffix}-{filterSuffix}.txt",
                     filterLog);
             }
         }
@@ -340,7 +340,7 @@ public sealed class LowResEnhancementSpikeTests
             MediaToolchain.RepositoryRoot,
             "artifacts",
             "test-results",
-            "PLY16",
+            "low-res-enhancement",
             phase,
             fileName);
         Directory.CreateDirectory(Path.GetDirectoryName(destination)!);

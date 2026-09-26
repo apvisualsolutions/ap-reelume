@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Courses;
 
 /// <summary>
-/// Which lesson the countdown offers when one ends (CRS-004).
+/// Which lesson the countdown offers when one ends.
 /// </summary>
 public sealed class NextLessonPolicyTests
 {

@@ -8,7 +8,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// The session's markers were a snapshot taken at open (BUG-008): saving, deleting, accepting, or
+/// The session's markers were a snapshot taken at open: saving, deleting, accepting, or
 /// correcting a marker changed the stores and nothing recomposed what the skip button follows, so
 /// a marker made during playback only worked after closing and reopening the episode.
 /// </summary>

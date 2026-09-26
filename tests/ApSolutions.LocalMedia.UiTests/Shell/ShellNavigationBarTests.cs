@@ -19,13 +19,13 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Shell;
 
 /// <summary>
-/// The shell's first row of §4: the open destination is told by two signals, and the title actions
+/// The shell's first row of the redesign: the open destination is told by two signals, and the title actions
 /// wrap.
 /// </summary>
 /// <remarks>
 /// <para>
 /// «Two signals, one of which is not colour» is the rule the whole redesign is built on, and the
-/// navigation already had one: the filled or hollow glyph. §4 asks for the second, a 3px bar in the
+/// navigation already had one: the filled or hollow glyph. The redesign asks for the second, a 3px bar in the
 /// accent, and it is a <b>bar that exists or does not</b> rather than one that changes colour —
 /// absent is not the same as dimmed, which is the distinction the package spends a section on.
 /// </para>
@@ -131,7 +131,7 @@ public sealed class ShellNavigationBarTests
     }
 
     // The title actions' WrapPanel used to be asserted here. It moved to WrappingSurfaceTests, which
-    // holds the closed table of every row of actions §4 has decided, so the rule has one mechanism
+    // holds the closed table of every row of actions the redesign has decided, so the rule has one mechanism
     // rather than one per view — two of them age differently, and the second one to be written is the
     // one nobody remembers to extend.
 

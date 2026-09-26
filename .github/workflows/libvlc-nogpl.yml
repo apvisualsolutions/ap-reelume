@@ -1,13 +1,12 @@
 name: LibVLC without GPL
 
-# ENG-013: builds LibVLC for Windows without GPL code, for both architectures, and refuses the
+# Builds LibVLC for Windows without GPL code, for both architectures, and refuses the
 # result unless eng/libvlc/verify-nogpl.ps1 finds nothing GPL in it.
 #
 # A workflow of its own and not a step of ci.yml, for two measured reasons. The engine is built once
 # per VLC version, not per commit: its inputs are the tag, the patches and these scripts, and
 # nothing in src/ changes them. And ci.yml's single Windows job already runs close enough to its
-# ceiling that eng/measure-ci-time.ps1 exists to watch the margin; hours of contrib builds do not
-# belong inside it.
+# ceiling that its margin is watched; hours of contrib builds do not belong inside it.
 #
 # It runs where VideoLAN runs it: their CI images, named in extras/ci/gitlab-ci.yml at the tag.
 # The dates in the image tags are theirs and are pinned on purpose — a newer image is a newer
@@ -17,7 +16,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/**
+      - dev
+      - dev/**
     paths:
       - eng/libvlc/**
       - .github/workflows/libvlc-nogpl.yml
@@ -29,8 +29,8 @@ jobs:
   build:
     name: build ${{ matrix.arch }}
     runs-on: ubuntu-24.04
-    # The contribs are the bulk. Measure it (eng/measure-ci-time.ps1) rather than trust this number;
-    # it is a hang ceiling, not an estimate. Hosted jobs stop at 360.
+    # The contribs are the bulk. Measure the run rather than trust this number; it is a hang
+    # ceiling, not an estimate. Hosted jobs stop at 360.
     timeout-minutes: 340
     strategy:
       fail-fast: false

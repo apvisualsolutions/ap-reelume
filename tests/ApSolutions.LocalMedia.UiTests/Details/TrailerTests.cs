@@ -12,7 +12,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Details;
 
 /// <summary>
-/// The film card offers the trailer that is already on the disk (LIB-014).
+/// The film card offers the trailer that is already on the disk.
 /// </summary>
 /// <remarks>
 /// Only a local file. A trailer from the provider is a YouTube key, and playing that inside the
@@ -73,7 +73,7 @@ public sealed class TrailerTests
     }
 
     /// <summary>
-    /// The provider's trailer is a second, separate offer (LIB-015): it leaves the application
+    /// The provider's trailer is a second, separate offer: it leaves the application
     /// instead of playing in it, and both cards make it, because TMDB has videos for series too.
     /// </summary>
     [Theory]

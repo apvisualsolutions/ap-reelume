@@ -136,7 +136,7 @@ public sealed class CatalogQueryTests
         var arrival = Assert.Single(page.Items, item => item.Title == "Arrival");
         var dune = Assert.Single(page.Items, item => item.Title == "Dune");
 
-        // Both fields, and which one draws is ResolveTitlePoster's answer (LIB-021), not the query's.
+        // Both fields, and which one draws is ResolveTitlePoster's answer, not the query's.
         Assert.Equal("/wXsQzWtGqPMhAqYYcVOOWvpS4Vy.jpg", arrival.PosterPath);
         Assert.Equal(new string('f', 64) + ".png", arrival.PersonalCover);
         Assert.Null(dune.PosterPath);
@@ -145,7 +145,7 @@ public sealed class CatalogQueryTests
         // And the order this one title overrides the general one with, handed over as stored. The
         // title without one reads null and follows the general order — the two together are what
         // stops the grid drawing every title with the same order while a stored override sits in the
-        // database unread, which is this repository's characteristic defect.
+        // database unread: stored and never read.
         Assert.Equal("Frame,Personal,Provider", arrival.CoverOrder);
         Assert.Null(dune.CoverOrder);
     }

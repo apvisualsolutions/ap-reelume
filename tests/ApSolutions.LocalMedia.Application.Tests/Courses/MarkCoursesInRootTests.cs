@@ -13,7 +13,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Courses;
 
 /// <summary>
-/// Marking a folder as a course (CRS-001).
+/// Marking a folder as a course.
 /// </summary>
 /// <remarks>
 /// What these hold to, beyond the happy path: the depth is declared and never guessed, nothing goes
@@ -110,9 +110,9 @@ public sealed class MarkCoursesInRootTests
     }
 
     /// <summary>
-    /// The lesson is anchored to LIB-009's identity rather than to its path, which is what makes
-    /// progress survive a move. A file the catalogue has not seen yet still becomes a lesson — it is
-    /// a lesson whose file is not catalogued, not an absence.
+    /// The lesson is anchored to the file identity the catalogue keeps rather than to its path, which
+    /// is what makes progress survive a move. A file the catalogue has not seen yet still becomes a
+    /// lesson — it is a lesson whose file is not catalogued, not an absence.
     /// </summary>
     [Fact]
     public async Task A_lesson_carries_the_identity_of_its_file_when_the_catalogue_has_one()
@@ -193,8 +193,8 @@ public sealed class MarkCoursesInRootTests
 
     /// <summary>
     /// Pointing at one folder declares the depth for the whole root, and at that depth there are
-    /// usually neighbours nobody has said anything about. ADR-0006 amendment 1 has the application
-    /// ask rather than claim them, so this pass marks the one that was named and hands the rest
+    /// usually neighbours nobody has said anything about. The application asks rather than
+    /// claiming them, so this pass marks the one that was named and hands the rest
     /// back to be counted into «Hemos encontrado {0} carpetas más».
     /// </summary>
     [Fact]

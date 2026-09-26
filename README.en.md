@@ -62,8 +62,7 @@ decisions.
 ## What it is not
 
 There are no accounts, no sync, and no cloud. It does not transcode or edit video. It does not play
-several at once. The full list, with identifiers, is in the
-[roadmap](docs/roadmap/README.en.md).
+several at once, and it does not stream to other devices.
 
 ## Privacy
 
@@ -96,14 +95,23 @@ was.
 |---|---|
 | [User guide](docs/user-guide/README.en.md) | How to do each thing |
 | [Troubleshooting](docs/troubleshooting/README.en.md) | What to do when something goes wrong |
-| [Roadmap](docs/roadmap/README.en.md) | What is coming and what will not be done |
-| [Feature matrix](docs/FEATURES.md) | The canonical scope record |
 | [Privacy](docs/privacy/PRIVACY.en.md) | What is stored and what never leaves |
-| [Legal status](docs/legal/LEGAL.en.md) | Licence, third parties, and what stays open |
 | [Changelog](docs/CHANGELOG.en.md) | What changed in each release |
-| [Development guide](docs/development/README.en.md) | How to build and verify |
-| [Releasing](docs/release/RELEASING.en.md) | How a release is cut |
-| [Decisions](docs/adr) | Why the project is the way it is |
+| [SmartScreen](docs/release/SMARTSCREEN.en.md) | Why Windows warns and what to check |
+| [Third-party notices](docs/release/THIRD-PARTY-NOTICES.en.md) | Which components it carries and under which licence |
+| [Security](SECURITY.md) | How to report a vulnerability |
+
+## Building from source
+
+You need Windows 11 x64 and the .NET SDK that [`global.json`](global.json) pins. From the root:
+
+```powershell
+dotnet build ApSolutions.LocalMedia.sln -c Release
+pwsh -NoProfile -File eng/verify.ps1
+```
+
+`eng/verify.ps1` is the same verification continuous integration runs: format, build, tests,
+documentation, packaging and coverage.
 
 ## Licence
 
@@ -112,5 +120,4 @@ AP Reelume Licence: free to use, with no right to modify or redistribute. See [L
 APIs but is not endorsed, certified, or otherwise approved by TMDB.
 
 The program comes with **no warranty whatsoever**, to the extent permitted by applicable law: see
-sections 15 to 17 of the [licence](LICENSE). The legal limits that remain open — among them the
-professional opinion under `REL-004` — are named in [the legal status](docs/legal/LEGAL.en.md).
+sections 15 to 17 of the [licence](LICENSE).

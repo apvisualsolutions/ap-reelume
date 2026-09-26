@@ -67,7 +67,7 @@ public sealed class DatabaseRecoveryViewTests
             RepositoryLayout.Root,
             "artifacts",
             "ui-captures",
-            "T4",
+            "database-recovery",
             "database-recovery.png");
         Directory.CreateDirectory(System.IO.Path.GetDirectoryName(artifactPath)!);
         frame.Save(artifactPath, PngBitmapEncoderOptions.Default);

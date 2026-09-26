@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.MediaTests.Media;
 
 /// <summary>
-/// Cataloguing and playing share one native instance and one release queue (BUG-010).
+/// Cataloguing and playing share one native instance and one release queue.
 /// </summary>
 /// <remarks>
 /// The probe used to keep both of its own, which the counter could not see. What is observable from

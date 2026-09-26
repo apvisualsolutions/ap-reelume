@@ -5,8 +5,8 @@ using ApSolutions.LocalMedia.Infrastructure.Updates;
 
 // The release-signing tool: makes the key pair, signs SHA256SUMS.txt, and verifies a signature the
 // way the shipped updater will. The secret key is read from a file or an environment variable and
-// is never printed; where it lives is the maintainer's decision, and this repository is not a place it
-// may live.
+// is never printed; where it lives is decided by whoever signs releases, and this repository is not
+// a place it may live.
 return args switch
 {
     ["keygen", var publicPath, var secretPath] => Keygen(publicPath, secretPath),

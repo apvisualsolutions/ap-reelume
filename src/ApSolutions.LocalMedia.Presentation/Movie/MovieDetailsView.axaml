@@ -186,11 +186,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
                 </StackPanel>
               </Button>
               <!--
-                «Reproducir desde el principio» is a glyph now and not four words: the maintainer asked
-                for it on 2026-08-25, and the row it sits in already carries three other labels. What
-                it says is unchanged — the name a reader hears and the tip a pointer finds are the
-                same sentence they always were, and the shape is the one every player draws for
-                «start again».
+                «Reproducir desde el principio» is a glyph now and not four words: the row it sits in
+                already carries three other labels. What it says is unchanged — the name a reader hears
+                and the tip a pointer finds are the same sentence they always were, and the shape is the
+                one every player draws for «start again».
               -->
               <!--
                 And the glyph is the ALTERNATIVE to that button, so it is here only while there is

@@ -94,7 +94,7 @@ public sealed class LibraryNavigationTests
     }
 
     /// <summary>
-    /// ARQ-004. The Back button is bound to this command, and both detail branches sit in the visual
+    /// The Back button is bound to this command, and both detail branches sit in the visual
     /// tree from the start, so the command is asked once — while the surface is still Browse — and
     /// the answer is no. Unless it announces the change, the button keeps that first no forever, and
     /// the walk measured exactly that: <c>Volver a la biblioteca is on screen but cannot be pressed:
@@ -189,7 +189,7 @@ public sealed class LibraryNavigationTests
                 RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
-                "T7",
+                "library-navigation",
                 $"library-{cultureName}.png");
             Directory.CreateDirectory(Path.GetDirectoryName(artifactPath)!);
             frame.Save(artifactPath, PngBitmapEncoderOptions.Default);

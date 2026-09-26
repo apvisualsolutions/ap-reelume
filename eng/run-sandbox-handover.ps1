@@ -233,7 +233,7 @@ powershell -ExecutionPolicy Bypass -NoProfile -File C:\share\sandbox-handover.ps
     Set-Content -LiteralPath $outputPath -Value ($result | ConvertTo-Json -Depth 8) -Encoding utf8NoBOM
     Write-Output ''
     Write-Output "Report: $outputPath"
-    Write-Output "Archive it at docs/evidence/stable/updater-handover.json once you have read it."
+    Write-Output "Archive it at eng/sandbox/updater-handover.json once you have read it."
 
     <#
         The lifecycle half of the same run, written as its own report because it answers a different
@@ -283,7 +283,7 @@ powershell -ExecutionPolicy Bypass -NoProfile -File C:\share\sandbox-handover.ps
         $lifecyclePath = Join-Path $stageRoot 'windows-lifecycle.json'
         Set-Content -LiteralPath $lifecyclePath -Value ($lifecycle | ConvertTo-Json -Depth 8) -Encoding utf8NoBOM
         Write-Output "Lifecycle: $lifecyclePath"
-        Write-Output "Archive it at docs/evidence/mvp/windows-lifecycle.json once you have read it."
+        Write-Output "Archive it at eng/sandbox/windows-lifecycle.json once you have read it."
 
         $failed = @($lifecyclePhases | Where-Object { $_.outcome -ne 'Passed' })
         if ($failed.Count -gt 0) {

@@ -4,7 +4,7 @@
 #
 # Builds LibVLC for Windows without GPL third-party libraries, the way VideoLAN builds it: inside
 # VideoLAN's own CI image, cross-compiling from Linux with extras/package/win32/build.sh unmodified
-# except for the patches in ./patches (ENG-013).
+# except for the patches in ./patches.
 #
 # Why this route and not the MSYS2 one the 2026-09-14 spike took: seven of that spike's nine traps
 # were 2026 tools refusing 2014-2018 code (gcc 16, cmake 4, yasm). VideoLAN's image pins the
@@ -14,7 +14,7 @@
 # What this script does NOT decide is which plugins are GPL. contrib/bootstrap --disable-gpl only
 # drops third-party libraries; VLC's configure has no GPL switch for its own modules, so some of
 # them are built either way. That is read afterwards from the sources by scan-plugin-licenses.ps1
-# and enforced by verify-nogpl.ps1 (ENG-027) — a hand list here would go stale the day a module
+# and enforced by verify-nogpl.ps1 — a hand list here would go stale the day a module
 # changes licence.
 #
 # Usage, inside the image:  eng/libvlc/build-nogpl.sh <x86_64|aarch64> <output-dir>
@@ -64,8 +64,8 @@ done
 
 # Third-party libraries. --disable-gpl refuses every contrib whose recipe says REQUIRE_GPL;
 # x264 and x265 have to be deselected by name (the spike saw bootstrap list them as "manually
-# deselected"). --enable-ad-clauses brings freetype2 back under its FTL licence, which the maintainer
-# chose on 2026-09-14 (ENG-025) — without it there are no subtitles.
+# deselected"). --enable-ad-clauses brings freetype2 back under its FTL licence, the one chosen for
+# FreeType on 2026-09-14 — without it there are no subtitles.
 #
 # --disable-zvbi is the same kind of deselection, and --disable-gpl cannot make it: libzvbi 0.2.35
 # carries two GPL-2.0-only files, src/packet-830.c and src/pdc.c, and contrib/src/zvbi/rules.mak

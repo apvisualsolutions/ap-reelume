@@ -10,7 +10,7 @@ namespace ApSolutions.LocalMedia.Presentation.Language;
 public interface ILanguageService
 {
     /// <summary>
-    /// What the application speaks with nothing stored, and what UX-010's reset puts back. Named
+    /// What the application speaks with nothing stored, and what the group's reset puts back. Named
     /// here rather than written twice, so the resolver and the reset cannot disagree.
     /// </summary>
     const string DefaultLanguage = "es";
@@ -23,7 +23,7 @@ public interface ILanguageService
 }
 
 /// <summary>
-/// One source of truth for the language (BUG-011). The interface was pinned to Spanish while the
+/// One source of truth for the language. The interface was pinned to Spanish while the
 /// updater's summary and the TMDB metadata followed the machine's culture, so an English system
 /// read release notes in one language inside a window speaking another. Now the resolved
 /// preference sets the thread culture and the resource dictionaries together, and everything that

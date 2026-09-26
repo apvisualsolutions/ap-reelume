@@ -23,15 +23,15 @@ namespace ApSolutions.LocalMedia.UiTests.Metadata;
 /// </summary>
 /// <remarks>
 /// <para>
-/// §4 asks for both paths in monospace and for the literal arrow to keep its accessible name. The
-/// monospace matters for the reason §4 gives about the duplicate list — figures and segments line up
+/// The redesign asks for both paths in monospace and for the literal arrow to keep its accessible name. The
+/// monospace matters for the reason it gives about the duplicate list — figures and segments line up
 /// under each other, so the eye finds the difference instead of hunting for it.
 /// </para>
 /// <para>
 /// <b>And the truncation was cutting off the half that matters.</b> Both paths trimmed with
 /// <c>CharacterEllipsis</c>, which eats the end — and the end of a rename is the filename, which is
 /// the only part that differs. Measured on 2026-08-22, this Avalonia offers
-/// <c>PathSegmentEllipsis</c>, which elides middle segments and keeps both ends. §4 says the same
+/// <c>PathSegmentEllipsis</c>, which elides middle segments and keeps both ends. The redesign says the same
 /// thing about the restore wizard's roots in its own words: paths are told apart by their end.
 /// </para>
 /// </remarks>

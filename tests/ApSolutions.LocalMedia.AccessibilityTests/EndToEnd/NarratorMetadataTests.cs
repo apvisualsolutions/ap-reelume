@@ -363,7 +363,7 @@ public sealed class NarratorMetadataTests
             RepositoryLayout.Root,
             "artifacts",
             "ui-captures",
-            "T33");
+            "narrator-metadata");
         Directory.CreateDirectory(directory);
         File.WriteAllText(Path.Combine(directory, fileName), tree.ToString());
     }

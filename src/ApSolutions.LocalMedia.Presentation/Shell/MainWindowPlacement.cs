@@ -15,7 +15,7 @@ namespace ApSolutions.LocalMedia.Presentation.Shell;
 public sealed record StoredWindowPlacement(double X, double Y, double Width, double Height, bool IsMaximized);
 
 /// <summary>
-/// Remembers where the main window was and puts it back there (WIN-003).
+/// Remembers where the main window was and puts it back there.
 /// <para>
 /// The geometry tracked is the last <em>normal</em> one: a maximized window saves the bounds it
 /// would restore to, plus the fact that it was maximized, so closing maximized does not burn the

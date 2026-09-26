@@ -4,8 +4,7 @@
 namespace ApSolutions.LocalMedia.Domain.Courses;
 
 /// <summary>
-/// Which root a pointed-at course folder belongs to, and how deep it sits in it (ADR-0006
-/// decision 3, as amended on 2026-08-31).
+/// Which root a pointed-at course folder belongs to, and how deep it sits in it.
 /// </summary>
 /// <param name="RootPath">
 /// The library root the declaration belongs to: an existing one when the folder is already inside
@@ -28,19 +27,19 @@ public sealed record CourseRootDeclaration(
 
 /// <summary>
 /// The gesture that declares a course root: a person points at <em>one</em> course folder and the
-/// depth is read off that, rather than typed as a number (ADR-0006, amendment 1).
+/// depth is read off that, rather than typed as a number.
 /// </summary>
 /// <remarks>
-/// Decision 3 is unchanged in what it decides — the program never guesses the depth — and changed
+/// The rule is unchanged in what it decides — the program never guesses the depth — and changed
 /// only in how it arrives. Guessing was measured and does not work: the candidate rule returned
 /// <b>31 courses where there are 12</b> over a real collection. A derived depth is the same number
-/// that used to be typed, so every measurement behind decision 3 still stands.
+/// that used to be typed, so every measurement behind that rule still stands.
 /// <para>
 /// Two answers come out of one gesture because they are one question. Pointing at
 /// <c>D:\Cursos\3D\Composición</c> when <c>D:\Cursos</c> is already a root means depth 2 in that
 /// root; pointing at it when nothing is catalogued means <c>D:\Cursos\3D</c> becomes a root and the
 /// depth is 1. Both readings put the siblings of the pointed-at folder at the same level as it,
-/// which is what the amendment offers to mark next.
+/// which is what the application offers to mark next.
 /// </para>
 /// </remarks>
 public static class CourseRootDeclarationPolicy
@@ -92,7 +91,7 @@ public static class CourseRootDeclarationPolicy
         }
 
         // Nothing catalogued holds it, so the folder's own parent becomes the root and the folder
-        // sits one level down. That is the reading the amendment asks for: the siblings it offers
+        // sits one level down. That is the reading the gesture asks for: the siblings it offers
         // to mark next are exactly the parent's other folders.
         return ParentOf(folder) is { Length: > 0 } parent
             ? new CourseRootDeclaration(parent, CourseDepth: 1, Below(parent, folder), IsExistingRoot: false)

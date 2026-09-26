@@ -11,7 +11,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Courses;
 
 /// <summary>
-/// The four offers a course card can make (CRS-003), asserted on the card itself rather than through
+/// The four offers a course card can make, asserted on the card itself rather than through
 /// the shell.
 /// </summary>
 /// <remarks>

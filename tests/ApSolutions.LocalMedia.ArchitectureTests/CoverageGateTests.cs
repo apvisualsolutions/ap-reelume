@@ -9,7 +9,7 @@ using ApSolutions.LocalMedia.TestSupport;
 namespace ApSolutions.LocalMedia.ArchitectureTests;
 
 /// <summary>
-/// Guards TST-001: the coverage gate exists, the verification gate runs it as a blocking step,
+/// The coverage gate exists, the verification gate runs it as a blocking step,
 /// and the tool it merges reports with is declared in the tool manifest. A gate that can be
 /// unplugged without a test noticing is a gate in name only.
 /// </summary>
@@ -30,7 +30,7 @@ public sealed class CoverageGateTests
     /// The files the new-file rule cannot see. Newness is decided against the base ref, so a file
     /// that shipped long ago and gets worse is held by nobody — which is measured rather than
     /// feared: <c>PlayerVersionsViewModel</c> went from 60.61%/27.27% to 45.45%/14.29% during
-    /// ARQ-004 and no gate said a word.
+    /// a refactor of the commands and no gate said a word.
     /// </summary>
     /// <remarks>
     /// Each declared path is checked to still exist, so the list cannot rot into a set of names for
@@ -48,7 +48,7 @@ public sealed class CoverageGateTests
 
         Assert.True(
             watched.Length >= 3,
-            $"The coverage gate watches {watched.Length} file(s); TST-001 named three, and the list "
+            $"The coverage gate watches {watched.Length} file(s); it started with three, and the list "
             + "is only allowed to shrink by a file reaching the bar, never by being deleted.");
         foreach (var path in watched)
         {

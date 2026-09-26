@@ -12,13 +12,13 @@ namespace ApSolutions.LocalMedia.TestSupport;
 /// <remarks>
 /// <para>
 /// It lives here because the same six lines had been copied into five test classes by the time
-/// ENG-044 widened the port, and every one of them had to be found and edited again. Five copies of
-/// a stub are five places a future field can be forgotten in.
+/// the live-watching setting widened the port, and every one of them had to be found and edited again.
+/// Five copies of a stub are five places a future field can be forgotten in.
 /// </para>
 /// <para>
 /// <b>Most callers pass <c>watchLocalRoots: false</c> on purpose</b>, and it is worth knowing why
 /// before changing one: those roots carry <see cref="ScanPolicy.Continuous"/>, so with the setting
-/// off they keep measuring what they measured before ENG-044 existed — that the per-root flag, and
+/// off they keep measuring what they measured before the setting existed — that the per-root flag, and
 /// not the setting, is what starts the watcher.
 /// </para>
 /// </remarks>

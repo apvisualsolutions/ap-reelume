@@ -14,24 +14,24 @@ namespace ApSolutions.LocalMedia.Application.Courses;
 /// <summary>What happened and which lesson it was about.</summary>
 /// <remarks>
 /// The outcome enumeration is <see cref="NextEpisodeOutcome"/> and not one of its own, which is the
-/// ficha's «la cuenta atrás es la de PLY-011» taken literally: the five ways a chain can end are the
+/// rule «the countdown is the episode one» taken literally: the five ways a chain can end are the
 /// same five, and a second enumeration naming them again is two lists that start agreeing and stop.
 /// <see cref="NextEpisodeOutcome.NoNextEpisode"/> is what «Curso terminado» is drawn from.
 /// </remarks>
 public sealed record NextLessonResult(NextEpisodeOutcome Outcome, CourseLessonProgress? Lesson);
 
 /// <summary>
-/// Counts down and then plays the next lesson of the course (CRS-004).
+/// Counts down and then plays the next lesson of the course.
 /// </summary>
 /// <remarks>
 /// The wait, the configured length and the cancellation are <see cref="ContinuityCountdown"/>'s —
-/// the very object PLY-011 uses, not a copy of its behaviour — so the length a person chose applies
+/// the very object the episode chain uses, not a copy of its behaviour — so the length a person chose applies
 /// to both chains and there is one loop to keep correct. What is this class's own is the two ends:
 /// which lesson comes next, and confirming at zero that its file is still there.
 /// <para>
 /// <b>The revalidation is a re-read and not a recheck of what was held.</b> The course is read again
 /// from the store when the countdown ends, so a drive pulled out — or a folder unmarked — during the
-/// wait is found now rather than trusted from when the offer was made. That is the half of T28 that
+/// wait is found now rather than trusted from when the offer was made. That is the half of the episode countdown that
 /// a copy would most easily have left out, because it looks redundant right up until it is not.
 /// </para>
 /// </remarks>
@@ -98,8 +98,8 @@ public sealed class StartNextLessonCountdown
             return new NextLessonResult(NextEpisodeOutcome.Cancelled, candidate);
         }
 
-        // Confirmed now rather than trusted from when the offer was made, which is T28's own rule.
-        // The lesson row carries LIB-009's identity; what has to exist at zero is the file behind it.
+        // Confirmed now rather than trusted from when the offer was made, which is the episode countdown's own rule.
+        // The lesson row carries the file identity the catalogue keeps; what has to exist at zero is the file behind it.
         //
         // The identity is dereferenced rather than tested: NextLessonPolicy steps over any lesson
         // with no file, so a candidate that reached this line has one by construction. Written as a

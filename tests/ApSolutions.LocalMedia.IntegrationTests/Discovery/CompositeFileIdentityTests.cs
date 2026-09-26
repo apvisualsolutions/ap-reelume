@@ -13,7 +13,7 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Discovery;
 /// The two halves of a file's identity, and what happens when one of them cannot be had.
 /// </summary>
 /// <remarks>
-/// TST-001's debt. The end-to-end scans covered the path where both halves answer and nothing
+/// Coverage debt. The end-to-end scans covered the path where both halves answer and nothing
 /// covered the failures the class exists for — a volume with no stable ids, a file another process
 /// is holding — which left it at 16% of its branches. The point of this composite is that either
 /// half may fail without costing the other, and that is only true if it is exercised.

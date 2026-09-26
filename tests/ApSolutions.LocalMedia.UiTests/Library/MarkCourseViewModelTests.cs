@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Library;
 
 /// <summary>
-/// The add dialog's course half (CRS-001, ADR-0006 amendment 1).
+/// The add dialog's course half.
 /// </summary>
 /// <remarks>
 /// A refusal has to arrive as a sentence on the screen, for the reason the root half already

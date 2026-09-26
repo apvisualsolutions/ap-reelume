@@ -13,10 +13,10 @@ public enum SettingsSection
     Appearance,
 
     /// <summary>
-    /// Which language the interface speaks: «Idioma». A destination of its own since 2026-09-13
-    /// (UX-010), where it used to be a card inside Appearance. It is one choice that governs every
-    /// screen rather than part of dressing the library — and as a card it would have put a second
-    /// «Restaurar valores por defecto» on the same screen, which the walk refuses to click.
+    /// Which language the interface speaks: «Idioma». A destination of its own, where it used to be a
+    /// card inside Appearance. It is one choice that governs every screen rather than part of dressing
+    /// the library — and as a card it would have put a second «Restaurar valores por defecto» on the
+    /// same screen, which the walk refuses to click.
     /// </summary>
     Language,
 
@@ -24,15 +24,15 @@ public enum SettingsSection
     Library,
 
     /// <summary>
-    /// Where a cover comes from and in which order: «Orden de las portadas» (LIB-021, ADR-0009). A
+    /// Where a cover comes from and in which order: «Orden de las portadas». A
     /// destination of its own rather than a card inside <see cref="Library"/>, which already hosts
     /// the scanning group: the gate refuses two option groups in one place, and a second «Restaurar
     /// valores por defecto» on one screen is a button the walk cannot resolve.
     /// </summary>
     Covers,
 
-    // «Reproducción» and «Detección de segmentos» were here until 2026-09-13. They went down to the
-    // player's gear (ADR-0012) and are reached through PlayerSettingsGroup now: their value is
+    // «Reproducción» and «Detección de segmentos» used to be here. They went down to the
+    // player's gear and are reached through PlayerSettingsGroup now: their value is
     // decided while watching something, which is not a question a settings page can be asked.
     Recommendations,
     Shortcuts,

@@ -21,7 +21,7 @@ public sealed class LibVlcSmokeTests
     [Fact]
     public async Task Embedded_engine_plays_a_real_h264_sample_and_reports_its_tracks()
     {
-        var path = await RequireSampleAsync("T18/h264-aac.mp4", H264Recipe);
+        var path = await RequireSampleAsync("smoke/h264-aac.mp4", H264Recipe);
         await using var factory = LibVlcFactory.CreateHeadless();
         await using var engine = new LibVlcMediaPlayerEngine(factory);
         await engine.InitializeAsync(TestContext.Current.CancellationToken);
@@ -51,7 +51,7 @@ public sealed class LibVlcSmokeTests
     [Fact]
     public async Task Opening_at_a_stored_position_starts_playback_there_and_not_at_zero()
     {
-        var path = await RequireSampleAsync("T18/h264-aac.mp4", H264Recipe);
+        var path = await RequireSampleAsync("smoke/h264-aac.mp4", H264Recipe);
         var stored = TimeSpan.FromSeconds(1.5);
         await using var factory = LibVlcFactory.CreateHeadless();
         await using var engine = new LibVlcMediaPlayerEngine(factory);
@@ -74,14 +74,14 @@ public sealed class LibVlcSmokeTests
     }
 
     /// <summary>
-    /// PLY-011's first link: the application can only offer the next episode if the engine says the
-    /// current one ended on its own. Before WP-2 nothing observed EndReached, so the state machine
-    /// stayed at Playing forever and the countdown had no moment to exist at.
+    /// The next-episode chain's first link: the application can only offer the next episode if the
+    /// engine says the current one ended on its own. Once nothing observed EndReached, so the state
+    /// machine stayed at Playing forever and the countdown had no moment to exist at.
     /// </summary>
     [Fact]
     public async Task Playing_to_the_end_of_the_media_reports_the_ended_state()
     {
-        var path = await RequireSampleAsync("T18/h264-aac.mp4", H264Recipe);
+        var path = await RequireSampleAsync("smoke/h264-aac.mp4", H264Recipe);
         await using var factory = LibVlcFactory.CreateHeadless();
         await using var engine = new LibVlcMediaPlayerEngine(factory);
         await engine.InitializeAsync(TestContext.Current.CancellationToken);
@@ -110,7 +110,7 @@ public sealed class LibVlcSmokeTests
     [Fact]
     public async Task Fifty_open_and_close_cycles_release_every_engine_resource()
     {
-        var path = await RequireSampleAsync("T18/h264-aac.mp4", H264Recipe);
+        var path = await RequireSampleAsync("smoke/h264-aac.mp4", H264Recipe);
         await using var factory = LibVlcFactory.CreateHeadless();
         var process = Process.GetCurrentProcess();
         process.Refresh();
@@ -153,7 +153,7 @@ public sealed class LibVlcSmokeTests
     [Fact]
     public async Task Cancelling_during_opening_leaves_the_engine_idle_and_released()
     {
-        var path = await RequireSampleAsync("T18/h264-aac.mp4", H264Recipe);
+        var path = await RequireSampleAsync("smoke/h264-aac.mp4", H264Recipe);
         await using var factory = LibVlcFactory.CreateHeadless();
         await using var engine = new LibVlcMediaPlayerEngine(factory);
         await engine.InitializeAsync(TestContext.Current.CancellationToken);
@@ -175,7 +175,7 @@ public sealed class LibVlcSmokeTests
         await using var factory = LibVlcFactory.CreateHeadless();
         await using var engine = new LibVlcMediaPlayerEngine(factory);
         await engine.InitializeAsync(TestContext.Current.CancellationToken);
-        var missing = Path.Combine(MediaToolchain.OutputRoot, "T18", "does-not-exist.mp4");
+        var missing = Path.Combine(MediaToolchain.OutputRoot, "smoke", "does-not-exist.mp4");
 
         var failure = await Assert.ThrowsAsync<PlaybackFailureException>(
             () => engine.OpenAsync(
@@ -185,7 +185,7 @@ public sealed class LibVlcSmokeTests
         Assert.Equal(PlaybackFailureCode.FileNotFound, failure.Failure.Code);
         Assert.Equal(0, engine.LiveMediaCount);
 
-        var path = await RequireSampleAsync("T18/h264-aac.mp4", H264Recipe);
+        var path = await RequireSampleAsync("smoke/h264-aac.mp4", H264Recipe);
         await engine.OpenAsync(
             new PlaybackRequest(new MediaFileId(Guid.NewGuid()), path),
             TestContext.Current.CancellationToken);
@@ -197,7 +197,7 @@ public sealed class LibVlcSmokeTests
     [Fact]
     public async Task Forced_disposal_during_playback_never_leaks_a_native_session()
     {
-        var path = await RequireSampleAsync("T18/h264-aac.mp4", H264Recipe);
+        var path = await RequireSampleAsync("smoke/h264-aac.mp4", H264Recipe);
         await using var factory = LibVlcFactory.CreateHeadless();
         var engine = new LibVlcMediaPlayerEngine(factory);
         await engine.InitializeAsync(TestContext.Current.CancellationToken);
@@ -222,7 +222,7 @@ public sealed class LibVlcSmokeTests
             MediaToolchain.RepositoryRoot,
             "artifacts",
             "test-results",
-            "T18",
+            "engine-smoke",
             "green",
             "engine-resource-cycles.csv");
         Directory.CreateDirectory(Path.GetDirectoryName(destination)!);

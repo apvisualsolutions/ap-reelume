@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Metadata;
 
 /// <summary>
-/// Taking a file somebody chose and making it a title's cover (LIB-018).
+/// Taking a file somebody chose and making it a title's cover.
 /// </summary>
 /// <remarks>
 /// The call that did not exist until 2026-09-03: the store had known how to import a personal image

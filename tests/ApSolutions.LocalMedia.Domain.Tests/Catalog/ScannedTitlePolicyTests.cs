@@ -21,9 +21,9 @@ public sealed class ScannedTitlePolicyTests
 
     /// <summary>The name a card shows, for the names a library actually holds.</summary>
     /// <remarks>
-    /// The first is the maintainer's own — «El Faro de Piedra 2019» was on the card, year and all, and it
-    /// was asserted verbatim in <c>ScanSeriesGroupingTests</c> as a defect waiting for a decision. The
-    /// rest are the shapes that come out of the places films come from.
+    /// The first came from a real library — «El Faro de Piedra 2019» was on the card, year and all, and
+    /// it was asserted verbatim in <c>ScanSeriesGroupingTests</c> as a defect waiting for a decision.
+    /// The rest are the shapes that come out of the places films come from.
     /// </remarks>
     [Theory]
     [InlineData("El Faro de Piedra 2019.mkv", "El Faro de Piedra", 2019)]

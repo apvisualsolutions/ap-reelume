@@ -10,7 +10,7 @@ namespace ApSolutions.LocalMedia.UiTests.Shell;
 /// A lambda handed to Dispatcher.Post is an async void in disguise: an exception that escapes it is
 /// rethrown on the interface thread and takes the application down. The deep audit found three of
 /// them at the entry points a machine controls — startup's automatic check, tray exit, and loose
-/// file activation (BUG-005).
+/// file activation.
 /// </summary>
 public sealed class DispatcherWiringTests
 {

@@ -305,7 +305,7 @@ public sealed class ContrastTokenTests
         // border and seg(true) draws the accent, over a semi-bold word. Until 2026-09-11 this counted
         // seven circles on the appearance page instead, and the circle was the whole signal in
         // eighteen of the tree's twenty-seven pills, because those never bound the chosen style at
-        // all. The circles came off at the maintainer's word — «aparece el selector del radial» — and the
+        // all. The circles came off because they read as a stray radio selector, and the
         // prototype never drew one, not even in its two high contrast modes, where the edge says it.
         Assert.Equal("Transparent", Setter(document, "Button.theme-option", "BorderBrush"));
         Assert.Contains(
@@ -319,8 +319,8 @@ public sealed class ContrastTokenTests
         // themes. The shell is held a test above; the appearance rows and the add dialog are cards.
         //
         // In light and dark this reads the dictionaries' own accent, and the application does not
-        // paint it: AppearanceService replaces it at start with one derived from the chosen preset. A
-        // gate audit on 2026-09-11 measured the gap — this said 7,61:1 in dark while three presets drew
+        // paint it: AppearanceService replaces it at start with one derived from the chosen preset. An
+        // audit of this check measured the gap — this said 7,61:1 in dark while three presets drew
         // the edge at 2,78 to 2,86:1 on the card. What is painted in those two themes is held by
         // AppearanceServiceTests, every preset against the page and the card; this stays the check on
         // the pairs as written, which is what the two high contrast themes do paint.
@@ -338,8 +338,8 @@ public sealed class ContrastTokenTests
         // And every pill in the tree binds the chosen class, so no row is left with no way to say
         // which one is on. That the binding is WRITTEN is all this can see: which pill it lights is
         // held where the pills are pressed — OptionPillTests, PlayerPanelColumnTests,
-        // ShellAssemblyTests, RootOnboardingViewTests and AudioOutputViewTests — since a gate audit on
-        // 2026-09-11 swapped three pairs of these bindings and this stayed green. The count is exact,
+        // ShellAssemblyTests, RootOnboardingViewTests and AudioOutputViewTests — since swapping three
+        // pairs of these bindings on purpose left this green. The count is exact,
         // the thirty the markup holds, so a pill added without being counted fails here first.
         var presentationRoot = System.IO.Path.Combine(
             RepositoryLayout.Root,

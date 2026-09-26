@@ -60,7 +60,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
                 Text="{DynamicResource LibraryItemCountLabel}" />
             <!--
               The discreet mark, and it is up here rather than in the strip on purpose: a scan that
-              started ON ITS OWN may not push the grid down (ADR-0010, fifth point), and this row's
+              started ON ITS OWN may not push the grid down, and this row's
               space is already spent. It is a symbol and not a word, so it stays literal like the
               other five and is raw to a reader; the strip below is what speaks, and only for a scan
               somebody asked for.
@@ -126,7 +126,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
         </WrapPanel>
       </Grid>
       <!--
-        THE NOTICES STRIP (ADR-0010). Everything here describes a STATE that lasts as long as its
+        THE NOTICES STRIP. Everything here describes a STATE that lasts as long as its
         condition, so it takes space and pushes the grid down rather than covering it: hiding a
         disconnected drive behind the titles it affects is worse than moving them once.
 
@@ -135,7 +135,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
         2026-08-21.
 
         A scan somebody LAUNCHED is here. A scan that started on its own is the pulse up in the
-        header instead, because the ADR's fifth point is that a shift nobody asked for is not paid
+        header instead, because the rule for notices is that a shift nobody asked for is not paid
         for. Both were invisible until 2026-09-05: the row only ever lit for the hand-launched one,
         and the automatic scan drew nothing at all.
       -->

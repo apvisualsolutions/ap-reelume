@@ -32,13 +32,13 @@ public enum UpscaleDrawRoute
 }
 
 /// <summary>
-/// The decisions PLY-016's drawing takes, kept away from the canvas that carries them out.
+/// The decisions the enlargement's drawing takes, kept away from the canvas that carries them out.
 /// </summary>
 /// <remarks>
-/// The tenth rule of this repository, applied: what talks to the machine is separated from what
-/// decides, and only the first is excluded from coverage. What is here is arithmetic — which route
-/// a frame takes, and where one source pixel lands in the destination — and it runs anywhere, so it
-/// is the half that is asserted.
+/// The rule for code that talks to the machine, applied: what talks to the machine is separated from
+/// what decides, and only the first is excluded from coverage. What is here is arithmetic — which route
+/// a frame takes, and where one source pixel lands in the destination — and it runs anywhere, so it is
+/// the half that is asserted.
 /// </remarks>
 public static class UpscaleDrawPlan
 {
@@ -81,8 +81,7 @@ public static class UpscaleDrawPlan
     /// <b>It lives here because nothing could see it change.</b> Naming the other order swaps red and
     /// blue in every enlarged video, and the whole test suite was blind to it: every test picture was
     /// grey, and the one with colour in it was pure green — the single colour that is identical in
-    /// both byte orders. Found by the mutation check on 2026-09-13, with the mutant surviving all 1,437
-    /// tests.
+    /// both byte orders. Found by mutating it: the mutant survived all 1,437 tests.
     /// </remarks>
     public const SKColorType SourceColourType = SKColorType.Bgra8888;
 
@@ -126,13 +125,13 @@ public static class UpscaleDrawPlan
     /// </para>
     /// <para>
     /// <b>This was 0.7 for half an hour, on a diagnosis that turned out to be wrong, and the story is
-    /// worth more than the number.</b> The maintainer reported «alrededor de las letras se ven cuadraditos o
-    /// de distintos tonos», this ring was the obvious suspect, and the coefficient came down twice
-    /// chasing it — with a gate loosened on the way. Then he ran the control nobody here had thought
-    /// to run: <b>his gamma was at 1.5, and at 1.0 the squares stop</b>. The artefact was banding from
-    /// an 8-bit tone curve (`ENG-021`), not this. So the coefficient is back at the value that measures
-    /// best, and the lesson is that <b>a report of something seen is a symptom and not a diagnosis</b>:
-    /// the suspect gets switched off before anything is tuned.
+    /// worth more than the number.</b> Small squares and stray tones showed around lettering, this
+    /// ring was the obvious suspect, and the coefficient came down twice chasing it — with a gate
+    /// loosened on the way. Then came the control nobody had thought to run: <b>gamma was at 1.5, and
+    /// at 1.0 the squares stop</b>. The artefact was banding from an 8-bit tone curve, not this. So the
+    /// coefficient is back at the value that measures best, and the lesson is that <b>a report of
+    /// something seen is a symptom and not a diagnosis</b>: the suspect gets switched off before
+    /// anything is tuned.
     /// </para>
     /// <para>
     /// <b>Two other designs were measured while chasing that ghost, and both are worse — which is the
@@ -143,16 +142,16 @@ public static class UpscaleDrawPlan
     /// second linear copy of the frame with a margin buys 25,7 % at a step of 10, against this 35,7 %.
     /// <b>All the sharpness above 13 % comes from the negative lobes, and so does the step.</b> Getting
     /// both needs a different algorithm — interpolating along an edge rather than across it — and that
-    /// is `ENG-022`, not a coefficient.
+    /// is a different candidate, not a coefficient.
     /// </para>
     /// <para>
-    /// <b>That ceiling was wrong, measured on 2026-09-25, and `ENG-022` is decided.</b> What stops at
-    /// 13 % is bounding to five samples this cubic has already resampled, so the ring is inside the
-    /// range before the bound looks. Bounding to the four source texels instead takes the step to 0
-    /// by construction and still reaches 30 %; a kernel steered along the edge reaches 34,9 % with the
-    /// same ramp. That is 0,8 points short of this chain, at six times its cost on the software canvas,
-    /// so it is not built — <c>EdgeDirectedUpscaleCandidateTests</c> keeps the candidate measured and
-    /// fails the day it wins.
+    /// <b>That ceiling turned out to be wrong, and the edge-directed candidate is decided.</b> What
+    /// stops at 13 % is bounding to five samples this cubic has already resampled, so the ring is
+    /// inside the range before the bound looks. Bounding to the four source texels instead takes the
+    /// step to 0 by construction and still reaches 30 %; a kernel steered along the edge reaches 34,9 %
+    /// with the same ramp. That is 0,8 points short of this chain, at six times its cost on the
+    /// software canvas, so it is not built — <c>EdgeDirectedUpscaleCandidateTests</c> keeps the
+    /// candidate measured and fails the day it wins.
     /// </para>
     /// </remarks>
     public static SKSamplingOptions SharpeningSource => new(new SKCubicResampler(0f, 0.85f));
@@ -181,8 +180,8 @@ public static class UpscaleDrawPlan
 
 /// <summary>
 /// Draws one enlarged frame through the drawing canvas rather than through the composition's own
-/// filter, which is PLY-016's portable link (<see cref="UpscaleLink.PortableUpscaler"/>) and the
-/// cubic one below it (<see cref="UpscaleLink.BicubicResample"/>).
+/// filter, which is the enlargement chain's portable link (<see cref="UpscaleLink.PortableUpscaler"/>)
+/// and the cubic one below it (<see cref="UpscaleLink.BicubicResample"/>).
 /// </summary>
 /// <remarks>
 /// <para>
@@ -292,12 +291,12 @@ public sealed class SkiaUpscaleDrawOperation : ICustomDrawOperation
     /// <summary>Everything that touches Skia, and nothing that decides anything.</summary>
     /// <remarks>
     /// <para>
-    /// Excluded from coverage under this repository's tenth rule: what is left here is the creation
+    /// Excluded from coverage under that same rule: what is left here is the creation
     /// of Skia's own objects and the draw calls on them, which can only answer differently if the
     /// renderer or the driver does.
     /// </para>
     /// <para>
-    /// <b>The first draft of this exclusion was a lie, and the mutation check said so.</b> It claimed
+    /// <b>The first draft of this exclusion was a lie, and mutating the code showed it.</b> It claimed
     /// every decision lived in <see cref="UpscaleDrawPlan"/> while four of them were still inside
     /// here — the byte order, the resampling kernel, the sampler's matrix and the route branch — and
     /// three of the four survived all 1,437 tests. The three that were values now live in the plan as

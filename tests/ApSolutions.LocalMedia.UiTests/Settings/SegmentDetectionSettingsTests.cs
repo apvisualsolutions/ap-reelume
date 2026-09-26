@@ -79,7 +79,7 @@ public sealed class SegmentDetectionSettingsTests
     }
 
     /// <summary>
-    /// UX-010, and it is asserted on what was stored rather than on the property: a reset that only
+    /// Restoring the defaults, asserted on what was stored rather than on the property: a reset that only
     /// moved the view model would leave the switch on across a restart while looking restored.
     /// </summary>
     [Fact]

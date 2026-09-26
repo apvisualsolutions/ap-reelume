@@ -79,9 +79,9 @@ public sealed class MetadataEditingTests
     }
 
     /// <summary>
-    /// The defect ADR-0009 closes, reproduced: restoring the provider's fields clears every lock, and
-    /// while the picked cover shared the provider's field that erased it and orphaned its file. Apart,
-    /// the provider's poster comes back and the picked cover stays.
+    /// The defect a separate field for the picked cover closes, reproduced: restoring the provider's
+    /// fields clears every lock, and while the picked cover shared the provider's field that erased it
+    /// and orphaned its file. Apart, the provider's poster comes back and the picked cover stays.
     /// </summary>
     [Fact]
     public async Task Restoring_the_provider_fields_keeps_the_hand_picked_cover()
@@ -183,7 +183,7 @@ public sealed class MetadataEditingTests
     }
 
     /// <summary>
-    /// LIB-021: an order set for one title is stored as the whole order, so moving the general one
+    /// An order set for one title is stored as the whole order, so moving the general one
     /// later cannot change what this title was told to do.
     /// </summary>
     [Fact]

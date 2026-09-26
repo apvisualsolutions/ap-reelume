@@ -18,7 +18,7 @@ namespace ApSolutions.LocalMedia.UiTests.Courses;
 /// A course's lesson row draws the numbers the prototype draws for it, and draws them on one line.
 /// </summary>
 /// <remarks>
-/// The second view of the corner batch, written the way the first was: the tree draws what the table
+/// The second view measured against the prototype, written the way the first was: the tree draws what the table
 /// says, and the table says what the design draws.
 /// <para>
 /// <b>What measuring first said, on 2026-09-03.</b> The design builds this row out of the same
@@ -34,46 +34,8 @@ namespace ApSolutions.LocalMedia.UiTests.Courses;
 /// numbers instead. That is <c>card-eyebrow</c>'s defect exactly, one file over.
 /// </para>
 /// </remarks>
-public sealed class LessonRowTests
+public sealed partial class LessonRowTests
 {
-    /// <summary>
-    /// Each number this row draws, what it is, and how it is found in the design.
-    /// </summary>
-    /// <remarks>
-    /// Anchored to the binding the design draws each one beside, rather than to the number: 12 is the
-    /// glyph's size, the number's size, the meta's size AND the row's gap, and a pattern keyed on the
-    /// value would pair any of them with any other.
-    /// </remarks>
-    private static readonly (string What, double Value, string Pattern)[] Pairings =
-    [
-        ("the glyph's width", 16, @"glyphStyle: \{ width: (?<value>[0-9]+), textAlign: 'center', flex: '0 0 auto', fontSize: 12, color: s\.watched"),
-        ("the glyph's size", 12, @"glyphStyle: \{ width: 16, textAlign: 'center', flex: '0 0 auto', fontSize: (?<value>[0-9]+), color: s\.watched"),
-        ("the number's width", 34, @"font-size:12px;font-weight:700;color:var\(--text2,\#5B6675\);width:(?<value>[0-9]+)px;flex:0 0 auto"">\{\{ ls\.num"),
-        ("the number's weight", 700, @"font-size:12px;font-weight:(?<value>[0-9]+);color:var\(--text2,\#5B6675\);width:34px;flex:0 0 auto"">\{\{ ls\.num"),
-        ("the row's gap", 12, @"Object\.assign\(\{\}, rowBox, \{ gap: (?<value>[0-9]+), borderColor: isCur"),
-        ("the gap over the meta", 2, @"font-size:12px;color:var\(--text2,\#5B6675\);margin-top:(?<value>[0-9]+)px"">\{\{ ls\.meta"),
-        ("the bar's greatest width", 220, @"margin-top:6px;max-width:(?<value>[0-9]+)px;height:3px"),
-        ("the bar's height", 3, @"margin-top:6px;max-width:220px;height:(?<value>[0-9]+)px;border-radius:2px"),
-        ("the chip's size", 11.5, @"borderRadius: 999, fontSize: (?<value>[0-9.]+), fontWeight: 600, whiteSpace: 'nowrap'"),
-        ("the chip's weight", 600, @"borderRadius: 999, fontSize: 11\.5, fontWeight: (?<value>[0-9]+), whiteSpace: 'nowrap'"),
-    ];
-
-    /// <summary>The numbers this row's classes draw are the ones the design writes.</summary>
-    [Fact]
-    public void The_numbers_this_row_draws_are_the_ones_the_design_writes()
-    {
-        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-
-        foreach (var (what, value, pattern) in Pairings)
-        {
-            var match = Regex.Match(design, pattern, RegexOptions.None, TimeSpan.FromSeconds(5));
-
-            Assert.True(match.Success, $"the design no longer draws {what}, so this row is paired with nothing.");
-            Assert.Equal(
-                value,
-                double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture));
-        }
-    }
 
     /// <summary>The row the view builds draws them, measured on the controls it builds.</summary>
     /// <remarks>

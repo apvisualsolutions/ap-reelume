@@ -17,12 +17,12 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// Whether this repository's pixel harness can see a Skia runtime shader, measured before `PLY-016`
-/// builds its portable upscaler on one.
+/// Whether this repository's pixel harness can see a Skia runtime shader, measured before the video
+/// enhancement builds its portable upscaler on one.
 /// </summary>
 /// <remarks>
 /// <para>
-/// The portable link of `PLY-016` has to sharpen an enlarged picture on <b>every</b> card, so it
+/// The portable link of the enhancement has to sharpen an enlarged picture on <b>every</b> card, so it
 /// cannot go through the D3D11 video processor — the CI runner carries only the Microsoft Basic
 /// Render Driver, which exposes no <c>ID3D11VideoDevice</c> at all. The route that does run
 /// everywhere is Avalonia's own Skia canvas, reached with <c>ICustomDrawOperation</c> and
@@ -123,8 +123,8 @@ public sealed class SkiaShaderHarnessTests
     /// </summary>
     /// <remarks>
     /// A shader that fails to compile paints nothing, and nothing is what «the harness cannot see a
-    /// shader» looks like too. Without this test the two would be the same reading, and `PLY-016`
-    /// would be sent down the CPU route by a typo. The API is
+    /// shader» looks like too. Without this test the two would be the same reading, and the
+    /// enhancement would be sent down the CPU route by a typo. The API is
     /// <c>SKRuntimeEffect.CreateShader(sksl, out errors)</c> — measured on SkiaSharp 3.119.4, where
     /// there is no <c>SKRuntimeEffect.Create</c> at all.
     /// </remarks>
@@ -160,7 +160,7 @@ public sealed class SkiaShaderHarnessTests
             found == Scene.MarkArea,
             $"The scan found {found} green pixels where a leased SKCanvas painted exactly "
                 + $"{Scene.MarkArea}. Zero means ICustomDrawOperation never reaches "
-                + "CaptureRenderedFrame in this harness, so `PLY-016`'s portable link cannot be "
+                + "CaptureRenderedFrame in this harness, so the enhancement's portable link cannot be "
                 + "gated here and belongs in the engine's CPU buffer instead.");
     }
 
@@ -178,7 +178,7 @@ public sealed class SkiaShaderHarnessTests
             found == Scene.MarkArea,
             $"The scan found {found} green pixels where an SkSL shader painted exactly "
                 + $"{Scene.MarkArea}. Zero, with the two tests above green, means this harness runs "
-                + "no runtime shader and `PLY-016`'s portable link has to be arithmetic on the "
+                + "no runtime shader and the enhancement's portable link has to be arithmetic on the "
                 + "frame buffer rather than SkSL on the canvas.");
     }
 

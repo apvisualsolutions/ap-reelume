@@ -12,7 +12,7 @@ using ApSolutions.LocalMedia.Presentation.Commands;
 namespace ApSolutions.LocalMedia.Presentation.Courses;
 
 /// <summary>
-/// One course in the grid (CRS-003): what it is, how far in it is, and the one button that carries
+/// One course in the grid: what it is, how far in it is, and the one button that carries
 /// on with it.
 /// </summary>
 public sealed class CourseCardViewModel
@@ -110,7 +110,7 @@ public sealed class CourseCardViewModel
 }
 
 /// <summary>
-/// The courses destination (CRS-003): the grid, and the positive empty state that offers to mark a
+/// The courses destination: the grid, and the positive empty state that offers to mark a
 /// folder.
 /// </summary>
 /// <remarks>
@@ -132,7 +132,7 @@ public sealed class CoursesViewModel : INotifyPropertyChanged
 
         // The one command type this tree has, even for work that finishes at once: a second,
         // synchronous kind would be a second place where a failure could go unhandled, which is the
-        // defect ARQ-004 removed.
+        // defect AsyncRelayCommand exists to remove.
         _open = new AsyncRelayCommand(
             parameter => Raise(Opened, parameter),
             parameter => parameter is CourseCardViewModel);

@@ -20,7 +20,9 @@ $env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 $env:DOTNET_NOLOGO = '1'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $outputRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot $Output))
-$matrixPath = Join-Path $repoRoot 'docs/evidence/mvp/recovery-matrix.md'
+# The matrix is written next to the pass results, under the output folder CI uploads, so a clean
+# checkout never needs a documentation folder to exist for the gate to run.
+$matrixPath = Join-Path $outputRoot 'recovery-matrix.md'
 
 # The nine failures the specification names, in the order it names them. A run that does not produce a
 # row for every one of these is an incomplete run, not a passing one.

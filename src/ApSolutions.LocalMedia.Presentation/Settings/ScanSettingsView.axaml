@@ -17,10 +17,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space12}">
       <!--
-        UX-010: inside the group and in its heading row. This section shares its destination with the
-        library's folders, which are NOT a group — putting the folders back would empty the library —
-        so only one button says «Restaurar valores por defecto» on this screen, which is what lets
-        the walk resolve it at all.
+        The reset sits inside the group and in its heading row. This section shares its destination with
+        the library's folders, which are NOT a group — putting the folders back would empty the library
+        — so only one button says «Restaurar valores por defecto» on this screen, which is what lets the
+        walk resolve it at all.
       -->
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
         <TextBlock

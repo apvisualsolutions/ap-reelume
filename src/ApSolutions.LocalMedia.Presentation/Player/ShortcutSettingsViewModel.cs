@@ -30,7 +30,7 @@ public sealed class ShortcutSettingsViewModel : INotifyPropertyChanged
     private string? _conflictMessage;
 
     // The map is demanded, never defaulted: an editor with a "?? new" fallback can silently edit a
-    // second map that no key press ever reads (ARQ-002).
+    // second map that no key press ever reads.
     public ShortcutSettingsViewModel(ShortcutMap map)
     {
         Bindings.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsEmpty));

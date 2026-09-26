@@ -12,7 +12,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Courses;
 
 /// <summary>
-/// A course's picture (CRS-006): when it is taken, when it is kept, and when nothing is decoded.
+/// A course's picture: when it is taken, when it is kept, and when nothing is decoded.
 /// </summary>
 /// <remarks>
 /// <b>Not one of these opens a video.</b> The grabber is a double that records what it was asked

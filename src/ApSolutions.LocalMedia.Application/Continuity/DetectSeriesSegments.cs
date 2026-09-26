@@ -61,7 +61,7 @@ public sealed class DetectSeriesSegments
     }
 
     /// <summary>
-    /// What the switch is before anybody touches it, and what UX-010's reset puts it back to. It is
+    /// What the switch is before anybody touches it, and what the settings reset puts it back to. It is
     /// named rather than written twice: a literal in the reset and another one here is two numbers
     /// that can disagree, and nothing would say which of them is the default.
     /// </summary>

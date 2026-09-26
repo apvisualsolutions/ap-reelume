@@ -15,7 +15,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// The gear's two levels: a list of groups, and the group that replaces it (ADR-0012). Nothing here
+/// The gear's two levels: a list of groups, and the group that replaces it. Nothing here
 /// is a popup, because nothing inside one can be reached by the walk.
 /// </summary>
 public sealed class PlayerSettingsMenuTests

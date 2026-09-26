@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 namespace ApSolutions.LocalMedia.Windows.Playback;
 
 /// <summary>
-/// PLY-016's measurement: asks every video adapter in this machine which picture formats its video
+/// The upscaler's measurement: asks every video adapter in this machine which picture formats its video
 /// processor takes, whether it accepts the vendor's super-resolution extension, and — the only part
 /// that proves anything — whether the picture that comes out differs with the extension on and off.
 /// </summary>

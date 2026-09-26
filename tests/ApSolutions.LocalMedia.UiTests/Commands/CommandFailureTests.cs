@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.UiTests.Commands;
 /// What happens to the failure when the work behind a button does not succeed.
 /// </summary>
 /// <remarks>
-/// ARQ-004. Every command surface in this application was its own private class implementing
+/// Every command surface in this application was its own private class implementing
 /// <c>ICommand</c> with <c>async void Execute</c> — twenty-four of them, and not one caught anything.
 /// An <c>async void</c> that throws does not return the failure to its caller: it rethrows it on
 /// whatever synchronization context was current, which on the interface thread is the application

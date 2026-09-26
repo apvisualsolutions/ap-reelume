@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Playback;
 
 /// <summary>
-/// Which link of PLY-016's chain draws a frame, from the vendor's own super resolution down to the
+/// Which link of the upscaling chain draws a frame, from the vendor's own super resolution down to the
 /// composition doing what it does today.
 /// </summary>
 /// <remarks>

@@ -15,7 +15,7 @@ namespace ApSolutions.LocalMedia.Infrastructure.Metadata;
 public sealed class ArtworkCache : IArtworkStore
 {
     /// <summary>
-    /// Ten megabytes is the ceiling on one poster (SEC-005): a legitimate TMDB image is a fraction
+    /// Ten megabytes is the ceiling on one poster: a legitimate TMDB image is a fraction
     /// of it, and anything bigger is a body worth refusing before it is buffered whole.
     /// </summary>
     public const int MaximumArtworkBytes = 10 * 1024 * 1024;
@@ -84,7 +84,7 @@ public sealed class ArtworkCache : IArtworkStore
         ValidateAlternativeText(alternativeText);
 
         // A host outside the declared purpose is a policy refusal, not a network failure: whatever
-        // suggested that address, this component's promise does not cover it (SEC-004).
+        // suggested that address, this component's promise does not cover it.
         if (!_allowedHosts.Any(pattern => NetworkPurpose.Matches(pattern, source.Host)))
         {
             throw new HttpRequestException(

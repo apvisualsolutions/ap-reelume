@@ -13,7 +13,7 @@
     archive itself, its hash, the two READMEs, and the package manifest's display name.
 
     Only x64 is written. The ARM64 artifact is built and verified on every run but is not published
-    until PRD-003 is settled, and a package manager entry is publication.
+    until its matrix has run on an ARM64 machine, and a package manager entry is publication.
 
     Nothing is submitted. The manifest is left in the package folder for a person to open a pull
     request with, once a release exists at the address it names. Until then the address is a promise,
@@ -160,7 +160,7 @@ Write-Manifest "$identifier.installer.yaml" @(
     "ManifestVersion: $schema")
 
 Write-Output "winget manifest: $folder"
-Write-Output ("{0} {1}, x64 only; ARM64 stays unpublished until PRD-003 is settled." -f $identifier, $version)
+Write-Output ("{0} {1}, x64 only; ARM64 stays unpublished until its matrix has run on an ARM64 machine." -f $identifier, $version)
 
 if ($Verify) {
     try {

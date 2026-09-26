@@ -38,9 +38,9 @@ public sealed class ReassignmentCandidateViewModel
 }
 
 /// <summary>
-/// A file a scan discovered that matches cataloged content without the certainty to act alone
-/// (LIB-002/003). Confirming a candidate keeps the old entity — progress and decisions included —
-/// under the new path; keeping it as new lets the file be its own entry from here on.
+/// A file a scan discovered that matches cataloged content without the certainty to act alone.
+/// Confirming a candidate keeps the old entity — progress and decisions included — under the new
+/// path; keeping it as new lets the file be its own entry from here on.
 /// </summary>
 public sealed class PendingReassignmentViewModel
 {
@@ -173,7 +173,8 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
     // Held as what they are rather than looked up out of the ICommand properties with `as`. Those
     // properties are only ever these two objects, so the cast could not fail — but it could stop
     // matching, silently, and a command that quietly stops announcing CanExecuteChanged is exactly
-    // the defect ARQ-004 left in this class: a button that asks once and never again.
+    // the defect the move to AsyncRelayCommand left in this class: a button that asks once and never
+    // again.
     private readonly AsyncRelayCommand _searchManually;
     private readonly AsyncRelayCommand _clearSelection;
     private IReadOnlyList<CandidateCardViewModel> _items = [];
@@ -205,7 +206,7 @@ public sealed class ReviewInboxViewModel : INotifyPropertyChanged
         // typed, is anything selected — so both have to be able to say the answer changed. The class
         // that used to back them could not: its CanExecuteChanged had an empty add and remove, so a
         // button asked once, at construction, and never again. Typing into the search box left Search
-        // disabled for good (ARQ-004 replaced twenty-four such classes; this pair was missed).
+        // disabled for good (twenty-four such classes were replaced; this pair was missed).
         _searchManually = new AsyncRelayCommand(
             () => SearchManuallyAsync(CancellationToken.None),
             CanSearchManually);

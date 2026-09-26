@@ -356,7 +356,7 @@ public sealed class SafeFileRenamer : ISafeFileRenamer
     /// <summary>
     /// Names the failure by what a person can do about it, not by the exception type. A file
     /// somebody is playing and a folder Windows will not let this user write into need different
-    /// actions, and "IOException" in the audit demanded neither (WIN-004).
+    /// actions, and "IOException" in the audit demanded neither.
     /// </summary>
     private static string Classify(Exception exception) => exception switch
     {

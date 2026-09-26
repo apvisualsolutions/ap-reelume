@@ -152,7 +152,7 @@ public sealed class HdrAccelerationTests
             MediaToolchain.RepositoryRoot,
             "artifacts",
             "test-results",
-            "T22",
+            "hdr-acceleration",
             "green",
             "hardware-observed.csv");
         Directory.CreateDirectory(Path.GetDirectoryName(report)!);

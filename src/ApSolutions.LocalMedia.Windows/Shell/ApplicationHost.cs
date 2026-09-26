@@ -15,7 +15,7 @@ namespace ApSolutions.LocalMedia.Windows.Shell;
 /// and the release of both.
 /// </summary>
 /// <remarks>
-/// ARQ-001. The composition root kept its provider — and with it LibVLC, SQLite, the tray icon and
+/// The composition root kept its provider — and with it LibVLC, SQLite, the tray icon and
 /// the hardware key registrations — in a static field that nothing ever released. Two consequences
 /// followed. The process leant on Windows to reclaim what it had taken, which is not a teardown but
 /// a bet that the operating system will not mind; and two applications could not exist at once in
@@ -84,7 +84,7 @@ public sealed class ApplicationHost : IAsyncDisposable
     /// dependency nobody registered.
     /// </summary>
     /// <remarks>
-    /// ARQ-010. Both checks answer the same question — not whether a defect exists, but when it is
+    /// Both checks answer the same question — not whether a defect exists, but when it is
     /// heard. Without them a broken registration waits for whichever resolution first happens to touch
     /// it, and in a desktop application that means a screen, in front of somebody, in a corner no test
     /// opened. Validating at build moves the whole class of defect to startup, which every test in this
@@ -154,7 +154,7 @@ public sealed class ApplicationHost : IAsyncDisposable
 
         _disposed = true;
 
-        // ENG-020. The tray icon belongs to the interface thread, and it goes first, before anything
+        // The tray icon belongs to the interface thread, and it goes first, before anything
         // below can yield. The player's teardown waits for the media it released to rest, and from
         // there the container's own release resumes on a pool thread: the icon threw there, and the
         // application ended on that exception after a session that had worked. Program releases from
@@ -214,11 +214,11 @@ public sealed class ApplicationHost : IAsyncDisposable
     /// The countdown offered at the end of an episode or a lesson, and what the buttons decided.
     /// </summary>
     /// <remarks>
-    /// It holds an <see cref="Action"/> rather than the use case since CRS-004, because there are two
+    /// It holds an <see cref="Action"/> rather than the use case since the course chain arrived, because there are two
     /// chains now and one overlay above both of them. Typing this to the episode countdown would have
     /// meant the lesson chain needing a second field, a second null check in the button handler, and
     /// a third the day a third chain arrives — and the failure mode of forgetting one is a Cancel
-    /// button that quietly does nothing, which is what PLY-011 already shipped once.
+    /// button that quietly does nothing, which is what the episode countdown already shipped once.
     /// </remarks>
     internal sealed class NextEpisodeOffer(Action cancel)
     {

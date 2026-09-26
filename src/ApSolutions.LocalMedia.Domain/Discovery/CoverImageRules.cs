@@ -23,7 +23,7 @@ public enum CoverImageVerdict
 }
 
 /// <summary>
-/// What may be accepted when somebody chooses their own cover (LIB-018), in one place.
+/// What may be accepted when somebody chooses their own cover, in one place.
 /// </summary>
 /// <remarks>
 /// <b>This is the lock that has to exist before the door does.</b> Choosing a cover copies a file the

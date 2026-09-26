@@ -284,7 +284,7 @@ public sealed class RootLifecycleTests
             var type = RequireType(
                 "ApSolutions.LocalMedia.Presentation",
                 "ApSolutions.LocalMedia.Presentation.Onboarding.RootOnboardingViewModel");
-            // The folder-management collaborators (LIB-A01) are optional and absent here: this
+            // The folder-management collaborators are optional and absent here: this
             // harness exercises adding a root, and reflection does not fill defaults on its own.
             // The fourth is the removal summariser, absent for the same reason.
             var viewModel = Activator.CreateInstance(type, _addRoot, null, null, null);

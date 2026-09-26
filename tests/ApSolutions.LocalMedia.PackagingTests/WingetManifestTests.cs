@@ -75,7 +75,7 @@ public sealed class WingetManifestTests
     }
 
     /// <summary>
-    /// ARM64 is built and verified on every run and is not published until `PRD-003` is settled. A
+    /// ARM64 is built and verified on every run and is not published until it is verified on ARM64 hardware. A
     /// package manager entry is publication, so it must not appear here either — the decision is not
     /// upheld by remembering it.
     /// </summary>

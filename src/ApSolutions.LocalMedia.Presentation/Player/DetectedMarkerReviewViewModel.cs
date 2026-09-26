@@ -201,8 +201,8 @@ public sealed class DetectedMarkerReviewViewModel : INotifyPropertyChanged
     /// </summary>
     /// <remarks>
     /// Kept because the class this replaced did it and a test says so, not because it earns its keep:
-    /// these three can always execute, so nothing that re-asks can get a different answer. ARQ-004 is
-    /// a move, and a move that quietly changes what a surface does is not a move.
+    /// these three can always execute, so nothing that re-asks can get a different answer. Moving to
+    /// the shared command is a move, and a move that quietly changes what a surface does is not a move.
     /// <para>
     /// Decided 2026-08-10, so it is not left as an open question: this goes, along with the assertion
     /// that pins it, the next time somebody opens this file for a reason of their own. Not before —

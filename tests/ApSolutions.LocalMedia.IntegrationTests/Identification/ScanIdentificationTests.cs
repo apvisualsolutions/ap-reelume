@@ -19,9 +19,9 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Identification;
 
 /// <summary>
-/// The end-to-end walk LIB-006/007 demand: real files scanned into a real SQLite catalogue, handed
-/// to real identification, stored as real candidates, and read back by the review inbox. Before
-/// WP-2 nothing joined the scan to identification, so this whole chain existed only piecewise.
+/// The end-to-end walk identification demands: real files scanned into a real SQLite catalogue, handed
+/// to real identification, stored as real candidates, and read back by the review inbox. Nothing
+/// once joined the scan to identification, so this whole chain existed only piecewise.
 /// </summary>
 [Trait("Category", "Integration")]
 public sealed class ScanIdentificationTests

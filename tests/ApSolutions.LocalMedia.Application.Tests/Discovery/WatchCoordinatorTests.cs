@@ -140,7 +140,7 @@ public sealed class WatchCoordinatorTests
     }
 
     /// <summary>
-    /// BUG-012. An overflowed watcher says it lost events; that is a rescan, not a funeral. The
+    /// An overflowed watcher says it lost events; that is a rescan, not a funeral. The
     /// second batch is the half the defect ate: the watching went on.
     /// </summary>
     [Fact]
@@ -172,7 +172,7 @@ public sealed class WatchCoordinatorTests
     }
 
     /// <summary>
-    /// BUG-012, the other half: a watcher that really died used to stay dead until the application
+    /// The other half: a watcher that really died used to stay dead until the application
     /// was started again, so a continuous root quietly stopped being followed. The fallback pass is
     /// the heartbeat that brings it back.
     /// </summary>
@@ -213,14 +213,14 @@ public sealed class WatchCoordinatorTests
 
         await coordinator.StartAsync(root, TestContext.Current.CancellationToken);
 
-        // Continuous is a choice, and the live watcher is what it means: a root whose owner chose
-        // Manual gets no watcher and no scan they did not ask for.
+        // Continuous is a choice, and the live watcher is what it means: a root set to Manual
+        // gets no watcher and no scan nobody asked for.
         Assert.Equal(0, watcher.Starts);
         Assert.Empty(scanner.Commands);
     }
 
     /// <summary>
-    /// ENG-044: a normal local folder is followed live because the setting says so, without the
+    /// A normal local folder is followed live because the setting says so, without the
     /// per-root Continuous flag — which nothing in the application ever assigned, so the whole
     /// watching slice never ran outside these tests.
     /// </summary>
@@ -265,7 +265,7 @@ public sealed class WatchCoordinatorTests
     // The tests above hand the settings stub `false` on purpose. They build their roots with the
     // per-root ScanPolicy.Continuous flag, so with the setting off they keep measuring exactly what
     // they measured before: that the flag is what switches the live watcher on, and not the setting
-    // that arrived with ENG-044. The stub itself is InMemoryScanWatchSettings, in
+    // that arrived later. The stub itself is InMemoryScanWatchSettings, in
     // tests/Shared/ScanWatchStubs.cs, which carries this same note — it used to be five copies of
     // the same six lines, and widening the port meant finding and editing every one of them.
 

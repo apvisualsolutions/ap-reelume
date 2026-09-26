@@ -7,7 +7,7 @@ namespace ApSolutions.LocalMedia.Application.Privacy;
 /// What went wrong in this session, held as codes so a diagnostics report has something true to say.
 /// </summary>
 /// <remarks>
-/// ARQ-004. A command surface that fails has two possible destinations: its own error state, or
+/// A command surface that fails has two possible destinations: its own error state, or
 /// nowhere. Only two of this application's twenty-four surfaces own any error state, so catching the
 /// failure without somewhere to put it would just be a quieter way of losing it.
 /// <para>

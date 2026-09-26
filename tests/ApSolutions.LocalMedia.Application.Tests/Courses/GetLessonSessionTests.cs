@@ -10,7 +10,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Courses;
 
 /// <summary>
-/// Whether the file that is playing is a lesson (CRS-004), and the course around it.
+/// Whether the file that is playing is a lesson, and the course around it.
 /// </summary>
 /// <remarks>
 /// Every refusal here ends the same way — no session, so the player's column is <b>absent</b> — and

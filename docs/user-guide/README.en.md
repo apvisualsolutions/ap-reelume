@@ -50,7 +50,7 @@ the privacy statement.
 ## A title's card
 
 From the card you can play, mark watched or unwatched, favourite it, save it for later, and rate it
-from 1 to 10. Also:
+from 1 to 5 stars. Also:
 
 - **Edit metadata.** What you edit is locked: a later remote refresh does not overwrite it.
 - **Preview rename.** It shows what it would do before doing it. On a conflict it does not run. It

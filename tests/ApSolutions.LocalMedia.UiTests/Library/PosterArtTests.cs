@@ -202,7 +202,7 @@ public sealed class PosterArtTests
     /// The prototype's covers are four backgrounds and this application built two of them. The
     /// missing one is the diagonal hatch — <c>repeating-linear-gradient(115deg,
     /// rgba(255,255,255,.055) 0 2px, transparent 2px 10px)</c> — which is why a wall of covers here
-    /// read flat beside the same wall there. The maintainer said it in three words: the striped
+    /// read flat beside the same wall there. Said in three words: the striped
     /// backgrounds are missing.
     /// </para>
     /// <para>

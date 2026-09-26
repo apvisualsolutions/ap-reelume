@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 namespace ApSolutions.LocalMedia.Domain.Courses;
 
 /// <summary>
-/// The number a lesson carries at the head of its name, kept as an ordered pair (CRS-001).
+/// The number a lesson carries at the head of its name, kept as an ordered pair.
 /// </summary>
 /// <remarks>
 /// <see cref="Minor"/> is what stops <c>1.3 Título</c> from becoming <c>1 3 Título</c>, which is what
@@ -26,7 +26,7 @@ public readonly record struct LessonOrdinal(int Major, int? Minor)
 }
 
 /// <summary>
-/// What a lesson's file name says about where it goes (CRS-001, ADR-0006 decision 4).
+/// What a lesson's file name says about where it goes.
 /// </summary>
 /// <remarks>
 /// Ordering is numeric and not alphabetical, because alphabetical puts <c>10</c> before <c>2</c> and

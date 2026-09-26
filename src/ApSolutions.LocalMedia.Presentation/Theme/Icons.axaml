@@ -5,12 +5,12 @@ SPDX-License-Identifier: LicenseRef-APSolutions
 <!--
   The prototype's icons, which are not a font.
 
-  Measured on 2026-08-24 by reading `design/AP Reelume.dc.html`: every pictogram in it is drawn by
+  Measured by reading the prototype's source: every pictogram in it is drawn by
   one function, `icon(n, s)`, as an SVG of 24 by 24 with `fill:none`, `stroke:currentColor`,
   `stroke-width:1.6` and round caps and joins. Thirty-five shapes, all of them line drawings. This
   application was painting Segoe Fluent glyphs instead — solid, filled pictograms from a different
-  drawing tradition — in twenty-seven places, and that is the difference the maintainer named first when
-  he said the player's icons are not the prototype's.
+  drawing tradition — in twenty-seven places, and that is the first difference anybody sees between
+  the player's icons and the prototype's.
 
   So the shapes come from there, converted rather than redrawn: paths verbatim, and the prototype's
   `rect` and `circle` elements turned into the arcs that draw them. Two shapes are this
@@ -92,8 +92,8 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   -->
   <!--
     The restart arc with its arrow on the other side: the same circle IconReset draws, read
-    the other way round, which is what «go back to the beginning» looks like. The maintainer asked
-    for exactly this on 2026-08-25 — «era el que estaba antes pero la flecha al otro lado».
+    the other way round, which is what «go back to the beginning» looks like: the reset
+    icon with the arrow on the other side.
   -->
   <StreamGeometry x:Key="IconRestart">M0 0 M24 24 M5 12a7 7 0 1 0 2.05-4.95 M5 4.5V8h3.5</StreamGeometry>
   <StreamGeometry x:Key="IconReset">M0 0 M24 24 M19 12a7 7 0 1 1-2.05-4.95 M19 4.5V8h-3.5</StreamGeometry>

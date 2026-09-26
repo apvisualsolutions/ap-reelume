@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// The edge-directed enlargement `ENG-022` asked for, measured against what ships and left unbuilt
+/// The edge-directed enlargement that was asked for, measured against what ships and left unbuilt
 /// because of what the measurement said.
 /// </summary>
 /// <remarks>
@@ -30,7 +30,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// </para>
 /// <para>
 /// <b>And it is not built, because 34,9 is below 35,7</b> and the step it removes is inside the
-/// ceiling the maintainer never objected to. It also costs more: on the software canvas, 5,1 s per 4K
+/// ceiling nobody objected to. It also costs more: on the software canvas, 5,1 s per 4K
 /// frame against the shipping chain's 0,9 s, and the card's figure cannot be read without a window.
 /// So the tests below keep the decision honest in both directions: the first proves this harness
 /// measures what the player measures, and the last fails the day either side moves enough to make
@@ -41,7 +41,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// kernel are textbook, and FSR's own edge-adaptive pass is not copied, for the attribution reason
 /// <see cref="UpscaleShaderSource"/> already records. Everything else measured on the way — cubics
 /// bounded to the texels, a steepened cubic, masks against a bilinear copy, Lanczos-3 bounded and
-/// unbounded — is in <c>docs/evidence/stable/ENG022-edge-directed-upscale.md</c> with every figure,
+/// unbounded — was recorded with every figure when the decision was taken,
 /// and so is why DCCI and NEDI were not: both are defined on a two-times lattice, and a player
 /// enlarges by whatever the window asks.
 /// </para>
@@ -172,7 +172,7 @@ public sealed class EdgeDirectedUpscaleCandidateTests
     /// <para>
     /// It fails in both directions on purpose. If the candidate ever lands closer to the truth than
     /// what ships — because the shipping chain got softer, or the candidate was improved — then it
-    /// wins on every yardstick at once and `ENG-022`'s answer changes. If it leaves 34,9 %, it has
+    /// wins on every yardstick at once and the decision not to build it changes. If it leaves 34,9 %, it has
     /// stopped being the alternative the evidence describes, and the record would be pointing at a
     /// figure nobody can reproduce. The band is as narrow as the control's on purpose: the gate
     /// auditor found that a floor of 33 let a candidate with its coherence dropped (33,9 %) or one
@@ -191,10 +191,10 @@ public sealed class EdgeDirectedUpscaleCandidateTests
             candidate < shipping,
             $"The edge-directed candidate lands {candidate:F1} % closer to the truth and what ships "
             + $"lands {shipping:F1} %. It removes the step as well, so it now wins on every yardstick "
-            + "and ENG-022's decision not to build it has to be taken again.");
+            + "and the decision not to build it has to be taken again.");
         Assert.True(
             candidate is > 34.8 and < 35.0,
-            $"The candidate lands {candidate:F2} % closer, against 34,9 % when ENG-022 was decided, "
+            $"The candidate lands {candidate:F2} % closer, against 34,9 % when it was decided, "
             + "so it is no longer the alternative the evidence describes.");
     }
 

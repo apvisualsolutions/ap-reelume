@@ -9,8 +9,8 @@ namespace ApSolutions.LocalMedia.Windows.Startup;
 /// <remarks>
 /// Only the decision lives here, not the screen that shows it or the action it carries out: those
 /// need a window and a shell, and a class that cannot be exercised without them would arrive with
-/// the coverage it could not have. The decision is the part worth being able to ask questions of
-/// (ARQ-006), and it now has them.
+/// the coverage it could not have. The decision is the part worth being able to ask questions of,
+/// and it now has them.
 /// </remarks>
 public static class DatabaseStartup
 {

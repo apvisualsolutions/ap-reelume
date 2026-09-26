@@ -44,7 +44,7 @@ public sealed record CatalogQuery(
 
 /// <summary>One row of the library grid, with everything the card on it paints.</summary>
 /// <remarks>
-/// The last five arrived on 2026-08-24, when the maintainer compared the grid with the prototype's. Its
+/// The last five arrived on 2026-08-24, when the grid was compared with the prototype's. Its
 /// card carries three lines and two badges — a kind chip, the title, «2024 · 111 min · Suspense», a
 /// watch status or an episode count, and a tick when the whole thing has been seen — and this record
 /// carried a title, a year and two flags. Every one of the five is in the database already; what was

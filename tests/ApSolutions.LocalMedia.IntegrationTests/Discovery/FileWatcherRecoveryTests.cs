@@ -34,7 +34,7 @@ public sealed class FileWatcherRecoveryTests
             TimeSpan.FromMilliseconds(750),
             watcher.GetField("DefaultDebounce")?.GetValue(null));
 
-        // BUG-012: the buffer the operating system fills defaults to 8 KiB, and a folder receiving
+        // The buffer the operating system fills defaults to 8 KiB, and a folder receiving
         // a season at once overflows it. This is the ceiling the platform allows.
         Assert.Equal(64 * 1024, watcher.GetField("InternalBufferBytes")?.GetValue(null));
         Assert.NotNull(Assembly.Load("ApSolutions.LocalMedia.Domain").GetType(
@@ -121,7 +121,7 @@ public sealed class FileWatcherRecoveryTests
 
         Assert.NotNull(deletion);
 
-        // BUG-012: a storm this size overflowed the system buffer on a hosted runner, and an
+        // A storm this size overflowed the system buffer on a hosted runner, and an
         // overflow used to end the watcher — the batches simply stopped, and the folder was no
         // longer followed. What is asserted is the half the defect ate: a file created after the
         // storm still arrives.
@@ -167,7 +167,7 @@ public sealed class FileWatcherRecoveryTests
     /// <b>The sweep nobody was getting.</b> The scheduler used to ask for
     /// <see cref="ScanPolicy.Continuous"/> on its own, and nothing in the application ever assigned
     /// that flag — so for every root a person can actually create, this enumerable emitted the
-    /// startup pass and stopped. That silently cost the recovery LIB-003 promises for USB and
+    /// startup pass and stopped. That silently cost the recovery promised for USB and
     /// network roots, and the retry that brings a dead live watcher back, which the coordinator
     /// feeds from this very schedule.
     /// </summary>
@@ -200,7 +200,7 @@ public sealed class FileWatcherRecoveryTests
 
     /// <summary>
     /// The negative control of the one above, and the half that keeps the setting honest: a local
-    /// root whose owner unticked the box gets the startup pass its own policy asks for and nothing
+    /// root whose box was unticked gets the startup pass its own policy asks for and nothing
     /// after it. Without this, unticking would leave files still appearing every so often.
     /// </summary>
     [Fact]
@@ -303,7 +303,7 @@ public sealed class FileWatcherRecoveryTests
         Directory.CreateDirectory(stormRoot);
         var root = Root(stormRoot, RootKind.Local);
 
-        // BUG-012 handler only runs when Windows drops change records, and at the product ceiling
+        // The overflow handler only runs when Windows drops change records, and at the product ceiling
         // of 64 KiB a storm overflows on some runs and not on others: this file coverage swung
         // between 88.54/73.81 and 93.75/71.43 across two runs of the same binary. So the buffer is
         // a constructor parameter — the pattern the debounce already had — and this test asks for

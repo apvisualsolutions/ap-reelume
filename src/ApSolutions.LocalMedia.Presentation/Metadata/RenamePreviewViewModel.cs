@@ -73,7 +73,7 @@ public sealed class RenamePreviewViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// The resource key for what went wrong and what to do about it, or null while nothing has.
-    /// The audit log kept the failure and the screen said nothing actionable (WIN-004): a locked
+    /// The audit log kept the failure and the screen said nothing actionable: a locked
     /// file asks for a different action than a folder this user cannot write into.
     /// </summary>
     public string? FailureKey =>

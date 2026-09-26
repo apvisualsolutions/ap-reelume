@@ -16,7 +16,7 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 /// to the factory's deferred release, which is the same discipline the media probe needed.
 /// </summary>
 /// <remarks>
-/// The queue used to live here too (BUG-011), and this copy disposed the native media inside its own
+/// The queue used to live here too, and this copy disposed the native media inside its own
 /// lock with nothing to catch a throwing release: the worker flag stayed raised, so the first failure
 /// ended the drain for good and every media after it leaked in silence. Unifying it needs the factory
 /// to flush on request, because teardown here must release the media before the player that

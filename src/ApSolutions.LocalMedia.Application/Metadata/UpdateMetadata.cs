@@ -16,13 +16,13 @@ public sealed record MetadataFieldChanges(
     string? BackdropPath = null)
 {
     /// <summary>
-    /// The picked cover's file name (LIB-021), or <see langword="null"/> to leave it as it is. It has
-    /// no lock because nothing but its owner ever writes it: a refresh has no field to reach it by.
+    /// The picked cover's file name, or <see langword="null"/> to leave it as it is. It has
+    /// no lock because nothing but the person's own choice ever writes it: a refresh has no field to reach it by.
     /// </summary>
     public string? PersonalCover { get; init; }
 
     /// <summary>
-    /// The order of origins this one title overrides the general setting with (LIB-021):
+    /// The order of origins this one title overrides the general setting with:
     /// <see langword="null"/> leaves it as it is, an empty list removes the override and puts the
     /// title back on the general order, and a list sets it.
     /// </summary>

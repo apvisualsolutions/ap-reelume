@@ -18,7 +18,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   </UserControl.Resources>
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel MaxWidth="620" Spacing="{DynamicResource Space12}">
-      <!-- UX-010: inside the group and in its heading row, the one button on this screen. -->
+      <!-- The reset sits inside the group and in its heading row, the one button on this screen. -->
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
         <TextBlock
             FontSize="{DynamicResource FontSizeSubtitle}"

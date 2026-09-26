@@ -19,7 +19,7 @@ namespace ApSolutions.LocalMedia.UiTests.Library;
 
 /// <summary>
 /// The question asked before a folder's catalogue is deleted. It says what will be lost, in numbers,
-/// and it says the loss cannot be undone — which is what the maintainer decided on 2026-09-06 when the
+/// and it says the loss cannot be undone — which is what was decided on 2026-09-06 when the
 /// prototype promised the catalogue would be kept and the application's own notice promised the
 /// opposite, and the code did neither.
 /// </summary>
@@ -32,7 +32,7 @@ public sealed class RootRemoveDialogTests
 
         var panel = scope.Panel();
 
-        // §4's overlay grammar. The panel that declared neither dimension was measured at 1280x1400,
+        // The redesign's overlay grammar. The panel that declared neither dimension was measured at 1280x1400,
         // opaque over the transport.
         Assert.Equal(520, panel.MaxWidth);
         Assert.Equal(560, panel.MaxHeight);

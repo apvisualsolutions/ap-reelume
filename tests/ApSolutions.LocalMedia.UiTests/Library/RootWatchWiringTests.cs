@@ -8,7 +8,7 @@ namespace ApSolutions.LocalMedia.UiTests.Library;
 
 /// <summary>
 /// Continuous watching is what makes the library follow the disk instead of the other way round.
-/// The deep audit found the whole slice registered and never resolved (LIB-002/003):
+/// A deep audit found the whole slice registered and never resolved:
 /// <c>RootWatchCoordinator</c>, the debounced watcher, and the fallback scheduler existed, were
 /// tested, and never started — the application only ever scanned when a button was pressed.
 /// </summary>
@@ -60,7 +60,7 @@ public sealed class RootWatchWiringTests
     }
 
     // The_fallback_scheduler_is_given_a_real_recovery_interval lived here and is gone on purpose
-    // (ENG-044). It asserted that the composition's source text mentioned
+    // since 2026-09-20. It asserted that the composition's source text mentioned
     // FallbackScanScheduler.DefaultRecoveryInterval, and it was green throughout the whole time the
     // sweep ran for absolutely nobody: the words were there, the constant was handed over, and the
     // scheduler broke out before its loop because nothing in the application ever assigned the

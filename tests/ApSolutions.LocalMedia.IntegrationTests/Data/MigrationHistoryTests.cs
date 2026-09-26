@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Data;
 
 /// <summary>
-/// BUG-012: the history of applied migrations is re-verified, not merely counted. A build whose
+/// The history of applied migrations is re-verified, not merely counted. A build whose
 /// migration text differs from what the file was actually migrated with must refuse the file — the
 /// schema on disk and the schema this build assumes are not the same thing just because the
 /// version numbers line up.

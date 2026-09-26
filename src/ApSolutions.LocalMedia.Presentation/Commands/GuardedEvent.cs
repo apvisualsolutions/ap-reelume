@@ -7,7 +7,7 @@ namespace ApSolutions.LocalMedia.Presentation.Commands;
 /// Work an event started, kept from becoming the end of the process.
 /// </summary>
 /// <remarks>
-/// ARQ-004. <see cref="AsyncRelayCommand"/> covers what a button starts. This covers the rest of the
+/// <see cref="AsyncRelayCommand"/> covers what a button starts. This covers the rest of the
 /// same defect: a handler whose signature returns <see langword="void"/> has no task for anybody to
 /// await either, so a failure inside it is rethrown on the interface thread with nothing there to
 /// catch it. There were three — a catalogue click, a route change, and a folder leaving the library.

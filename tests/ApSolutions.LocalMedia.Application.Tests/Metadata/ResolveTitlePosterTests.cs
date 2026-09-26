@@ -30,7 +30,7 @@ public sealed class ResolveTitlePosterTests
     private static readonly ICoverOrderSettings DefaultOrder = new StubOrder(CoverOrderPolicy.Default);
 
     /// <summary>
-    /// ADR-0009's third origin: with nothing picked and nothing from the provider, the frame taken
+    /// The third origin of a cover: with nothing picked and nothing from the provider, the frame taken
     /// from the title's own video draws.
     /// </summary>
     [Fact]
@@ -92,7 +92,7 @@ public sealed class ResolveTitlePosterTests
     /// <summary>
     /// A provider address is never mistaken for a personal cover. Until 2026-09-18 this test was
     /// called «the provider is asked first», because both lived in one field and that was the order;
-    /// since LIB-021 the picked cover has its own field and wins, and what survives of the old
+    /// now the picked cover has its own field and wins, and what survives of the old
     /// assertion is that a provider address alone never reaches the personal store.
     /// </summary>
     [Fact]
@@ -110,7 +110,7 @@ public sealed class ResolveTitlePosterTests
         Assert.Equal(0, store.PersonalCalls);
     }
 
-    /// <summary>ADR-0009's order: the cover somebody picked wins over the provider's.</summary>
+    /// <summary>The cover order: the one somebody picked wins over the provider's.</summary>
     [Fact]
     public void The_hand_picked_cover_wins_over_the_provider_when_both_are_on_disk()
     {
@@ -209,7 +209,7 @@ public sealed class ResolveTitlePosterTests
 
     /// <summary>
     /// The general setting decides when the title says nothing, so moving it in Settings moves what
-    /// the whole library draws (LIB-021, ADR-0009 decision 4).
+    /// the whole library draws.
     /// </summary>
     [Fact]
     public void The_general_order_decides_when_the_title_has_none_of_its_own()

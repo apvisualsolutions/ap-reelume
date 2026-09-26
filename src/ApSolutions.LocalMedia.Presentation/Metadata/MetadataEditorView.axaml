@@ -58,7 +58,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
 
       <!--
         The path stays editable and the button sits beside it, rather than replacing it: typing a
-        path is what LIB-011 actually verified and somebody's existing library depends on it, and a
+        path is what has always been tested and somebody's existing library depends on it, and a
         chooser that hid the field would take that away to add something.
 
         The button fills the poster field itself and ticks its lock, so a provider refresh cannot put
@@ -85,7 +85,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
             TextWrapping="Wrap"
             automation:AutomationProperties.LiveSetting="Polite" />
         <!--
-          LIB-021, ADR-0009 decision 4: this one title can override the general order. One choice
+          This one title can override the general order. One choice
           and not a second reorderer — picking an origin puts it first and leaves the rest as they
           were, which is what overriding means; the general order itself is moved in Settings.
         -->

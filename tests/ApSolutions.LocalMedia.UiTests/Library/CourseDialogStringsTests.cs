@@ -10,7 +10,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Library;
 
 /// <summary>
-/// The two things the course dialog's words do that markup alone cannot promise (CRS-001).
+/// The two things the course dialog's words do that markup alone cannot promise.
 /// </summary>
 /// <remarks>
 /// Both were written against an unmeasured assumption and are measured here instead. The Avalonia

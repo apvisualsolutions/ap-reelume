@@ -4,12 +4,12 @@
 namespace ApSolutions.LocalMedia.Domain.Courses;
 
 /// <summary>
-/// Which lesson follows which (CRS-004), for the countdown that offers the next one when one ends.
+/// Which lesson follows which, for the countdown that offers the next one when one ends.
 /// </summary>
 /// <remarks>
 /// The episode chain needs a policy to decide an <i>order</i> — seasons, episode numbers, specials
 /// last. This one does not: <see cref="ICourseRepository.ListLessonsAsync"/> hands lessons back in
-/// the order the file names decided, and CRS-001 made that order the stored one precisely so nothing
+/// the order the file names decided, and course detection made that order the stored one precisely so nothing
 /// downstream would re-derive it and get a different answer. So what is left here is the one
 /// question the order does not answer: what comes after this, and can it be played.
 /// <para>

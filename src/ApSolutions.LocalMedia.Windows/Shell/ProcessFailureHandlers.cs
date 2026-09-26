@@ -9,7 +9,7 @@ namespace ApSolutions.LocalMedia.Windows.Shell;
 /// The process's own last word about a failure that reached no surface.
 /// </summary>
 /// <remarks>
-/// ARQ-004. A command that knows where its failure belongs puts it there. This exists for what is
+/// A command that knows where its failure belongs puts it there. This exists for what is
 /// left: a task nobody awaited, a continuation running where no surface is listening, a failure
 /// raised after the screen that started the work has gone. Those were ending the process quietly.
 /// <para>
@@ -20,8 +20,8 @@ namespace ApSolutions.LocalMedia.Windows.Shell;
 /// does not reach.
 /// </para>
 /// <para>
-/// It hooks and unhooks rather than wiring statics at class load. ARQ-001 spent this repository's
-/// patience on exactly one static field nothing could release, and two applications in one process
+/// It hooks and unhooks rather than wiring statics at class load. One static field nothing could
+/// release was already one too many, and two applications in one process
 /// is now something the tests rely on.
 /// </para>
 /// </remarks>

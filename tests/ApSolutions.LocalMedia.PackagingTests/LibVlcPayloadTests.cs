@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.PackagingTests;
 
 /// <summary>
 /// The LibVLC inside each package is exactly the tree that was verified free of GPL code, file for
-/// file and byte for byte (ENG-013).
+/// file and byte for byte.
 /// </summary>
 /// <remarks>
 /// verify-nogpl.ps1 proves a tree clean and writes its manifest; libvlc.lock.json pins that tree by
@@ -81,11 +81,11 @@ public sealed class LibVlcPayloadTests
 
     /// <summary>
     /// The bill of materials names the engine with the hash it is pinned by. It is built from the lock
-    /// files, and since ENG-013 no lock file names LibVLC: without its own entry the largest native
+    /// files, and since the engine is built here no lock file names LibVLC: without its own entry the largest native
     /// component of the artifact would drop out of the list on the day it changed.
     /// <para>
     /// Each package against its OWN architecture's tree. The first version read the x64 SBOM only, and
-    /// a mutation audit found the ARM64 package naming the x64 zip — the script always took the x64 asset
+    /// an audit of the gate found the ARM64 package naming the x64 zip — the script always took the x64 asset
     /// — with zeroed hashes in the ARM64 SBOM passing six of six.
     /// </para>
     /// </summary>

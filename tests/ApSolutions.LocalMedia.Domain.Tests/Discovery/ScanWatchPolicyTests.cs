@@ -8,7 +8,7 @@ namespace ApSolutions.LocalMedia.Domain.Tests.Discovery;
 
 /// <summary>
 /// Whether a root is followed live, decided from its kind, its own policy and the one setting a
-/// person can reach. This is ENG-044: the live watcher was built whole and never switched on,
+/// person can reach. The live watcher was once built whole and never switched on,
 /// because the only thing that turned it on was a <see cref="ScanPolicy.Continuous"/> flag that
 /// nothing in the tree ever assigned and no screen ever offered.
 /// </summary>
@@ -51,7 +51,7 @@ public sealed class ScanWatchPolicyTests
     /// <summary>
     /// <b>The case that corrected this design, and it came from a test that already existed.</b>
     /// <c>WatchCoordinatorTests.A_manual_root_is_not_watched_behind_its_owners_back</c> holds that a
-    /// root whose owner chose Manual gets no watcher and no scan they did not ask for — and it is
+    /// root set to Manual gets no watcher and no scan they did not ask for — and it is
     /// not abstract: <c>DeclareCourseFolder</c> adds a course folder as Manual alone <b>on
     /// purpose</b>, because the dialog's own help promises the rest of the drive is left alone.
     /// A setting that switched watching on for every local root would break a promise made in
@@ -105,7 +105,7 @@ public sealed class ScanWatchPolicyTests
     /// roots» and never spoke for the drive that gets pulled out or the share across the network,
     /// so it cannot switch their sweep off — and off is what they would be, because the setting
     /// never gives either of them a live watcher in the first place. The sweep is the only net
-    /// they have, which is the half of LIB-003 that says «recovery for USB/NAS».
+    /// they have, which is the half of the promise that says «recovery for USB/NAS».
     /// </summary>
     [Theory]
     [InlineData(RootKind.Usb)]
@@ -168,7 +168,7 @@ public sealed class ScanWatchPolicyTests
     /// <b>The interval lived in two places saying different numbers.</b> The screen offered thirty
     /// minutes and the scheduler ran every fifteen, and neither knew about the other — the screen's
     /// value governed nothing at all, so nobody could notice. Fifteen wins: it is the one the code
-    /// actually ran and the one the archived WP-2 evidence backs in writing, so there is no
+    /// actually ran and the one the archived measurements back in writing, so there is no
     /// behaviour to preserve on the other side. It lives here, once, and both ends point at it.
     /// </summary>
     [Fact]

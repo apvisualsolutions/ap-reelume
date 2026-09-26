@@ -16,7 +16,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 
 /// <summary>
-/// ARQ-005: what the window has to show while the database is being made ready.
+/// What the window has to show while the database is being made ready.
 /// </summary>
 /// <remarks>
 /// The interface thread used to migrate the database before anything could be handed to the window,

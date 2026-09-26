@@ -591,7 +591,7 @@ public sealed class DetailsNavigationTests
     /// Every episode row is the same height and their numbers end on the same pixel.
     /// </summary>
     /// <remarks>
-    /// §4 asks for the number to be monospaced and right-aligned "so the column lines up", and what
+    /// The redesign asks for the number to be monospaced and right-aligned "so the column lines up", and what
     /// lines a column up is measurable: episode 9 and episode 10 have to finish at the same x. Asserted
     /// that way rather than on the font family, because a family name is a means and the alignment is
     /// the end — and a proportional font in a fixed, right-aligned column would satisfy the row's

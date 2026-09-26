@@ -25,7 +25,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// </summary>
 /// <remarks>
 /// <para>
-/// That is what §4 asks. What measuring asked first was <b>what those rows say</b>, and the answer on
+/// That is what the redesign asks. What measuring asked first was <b>what those rows say</b>, and the answer on
 /// 2026-08-21 was the compiler's: neither marker list declared an <c>ItemTemplate</c>, so each row
 /// painted the record's generated <c>ToString()</c> — <c>IntroMarker { Id = …, SeriesId = SeriesId
 /// { Value = … }, Kind = Intro, … }</c> — two GUIDs and a type name, in a column 320 wide, clipped
@@ -48,7 +48,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// </remarks>
 public sealed class SideListRowTests
 {
-    /// <summary>The height §4 gives a row in the side column.</summary>
+    /// <summary>The height the redesign gives a row in the side column.</summary>
     private const double RowHeight = 36;
 
     private static readonly SeriesId Series = new(Guid.Parse("d1f70001-0000-4000-8000-000000000001"));

@@ -16,9 +16,9 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Discovery;
 
 /// <summary>
-/// The end-to-end walk LIB-002/003 demand: the background host starts watching with the
+/// The end-to-end walk continuous watching demands: the background host starts watching with the
 /// application, the startup pass catalogues what is already there, and a file dropped afterwards is
-/// catalogued by the watcher without anybody pressing anything. Before WP-2 the whole slice was
+/// catalogued by the watcher without anybody pressing anything. The whole slice was once
 /// registered and never started.
 /// </summary>
 [Trait("Category", "Integration")]
@@ -46,7 +46,7 @@ public sealed class ContinuousWatchTests
         await roots.AddAsync(root, TestContext.Current.CancellationToken);
         var mediaFiles = new MediaFileRepository(factory);
         // Off on purpose: this root carries ScanPolicy.Continuous, so the flag and not the setting
-        // still starts the watcher — which is what this scene measured before ENG-044 existed.
+        // still starts the watcher — which is what this scene measured before the setting existed.
         var settings = new InMemoryScanWatchSettings(watchLocalRoots: false);
         var coordinator = new RootWatchCoordinator(
             new DebouncedFileWatcher(new SystemClock(), TimeSpan.FromMilliseconds(150)),

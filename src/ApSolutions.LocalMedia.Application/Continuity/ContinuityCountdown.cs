@@ -11,14 +11,14 @@ namespace ApSolutions.LocalMedia.Application.Continuity;
 /// any input can reach.
 /// </summary>
 /// <remarks>
-/// Extracted on 2026-09-01 when the course chain arrived (CRS-004), whose ficha says the countdown
-/// «is PLY-011's». Two classes running their own loop would have been two countdowns that agree
+/// Extracted on 2026-09-01 when the course chain arrived, whose requirement is that its countdown
+/// is the episode one. Two classes running their own loop would have been two countdowns that agree
 /// today, and the one that stops agreeing is the one nobody is looking at — this repository's own
 /// recurring defect, found six times over in a list of containers written six times.
 /// <para>
 /// <b>The setting key is shared and stays the episode one.</b> A person configures «how long before
 /// the next thing starts», not one answer for series and another for courses, and the stored key is
-/// what T28 wrote and what the settings surface already reads and writes. Renaming it would leave
+/// what the episode countdown wrote and what the settings surface already reads and writes. Renaming it would leave
 /// every existing installation's chosen length behind on the old key, silently back at ten seconds.
 /// </para>
 /// </remarks>

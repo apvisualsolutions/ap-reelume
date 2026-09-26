@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 AP Solutions
 SPDX-License-Identifier: LicenseRef-APSolutions
 -->
 <!--
-A course opened (CRS-002, CRS-003): the header, the modules with their lessons, and the thread panel
+A course opened: the header, the modules with their lessons, and the thread panel
 that answers «¿por dónde iba?» without making anybody re-watch anything.
 
 The thread panel sits in the fixed column of a Grid rather than sticking to the viewport. The design

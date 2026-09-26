@@ -23,8 +23,8 @@ param(
     [string]$Version,
 
     # The package this bill describes. Until 2026-09-18 there was no parameter and every SBOM said
-    # win-x64; the day the engine became a pinned tree per architecture, a mutation audit found the ARM64
-    # package naming the x64 engine's hash. Both packaging scripts pass it.
+    # win-x64; the day the engine became a pinned tree per architecture, the ARM64 package was found
+    # naming the x64 engine's hash. Both packaging scripts pass it.
     [ValidateSet('x64', 'arm64')]
     [string]$Architecture = 'x64'
 )
@@ -99,7 +99,7 @@ foreach ($lockFile in $lockFiles) {
     }
 }
 
-# LibVLC is not a package since ENG-013, so no lock file above names it: it is the tree
+# LibVLC is not a package since the engine is built without GPL, so no lock file above names it: it is the tree
 # eng/libvlc/libvlc.lock.json pins, built from VLC without GPL code and published by this
 # repository. Without this entry the bill of materials would lose the largest native component the
 # artifact carries on the very day it changed.

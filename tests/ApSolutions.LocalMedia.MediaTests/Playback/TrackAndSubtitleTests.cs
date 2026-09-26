@@ -109,7 +109,7 @@ public sealed class TrackAndSubtitleTests
     {
         var sample = MediaManifest.Require(SpanishFirst);
         var media = await CodecMatrixTests.RequireSampleAsync(sample);
-        var root = Path.Combine(MediaToolchain.OutputRoot, "T20");
+        var root = Path.Combine(MediaToolchain.OutputRoot, "tracks-and-subtitles");
         var subtitle = WriteSubtitle(media, extension, expectedEncoding.StartsWith("UTF-16", StringComparison.Ordinal));
 
         var discovered = ExternalSubtitleDiscovery.Discover(media, root);
@@ -139,7 +139,7 @@ public sealed class TrackAndSubtitleTests
     {
         var sample = MediaManifest.Require(SpanishFirst);
         var media = await CodecMatrixTests.RequireSampleAsync(sample);
-        var outsideRoot = Path.Combine(MediaToolchain.OutputRoot, "T20-outside");
+        var outsideRoot = Path.Combine(MediaToolchain.OutputRoot, "tracks-and-subtitles-outside");
         Directory.CreateDirectory(outsideRoot);
         var intruder = Path.Combine(
             outsideRoot,
@@ -149,7 +149,7 @@ public sealed class TrackAndSubtitleTests
             "1\n00:00:00,000 --> 00:00:01,000\nIntruso\n",
             TestContext.Current.CancellationToken);
 
-        var confined = ExternalSubtitleDiscovery.Discover(media, Path.Combine(MediaToolchain.OutputRoot, "T20"));
+        var confined = ExternalSubtitleDiscovery.Discover(media, Path.Combine(MediaToolchain.OutputRoot, "tracks-and-subtitles"));
         var refused = ExternalSubtitleDiscovery.Discover(media, outsideRoot);
 
         Assert.DoesNotContain(confined, item => item.Path.Equals(intruder, StringComparison.OrdinalIgnoreCase));

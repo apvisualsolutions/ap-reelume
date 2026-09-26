@@ -56,7 +56,7 @@ public readonly record struct UpscaleCapabilities(
     bool CubicResampler);
 
 /// <summary>
-/// PLY-016's chain of descent: which link draws this frame, decided without touching a graphics
+/// The upscaler's chain of descent: which link draws this frame, decided without touching a graphics
 /// card.
 /// </summary>
 /// <remarks>
@@ -67,7 +67,7 @@ public readonly record struct UpscaleCapabilities(
 /// </para>
 /// <para>
 /// <b>The two gates in front of the fall are not tidiness.</b> «Switched off, nothing changes» is
-/// half of what the maintainer asked for, and a picture already as large as the box it is drawn in gains
+/// half of the requirement, and a picture already as large as the box it is drawn in gains
 /// nothing from a card — enlarging it anyway would spend a graphics card to throw the result away
 /// and light the indicator over every file in the library.
 /// </para>
@@ -111,7 +111,7 @@ public static class UpscaleChainPolicy
     // WHAT IS DELIBERATELY NOT HERE, and it was here for an hour on 2026-09-13: a method that took a
     // measured UpscaleCost and switched the link it belonged to off the table. It was written, tested
     // with six cases, and called from nowhere but its own test file — which is this repository's
-    // defining defect, and the mutation check named it. Removing it is better than keeping a sixth
+    // defining defect, and the gate auditor named it. Removing it is better than keeping a sixth
     // instance of «registered and never fed».
     //
     // Wiring it for real needs a clock in the drawing path, and that belongs with the frame-cost

@@ -3,15 +3,14 @@ SPDX-FileCopyrightText: 2026 AP Solutions
 SPDX-License-Identifier: LicenseRef-APSolutions
 -->
 <!--
-The courses destination (CRS-003). A grid of folders somebody marked, each card carrying the one
+The courses destination. A grid of folders somebody marked, each card carrying the one
 thing that card is for: carrying on.
 
-THE OFFER MOVES WITH THE STATE, which is the prototype's arrangement and the maintainer's decision of
-2026-09-03. It sits inside the empty box while there are no courses — accented, because there is
-nothing else on the screen to rank it against — and drops to the foot in the plain button once there
-are. An earlier note here argued the opposite, that an offer disappearing the moment it starts
-working is one somebody has to go looking for; it does not disappear, it moves under the thing it
-made.
+THE OFFER MOVES WITH THE STATE, which is the prototype's arrangement. It sits inside the empty box while
+there are no courses — accented, because there is nothing else on the screen to rank it against — and
+drops to the foot in the plain button once there are. An earlier note here argued the opposite, that an
+offer disappearing the moment it starts working is one somebody has to go looking for; it does not
+disappear, it moves under the thing it made.
 
 The empty state is a dashed box rather than a filled one: dashed is what the design draws for a
 place where something is going to go, and a positive surface said «this is fine» about a screen with

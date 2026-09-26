@@ -16,12 +16,12 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// Where <see cref="VideoFrameView"/> gets its compiled shader, and how many times it asks (ENG-017).
+/// Where <see cref="VideoFrameView"/> gets its compiled shader, and how many times it asks.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The surface compiled the shader once and nothing said so.</b> The mutation check found it on
-/// 2026-09-13 while PLY-016 was being written: deleting the <c>_effectAsked</c> sentinel compiles the
+/// <b>The surface compiled the shader once and nothing said so.</b> An audit of the gates found it on
+/// 2026-09-13 while the video enhancement was being written: deleting the <c>_effectAsked</c> sentinel compiles the
 /// SkSL on every frame — about 173,000 of them in a two-hour film — and the whole interface suite
 /// stayed green, because the compiler was a static call behind a private field and nothing outside
 /// the class could count anything. The answer was never a louder comment: it is the seam these tests
@@ -39,7 +39,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// </remarks>
 public sealed class VideoFrameViewShaderTests
 {
-    // Four times the picture, which is what puts the chain on its enlarging path: PLY-016 does
+    // Four times the picture, which is what puts the chain on its enlarging path: the enhancement does
     // nothing to a frame that is not being enlarged, and the shader would never be asked for.
     private const int SourceWidth = 160;
     private const int SourceHeight = 90;
@@ -102,7 +102,7 @@ public sealed class VideoFrameViewShaderTests
     }
 
     /// <summary>
-    /// What the maintainer would see on a machine whose driver rejects the SkSL: the film, drawn by the
+    /// What a person would see on a machine whose driver rejects the SkSL: the film, drawn by the
     /// link below. The arm exists because of that machine and cannot be reached on one where the
     /// shader compiles, which is what the seam is for.
     /// </summary>

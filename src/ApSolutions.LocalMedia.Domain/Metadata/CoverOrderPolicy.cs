@@ -3,7 +3,7 @@
 
 namespace ApSolutions.LocalMedia.Domain.Metadata;
 
-/// <summary>Where a title's cover came from (ADR-0009, LIB-021).</summary>
+/// <summary>Where a title's cover came from.</summary>
 public enum CoverOrigin
 {
     /// <summary>A file somebody picked from their own disk.</summary>

@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Metadata;
 
 /// <summary>
-/// LIB-016. Whether the application may refresh stored metadata nobody asked it to, and where that
+/// Whether the application may refresh stored metadata nobody asked it to, and where that
 /// answer lives.
 /// </summary>
 /// <remarks>

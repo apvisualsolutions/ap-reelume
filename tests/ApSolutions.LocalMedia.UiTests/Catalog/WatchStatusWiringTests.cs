@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Catalog;
 
 /// <summary>
-/// The watched toggle existed as a control and never as a behaviour (CNT-A01): the card built it
+/// The watched toggle existed as a control and never as a behaviour: the card built it
 /// with a null handler, so a person's mark went nowhere, and the container carried a dead
 /// <c>WatchStatusViewModel</c> registration shadowed by the <c>new</c> the card actually uses.
 /// </summary>
@@ -37,7 +37,7 @@ public sealed class WatchStatusWiringTests
     public void The_dead_watch_status_registration_is_gone()
     {
         // The card news its own WatchStatusViewModel with the handler; a container registration
-        // nothing resolves would be the double ownership ARQ-008 already taught us to refuse.
+        // nothing resolves would be the double ownership an earlier audit taught us to refuse.
         Assert.DoesNotContain(
             "AddTransient<WatchStatusViewModel>",
             CompositionSource(),

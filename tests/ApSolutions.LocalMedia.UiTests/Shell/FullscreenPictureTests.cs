@@ -21,8 +21,8 @@ namespace ApSolutions.LocalMedia.UiTests.Shell;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>The maintainer reported «aun no funciona la pantalla completa» twice, on 2026-08-25 and again on
-/// 2026-09-13, and the cause was different each time.</b> The first was that nothing moved the window;
+/// <b>Fullscreen was reported not working twice, on 2026-08-25 and again on 2026-09-13, and the
+/// cause was different each time.</b> The first was that nothing moved the window;
 /// <see cref="ShellWindowModeTests"/> was written for it and closes it. The second is this: the window
 /// does go fullscreen, and <b>the picture does not fill it</b>, because the navigation rail and the
 /// header come back the moment the pointer moves — and they take layout space.
@@ -35,7 +35,7 @@ namespace ApSolutions.LocalMedia.UiTests.Shell;
 /// remark while still only asserting the window.
 /// </para>
 /// <para>
-/// The rule being enforced is already decided in <c>ADR-0010</c>: a state takes space and an event
+/// The rule being enforced is already decided for the whole interface: a state takes space and an event
 /// floats. In fullscreen the shell's chrome is an event, so it must not take space from the picture.
 /// </para>
 /// </remarks>
@@ -77,7 +77,7 @@ public sealed class FullscreenPictureTests
                 surface.Bounds.Width >= available - 1,
                 $"In fullscreen the picture is {surface.Bounds.Width} wide inside a window of "
                     + $"{available}, so the chrome is taking space from it. In fullscreen the chrome "
-                    + "is an event and floats (ADR-0010); it does not stand beside the picture.");
+                    + "is an event and floats; it does not stand beside the picture.");
         }
         finally
         {

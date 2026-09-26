@@ -33,7 +33,7 @@ public enum PlayerPanel
     Versions,
 
     /// <summary>
-    /// The course this lesson belongs to, and every other lesson in it (CRS-004).
+    /// The course this lesson belongs to, and every other lesson in it.
     /// </summary>
     /// <remarks>
     /// The one panel here that is not about the media. The other five answer questions about the

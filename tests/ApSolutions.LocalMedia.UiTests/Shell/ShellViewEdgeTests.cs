@@ -20,7 +20,7 @@ namespace ApSolutions.LocalMedia.UiTests.Shell;
 /// </summary>
 /// <remarks>
 /// Written on 2026-09-25 because the coverage gate asked for them: the view gained the pointer's
-/// handling with ENG-018, its branches moved, and the file had to reach the bar rather than carry a
+/// handling for the idle chrome, its branches moved, and the file had to reach the bar rather than carry a
 /// floor copied from a run that had not happened yet. The guards nothing could take were removed; these
 /// are the ones something can.
 /// </remarks>

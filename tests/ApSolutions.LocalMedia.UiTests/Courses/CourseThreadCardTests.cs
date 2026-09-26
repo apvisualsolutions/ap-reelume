@@ -19,14 +19,14 @@ namespace ApSolutions.LocalMedia.UiTests.Courses;
 /// The course thread's card draws the numbers the prototype draws for it.
 /// </summary>
 /// <remarks>
-/// This is the first view of the corner batch, and it is written view-shaped rather than class-shaped
+/// This is the first view measured against the prototype corner by corner, and it is written view-shaped rather than class-shaped
 /// on purpose: a radius belongs to an element of a screen and not to a number.
 /// <c>SurfaceCornerTests</c> holds the corner and <c>OverlineTests</c> holds the two headings; what
 /// is here is everything else this card owes the prototype.
 /// <para>
 /// <b>The tree draws what the table says, and the table says what the design draws.</b> The same two
 /// halves <c>ButtonShapeTests</c> has, for its reason: a table of hand-copied numbers certifies
-/// itself, and the handover that opened this batch carried two numbers measurement contradicted.
+/// itself, and the first notes for this card carried two numbers measurement contradicted.
 /// </para>
 /// <para>
 /// <b>What this found on 2026-09-03.</b> The tree drew «Dónde lo dejaste» as a 20 px semi-bold
@@ -37,52 +37,8 @@ namespace ApSolutions.LocalMedia.UiTests.Courses;
 /// would have left the card halfway between two designs, which is why neither half was done alone.
 /// </para>
 /// </remarks>
-public sealed class CourseThreadCardTests
+public sealed partial class CourseThreadCardTests
 {
-    /// <summary>
-    /// Each number this card draws, what it is, and how it is found in the design.
-    /// </summary>
-    /// <remarks>
-    /// The pattern travels with the pairing rather than being derived from the value, because the
-    /// design writes this card as inline style attributes and several of these numbers repeat inside
-    /// them — 12 is the card's inner gap AND its corner, 10 is the rule over the recap AND the gap
-    /// under the whole card. A pattern keyed on the number alone would match a neighbour and be
-    /// perfectly consistent with itself while doing it.
-    /// </remarks>
-    private static readonly (string What, double Value, string Pattern)[] Pairings =
-    [
-        ("the card's padding", 18, @"gap:12px;padding:(?<value>[0-9.]+)px;border-radius:12px"),
-        ("the card's inner gap", 12, @"flex-direction:column;gap:(?<value>[0-9.]+)px;padding:18px"),
-        ("the gap under the card", 10, @"flex-direction:column;gap:(?<value>[0-9.]+)px;position:sticky"),
-        ("the lesson's size", 15, @"font-size:(?<value>[0-9.]+)px;font-weight:600;text-wrap:pretty"">\{\{ crs\.threadLesson"),
-        ("the lesson's weight", 600, @"font-size:15px;font-weight:(?<value>[0-9]+);text-wrap:pretty"">\{\{ crs\.threadLesson"),
-        ("the minute's size", 12.5, @"font-size:(?<value>[0-9.]+)px;color:var\(--text2,\#5B6675\);margin-top:3px"),
-        ("the gap between lesson and minute", 3, @"color:var\(--text2,\#5B6675\);margin-top:(?<value>[0-9.]+)px"">\{\{ crs\.threadMinute"),
-        ("the recap's gap", 6, @"flex-direction:column;gap:(?<value>[0-9.]+)px;border-top:1px solid var\(--hair"),
-        ("the rule over the recap", 10, @"border-top:1px solid var\(--hair,rgba\(15,23,42,\.09\)\);padding-top:(?<value>[0-9.]+)px"),
-        ("a recap line's size", 12.5, @"align-items:baseline;font-size:(?<value>[0-9.]+)px;color:var\(--text2"),
-    ];
-
-    /// <summary>The numbers this card's classes draw are the ones the design writes.</summary>
-    /// <remarks>
-    /// Without this half the classes below are a second set of hand-copied numbers, and a pairing
-    /// that drifts from the design certifies itself.
-    /// </remarks>
-    [Fact]
-    public void The_numbers_this_card_draws_are_the_ones_the_design_writes()
-    {
-        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-
-        foreach (var (what, value, pattern) in Pairings)
-        {
-            var match = Regex.Match(design, pattern, RegexOptions.None, TimeSpan.FromSeconds(5));
-
-            Assert.True(match.Success, $"the design no longer draws {what}, so this card is paired with nothing.");
-            Assert.Equal(
-                value,
-                double.Parse(match.Groups["value"].Value, CultureInfo.InvariantCulture));
-        }
-    }
 
     /// <summary>
     /// The card the view builds draws those numbers, measured on the controls rather than read off

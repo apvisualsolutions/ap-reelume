@@ -33,7 +33,7 @@ public sealed record EditableMetadata(
 {
     /// <summary>
     /// The file name of the cover somebody picked from their own disk, kept apart from the provider's
-    /// <see cref="PosterPath"/> (ADR-0009, LIB-021). <see cref="MetadataMergePolicy"/> never assigns
+    /// <see cref="PosterPath"/>. <see cref="MetadataMergePolicy"/> never assigns
     /// it, and that is the whole fix: until 2026-09-18 both lived in <see cref="PosterPath"/>, so
     /// choosing a cover overwrote the provider's and restoring the provider's fields overwrote the
     /// choice and orphaned its file.
@@ -43,7 +43,7 @@ public sealed record EditableMetadata(
     /// <summary>
     /// The order of origins this one title overrides the general setting with, as
     /// <see cref="CoverOrderPolicy.Format"/> writes it, or <see langword="null"/> to follow the
-    /// general one (ADR-0009 decision 4, LIB-021).
+    /// general one.
     /// </summary>
     /// <remarks>
     /// It holds the whole order and not just the origin that wins, so that somebody moving the

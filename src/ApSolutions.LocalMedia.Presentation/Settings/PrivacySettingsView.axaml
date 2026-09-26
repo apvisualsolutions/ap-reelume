@@ -20,8 +20,9 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
   <StackPanel x:Name="PrivacySurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
     <!--
-      UX-010: inside the group and in its heading row. It may only ever take a consent away, which
-      is why it is not accented and why it sits beside the title rather than under the two switches.
+      The reset sits inside the group and in its heading row. It may only ever take a consent away,
+      which is why it is not accented and why it sits beside the title rather than under the two
+      switches.
     -->
     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
       <TextBlock
@@ -76,9 +77,9 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     </Border>
 
     <!--
-    LIB-016. The switch only exists where a connection is possible at all: with no consented
-    connection the automatic refresh has nothing it could do, and offering it would be offering
-    something that cannot happen.
+    The automatic metadata refresh. The switch only exists where a connection is possible at all: with
+    no consented connection the automatic refresh has nothing it could do, and offering it would be
+    offering something that cannot happen.
 
     The sentence under the name is the one this page already wrote, moved from beneath the checkbox
     into the card's own left column - which is where the prototype puts a setting's description, and

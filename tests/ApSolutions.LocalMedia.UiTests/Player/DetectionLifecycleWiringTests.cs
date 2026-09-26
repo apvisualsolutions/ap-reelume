@@ -9,7 +9,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// <summary>
 /// Background detection is a guest in somebody's session: it has to stop when asked. The deep audit
 /// found it uncancellable — the use case accepts a token nobody passed — and immortal, surviving the
-/// window it was scheduled from because nothing on the exit path told it to stop (BUG-004).
+/// window it was scheduled from because nothing on the exit path told it to stop.
 /// </summary>
 public sealed class DetectionLifecycleWiringTests
 {

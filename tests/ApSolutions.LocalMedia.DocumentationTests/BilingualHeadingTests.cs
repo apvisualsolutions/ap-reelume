@@ -15,50 +15,31 @@ namespace ApSolutions.LocalMedia.DocumentationTests;
 /// does catch the failure that actually happens — a section added to one language and forgotten in
 /// the other, which turns a bilingual promise into a Spanish promise with an English summary.
 /// </remarks>
-public sealed class BilingualHeadingTests
+public sealed partial class BilingualHeadingTests
 {
+    /// <summary>
+    /// Fewer published Spanish documents than this and the accent sweep is reading an empty or
+    /// truncated tree. Eight are published today.
+    /// </summary>
+    internal const int SpanishDocumentFloor = 6;
+
     private static readonly Regex Heading =
         new(@"(?m)^(?<level>#{1,6})\s+\S", RegexOptions.Compiled, TimeSpan.FromSeconds(2));
 
     /// <summary>The documents the release promises to publish in both languages.</summary>
-    public static TheoryData<string> PublicDocuments() =>
+    private static readonly string[] PublicStems =
     [
         "README",
-        "docs/roadmap/README",
         "docs/user-guide/README",
         "docs/troubleshooting/README",
-        "docs/development/README",
         "docs/privacy/PRIVACY",
-        "docs/release/RELEASING",
         "docs/release/SMARTSCREEN",
         "docs/release/THIRD-PARTY-NOTICES",
         "docs/release/licenses/README",
-        "docs/legal/LEGAL",
         "docs/CHANGELOG",
     ];
 
-    /// <summary>
-    /// The design documents, which are not published with a release and are bilingual all the same.
-    /// </summary>
-    /// <remarks>
-    /// They are the reference a contributor reads before touching a view, and a reference that says more
-    /// in one language than in the other is a reference that decides which language gets the rule.
-    /// </remarks>
-    public static TheoryData<string> DesignDocuments() =>
-    [
-        "docs/design/SURFACES",
-        "docs/design/ELEMENTS",
-    ];
-
-    [Theory]
-    [MemberData(nameof(DesignDocuments))]
-    public void The_design_document_exists_in_both_languages(string stem) =>
-        The_document_exists_in_both_languages(stem);
-
-    [Theory]
-    [MemberData(nameof(DesignDocuments))]
-    public void The_design_documents_two_languages_carry_the_same_structure(string stem) =>
-        The_two_languages_carry_the_same_structure(stem);
+    public static TheoryData<string> PublicDocuments() => [.. PublicStems];
 
     [Theory]
     [MemberData(nameof(PublicDocuments))]
@@ -83,37 +64,23 @@ public sealed class BilingualHeadingTests
     }
 
     /// <summary>
-    /// Every evidence document carries both languages inside one file, so the two halves are edited
-    /// together instead of drifting into two documents.
+    /// Every published document the release promises in both languages is on the list above, so a
+    /// new pair cannot ship without its structure being compared.
     /// </summary>
-    /// <remarks>
-    /// The repository has two conventions and both are accepted, because both keep the languages in
-    /// one file: the earlier reports pair the languages inside each heading with a slash, and from
-    /// T39B onwards the Spanish text is one section and its translation another. What is rejected is
-    /// a report written in one language, which is the failure this exists to catch.
-    /// </remarks>
     [Fact]
-    public void Every_mvp_evidence_document_carries_both_languages_in_one_file()
+    public void Every_published_pair_is_on_the_list()
     {
-        var evidenceRoot = RepositoryLayout.PathFromRoot("docs/evidence/mvp");
-        var offenders = new List<string>();
-
-        foreach (var file in Directory.EnumerateFiles(evidenceRoot, "T*.md"))
-        {
-            var text = File.ReadAllText(file);
-            var sectioned = text.Contains("\n## Español", StringComparison.Ordinal)
-                && text.IndexOf("\n## English", StringComparison.Ordinal)
-                    > text.IndexOf("\n## Español", StringComparison.Ordinal);
-            var pairedHeadings = HeadingLines(text).Count(line => line.Contains(" / ", StringComparison.Ordinal));
-            if (!sectioned && pairedHeadings < 2)
-            {
-                offenders.Add(Path.GetFileName(file));
-            }
-        }
+        var listed = PublicStems.ToHashSet(StringComparer.Ordinal);
+        var unlisted = PublishedFiles.All
+            .Where(path => path.EndsWith(".es.md", StringComparison.OrdinalIgnoreCase))
+            .Select(path => Path.GetRelativePath(RepositoryLayout.Root, path).Replace('\\', '/')[..^6])
+            .Where(stem => !listed.Contains(stem))
+            .Order(StringComparer.Ordinal)
+            .ToArray();
 
         Assert.True(
-            offenders.Count == 0,
-            $"These evidence documents are not bilingual: {string.Join(", ", offenders)}.");
+            unlisted.Length == 0,
+            $"These published documents are bilingual and their structure is compared by nobody: {string.Join(", ", unlisted)}.");
     }
 
     /// <summary>
@@ -123,22 +90,42 @@ public sealed class BilingualHeadingTests
     [Fact]
     public void The_spanish_documents_keep_their_accents()
     {
-        var flattened = new List<string>();
-        foreach (var file in Directory.EnumerateFiles(
-            RepositoryLayout.PathFromRoot("docs"), "*.es.md", SearchOption.AllDirectories))
-        {
-            var text = File.ReadAllText(file);
-            if (!text.Any(character => "áéíóúñÁÉÍÓÚÑ¿¡".Contains(character, StringComparison.Ordinal)))
-            {
-                flattened.Add(Path.GetRelativePath(RepositoryLayout.Root, file));
-            }
-        }
+        var spanish = PublishedFiles.All
+            .Where(path => path.EndsWith(".es.md", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
 
-        Assert.True(flattened.Count == 0, $"Spanish documents with no diacritics at all: {string.Join(", ", flattened)}.");
+        Assert.True(
+            spanish.Length >= SpanishDocumentFloor,
+            $"only {spanish.Length} published Spanish documents were read, so the sweep is not reading the repository.");
+        Assert.Empty(Flattened(spanish));
     }
 
-    private static IEnumerable<string> HeadingLines(string text) =>
-        text.Split('\n').Where(line => line.StartsWith('#'));
+    /// <summary>The accent sweep, against a document written without a single diacritic.</summary>
+    [Fact]
+    public void A_spanish_document_without_diacritics_is_reported()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "accents-" + Guid.NewGuid().ToString("n")[..12]);
+        Directory.CreateDirectory(root);
+        try
+        {
+            var kept = Path.Combine(root, "KEPT.es.md");
+            var flattened = Path.Combine(root, "FLAT.es.md");
+            File.WriteAllText(kept, "# Guía\n\nLa aplicación reproduce vídeos.\n");
+            File.WriteAllText(flattened, "# Guia\n\nLa aplicacion reproduce videos.\n");
+
+            Assert.Equal([flattened], Flattened([kept, flattened]));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    private static string[] Flattened(IEnumerable<string> files) =>
+    [
+        .. files.Where(file => !File.ReadAllText(file)
+            .Any(character => "áéíóúñÁÉÍÓÚÑ¿¡".Contains(character, StringComparison.Ordinal))),
+    ];
 
     private static string[] HeadingShape(string path) =>
         File.Exists(path)

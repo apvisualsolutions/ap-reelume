@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 AP Solutions
 SPDX-License-Identifier: LicenseRef-APSolutions
 -->
 <!--
-  The language, in a destination of its own since 2026-09-13 (UX-010). It lived as the twelfth
+  The language, in a destination of its own. It lived as the twelfth
   row-card of Appearance, and moving it is not tidying: it is one choice that governs every screen,
   and a «Restaurar valores por defecto» for it beside Appearance's own would have put two controls
   answering to one name on a single screen — which the walk refuses to resolve, and rightly, because
@@ -21,7 +21,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     x:DataType="settings:AppearanceSettingsViewModel">
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel x:Name="LanguageSettingsSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
-      <!-- UX-010: inside the group and in its heading row, never under the controls. -->
+      <!-- The reset sits inside the group and in its heading row, never under the controls. -->
       <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
         <TextBlock
             FontSize="{DynamicResource FontSizeSubtitle}"

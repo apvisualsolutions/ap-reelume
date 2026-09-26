@@ -32,8 +32,8 @@ public static partial class CompositionRoot
     /// anything doubtful waits for a person instead of being guessed at.
     /// </summary>
     /// <remarks>
-    /// ARQ-006 step 2. Without a provider the review inbox has nothing to review, which is exactly
-    /// the gap ADR-0003 found.
+    /// Without a provider the review inbox has nothing to review, which is exactly the gap that
+    /// once left it empty.
     /// </remarks>
     private static IServiceCollection AddIdentification(this IServiceCollection services) =>
         services
@@ -47,12 +47,12 @@ public static partial class CompositionRoot
                 provider.GetRequiredService<TmdbOptions>(),
                 provider.GetRequiredService<TmdbRateLimiter>(),
                 TimeProvider.System))
-            // ArtworkCache came back into the container on 2026-08-28, and ART-A01 (2026-08-09) is
-            // what it reverses: it left because nothing fetched art and no surface showed it, and
+            // ArtworkCache came back into the container on 2026-08-28, reversing its removal on
+            // 2026-08-09: it left because nothing fetched art and no surface showed it, and
             // wiring the whole chain was out of proportion for an MVP whose remote identification
             // ships disabled. Both halves are here now — ApplyIdentification fetches at the one
             // moment somebody has consented to talk to the provider, and the film card draws what is
-            // on the disk without ever opening a connection. The gap the plan documented is closed.
+            // on the disk without ever opening a connection. That gap is closed.
             .AddSingleton<IArtworkStore>(provider => new ArtworkCache(
                 provider.GetRequiredService<IAppDataPaths>().DataRoot,
                 CreateArtworkClient()))
@@ -94,13 +94,12 @@ public static partial class CompositionRoot
     /// The three surfaces a title card leads to: correcting its metadata, renaming the files behind
     /// it, and deciding which copy of a duplicate is the one that plays.
     /// </summary>
-    /// <remarks>ARQ-006 step 2.</remarks>
     private static IServiceCollection AddCatalogEditing(this IServiceCollection services) =>
         services
             .AddSingleton<ICatalogMetadataRepository, CatalogMetadataRepository>()
             .AddSingleton<MetadataMergePolicy>()
 
-            // The trailer this application does not play (LIB-015). The provider's trailer is a
+            // The trailer this application does not play. The provider's trailer is a
             // YouTube key, and the browser is the use YouTube's terms allow — so what is registered
             // is something that hands an address to the shell, not something that connects. The
             // declared network purposes are unchanged for that exact reason.
@@ -124,7 +123,7 @@ public static partial class CompositionRoot
                 CurrentMetadataLanguage(),
                 TimeProvider.System))
 
-            // LIB-016. Off by default, and off means the repository is not even read. The pass runs
+            // Off by default, and off means the repository is not even read. The pass runs
             // once per launch, after the window is painted, and yields to a scan or to playback.
             .AddSingleton<IAutoRefreshSettings, StoredAutoRefreshSettings>()
             .AddTransient(provider => new RefreshStaleMetadata(
@@ -137,7 +136,7 @@ public static partial class CompositionRoot
             .AddTransient<SetPersonalCover>()
             .AddTransient<ResolveTitlePoster>()
 
-            // LIB-021. A frame of its own video for every title with no other cover. The grabber
+            // A frame of its own video for every title with no other cover. The grabber
             // opens files on the one native instance the player uses, and the pass is registered
             // once because it is what refuses a second pass while the first runs.
             .AddSingleton<ITitleFrameSources, TitleFrameSourceRepository>()
@@ -145,7 +144,7 @@ public static partial class CompositionRoot
                 new LibVlcVideoFrameGrabber(provider.GetRequiredService<LibVlcFactory>()))
             .AddSingleton<CaptureTitleFrames>()
             .AddSingleton<TitleFramePass>()
-            // LIB-018. The picker is handed the two things it cannot reach for itself: the system's
+            // The picker is handed the two things it cannot reach for itself: the system's
             // own file dialog, which belongs to the host, and the use case that copies the chosen
             // file in. Built with neither — which is what every test that only displays a picker
             // does — its button refuses to be pressed rather than accepting a press and doing

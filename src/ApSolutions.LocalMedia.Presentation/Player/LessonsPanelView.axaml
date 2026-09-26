@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 AP Solutions
 SPDX-License-Identifier: LicenseRef-APSolutions
 -->
 <!--
-The player's «Lecciones» panel (CRS-004): the whole course in the column's fixed 320 px, with the
+The player's «Lecciones» panel: the whole course in the column's fixed 320 px, with the
 lesson being played marked and every other one a press away.
 
 The prototype draws three things per row and no more — a state glyph, the name, and how long it runs

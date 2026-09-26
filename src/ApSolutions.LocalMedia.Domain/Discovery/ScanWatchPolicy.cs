@@ -8,12 +8,12 @@ namespace ApSolutions.LocalMedia.Domain.Discovery;
 /// </summary>
 /// <remarks>
 /// <para>
-/// This exists because of ENG-044. <see cref="ScanPolicy.Continuous"/> was the only thing that
+/// This exists because of a defect. <see cref="ScanPolicy.Continuous"/> was the only thing that
 /// switched the live watcher on, and <b>nothing in the tree ever assigned it</b>: every way of
 /// adding a root produced <c>Startup | Manual</c> or <c>Manual</c>, and no screen offered the
 /// choice. So the whole watching slice — the debounced watcher, its coordinator, its background
 /// host — was built, registered, covered by tests and never reached in the assembled application,
-/// while the scope record called continuous watching verified.
+/// while continuous watching was counted as verified.
 /// </para>
 /// <para>
 /// The fix is not to make <c>Continuous</c> the default behind everyone's back, which would follow
@@ -24,7 +24,7 @@ namespace ApSolutions.LocalMedia.Domain.Discovery;
 /// <para>
 /// <b>And the setting stops at <see cref="ScanPolicy.Startup"/>, which an existing test taught.</b>
 /// <c>WatchCoordinatorTests.A_manual_root_is_not_watched_behind_its_owners_back</c> holds that a
-/// root whose owner chose Manual is not followed, and that is not a formality:
+/// root set to Manual is not followed, and that is not a formality:
 /// <c>DeclareCourseFolder</c> adds a course folder as Manual alone on purpose, because the dialog's
 /// own help promises the rest of the drive is left alone. A setting that reached every local root
 /// would break a promise made in writing. So it reaches the roots that already asked to be kept up
@@ -39,8 +39,8 @@ public static class ScanWatchPolicy
     /// <b>This number lived in two places saying different things.</b> The settings screen offered
     /// thirty minutes and <c>FallbackScanScheduler</c> ran every fifteen, and neither knew about the
     /// other — which nobody could notice, because the screen's value governed nothing at all
-    /// (ENG-010). Fifteen wins: it is the one the code actually ran and the one the archived WP-2
-    /// evidence backs in writing, so there is no behaviour on the other side to preserve. It lives
+    /// Fifteen wins: it is the one the code actually ran and the one the original measurements
+    /// back in writing, so there is no behaviour on the other side to preserve. It lives
     /// here once and both ends point at it rather than copying the digits.
     /// </remarks>
     public static readonly TimeSpan DefaultSweepInterval = TimeSpan.FromMinutes(15);
@@ -68,7 +68,7 @@ public static class ScanWatchPolicy
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This is the other half of ENG-044, and it was still broken after the first half was fixed.
+    /// This is the other half of the same defect, and it was still broken after the first half was fixed.
     /// <c>FallbackScanScheduler</c> kept asking for <see cref="ScanPolicy.Continuous"/> on its own,
     /// which nothing assigns, so <b>no real root ever reached its loop</b> — it emitted the startup
     /// pass and broke out. That silently cost two things: the recovery sweep <see cref="ScanPolicy"/>
@@ -84,8 +84,8 @@ public static class ScanWatchPolicy
     /// asymmetry worth reading twice. The setting says «local roots» and means it: it never spoke
     /// for the drive that gets pulled out or the share across the network, so it cannot switch off
     /// a sweep it never switched on. There the sweep is the only net that exists, because the
-    /// setting never gives either of them a live watcher — which is the half of LIB-003 that reads
-    /// «recovery for USB/NAS».
+    /// setting never gives either of them a live watcher — which is the half of the watching promise
+    /// that reads «recovery for USB/NAS».
     /// </para>
     /// <para>
     /// <b>The mirror case: a local root the setting left alone is not swept either.</b> The screen's

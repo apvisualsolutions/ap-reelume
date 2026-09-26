@@ -42,7 +42,7 @@ public sealed class StartNextEpisodeCountdown
     /// <summary>Where the chosen countdown length is stored between sessions.</summary>
     /// <remarks>
     /// The constants forward to <see cref="ContinuityCountdown"/>, which owns the wait since the
-    /// course chain arrived (CRS-004). They stay declared here because the settings surface, T28's
+    /// course chain arrived. They stay declared here because the settings surface, the countdown's
     /// tests and the shortcut documentation all name them through this type.
     /// </remarks>
     public const string SettingKey = ContinuityCountdown.SettingKey;

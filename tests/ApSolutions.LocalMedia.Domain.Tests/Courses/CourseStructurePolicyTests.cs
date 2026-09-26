@@ -7,10 +7,10 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Courses;
 
 /// <summary>
-/// Which folders are courses, at the depth the root declares (CRS-001, ADR-0006 decision 3).
+/// Which folders are courses, at the depth the root declares.
 /// </summary>
 /// <remarks>
-/// The two shapes exercised here are the two real roots the ADR measured: one is
+/// The two shapes exercised here are the two real roots measured when this was designed: one is
 /// <c>root / category / course / [section] / lesson</c> and the other is
 /// <c>root / course / section / lesson</c>. Any fixed depth would have been right about one and
 /// wrong about the other, which is the whole reason the depth is declared.

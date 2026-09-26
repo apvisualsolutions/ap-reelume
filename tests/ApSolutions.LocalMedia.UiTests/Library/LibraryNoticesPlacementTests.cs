@@ -16,7 +16,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Library;
 
 /// <summary>
-/// The notices strip takes space and pushes the grid down, and never covers it (ADR-0010).
+/// The notices strip takes space and pushes the grid down, and never covers it.
 /// </summary>
 /// <remarks>
 /// Geometry and not structure, for the reason <see cref="Player.LooseFileBannerPlacementTests"/>
@@ -96,7 +96,7 @@ public sealed class LibraryNoticesPlacementTests
     }
 
     /// <summary>
-    /// The scan is drawn two ways, and which one depends on who launched it (ADR-0010, point five).
+    /// The scan is drawn two ways, and which one depends on who launched it.
     /// </summary>
     /// <remarks>
     /// The strip is checked by geometry rather than by the flag it binds to, because the flag is what

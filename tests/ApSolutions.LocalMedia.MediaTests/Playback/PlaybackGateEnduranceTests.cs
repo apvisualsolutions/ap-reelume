@@ -94,7 +94,7 @@ public sealed class PlaybackGateEnduranceTests
             MediaToolchain.RepositoryRoot,
             "artifacts",
             "test-results",
-            "C4",
+            "endurance",
             "endurance-resources.csv");
         Directory.CreateDirectory(Path.GetDirectoryName(report)!);
         await File.WriteAllLinesAsync(report, rows, TestContext.Current.CancellationToken);
@@ -128,8 +128,7 @@ public sealed class PlaybackGateEnduranceTests
         // Handles are measured on the whole process, which also runs the test host and the coverage
         // collector, so this bound catches a gross regression rather than pinning a precise figure.
         // The two handles per cycle measured here belong to the hardware decoder: with software
-        // decoding the same loop gains none, which HandleGrowthTests pins. The C4 evidence records
-        // the attribution.
+        // decoding the same loop gains none, which HandleGrowthTests pins.
         const int cyclesBetweenWindows = 25;
         const int allowedHandlesPerCycle = 8;
         Assert.InRange(

@@ -23,14 +23,14 @@ public sealed class VideoFrameView : Control, IDisposable
         AvaloniaProperty.Register<VideoFrameView, IVideoFrameSource?>(nameof(FrameSource));
 
     /// <summary>
-    /// Whether a picture smaller than the box it is drawn in is enhanced on its way there (PLY-016).
+    /// Whether a picture smaller than the box it is drawn in is enhanced on its way there.
     /// </summary>
     /// <remarks>
-    /// <b>It ships on</b>, which is what the maintainer asked for: the improvement reaches everybody
+    /// <b>It ships on</b>, so the improvement reaches everybody
     /// without anybody finding a switch. Off is not a second code path — it lands on
     /// <see cref="UpscaleLink.CompositionBilinear"/>, which is the drawing this surface did before
-    /// PLY-016 existed, so «off» and «today» are the same pixels rather than two things that have to
-    /// be kept in step.
+    /// the enhancement existed, so «off» and «today» are the same pixels rather than two things that
+    /// have to be kept in step.
     /// </remarks>
     public static readonly StyledProperty<bool> IsUpscaleEnabledProperty =
         AvaloniaProperty.Register<VideoFrameView, bool>(nameof(IsUpscaleEnabled), defaultValue: true);
@@ -59,7 +59,7 @@ public sealed class VideoFrameView : Control, IDisposable
     /// releases it instead, and what is at stake is a few hundred bytes once per film.
     /// </para>
     /// <para>
-    /// <b>That «once» went unguarded until ENG-017, and the mutation check said so on 2026-09-13.</b>
+    /// <b>That «once» used to go unguarded, and a mutation showed it.</b>
     /// Deleting <c>_effectAsked</c> compiles the shader on every frame — about 173,000 of them in a
     /// two-hour film — and no test noticed, because nothing outside this class could count
     /// compilations. What it needed was a seam and not a louder comment, so
@@ -83,7 +83,7 @@ public sealed class VideoFrameView : Control, IDisposable
 
     /// <summary>
     /// Where the compiled shader comes from. A surface built without one asks
-    /// <see cref="UpscaleShaderSource"/>, which is what the application does (ENG-017).
+    /// <see cref="UpscaleShaderSource"/>, which is what the application does.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -93,7 +93,7 @@ public sealed class VideoFrameView : Control, IDisposable
     /// reach through this surface before.
     /// </para>
     /// <para>
-    /// The first is how many times the shader is compiled, which is what ENG-017 was opened for. The
+    /// The first is how many times the shader is compiled, which is what the seam was added for. The
     /// second is what this surface draws when the shader does <b>not</b> compile: that arm belongs to
     /// a driver rejecting the SkSL, so on a machine where it compiles there is no way to enter it.
     /// It is the same argument, one storey up, that <see cref="UpscaleShaderSource.TryCompile"/>
@@ -162,7 +162,8 @@ public sealed class VideoFrameView : Control, IDisposable
     }
 
     /// <summary>
-    /// Which link of PLY-016's chain draws this frame. Held under <c>_sync</c> by its only caller.
+    /// Which link of the enhancement chain draws this frame. Held under <c>_sync</c> by its only
+    /// caller.
     /// </summary>
     /// <remarks>
     /// <para>

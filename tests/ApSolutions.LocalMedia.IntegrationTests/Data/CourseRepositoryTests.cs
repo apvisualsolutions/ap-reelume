@@ -11,7 +11,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Data;
 
 /// <summary>
-/// Courses and lessons against the real store (CRS-001, CRS-005, migration 0022).
+/// Courses and lessons against the real store (migration 0022).
 /// </summary>
 [Trait("Category", "Integration")]
 public sealed class CourseRepositoryTests
@@ -178,8 +178,8 @@ public sealed class CourseRepositoryTests
     }
 
     /// <summary>
-    /// One nullable column carries both of ADR-0006's answers: a root holds courses exactly when it
-    /// has a depth, and undeclaring is setting it back to nothing.
+    /// One nullable column carries both answers the course design needs: a root holds courses exactly
+    /// when it has a depth, and undeclaring is setting it back to nothing.
     /// </summary>
     [Fact]
     public async Task A_root_declares_its_course_depth_and_can_take_it_back()
@@ -276,7 +276,7 @@ public sealed class CourseRepositoryTests
         LastOpenedAtUtc: null);
 
     /// <summary>
-    /// The lesson a file backs (CRS-004), which is how a playing session learns it is a lesson at
+    /// The lesson a file backs, which is how a playing session learns it is a lesson at
     /// all — and the query <c>ix_lessons_media_file</c> had been waiting for since migration 0022.
     /// </summary>
     [Fact]

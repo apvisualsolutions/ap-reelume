@@ -15,7 +15,7 @@ namespace ApSolutions.LocalMedia.DocumentationTests;
 /// the runner and left them green in CI, which is the worst way for a gate to be wrong. Everything
 /// git ignores starts with a dot at the top level, so that is the line.
 /// <para>
-/// This lived on the project's own copy of <c>RepositoryLayout</c> until ARQ-012 left one anchor for
+/// This lived on the project's own copy of <c>RepositoryLayout</c> until there was one anchor for
 /// every test project. Finding the root is shared; deciding which projects count is this suite's.
 /// </para>
 /// </remarks>

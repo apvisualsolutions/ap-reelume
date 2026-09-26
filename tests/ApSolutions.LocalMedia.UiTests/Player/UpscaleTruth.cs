@@ -8,7 +8,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// every harness that ranks an enlargement so that they all rank against the same picture.
 /// </summary>
 /// <remarks>
-/// It lived inside <see cref="VideoUpscaleFidelityTests"/> until `ENG-022` needed a second harness
+/// It lived inside <see cref="VideoUpscaleFidelityTests"/> until the edge-directed candidate needed a second harness
 /// to measure candidates the player does not draw. A copy would have let the two drift apart, and
 /// then the second harness's control — that it reproduces the first one's figures — would compare
 /// two different pictures and mean nothing.

@@ -15,7 +15,7 @@ using ApSolutions.LocalMedia.Presentation.Movie;
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
 /// <summary>
-/// One lesson in the player's side column (CRS-004): a glyph, a name, and how long it runs.
+/// One lesson in the player's side column: a glyph, a name, and how long it runs.
 /// </summary>
 /// <remarks>
 /// Deliberately not <c>LessonRowViewModel</c>, which is the card's row. That one carries a mark
@@ -133,7 +133,7 @@ public sealed class LessonsPanelModuleViewModel
 }
 
 /// <summary>
-/// The player's «Lecciones» panel (CRS-004): the whole course beside the picture, with the lesson
+/// The player's «Lecciones» panel: the whole course beside the picture, with the lesson
 /// being played marked and every other one a press away.
 /// </summary>
 /// <remarks>

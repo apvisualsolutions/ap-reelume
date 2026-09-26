@@ -3,7 +3,7 @@
 
 <#
 .SYNOPSIS
-    TST-001: the automated coverage gate. Every source file that is new against the base ref
+    The automated coverage gate. Every source file that is new against the base ref
     must arrive with at least the minimum line and branch coverage in this run's reports.
 
 .DESCRIPTION
@@ -64,7 +64,7 @@ try {
             Where-Object { $_ -like '*.cs' })
     if ($LASTEXITCODE -ne 0) { Write-Error 'git diff failed.'; exit 1 }
 
-    # A new path is not the same thing as new code. Splitting a large file into partials (ARQ-006)
+    # A new path is not the same thing as new code. Splitting a large file into partials
     # creates paths whose every line already shipped, and holding moved code to a coverage bar it
     # never had to meet would price refactoring out of the repository — the gate would be pushing
     # against the tidying it exists to make safe.
@@ -186,7 +186,7 @@ try {
     <#
         What the gate above cannot see. Newness is decided against the base ref, so a file that
         shipped long ago and gets worse is watched by nobody — and that is measured, not feared:
-        ARQ-004 thinned PlayerVersionsViewModel, took its covered lines with it, and dropped it from
+        a refactoring thinned PlayerVersionsViewModel, took its covered lines with it, and dropped it from
         60.61/27.27 to 45.45/14.29 without a single gate saying a word.
 
         Each entry carries the floor its code meets today, so the list works like the orphan list in
@@ -201,7 +201,7 @@ try {
         that was on the list and degrades still fails, which is what the rule was for.
     #>
     $watched = @(
-        # TST-001 named all three on 2026-08-09 and all three are paid: two on 2026-08-10 and this
+        # The gate named all three on 2026-08-09 and all three are paid: two on 2026-08-10 and this
         # one, the last, with unit tests aimed at its decisions rather than at the scans that
         # already walked its happy path. The list stays whatever the numbers say — a file that
         # reaches the bar is watched at the bar, not dropped.
@@ -371,19 +371,19 @@ try {
         is why -WriteDebt is run by the workflow on every build, pass or fail — moving a floor is
         then copying a measurement rather than guessing at one.
     #>
-    # 189 desde el 2026-09-01, y es la primera vez que sube. La excepcion la autoriza esta misma
-    # puerta por escrito —«add it with the reason and raise the ratchet in the same change»— y la
-    # razon es estructural, no deuda: LessonsPanelView.axaml mide 100/50 porque esa es la UNICA rama
-    # que el compilador de Avalonia genera para un .axaml, en la linea del elemento raiz, y todas las
-    # vistas del arbol miden exactamente eso. Una vista nueva sube este numero en uno; cualquier otra
-    # cosa que lo suba hay que discutirla.
+    # Una vista nueva sube este numero en uno, y es la unica excepcion que esta puerta autoriza por
+    # escrito —«add it with the reason and raise the ratchet in the same change»—. La razon es
+    # estructural, no deuda: un .axaml mide 100/50 porque esa es la UNICA rama que el compilador de
+    # Avalonia genera para el, en la linea del elemento raiz, y todas las vistas del arbol miden
+    # exactamente eso. Cualquier otra cosa que lo suba hay que discutirla.
     #
-    # Los otros cuatro archivos que CRS-004 trajo a la lista salieron de ella mejorando, que es el
-    # unico camino que admite: las ramas que les faltaban se nombraron con el JSON de coverlet y se
-    # cubrieron con pruebas antes de escribir el archivo.
+    # Los demas archivos salen de la lista mejorando, que es el unico camino que admite: las ramas que
+    # les faltan se nombran con el JSON de coverlet —linea y offset— y se cubren con pruebas antes de
+    # escribir el archivo.
     #
-    # 189 desde el 2026-09-02, y esta vez BAJA: WindowsAudioEndpointConfigurator.cs entro en la lista
-    # a 23/20 —hardware ausente— y salio de ella a 100/100 el mismo dia, sin tocar esta puerta.
+    # Un archivo que depende de hardware tambien puede salir: WindowsAudioEndpointConfigurator.cs
+    # entro en la lista a 23/20 —hardware ausente— y salio de ella a 100/100 el mismo dia, sin tocar
+    # esta puerta.
     #
     # Lo que lo movio no fue un suelo sino un seam. La clase era COM de arriba abajo, asi que la
     # aritmetica que decide cuantos canales salen por los altavoces solo podia ejecutarse en una
@@ -432,31 +432,31 @@ try {
     # las tres guardas del clic en una tarjeta, que ninguna prueba ni ninguna persona podía tomar.
     #
     # 185 también el 2026-09-11, y por la segunda vía de subir, la que se olvida: pruebas nuevas que
-    # recorren un archivo de paso. Las del auditor de puertas pulsaron las tres disposiciones de audio
+    # recorren un archivo de paso. Unas pruebas nuevas pulsaron las tres disposiciones de audio
     # y AudioOutputViewModel.cs pasó de 99/88 a 100/91 en CI, que la previsualización local no vio
     # porque esta máquina tiene salidas de audio de verdad y el runner no. En vez de copiar el suelo
     # nuevo se cubrieron las cinco ramas que faltaban, cada una con sus dos mitades en la misma prueba.
     #
-    # 186 el 2026-09-18, por mejora: UpdateMetadata.cs llega a 100/100 y sale. LIB-021 le añadió un
-    # campo y la previsualización lo leyó subiendo de 81/88 a 82/90; en vez de copiar ese suelo se
+    # 186 el 2026-09-18, por mejora: UpdateMetadata.cs llega a 100/100 y sale. El orden de las
+    # portadas le añadió un campo y la previsualización lo leyó subiendo de 81/88 a 82/90; en vez de copiar ese suelo se
     # cubrió lo que faltaba. Eran la primera edición de un título sin fila, que esta suite nunca
     # tomaba, y la rama del título ausente, que el JSON de coverlet nombró por su offset: todas las
     # pruebas pasaban un título.
     #
     # 185 el 2026-09-19, por mejora: CatalogItemViewModel.cs llega a 100/100 y sale. La tarjeta ganó
-    # un aviso de cambio de portada (LIB-021) y la previsualización la leyó subiendo de 100/90 a
+    # un aviso de cambio de portada y la previsualización la leyó subiendo de 100/90 a
     # 100/91; las tres ramas que faltaban eran una copia privada de la lectura de textos traducidos,
     # y se sustituyó por PresentationText.Resource, que ya cubre el caso sin aplicación. El evento
     # nace con un suscriptor vacío, así que avisar no añade una rama que ninguna prueba tome.
     # 186 el 2026-09-20, por una vista nueva: CoverOrderSettingsView.axaml mide 100/50 como las otras
     # sesenta y cinco, porque esa mitad es la única rama que el compilador de Avalonia genera para un
     # .axaml, en la línea del elemento raíz. Eso no es deuda, y es la única razón por la que este
-    # número sube (LIB-021, el ajuste del orden de portadas). Su ViewModel NO entró en la lista: el
+    # número sube (el ajuste del orden de portadas). Su ViewModel NO entró en la lista: el
     # run lo midió por encima del listón y lo que faltaba se cubrió con pruebas, que es la otra
     # mitad de la regla — un archivo nuevo sólo entra cuando no puede mejorar.
     #
     # 185 el 2026-09-20, por mejora: FallbackScanScheduler.cs llega a 100/100 y sale de la lista.
-    # ENG-044 le quitó las dos ramas que lo sostenían por debajo del listón — un guard contra un
+    # Se le quitaron las dos ramas que lo sostenían por debajo del listón — un guard contra un
     # intervalo no positivo y un `_recoveryInterval is not { }` — al dejar de recibir una constante
     # y pasar a leer IScanWatchSettings, cuyo contrato promete un valor ya dentro de rango, recortado
     # en el almacén. Lo que queda es la bandera de Startup, la decisión de ScanWatchPolicy y el
@@ -465,8 +465,8 @@ try {
     # el artefacto del run 35510164184: el artefacto CONFIRMA, no descubre, que es para lo que existe
     # esa previsualización.
     #
-    # 184 el 2026-09-25, por mejora: ShellView.axaml.cs llega a 100/97 y sale de la lista. ENG-018 le
-    # dio el puntero y la puerta lo leyó mejorando (76 → 80) sin llegar al listón; en vez de copiar un
+    # 184 el 2026-09-25, por mejora: ShellView.axaml.cs llega a 100/97 y sale de la lista. Ocultar el
+    # puntero le añadió código y la puerta lo leyó mejorando (76 → 80) sin llegar al listón; en vez de copiar un
     # suelo de un run que aún no existía, se quitaron las guardas que nada podía tomar — dos
     # comprobaciones de nulo en un manejador que sólo se engancha a un modelo que existe, dos
     # FindControl sobre controles del propio marcado y una pregunta al coordinador cuya respuesta el

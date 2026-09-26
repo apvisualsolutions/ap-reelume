@@ -29,7 +29,7 @@ public sealed class DebouncedFileWatcher : IRootWatcher
     /// The smallest buffer the platform honours; anything under it is silently raised to this.
     /// Only a test asks for it, and it asks so that the overflow it exists to prove is certain
     /// rather than likely: at the product's ceiling a storm overflows on some runs and not on
-    /// others, so the handler BUG-012 added ran or did not run with nothing saying which, and this
+    /// others, so the overflow handler ran or did not run with nothing saying which, and this
     /// file's coverage swung by four lines between two runs of the same binary.
     /// </summary>
     public const int MinimumInternalBufferBytes = 4 * 1024;

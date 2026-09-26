@@ -11,7 +11,7 @@
     -->
     <PlatformTarget Condition="'$(RuntimeIdentifier)' == ''">x64</PlatformTarget>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <!-- WIN-002: long paths and per-monitor DPI are declared, not inherited. -->
+    <!-- Long paths and per-monitor DPI are declared, not inherited. -->
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>

@@ -328,7 +328,7 @@ public sealed class PrivacyConsentTests
     }
 
     /// <summary>
-    /// LIB-016. The automatic refresh is subordinate to the consented connection: with no token in
+    /// The automatic refresh is subordinate to the consented connection: with no token in
     /// place the provider can only serve what it already cached, so a switch would offer something
     /// that cannot happen. It is not disabled — it is not there.
     /// </summary>
@@ -365,7 +365,7 @@ public sealed class PrivacyConsentTests
     }
 
     /// <summary>
-    /// UX-010, measured on what was saved. This group is two consents, so the factory value is the
+    /// Restoring the defaults, measured on what was saved. This group is two consents, so the factory value is the
     /// state of a machine nobody has asked anything: both off.
     /// </summary>
     [Fact]

@@ -13,10 +13,10 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Application.Tests.Metadata;
 
 /// <summary>
-/// The background pass that takes a frame for every title with no other cover (LIB-021, ADR-0009).
+/// The background pass that takes a frame for every title with no other cover.
 /// </summary>
 /// <remarks>
-/// It opens videos on its own, which is the widening of LibVLC's use the ADR accepted with its limit:
+/// It opens videos on its own, which is a widening of LibVLC's use accepted only with its limit:
 /// only files already in the library, once per title, and the result kept. These tests hold each half
 /// of that limit, and the pass's manners: it yields to somebody watching or to a scan, and it tells the
 /// grid in batches rather than per frame or only at the end.
@@ -111,8 +111,8 @@ public sealed class CaptureTitleFramesTests : IDisposable
 
     /// <summary>
     /// Busy before the first title decodes nothing at all. The theory above only turns busy after a
-    /// capture, so it could not tell «checked before every title» from «checked after»; a mutation audit
-    /// measured that on 2026-09-18 with the check moved behind the first title, and it stayed green.
+    /// capture, so it could not tell «checked before every title» from «checked after»: with the
+    /// check mutated to run behind the first title, it stayed green.
     /// </summary>
     [Theory]
     [InlineData(true, false)]

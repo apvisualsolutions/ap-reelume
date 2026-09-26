@@ -1,41 +1,51 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
+using System.Diagnostics;
 using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
 namespace ApSolutions.LocalMedia.IntegrationTests.Privacy;
 
 /// <summary>
-/// This repository is going to be public, and publishing is not reversible.
+/// This repository is public, and publishing is not reversible.
 /// </summary>
 /// <remarks>
-/// Until now the check for personal data was a command somebody had to remember to run. It found
-/// things, and it also missed things: a redaction pass replaced one show's title in its Spanish form
-/// and left the English one, because the pattern being grepped for was written in Spanish. A check
-/// that depends on memory finds what the person was already thinking about.
+/// A check for personal data that somebody has to remember to run finds what that person was already
+/// thinking about. One such pass replaced a show's title in its Spanish form and left the English one,
+/// because the pattern being searched for was written in Spanish.
 /// <para>
 /// Nothing personal is written down here. Every pattern is derived from the machine the suite runs
 /// on — the account name, the computer name, the profile path, and the names of the folders sitting
 /// beside the repository that git has been told to ignore. Those ignored folders are the personal
-/// library: if one of their names turns up in a versioned file, something leaked out of them.
+/// library: if one of their names turns up in a published file, something leaked out of them.
+/// </para>
+/// <para>
+/// <b>What is read is what git publishes, not what the disk holds.</b> A working copy also holds
+/// build output, the library itself and whatever a machine keeps out with its own exclude rules;
+/// none of that reaches a clone, and a sweep of the disk would report it or, worse, would be the
+/// only thing looking at a file while the file that actually ships goes unread.
 /// </para>
 /// <para>
 /// What this cannot do is recognise a translation. A show named in one language in a folder and in
-/// another inside a fixture is invisible to it, which is exactly how the last one survived. That
-/// part is still a person's judgement, and saying so is better than implying the check is total.
+/// another inside a fixture is invisible to it. That part is still a person's judgement, and saying
+/// so is better than implying the check is total.
 /// </para>
 /// </remarks>
 [Trait("Category", "Integration")]
-public sealed class RepositoryPrivacyTests
+public sealed partial class RepositoryPrivacyTests
 {
-    /// <summary>Where versioned text lives. Build output and the library itself are not in it.</summary>
-    // "design" joined on 2026-08-17 with the interface redesign handoff. A directory that appears at
-    // the root and is not on this list is read as one of the maintainer's own folders, so the check
-    // reported every versioned file that says "design" — which is the check working: an unknown
-    // directory beside the repository is exactly what it exists to notice. Adding a versioned one
-    // here is the statement that it belongs to the repository.
-    private static readonly string[] VersionedDirectories =
+    /// <summary>
+    /// The folders of the working copy that belong to the repository, published or not. Any other
+    /// folder at the root is read as somebody's own media.
+    /// </summary>
+    /// <remarks>
+    /// A folder that belongs to the working copy and is missing here is read as a library folder, and
+    /// then every published file that happens to contain its name is reported — which is the check
+    /// working: an unknown directory beside the repository is exactly what it exists to notice.
+    /// Adding one here is the statement that it belongs to the repository.
+    /// </remarks>
+    private static readonly string[] OwnDirectories =
         ["src", "tests", "docs", "eng", ".github", "benchmarks", "design"];
 
     private static readonly string[] Skipped = ["bin", "obj", "artifacts", ".git", "node_modules"];
@@ -55,11 +65,11 @@ public sealed class RepositoryPrivacyTests
             ("the repository path", RepositoryLayout.Root),
         };
 
-        var leaks = VersionedFiles()
+        var leaks = VersionedTexts()
             .SelectMany(file => forbidden
                 .Where(entry => entry.Value.Length > 3
-                    && File.ReadAllText(file).Contains(entry.Value, StringComparison.OrdinalIgnoreCase))
-                .Select(entry => $"{Relative(file)} carries {entry.Kind}"))
+                    && file.Text.Contains(entry.Value, StringComparison.OrdinalIgnoreCase))
+                .Select(entry => $"{Relative(file.Path)} carries {entry.Kind}"))
             .Order(StringComparer.Ordinal)
             .ToArray();
 
@@ -68,8 +78,8 @@ public sealed class RepositoryPrivacyTests
 
     /// <summary>
     /// The folders beside the repository that git ignores are somebody's media. Their names must not
-    /// appear in anything versioned — not in evidence, not in documentation, and not as an example in
-    /// a test, which is where the last one was found.
+    /// appear in anything published — not in documentation, and not as an example in a test, which
+    /// is where the last one was found.
     /// </summary>
     [Fact]
     public void No_versioned_file_names_a_folder_of_the_personal_library()
@@ -77,10 +87,10 @@ public sealed class RepositoryPrivacyTests
         var ignored = IgnoredNeighbours();
         Assert.SkipWhen(ignored.Count == 0, "There is no ignored folder beside the repository to check against.");
 
-        var leaks = VersionedFiles()
+        var leaks = VersionedTexts()
             .SelectMany(file => ignored
-                .Where(name => File.ReadAllText(file).Contains(name, StringComparison.OrdinalIgnoreCase))
-                .Select(_ => $"{Relative(file)} names one of the ignored folders beside the repository"))
+                .Where(name => file.Text.Contains(name, StringComparison.OrdinalIgnoreCase))
+                .Select(_ => $"{Relative(file.Path)} names one of the ignored folders beside the repository"))
             .Distinct(StringComparer.Ordinal)
             .Order(StringComparer.Ordinal)
             .ToArray();
@@ -97,7 +107,13 @@ public sealed class RepositoryPrivacyTests
     {
         Assert.False(string.IsNullOrWhiteSpace(Environment.UserName));
         Assert.False(string.IsNullOrWhiteSpace(Environment.MachineName));
-        Assert.NotEmpty(VersionedFiles());
+
+        // Hundreds of files are published: the sources alone are more than this. Fewer means the
+        // sweep is reading an empty or truncated list and agreeing with everything in it.
+        var versioned = VersionedFiles();
+        Assert.True(versioned.Count >= 500, $"only {versioned.Count} published text files were read.");
+        Assert.Contains(versioned, file => string.Equals(
+            Path.GetFullPath(file), Path.GetFullPath(RepositoryLayout.SolutionPath), StringComparison.OrdinalIgnoreCase));
 
         // And the search itself works: the repository path is in this file's own location.
         var probe = Path.Combine(RepositoryLayout.Root, "docs");
@@ -105,54 +121,74 @@ public sealed class RepositoryPrivacyTests
     }
 
     /// <summary>
-    /// The versioned tool configuration declares the public documentation server and nothing else.
+    /// Nothing the ignore rules exclude is still published.
     /// </summary>
     /// <remarks>
-    /// <b>A closed list, because the two checks above cannot see this one.</b> They look for the
-    /// account, the computer and the profile path of whoever built the tree — and a company's own
-    /// server is none of those. On 2026-09-05 a connector for an internal service landed in
-    /// <c>.tools.json</c> carrying its host name and a path on a mapped network drive, and it reached
-    /// the public <c>main</c> without a single gate saying anything: the file sits at the root, and
-    /// the sweep only read <c>*.md</c> and <c>*.props</c> there.
-    /// <para>
-    /// So this does not try to recognise what is private, which is the filter-the-bad shape this
-    /// repository refuses everywhere else. It allows what is known to be publishable, and anything
-    /// else has to be argued for here first. The host is deliberately not written down, not even as
-    /// something to forbid: naming it in a test would publish it again.
-    /// </para>
+    /// A file that git follows keeps being published after a rule starts ignoring it: ignoring only
+    /// stops a file from being added, never removes one. So a path somebody decided to keep out of
+    /// the repository is only out of it once it has also left the index, and until then every push
+    /// publishes it whole. That is the most serious leak there is, because nothing in the file has to
+    /// be wrong for it to happen.
     /// </remarks>
     [Fact]
-    public void The_versioned_tool_configuration_declares_only_servers_that_are_safe_to_publish()
+    public void Nothing_the_ignore_rules_exclude_is_still_published()
     {
-        var configuration = Path.Combine(RepositoryLayout.Root, ".tools.json");
-        Assert.True(File.Exists(configuration), ".tools.json is versioned and has to be there.");
+        Assert.SkipUnless(IsRepository(RepositoryLayout.Root), "This tree is not a git checkout, so nothing is published from it.");
 
-        using var document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(configuration));
-        var declared = document.RootElement
-            .GetProperty("toolServers")
-            .EnumerateObject()
-            .Select(server => server.Name)
-            .Order(StringComparer.Ordinal)
-            .ToArray();
+        var excluded = Git(RepositoryLayout.Root, "ls-files", "-z", "--cached", "--ignored", "--exclude-standard");
 
-        // Avalonia's own documentation service, public and named by GUIDE.md as the reason this file
-        // is versioned at all. A connector to anything of this company's goes in local configuration,
-        // which is not published.
-        Assert.Equal(["avalonia-docs"], declared);
+        Assert.True(
+            excluded.Length == 0,
+            $"{excluded.Length} file(s) are excluded by the ignore rules and still in the index, so they "
+                + "are published anyway. Remove them from the index: "
+                + string.Join(", ", excluded.Take(20)));
     }
 
-    // A check for mapped network drives was written here on 2026-09-06 and taken out the same hour,
-    // and the attempt is worth more than the check would have been. A drive letter derived from this
-    // machine is too poor a pattern to be one: the first version matched every URL in the tree,
-    // because "https://" ends in "s:/"; anchored to the start of a path it still matched half a dozen
-    // test fixtures that use the same letter as an invented path. There is no way to tell "the share
-    // this office maps" from "a letter somebody typed into a fixture", so it would have been a gate
-    // that cries on honest work — and this repository has already learned that a noisy guard is one
-    // that gets switched off. The precise check is the one above: a closed list of what may be
-    // published, which caught the real defect with no false positives at all.
+    /// <summary>
+    /// The two rules above against a repository made for them: one file published normally, one
+    /// kept in the index after a rule excluded it, and one written and not yet added.
+    /// </summary>
+    [Fact]
+    public void The_published_list_is_what_a_clone_would_hold()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "repository-privacy-" + Guid.NewGuid().ToString("n")[..12]);
+        Directory.CreateDirectory(root);
+        try
+        {
+            Git(root, "init", "--quiet");
+            File.WriteAllText(Path.Combine(root, "kept.md"), "kept\n");
+            File.WriteAllText(Path.Combine(root, "left-in.md"), "excluded and never removed\n");
+            File.WriteAllText(Path.Combine(root, "new.md"), "not yet added\n");
+            Git(root, "add", "kept.md", "left-in.md");
+            File.WriteAllText(Path.Combine(root, ".git", "info", "exclude"), "/left-in.md\n");
+
+            Assert.Equal(
+                ["kept.md", "new.md"],
+                PublishedFiles(root).Select(path => Path.GetFileName(path)).Order(StringComparer.Ordinal).ToArray());
+            Assert.Equal(["left-in.md"], Git(root, "ls-files", "-z", "--cached", "--ignored", "--exclude-standard"));
+        }
+        finally
+        {
+            // Git writes its objects read-only, and a recursive delete refuses a read-only file.
+            foreach (var file in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
+
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    // A check for mapped network drives was written here once and taken out the same hour, and the
+    // attempt is worth more than the check would have been. A drive letter derived from this machine
+    // is too poor a pattern to be one: the first version matched every URL in the tree, because
+    // "https://" ends in "s:/"; anchored to the start of a path it still matched half a dozen test
+    // fixtures that use the same letter as an invented path. There is no way to tell "the share this
+    // office maps" from "a letter somebody typed into a fixture", so it would have been a gate that
+    // cries on honest work, and a noisy guard is one that gets switched off.
 
     /// <summary>
-    /// The folders beside the repository that are not versioned. They are the personal library: git
+    /// The folders beside the repository that are not its own. They are the personal library: git
     /// was told to ignore them, which is the repository's own statement that they do not belong to it.
     /// </summary>
     private static IReadOnlyList<string> IgnoredNeighbours()
@@ -163,39 +199,80 @@ public sealed class RepositoryPrivacyTests
             .Select(directory => directory.Name)
             .Where(name => !name.StartsWith('.')
                 && !Skipped.Contains(name, StringComparer.OrdinalIgnoreCase)
-                && !VersionedDirectories.Contains(name, StringComparer.OrdinalIgnoreCase))];
+                && !OwnDirectories.Contains(name, StringComparer.OrdinalIgnoreCase))];
     }
 
-    private static List<string> VersionedFiles()
-    {
-        var root = RepositoryLayout.Root;
-        var files = new List<string>();
-        foreach (var directory in VersionedDirectories.Select(name => Path.Combine(root, name)))
-        {
-            if (!Directory.Exists(directory))
-            {
-                continue;
-            }
+    /// <summary>
+    /// Every published text file, root files included. The root used to be read for two extensions
+    /// only, and the one file that carried a company host out was a JSON file sitting right there and
+    /// never opened: a sweep that names extensions one by one is a filter for what somebody thought of.
+    /// </summary>
+    private static List<string> VersionedFiles() =>
+        [.. PublishedFiles(RepositoryLayout.Root).Where(IsText)];
 
-            files.AddRange(Directory
-                .EnumerateFiles(directory, "*", SearchOption.AllDirectories)
+    /// <summary>Each published text file read once, rather than once per value looked for.</summary>
+    private static IEnumerable<(string Path, string Text)> VersionedTexts() =>
+        VersionedFiles().Select(path => (path, File.ReadAllText(path)));
+
+    /// <summary>
+    /// What git follows or would follow if added now, minus what the ignore rules exclude although it
+    /// is still in the index. Without a repository around the tree, the disk is all there is.
+    /// </summary>
+    private static List<string> PublishedFiles(string root)
+    {
+        if (!IsRepository(root))
+        {
+            return [.. Directory
+                .EnumerateFiles(root, "*", SearchOption.AllDirectories)
                 .Where(file => !Skipped.Any(skipped =>
-                    file.Contains($"{Path.DirectorySeparatorChar}{skipped}{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
-                    && IsText(file)));
+                    file.Contains($"{Path.DirectorySeparatorChar}{skipped}{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase)))];
         }
 
-        // Every text file at the root and not two extensions of it. It read *.md and *.props until
-        // 2026-09-06, and the file that carried a company host to the public main was .tools.json,
-        // sitting right there and never opened. A sweep that names extensions one by one is a filter
-        // for what somebody thought of.
-        files.AddRange(Directory.EnumerateFiles(root, "*").Where(IsText));
-        return files;
+        var excluded = Git(root, "ls-files", "-z", "--cached", "--ignored", "--exclude-standard")
+            .ToHashSet(StringComparer.Ordinal);
+        return [.. Git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard")
+            .Where(relative => !excluded.Contains(relative))
+            .Distinct(StringComparer.Ordinal)
+            .Select(relative => Path.GetFullPath(Path.Combine(root, relative)))
+            .Where(File.Exists)];
+    }
+
+    private static bool IsRepository(string root) =>
+        Directory.Exists(Path.Combine(root, ".git")) || File.Exists(Path.Combine(root, ".git"));
+
+    private static string[] Git(string root, params string[] arguments)
+    {
+        var start = new ProcessStartInfo("git")
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
+        foreach (var argument in (string[])["-c", "safe.directory=*", "-c", "core.quotepath=off", "-C", root, .. arguments])
+        {
+            start.ArgumentList.Add(argument);
+        }
+
+        using var process = Process.Start(start)
+            ?? throw new InvalidOperationException("git could not be started, so nothing is known about what is published.");
+        var errors = process.StandardError.ReadToEndAsync();
+        var output = process.StandardOutput.ReadToEnd();
+        process.WaitForExit();
+
+        // A git that failed would otherwise read as a repository with nothing in it.
+        if (process.ExitCode != 0)
+        {
+            throw new InvalidOperationException($"git {string.Join(' ', arguments)} exited {process.ExitCode}: {errors.Result}");
+        }
+
+        return output.Split('\0', StringSplitOptions.RemoveEmptyEntries);
     }
 
     private static bool IsText(string path) => Path.GetExtension(path).ToLowerInvariant() switch
     {
         ".cs" or ".md" or ".json" or ".xml" or ".yml" or ".yaml" or ".ps1" or ".axaml"
-            or ".csproj" or ".props" or ".targets" or ".appxmanifest" or ".editorconfig" or ".sln" => true,
+            or ".csproj" or ".props" or ".targets" or ".appxmanifest" or ".editorconfig" or ".sln"
+            or ".txt" or ".sh" or ".sql" or ".runsettings" or ".gitignore" or ".gitattributes" => true,
         _ => false,
     };
 

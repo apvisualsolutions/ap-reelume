@@ -133,7 +133,7 @@ public sealed class CodecMatrixTests
             MediaToolchain.RepositoryRoot,
             "artifacts",
             "test-results",
-            "T19",
+            "codec-matrix",
             "green",
             "media-provenance.json");
         Directory.CreateDirectory(Path.GetDirectoryName(destination)!);

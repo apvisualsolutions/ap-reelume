@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Shell;
 
 /// <summary>
-/// One owner for the player window coordinator (ARQ-008). The audit found it registered in the
+/// One owner for the player window coordinator. An audit found it registered in the
 /// container and simultaneously built by hand in <c>ShellView</c>: two instances meant the
 /// registered one held geometry nobody ever read, and whichever half a future change wired would
 /// silently disagree with the other.

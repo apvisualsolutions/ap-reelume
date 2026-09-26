@@ -26,7 +26,7 @@ public sealed class WindowsDisplayCapabilityProvider : IDisplayCapabilityProvide
     private const uint HighDynamicRangeUserEnabled = 0x20;
 
     /// <summary>
-    /// Why the last query answered what it did. Recorded so an evidence run can tell "the display
+    /// Why the last query answered what it did. Recorded so a diagnostic run can tell "the display
     /// has no HDR" apart from "the query did not work on this machine".
     /// </summary>
     public string LastDiagnostic { get; private set; } = "not queried";

@@ -4,18 +4,25 @@
 namespace ApSolutions.LocalMedia.TestSupport;
 
 /// <summary>
-/// Where this checkout begins. One anchor, found once, for every test project (ARQ-012).
+/// Where this checkout begins. One anchor, found once, for every test project.
 /// </summary>
 /// <remarks>
 /// The walk up from the output directory was pasted into fifty-eight files, and two of those copies
-/// anchored on <c>docs/FEATURES.md</c> while the rest anchored on the solution: two definitions of
+/// anchored on a document while the rest anchored on the solution: two definitions of
 /// "the repository root" in one repository, which is one too many. The solution file is the anchor
 /// because it *is* the definition of this checkout, and because a document can be moved — moving
-/// <c>docs/FEATURES.md</c> would have broken the root itself.
+/// that document would have broken the root itself.
 /// </remarks>
 internal static class RepositoryLayout
 {
     private const string Anchor = "ApSolutions.LocalMedia.sln";
+
+    /// <summary>
+    /// Whether each directory already asked about holds its own <c>.git</c>, so a sweep over
+    /// thousands of files asks the disk once per directory rather than once per file and level.
+    /// </summary>
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> CheckoutRoots =
+        new(StringComparer.OrdinalIgnoreCase);
 
     public static string Root { get; } = FindRoot();
 
@@ -39,32 +46,55 @@ internal static class RepositoryLayout
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <c>.worktrees/</c> holds whole copies of this repository belonging to other sessions.
-    /// Git ignores them and a CI runner does not have them at all, so a sweep that reads them
-    /// answers a different question depending on how many sessions happen to be open and what each
-    /// of them is holding — <b>red on the machine of whoever is writing and green in CI</b>, which
-    /// is the worst way for a gate to be wrong. Measured three times: on 2026-09-02 against the
-    /// run-duration figure, on 2026-09-03 with three parallel sessions each holding its own
-    /// <c>GUIDE.md</c>, and on 2026-09-20 as ENG-009, where running the mutation check in a worktree
-    /// put <c>EvidenceLinkTests</c> red over a copy of the one document allowed to quote the defect
-    /// it guards against.
+    /// Another checkout is any directory below the root that carries its own <c>.git</c>: a
+    /// directory for a nested clone, a file for a git worktree. Such copies are not part of this
+    /// checkout and a CI runner does not have them at all, so a sweep that reads them answers a
+    /// different question depending on how many copies happen to exist and what each of them is
+    /// holding — <b>red on the machine of whoever is writing and green in CI</b>, which is the worst
+    /// way for a gate to be wrong. Measured three times, the last with <c>EvidenceLinkTests</c> red
+    /// over a worktree's copy of the one document allowed to quote the defect it guards against.
     /// </para>
     /// <para>
-    /// <b>Relative to the root and never absolute</b>, which the first version of this got wrong and
-    /// a parallel session measured within the hour. Matched against the absolute path, a checkout
-    /// that itself lives under <c>.worktrees/</c> excludes <b>every one of its own</b>
-    /// documents: the sweep reads nothing and agrees with everything. Relative to its own root, a
-    /// worktree's files simply do not carry the prefix, so it reads itself and nobody else.
+    /// <b>Relative to the root and never absolute</b>, which the first version of this got wrong.
+    /// Only the directories between this root and the path are asked: a checkout that itself lives
+    /// inside another one would otherwise find that one's <c>.git</c> above its own root and exclude
+    /// <b>every one of its own</b> documents, so the sweep would read nothing and agree with
+    /// everything. Counted from its own root, a worktree reads itself and nobody else.
     /// </para>
     /// <para>
-    /// The prefix is the whole path and not a lone <c>worktrees</c> segment: a directory of that
-    /// name anywhere else in the tree is this repository's own and has to be read.
+    /// The rule is the marker and never a folder name: a directory called <c>worktrees</c>, or
+    /// anything else, with no <c>.git</c> of its own is this repository's own and has to be read.
     /// </para>
     /// </remarks>
-    public static bool IsInsideAnotherCheckout(string path) =>
-        Path.GetRelativePath(Root, path)
-            .Replace(Path.DirectorySeparatorChar, '/')
-            .StartsWith(".worktrees/", StringComparison.Ordinal);
+    public static bool IsInsideAnotherCheckout(string path)
+    {
+        var relative = Path.GetRelativePath(Root, path);
+        if (Path.IsPathRooted(relative))
+        {
+            return false;
+        }
+
+        var segments = relative.Split(
+            [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+            StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length == 0 || segments[0] == "..")
+        {
+            return false;
+        }
+
+        var directory = Root;
+        foreach (var segment in segments)
+        {
+            directory = Path.Combine(directory, segment);
+            if (CheckoutRoots.GetOrAdd(directory, candidate => Path.Exists(Path.Combine(candidate, ".git"))))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     private static string FindRoot()
     {

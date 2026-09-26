@@ -14,10 +14,10 @@ namespace ApSolutions.LocalMedia.PerformanceTests;
 /// <summary>
 /// What the application costs while nobody is using it.
 /// <para>
-/// C6 recorded handles climbing about seven a minute with the tray enabled and left alone, and could
-/// not attribute it. This measures the tray on its own, in a child process, so the reading is the
-/// tray's and not the whole application's — and it also checks the least interesting and most
-/// important thing: that the process is still running at the end.
+/// An earlier measurement recorded handles climbing about seven a minute with the tray enabled and left
+/// alone, and could not attribute it. This measures the tray on its own, in a child process, so the
+/// reading is the tray's and not the whole application's — and it also checks the least interesting and
+/// most important thing: that the process is still running at the end.
 /// </para>
 /// </summary>
 public sealed class TrayIdleTests
@@ -27,8 +27,8 @@ public sealed class TrayIdleTests
     private const int IdleSeconds = 60;
 
     /// <summary>
-    /// Generous next to the seven per minute C6 saw, and far below what a real leak would produce. A
-    /// tray that is doing nothing should not be allocating anything at all.
+    /// Generous next to the seven per minute measured before, and far below what a real leak would
+    /// produce. A tray that is doing nothing should not be allocating anything at all.
     /// </summary>
     private const double AllowedHandlesPerMinute = 30;
 

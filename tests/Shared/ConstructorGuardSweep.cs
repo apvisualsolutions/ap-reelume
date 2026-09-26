@@ -10,7 +10,7 @@ using NSubstitute;
 namespace ApSolutions.LocalMedia.TestSupport;
 
 /// <summary>
-/// TST-001: the null-guard sweep. Ninety of the two hundred and five files short of the coverage
+/// The null-guard sweep. Ninety of the two hundred and five files short of the coverage
 /// bar were short of it for one repeated reason — a constructor writing
 /// <c>?? throw new ArgumentNullException</c> that no test ever handed a null. The throw is a branch,
 /// an untaken branch is half a branch pair, and eight Application files sat at exactly 100/50

@@ -91,7 +91,7 @@ function Clear-ProfilerEnvironment {
     The 2026-08-10 failure is what this is measured against. All it left behind was
     `Window shown: False; exit code -1; 16 migration(s) applied to a new database`, and those sixteen
     migrations already rule out the death-before-migrating half of the question. What was never
-    recorded is the other half: whether anything was still alive to paint. Since ARQ-005 the window
+    recorded is the other half: whether anything was still alive to paint. Since then the window
     is created before the migration runs, so a repeat also rules the migration out by construction.
 
     Nothing in here may throw. A diagnosis that fails takes the place of the failure it was called to
@@ -609,7 +609,7 @@ VALUES ($($newest + 1), 'from_a_later_release', '$([DateTimeOffset]::UtcNow.ToSt
     <#
         The four phases Windows performs cannot run from this script: they need a clean machine, an
         administrator, and a signature. They were run by hand inside Windows Sandbox — a clean,
-        disposable Windows — and archived at docs/evidence/mvp/windows-lifecycle.json.
+        disposable Windows — and archived at eng/sandbox/windows-lifecycle.json.
 
         That report is accepted only while it still describes this package. It carries the SHA-256 of
         Package.appxmanifest, and the manifest is what governs installation, file associations, and
@@ -619,7 +619,7 @@ VALUES ($($newest + 1), 'from_a_later_release', '$([DateTimeOffset]::UtcNow.ToSt
 
         eng/README-sandbox.md records how to run it again.
     #>
-    $archivedPath = Join-Path $repoRoot 'docs/evidence/mvp/windows-lifecycle.json'
+    $archivedPath = Join-Path $repoRoot 'eng/sandbox/windows-lifecycle.json'
     $manifestSha = (Get-FileHash -LiteralPath (Join-Path $repoRoot 'src/ApSolutions.LocalMedia.Windows.Package/Package.appxmanifest') -Algorithm SHA256).Hash.ToLowerInvariant()
     $archived = $null
     if (Test-Path -LiteralPath $archivedPath) {

@@ -20,8 +20,8 @@ public sealed record GroupScannedEpisodesResult(int SeriesCount, int EpisodeCoun
 /// The catalogue has had <c>titles</c>, <c>seasons</c>, <c>episodes</c> and <c>episode_media</c>
 /// since migration 0004, the series card has been drawn and routed to since it was written, and
 /// <b>nothing had ever written a row into any of the four</b>. Every scanned file became one loose
-/// card, so the maintainer's two shows — eight seasons and seventy-four episodes of one, three and
-/// twenty-five of the other — arrived as a hundred and two cards in the grid. This is the caller
+/// card, so two real shows — one of eight seasons, the other of three — arrived as a hundred-odd
+/// loose cards in the grid. This is the caller
 /// those four tables were waiting for, and it is the same shape <c>GroupScannedVersions</c> already
 /// has for duplicates: run after every scan, decide from the names, write through the ports.
 /// </para>

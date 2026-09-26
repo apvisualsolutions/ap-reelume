@@ -15,7 +15,7 @@ using ApSolutions.LocalMedia.Presentation.Movie;
 namespace ApSolutions.LocalMedia.Presentation.Courses;
 
 /// <summary>
-/// One lesson on the course card (CRS-005), the mirror of an episode row: the same three states, the
+/// One lesson on the course card, the mirror of an episode row: the same three states, the
 /// same glyphs, the same partial bar, and a mark that a person's hand wins with.
 /// </summary>
 public sealed class LessonRowViewModel
@@ -152,7 +152,7 @@ public sealed class CourseModuleViewModel
 }
 
 /// <summary>
-/// A course opened (CRS-002, CRS-003): its header, its modules, and the thread panel that answers
+/// A course opened: its header, its modules, and the thread panel that answers
 /// «¿por dónde iba?» without making anybody re-watch anything.
 /// </summary>
 public sealed class CourseDetailsViewModel : INotifyPropertyChanged
@@ -275,7 +275,7 @@ public sealed class CourseDetailsViewModel : INotifyPropertyChanged
     public LessonRowViewModel? ThreadLessonRow { get; private set; }
 
     /// <summary>
-    /// What the last mark did, announced rather than only drawn (CRS-005).
+    /// What the last mark did, announced rather than only drawn.
     /// </summary>
     /// <remarks>
     /// Marking a lesson moves the thread, and the thread is the whole point of the card. Somebody
@@ -358,9 +358,9 @@ public sealed class CourseDetailsViewModel : INotifyPropertyChanged
     private Task ResumeThreadAsync() => ThreadLessonRow is { } row ? PlayAsync(row) : Task.CompletedTask;
 
     /// <summary>
-    /// Marks the lesson watched, or hands it back. It writes through PLY-009's own use case and the
-    /// key PLY-008 already stores under, so a lesson's mark is a watch state like any other — which
-    /// is what makes it survive the file being moved.
+    /// Marks the lesson watched, or hands it back. It writes through the watch-state use case and the
+    /// key playback progress already stores under, so a lesson's mark is a watch state like any other —
+    /// which is what makes it survive the file being moved.
     /// </summary>
     private async Task ToggleWatchedAsync(LessonRowViewModel lesson)
     {

@@ -23,14 +23,14 @@ namespace ApSolutions.LocalMedia.UiTests.Settings;
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>§4 asks for five theme buttons and the answer is three</b>, which is not a measurement against
+/// <b>The redesign asks for five theme buttons and the answer is three</b>, which is not a measurement against
 /// the document but a decision the tree had already taken and written down. <c>ThemePreference.cs</c>
 /// says it above the two high-contrast variants: they are a state read from Windows, not a fourth and
 /// fifth choice somebody picks. An application offering its own high-contrast picker either ignores
 /// the system setting or duplicates it. This asserts the three so the decision cannot drift back.
 /// </para>
 /// <para>
-/// <b>The rows still wrap, for the other reason.</b> §4's stated one — five will not fit in 620 — is
+/// <b>The rows still wrap, for the other reason.</b> The redesign's stated one — five will not fit in 620 — is
 /// void with three: measured on 2026-08-21, the pills total <b>263 px in Spanish and 241 in English</b>
 /// inside a 620-wide column, with 357 to spare. What earns the change is the shape itself: a
 /// horizontal <c>StackPanel</c> offers its children infinite width and draws them where they fall,
@@ -41,7 +41,7 @@ namespace ApSolutions.LocalMedia.UiTests.Settings;
 public sealed class AppearanceSettingsTests
 {
     /// <summary>
-    /// Five theme pills: the maintainer revoked the picked-high-contrast refusal on 2026-08-23, so both
+    /// Five theme pills: the refusal to let high contrast be picked was revoked on 2026-08-23, so both
     /// high contrasts are choices now — with Windows' own setting still overriding whichever is on.
     /// </summary>
     [AvaloniaFact]
@@ -69,7 +69,7 @@ public sealed class AppearanceSettingsTests
         // — accent fill and a chosen edge — and a row that grew a pill without one would be the
         // defect this counts against.
         //
-        // The two language pills left on 2026-09-13 for a destination of their own (UX-010), which
+        // The two language pills left on 2026-09-13 for a destination of their own, which
         // is why this no longer adds a 2.
         Assert.Equal(themes.Length + 3 + 3, pills.Length);
         window.Close();
@@ -102,7 +102,7 @@ public sealed class AppearanceSettingsTests
             .Where(panel => panel.GetVisualChildren().OfType<Button>().Any(button => button.Classes.Contains("theme-option")))
             .ToArray();
         // Three since 2026-09-13: theme, density and rounding. The language row left this page for a
-        // destination of its own (UX-010), and it has its own test there.
+        // destination of its own, and it has its own test there.
         Assert.Equal(3, rows.Length);
 
         foreach (var row in rows)

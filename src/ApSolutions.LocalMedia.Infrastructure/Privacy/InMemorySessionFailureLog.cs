@@ -9,7 +9,7 @@ namespace ApSolutions.LocalMedia.Infrastructure.Privacy;
 /// The session's failures, in memory, bounded, and never written anywhere.
 /// </summary>
 /// <remarks>
-/// ARQ-004. Failures arrive from whichever thread was running the work — a command's continuation, a
+/// Failures arrive from whichever thread was running the work — a command's continuation, a
 /// task nobody awaited, the handler of last resort — so every entry point here is taken under the
 /// lock. The ceiling is the other half of it: an application failing a new way every second must not
 /// turn this into a list that stops growing only when the process does.

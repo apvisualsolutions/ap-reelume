@@ -10,7 +10,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.MediaTests.Playback;
 
 /// <summary>
-/// Playing hands its media to the one release queue this process owns (BUG-011).
+/// Playing hands its media to the one release queue this process owns.
 /// </summary>
 /// <remarks>
 /// The engine used to keep a third queue of its own, and that queue disposed the native media inside

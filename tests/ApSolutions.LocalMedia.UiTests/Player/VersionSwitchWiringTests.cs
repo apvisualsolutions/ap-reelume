@@ -9,7 +9,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// The live version switch existed as a use case and a dialog and never as an action (VSW-A01):
+/// The live version switch existed as a use case and a dialog and never as an action:
 /// nothing in the player offered the other versions, so <c>SwitchMediaVersion</c> was registered
 /// and invoked by nobody, and the dialog's buttons were wired to nothing.
 /// </summary>

@@ -185,12 +185,11 @@ SPDX-License-Identifier: LicenseRef-APSolutions
 
     <!--
       A note and not a warning, and that is a decision that changed on 2026-09-02. The three notices
-      were warnings together on the ground that «each one means somebody's choice was not honoured»,
-      and this one is the exception the prototype draws differently: `downmix` is small grey text
-      under the buttons — `font-size:11px; opacity:.72` — rather than a bordered box.
-      «El prototipo manda», said the maintainer when asked which of the two to keep.
-      <b>The other two stay warnings</b>: no output at all and a device that went away are the ones
-      the prototype does not draw as notes either.
+      were warnings together on the ground that «each one means somebody's choice was not honoured», and
+      this one is the exception the prototype draws differently: `downmix` is small grey text under the
+      buttons — `font-size:11px; opacity:.72` — rather than a bordered box, and where the two disagree
+      the prototype wins. <b>The other two stay warnings</b>: no output at all and a device that went
+      away are the ones the prototype does not draw as notes either.
     -->
     <TextBlock
         x:Name="DegradedLayoutNotice"

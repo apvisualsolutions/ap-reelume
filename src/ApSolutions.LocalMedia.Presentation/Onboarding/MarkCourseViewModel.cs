@@ -11,7 +11,7 @@ using ApSolutions.LocalMedia.Presentation.Commands;
 namespace ApSolutions.LocalMedia.Presentation.Onboarding;
 
 /// <summary>
-/// The add dialog's «Curso (carpeta de lecciones)» half (CRS-001, ADR-0006 amendment 1).
+/// The add dialog's «Curso (carpeta de lecciones)» half.
 /// </summary>
 /// <remarks>
 /// It owns the choice between the two things the dialog can add and everything the course branch

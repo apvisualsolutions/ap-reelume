@@ -44,11 +44,11 @@ public sealed record ShellSurfaces
     /// <summary>The duplicates destination's list; the per-title review stays on its own surface.</summary>
     public DuplicatesOverviewViewModel? DuplicatesOverview { get; init; }
 
-    /// <summary>The courses destination's grid (CRS-003).</summary>
+    /// <summary>The courses destination's grid.</summary>
     public Courses.CoursesViewModel? Courses { get; init; }
 
     /// <summary>
-    /// One course opened, under the grid (CRS-002). It is a surface of its own rather than a mode of
+    /// One course opened, under the grid. It is a surface of its own rather than a mode of
     /// the grid because it holds a different question — where you left off — and because the grid has
     /// to stay on screen: coming back from a course is scrolling up, not a button somebody has to
     /// find.
@@ -66,7 +66,7 @@ public sealed record ShellSurfaces
     public RootOnboardingViewModel? Onboarding { get; init; }
 
     /// <summary>
-    /// The add dialog's other half: marking a folder as a course (CRS-001). It shares the dialog's
+    /// The add dialog's other half: marking a folder as a course. It shares the dialog's
     /// one path box with <see cref="Onboarding"/> rather than owning a second one.
     /// </summary>
     public MarkCourseViewModel? MarkCourse { get; init; }
@@ -81,7 +81,7 @@ public sealed record ShellSurfaces
 
     public ScanSettingsViewModel? ScanSettings { get; init; }
 
-    /// <summary>Where the order every cover is looked for in is moved (LIB-021).</summary>
+    /// <summary>Where the order every cover is looked for in is moved.</summary>
     public CoverOrderSettingsViewModel? CoverOrderSettings { get; init; }
 
     public ShortcutSettingsViewModel? Shortcuts { get; init; }
@@ -141,7 +141,7 @@ public sealed record ShellSurfaces
 
     /// <summary>
     /// The clock that puts the chrome away after a while without the mouse, or nothing for a shell
-    /// that never does (ENG-018).
+    /// that never does.
     /// </summary>
     /// <remarks>
     /// A port rather than a timer built inside the shell, because a timer built inside cannot be asked

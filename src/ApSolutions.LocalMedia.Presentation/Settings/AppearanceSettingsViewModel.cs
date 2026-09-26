@@ -61,7 +61,7 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
     /// <remarks>
     /// These were five strings holding a <c>●</c> or a <c>○</c>, and the circle was the only thing on
     /// this row that said which theme was on: no pill bound the chosen style, so all five were drawn
-    /// alike. On 2026-09-11 the maintainer read the circle as a radio button dropped inside a pill, which
+    /// alike. The circle read as a radio button dropped inside a pill, which
     /// is what the prototype never draws, and the answer is the one the accent swatches already got:
     /// the chosen pill's own border and fill. A border is a shape, so it still says it in both high
     /// contrast dictionaries, where the two fills are one colour.
@@ -96,13 +96,13 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
 
     public ICommand ApplyThemeCommand { get; }
 
-    /// <summary>Takes "es" or "en" and makes the whole application speak it (BUG-011).</summary>
+    /// <summary>Takes "es" or "en" and makes the whole application speak it.</summary>
     public ICommand ApplyLanguageCommand { get; }
 
     /// <summary>Takes a <c>#RRGGBB</c> and derives the whole accent family from it.</summary>
     public ICommand ApplyAccentCommand { get; }
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     /// <remarks>
     /// The language is deliberately left alone. It is a group of its own — the interface's language
     /// is chosen once and governs every screen — and folding it in here would mean a click meant to
@@ -111,7 +111,7 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
     public ICommand RestoreDefaultsCommand { get; }
 
     /// <summary>
-    /// The «Restaurar valores por defecto» of the language group (UX-010), which is a group of its
+    /// The «Restaurar valores por defecto» of the language group, which is a group of its
     /// own with a destination of its own and shares only this view model.
     /// </summary>
     public ICommand RestoreLanguageDefaultsCommand { get; }
@@ -131,11 +131,11 @@ public sealed class AppearanceSettingsViewModel : INotifyPropertyChanged
     /// Which swatch is the one in force, as a flag the style reads rather than a glyph on top of it.
     /// </summary>
     /// <remarks>
-    /// It was a glyph — the same ● and ○ every pill row in this tree carried until 2026-09-11, when
-    /// they came off for the same reason — and the maintainer was right that it does not belong here: a circle drawn inside a circle of colour reads as a radio
-    /// button somebody dropped on a swatch. The prototype says it with the swatch's own edge, a ring
-    /// of the page's ink around the chosen one, and that is geometry too: a border is a shape, so it
-    /// survives both high contrast dictionaries exactly as the glyph did.
+    /// It was a glyph — the same ● and ○ every pill row in this tree once carried, until they came off
+    /// for the same reason — and it does not belong here: a circle drawn inside a circle of colour
+    /// reads as a radio button somebody dropped on a swatch. The prototype says it with the swatch's
+    /// own edge, a ring of the page's ink around the chosen one, and that is geometry too: a border is
+    /// a shape, so it survives both high contrast dictionaries exactly as the glyph did.
     /// </remarks>
     public bool IsFirstAccent => IsAccent(0);
 

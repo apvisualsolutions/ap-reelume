@@ -7,16 +7,16 @@ using ApSolutions.LocalMedia.Domain.Continuity;
 namespace ApSolutions.LocalMedia.Domain.Courses;
 
 /// <summary>
-/// Where a lesson's progress lives (CRS-002, CRS-005).
+/// Where a lesson's progress lives.
 /// </summary>
 /// <remarks>
-/// It lives in PLY-008's store and nowhere else. A course is to its lessons what a show is to its
+/// It lives in the continuity store and nowhere else. A course is to its lessons what a show is to its
 /// episodes, so the key takes the shape the store already has — course in the title position, lesson
 /// in the episode position — and every piece of continuity that reads a
 /// <see cref="ContentKey"/> keeps working without knowing a course exists: resume, the watched
-/// threshold of PLY-009, the manual override that wins over it, and the countdown of PLY-011.
+/// threshold, the manual override that wins over it, and the next-episode countdown.
 /// <para>
-/// This is a translation and not a second store, which is the whole of decision 6: inventing a
+/// This is a translation and not a second store, and that is the whole decision: inventing a
 /// <c>lesson_progress</c> table would have been a second answer to «how far in was I», and two
 /// answers to one question is how they start disagreeing.
 /// </para>

@@ -15,7 +15,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <Border Padding="32" Background="{DynamicResource ShellSurfaceBrush}">
     <StackPanel x:Name="SegmentDetectionSurface" MaxWidth="620" Spacing="{DynamicResource Space12}">
       <!--
-        UX-010: the button that puts this group back sits inside the group and in its heading row,
+        The button that puts this group back sits inside the group and in its heading row,
         never under the controls — there, appearing and going would move every control the mouse was
         about to press, and past a list it would fall outside the first viewport the walk can reach.
       -->

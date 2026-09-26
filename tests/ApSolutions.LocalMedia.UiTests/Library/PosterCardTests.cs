@@ -26,7 +26,7 @@ namespace ApSolutions.LocalMedia.UiTests.Library;
 /// </summary>
 /// <remarks>
 /// <para>
-/// §4 asks for "initials over <c>ControlFillBrush</c>, never a hole" and there is no artwork in this
+/// The redesign asks for "initials over <c>ControlFillBrush</c>, never a hole" and there is no artwork in this
 /// application to replace them with, so what these assert is the card as it ships rather than a
 /// placeholder state. The proportion is asserted as a computed ratio and not as two numbers, because
 /// 148 and 222 agreeing with two constants written here would still pass the day one of them moved
@@ -107,7 +107,7 @@ public sealed class PosterCardTests
 
     /// <summary>The title holds one line, ending in an ellipsis, and the caption is set apart.</summary>
     /// <remarks>
-    /// One line and not two, decided on 2026-08-24 by the maintainer looking at the real grid: a title
+    /// One line and not two, decided on 2026-08-24 looking at the real grid: a title
     /// that took a second line pushed its own caption below the caption of the card beside it, so a
     /// row read as a ragged edge. The full title is still announced — the button around the card
     /// carries it as its accessible name.
@@ -320,7 +320,7 @@ public sealed class PosterCardTests
     }
 
     /// <summary>
-    /// A frame taken in the background (LIB-021) reaches a card already on screen: the same card,
+    /// A frame taken in the background reaches a card already on screen: the same card,
     /// told, swaps its initials for the picture. Without the notice the card would keep its letters
     /// until the grid was rebuilt, and rebuilding it is what pulled cards from under a press.
     /// </summary>

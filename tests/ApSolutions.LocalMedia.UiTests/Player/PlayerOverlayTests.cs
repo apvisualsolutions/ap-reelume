@@ -21,7 +21,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// Guards the T18 acceptance criterion that accessible transport controls compose above the decoded
+/// Guards the acceptance criterion that accessible transport controls compose above the decoded
 /// picture. The decoded frame is a flat colour, so a pixel that is no longer that colour proves the
 /// overlay was drawn on top rather than behind the video surface.
 /// </summary>
@@ -37,7 +37,7 @@ public sealed class PlayerOverlayTests
     {
         Assert.NotNull(Avalonia.Application.Current);
         App.ApplyLanguage(Avalonia.Application.Current, CultureInfo.GetCultureInfo("es-ES"));
-        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T18");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "player-overlay");
         Directory.CreateDirectory(captures);
 
         foreach (var (scaling, percentage) in SupportedScalings)

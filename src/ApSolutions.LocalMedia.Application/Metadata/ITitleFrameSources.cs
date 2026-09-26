@@ -7,7 +7,7 @@ using ApSolutions.LocalMedia.Domain.Courses;
 namespace ApSolutions.LocalMedia.Application.Metadata;
 
 /// <summary>
-/// A title's video to take a frame from (LIB-021), with what identifies that file's current state so
+/// A title's video to take a frame from, with what identifies that file's current state so
 /// an unchanged file is never decoded twice.
 /// </summary>
 /// <param name="Stamp">

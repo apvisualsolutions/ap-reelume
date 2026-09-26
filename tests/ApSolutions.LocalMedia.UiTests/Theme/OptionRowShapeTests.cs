@@ -46,13 +46,12 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// </para>
 /// <para>
 /// The second half of every claim is the design itself. Each row of the table carries the pattern
-/// that finds its number in <c>design/AP Reelume.dc.html</c>, so the table cannot quietly become a
-/// set of numbers somebody copied once: if the design moves, the test that reads it fails.
+/// that finds its number in the prototype, so the table cannot quietly become a set of numbers
+/// somebody copied once: wherever the prototype is present, a move in it fails the test that reads it.
 /// </para>
 /// </remarks>
-public sealed class OptionRowShapeTests
+public sealed partial class OptionRowShapeTests
 {
-    private const string DesignDocument = "design/AP Reelume.dc.html";
 
     /// <summary>
     /// The row's own style object in the prototype, written once per list.
@@ -90,7 +89,7 @@ public sealed class OptionRowShapeTests
     /// <summary>Every view whose radios are rows of one of these lists.</summary>
     /// <remarks>
     /// Closed on purpose. Without it a fourth list added next year would be drawn any way at all and
-    /// nothing here would notice — which is the state ADR-0007 found ten button classes in.
+    /// nothing here would notice — which is the state ten button classes were once found in.
     /// </remarks>
     private static readonly string[] Views = ["TrackSelectorView", "AudioOutputView"];
 
@@ -112,60 +111,13 @@ public sealed class OptionRowShapeTests
         ("DuplicatesOverviewView",
             "the same decision one level up, on the group's own card."),
         ("MetadataEditorView",
-            "LIB-021: choosing where this title's cover comes from is a field of a form, not a row "
+            "Choosing where this title's cover comes from is a field of a form, not a row "
             + "of the player's panel. The prototype draws this row style three times and all three "
             + "are lists in a 320 px panel; wearing that shape inside an editor whose other eleven "
             + "fields are boxes and checkboxes would make one field look like something else. It is "
             + "a row of options rather than a drop-down because nothing inside a popup can be "
             + "clicked by the autonomous walk."),
     ];
-
-    [AvaloniaFact]
-    public void Every_number_of_the_row_is_the_number_the_design_writes()
-    {
-        var design = File.ReadAllText(RepositoryLayout.PathFromRoot(DesignDocument));
-
-        // Anti-blindness floor: a document that stopped matching would let every claim below pass by
-        // finding nothing. Three lists share the row style, and all three have to be there.
-        var rows = Regex.Matches(design, RowStylePattern, RegexOptions.None, TimeSpan.FromSeconds(5));
-        Assert.True(
-            rows.Count == 3,
-            $"the design writes the option row's style {rows.Count} times and it writes it three — "
-                + "once for the audio list, once for the devices and once for the subtitles — so "
-                + "this is reading the wrong document or the wrong shape.");
-
-        // And all three write the same four numbers. The table below reads whichever one comes
-        // first, so this is what stops it describing one list while another quietly differs.
-        foreach (var group in new[] { "gap", "height", "pad", "radius" })
-        {
-            var values = rows.Select(row => row.Groups[group].Value).Distinct(StringComparer.Ordinal).ToArray();
-            Assert.True(
-                values.Length == 1,
-                $"the three lists disagree about {group}: {string.Join(", ", values)}. The table "
-                    + "describes one row, so three rows that differ is a decision somebody has to make.");
-        }
-
-        var wrong = new List<string>();
-        foreach (var (what, expected, group, pattern) in Design)
-        {
-            var match = Regex.Match(design, pattern, RegexOptions.None, TimeSpan.FromSeconds(5));
-            if (!match.Success)
-            {
-                wrong.Add($"{what}: the design no longer writes /{pattern}/ at all");
-                continue;
-            }
-
-            var drawn = double.Parse(match.Groups[group].Value, CultureInfo.InvariantCulture);
-            if (drawn != expected)
-            {
-                wrong.Add($"{what}: the table says {expected} and the design writes {drawn}");
-            }
-        }
-
-        Assert.True(
-            wrong.Count == 0,
-            "The table's numbers are the design's: " + string.Join("; ", wrong));
-    }
 
     /// <summary>
     /// The row on screen carries those numbers, measured with the appearance service running.

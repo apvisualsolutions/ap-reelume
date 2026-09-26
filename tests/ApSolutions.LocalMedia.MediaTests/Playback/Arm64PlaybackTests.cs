@@ -3,7 +3,6 @@
 
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.MediaTests.Fixtures;
 using Xunit;
 
@@ -23,7 +22,7 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 [Trait("Category", "RealMedia")]
 public sealed partial class Arm64PlaybackTests
 {
-    /// <summary>Everything T42 requires of ARM64 hardware, named so a missing one is visible.</summary>
+    /// <summary>Everything ARM64 parity requires of the hardware, named so a missing one is visible.</summary>
     private static readonly string[] RequiredPhases =
     [
         "native-execution",
@@ -159,32 +158,6 @@ public sealed partial class Arm64PlaybackTests
         Assert.Equal("win-arm64", Matrix().GetProperty("runtime").GetString());
     }
 
-    /// <summary>
-    /// The rule that keeps T42 from closing itself. <c>PRD-003</c> is the commitment ARM64 hardware
-    /// settles, and it cannot be verified while any phase of the matrix is still blocked.
-    /// </summary>
-    [Fact]
-    public void The_arm64_commitment_is_not_verified_while_any_phase_is_blocked()
-    {
-        var blocked = PhaseElements()
-            .Where(phase => phase.GetProperty("outcome").GetString() != "Passed")
-            .Select(phase => phase.GetProperty("id").GetString()!)
-            .ToArray();
-
-        if (blocked.Length == 0)
-        {
-            return;
-        }
-
-        var features = File.ReadAllText(Path.Combine(MediaToolchain.RepositoryRoot, "docs", "FEATURES.md"));
-        var row = Arm64FeatureRow().Match(features);
-
-        Assert.True(row.Success, "docs/FEATURES.md has no PRD-003 row.");
-        Assert.False(
-            row.Groups["status"].Value == "VERIFIED",
-            $"PRD-003 is VERIFIED while these phases are still blocked: {string.Join(", ", blocked)}.");
-    }
-
     private static bool HostIsArm64() => RuntimeInformation.OSArchitecture == Architecture.Arm64;
 
     private static string MatrixPath() =>
@@ -218,7 +191,4 @@ public sealed partial class Arm64PlaybackTests
             .Value
             .Trim();
     }
-
-    [GeneratedRegex(@"(?m)^\|\s*PRD-003\s*\|[^|]*\|[^|]*\|\s*(?<status>[A-Z_]+)\s*\|")]
-    private static partial Regex Arm64FeatureRow();
 }

@@ -8,7 +8,7 @@ using ApSolutions.LocalMedia.Domain.Courses;
 namespace ApSolutions.LocalMedia.Application.Courses;
 
 /// <summary>
-/// A course's picture: the file holding it, taken from the course's own first lesson (CRS-006).
+/// A course's picture: the file holding it, taken from the course's own first lesson.
 /// </summary>
 /// <remarks>
 /// <b>It is the picture the prototype draws, with the one substitution the prototype could not
@@ -17,7 +17,7 @@ namespace ApSolutions.LocalMedia.Application.Courses;
 /// that panel would be a placeholder for ever — unless the picture came from the video, which
 /// measurement on 2026-09-03 said it can.
 /// <para>
-/// <b>A cover somebody chose wins.</b> A course's identity is a title's identity, so LIB-018's
+/// <b>A cover somebody chose wins.</b> A course's identity is a title's identity, so the cover
 /// picker reaches courses like anything else, and a picture the application took for itself must
 /// never sit over one a person picked.
 /// </para>
@@ -41,7 +41,7 @@ public sealed class GetCourseThumbnail(
     /// The picture for this course, taking it first if there is none or the one there went stale.
     /// </summary>
     /// <remarks>
-    /// <paramref name="chosenCover"/> is whatever LIB-018 stored for this course. When there is one
+    /// <paramref name="chosenCover"/> is whatever the cover picker stored for this course. When there is one
     /// this answers with it and decodes nothing at all: the cheapest frame is the one nobody takes.
     /// </remarks>
     public async Task<string?> ExecuteAsync(

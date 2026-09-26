@@ -27,7 +27,7 @@ namespace ApSolutions.LocalMedia.UiTests.Library;
 /// <remarks>
 /// <para>
 /// The prototype was measured on 2026-09-12 with headless Chrome at both widths and all three
-/// densities, in the DOM and in pixels (<c>docs/evidence/stable/audit-poster-card-rhythm.md</c>).
+/// densities, in the DOM and in pixels.
 /// Four distances came out of it, and only the last one moves with the density:
 /// </para>
 /// <list type="bullet">

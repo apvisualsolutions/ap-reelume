@@ -19,7 +19,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// Two things were wrong with that. It covered <b>two views of fifty</b>, and it was stricter than the
 /// tree: the same <c>⚠</c> those two refused is literal in every other view that carries it, and
 /// <c>○ ◐ ●</c>, <c>→</c>, <c>✓</c> and <c>!</c> are literal by decision. Both copies fired on a glyph
-/// this batch added, one after the other, which is what a rule kept in two places does.
+/// added in one change, one after the other, which is what a rule kept in two places does.
 /// </para>
 /// <para>
 /// So it is stated once, over every view, as what it actually protects: <b>a literal is allowed only

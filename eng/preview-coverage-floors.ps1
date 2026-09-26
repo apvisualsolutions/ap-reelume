@@ -7,10 +7,10 @@
 
 .DESCRIPTION
     eng/check-coverage.ps1 refuses a floor that is too low exactly as it refuses one that is too
-    high, so a batch that improves a file turns a CI run red with "N improved". That red used to be
-    called the cost of doing business — GUIDE.md said subir cobertura cuesta dos vueltas — and it
-    was an excuse dressed as a rule: on 2026-08-31 a file was measured here at 83.33% of branches,
-    CI answered 83, and the number was written into a handover as a warning instead of into
+    high, so a change that improves a file turns a CI run red with "N improved". That red used to be
+    called the cost of doing business — raising coverage was said to take two rounds — and it was an
+    excuse dressed as a rule: on 2026-08-31 a file was measured here at 83.33% of branches, CI
+    answered 83, and the number was written down as a warning instead of into
     eng/coverage-debt.txt as a fix.
 
     This answers the same question without spending the run. It measures the suites you name, reads
@@ -103,7 +103,7 @@ function Get-NewSourceFile {
     param([string]$BaseRef)
 
     <#
-        A GIT THAT CANNOT ANSWER MUST NOT READ AS A CLEAN TREE, and until ENG-047 it did. The three
+        A GIT THAT CANNOT ANSWER MUST NOT READ AS A CLEAN TREE, and until 2026-09-20 it did. The three
         queries sent their complaints to $null and nobody looked at the exit code, so a repository
         git refuses to touch - the wrong directory, a dubious ownership refusal, a base ref that is
         not there - produced an empty list, which is the same answer a tree with no new source
@@ -235,9 +235,9 @@ try {
         takes branches the runner cannot. They are reported apart rather than hidden, because a
         warning that fires when it should not is what teaches people to ignore the warning.
 
-        The list only grows by measurement — GUIDE.md says seven files behave this way, and these
-        are the ones that have actually shown up. WindowsAudioDeviceCatalog is the one the guide
-        names: 79/61 here against 32/11 there.
+        The list only grows by measurement — seven files are known to behave this way, and these
+        are the ones that have actually shown up. WindowsAudioDeviceCatalog is the clearest case:
+        79/61 here against 32/11 there.
     #>
     $readsDifferentlyHere = @(
         'src/ApSolutions.LocalMedia.Windows/Playback/WindowsAudioDeviceCatalog.cs',

@@ -23,7 +23,7 @@ namespace ApSolutions.LocalMedia.AccessibilityTests.EndToEnd;
 
 /// <summary>
 /// Assertions about the composition made against the registered descriptors rather than the source
-/// file's text (the start of ARQ-006). A textual assertion is satisfied by a comment, a dead
+/// file's text. A textual assertion is satisfied by a comment, a dead
 /// registration, or a coincidence of characters; a descriptor is only satisfied by the collection
 /// the application actually builds from.
 /// </summary>
@@ -33,7 +33,7 @@ public sealed class CompositionDescriptorTests
     /// Identification has its provider, its candidate source, and — since 2026-08-28 — its artwork.
     /// </summary>
     /// <remarks>
-    /// This assertion was the opposite one until that date, and ART-A01 (2026-08-09) is what it
+    /// This assertion was the opposite one until that date, and an earlier audit is what it
     /// recorded: nothing fetched remote artwork and no surface showed it, so the registration left
     /// rather than promise a behaviour that did not exist. Both halves exist now, and both are asked
     /// for here — the store the identification fetches through, and the use case that decides
@@ -52,17 +52,19 @@ public sealed class CompositionDescriptorTests
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IArtworkStore));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(CacheTitleArtwork));
 
-        // Resolved and not merely registered, which is the whole of this repository's characteristic
-        // defect: the use case is built from the store, so resolving it proves the store is
-        // reachable rather than only declared. ApplyIdentification is deliberately not resolved
-        // here — it would open the database, and what this suite is about is the collection.
+        // Resolved and not merely registered, which is the whole difference between a service that
+        // works and one that is registered and never fed: the use case is built from the store, so
+        // resolving it proves the store is reachable rather than only declared. ApplyIdentification is
+        // deliberately not resolved here — it would open the database, and what this suite is about is
+        // the collection.
         using var provider = services.BuildServiceProvider();
         Assert.NotNull(provider.GetRequiredService<CacheTitleArtwork>());
     }
 
     /// <summary>
     /// <b>Moved from <c>RootWatchWiringTests</c>, which asserted that the composition's source text
-    /// mentioned a constant — and that is exactly the kind of gate ENG-044 walked straight past.</b>
+    /// mentioned a constant — and that is exactly the kind of gate the never-switched-on live
+    /// watcher walked straight past.</b>
     /// The old assertion was satisfied by the words being present; it could not notice that the
     /// scheduler they were handed to would never reach its loop, because nothing in the application
     /// assigned the flag it asked for. This resolves the real scheduler from the real container and

@@ -4,7 +4,7 @@
 namespace ApSolutions.LocalMedia.Domain.Discovery;
 
 /// <summary>
-/// Which file next to a film is its trailer (LIB-014).
+/// Which file next to a film is its trailer.
 /// </summary>
 /// <remarks>
 /// Two conventions, the ones Plex, Jellyfin and Kodi all write: a sibling named

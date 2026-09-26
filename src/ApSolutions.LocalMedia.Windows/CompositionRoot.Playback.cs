@@ -35,7 +35,6 @@ public static partial class CompositionRoot
     /// Everything a session touches: the engine, the surfaces that drive it, what it remembers about
     /// where you were, and the markers and segments it can skip.
     /// </summary>
-    /// <remarks>ARQ-006 step 2.</remarks>
     private static IServiceCollection AddPlayback(this IServiceCollection services) =>
         services
             .AddSingleton(_ => LibVlcFactory.CreateDefault())
@@ -112,7 +111,7 @@ public static partial class CompositionRoot
                     _ = await tracker.FlushAsync(PersistenceTrigger.Seek, token).ConfigureAwait(false);
                 },
                 // The speed is stored GLOBALLY and not per file or per series, and that is a
-                // decision rather than the easy path (ENG-011): a speed is how this person watches,
+                // decision rather than the easy path: a speed is how this person watches,
                 // while the audio language is a property of the series — which is why the tracks
                 // carry three scopes and this does not. The three-scope machinery still resolves it,
                 // so narrowing it later costs nothing.
@@ -142,7 +141,6 @@ public static partial class CompositionRoot
     /// What the library knows about you rather than about the files: the home surface, the marks you
     /// put on a title, and the recommendations drawn from both. All of it stays on this machine.
     /// </summary>
-    /// <remarks>ARQ-006 step 2.</remarks>
     private static IServiceCollection AddPersonalisation(this IServiceCollection services) =>
         services
             .AddSingleton<IHomeReadModel, HomeReadModel>()

@@ -39,7 +39,7 @@ public sealed class RecommendationSettingsViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     /// <remarks>
     /// It <b>applies</b> the threshold rather than only moving the slider, because in this group the
     /// slider on its own changes nothing: what is in force is what the use case last wrote, and it

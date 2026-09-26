@@ -10,8 +10,8 @@ namespace ApSolutions.LocalMedia.Domain.Personalization;
 /// at all; there is no half star and no zero, because zero and "not rated" would be indistinguishable.
 /// </summary>
 /// <remarks>
-/// It was one to ten until 2026-08-25, drawn as ten numbered squares. Five stars is what the maintainer
-/// asked for — «las típicas de Google» — and what is already stored comes with it: migration 0020
+/// It was one to ten until 2026-08-25, drawn as ten numbered squares. Five stars is the familiar
+/// scale people already know, and what is already stored comes with it: migration 0020
 /// halves every rating and rounds up, so a 1 survives as one star rather than falling to a zero this
 /// application cannot hold.
 /// </remarks>

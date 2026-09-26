@@ -13,13 +13,13 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Playback;
 
 /// <summary>
-/// What the endpoint actually receives, recorded rather than read (PLY-004).
+/// What the endpoint actually receives, recorded rather than read.
 ///
-/// The surround rows of T23 were left unverified on the strength of a label: the registry says an
-/// endpoint mixes in two channels, so 5.1 and 7.1 were recorded as a hardware block. That label is
-/// written by Windows, and listing it is not verifying it. These tests play the tone-marked sample
-/// through a real audio output and capture the engine's own mix back through WASAPI loopback, so both
-/// the channel count and the content of every channel are measured.
+/// The surround rows of the audio channel matrix were left unverified on the strength of a label: the
+/// registry says an endpoint mixes in two channels, so 5.1 and 7.1 were recorded as a hardware block.
+/// That label is written by Windows, and listing it is not verifying it. These tests play the
+/// tone-marked sample through a real audio output and capture the engine's own mix back through WASAPI
+/// loopback, so both the channel count and the content of every channel are measured.
 ///
 /// Two limits, so that a pass here is not read as more than it is. The capture takes the endpoint's
 /// whole mix, so audio from another application during the run would be included; and the assertions
@@ -73,7 +73,7 @@ public sealed class AudioLoopbackChannelTests
         Assert.SkipWhen(
             endpoint.Channels < 8,
             $"The largest active render endpoint mixes {endpoint.Channels} channels, so 7.1 cannot be "
-                + "recorded here. PLY-004's surround rows stay unverified until an eight-channel one exists.");
+                + "recorded here. The surround rows stay unverified until an eight-channel one exists.");
 
         var capture = await RecordToneSampleAsync(endpoint.Id);
         var results = ChannelToneAnalysis.Measure(capture, ChannelToneAnalysis.Surround71);
@@ -259,7 +259,7 @@ public sealed class AudioLoopbackChannelTests
 
     private static async Task WriteRowsAsync(IReadOnlyList<string> rows, string fileName)
     {
-        var directory = Path.Combine(MediaToolchain.RepositoryRoot, "artifacts", "test-results", "PLY-004");
+        var directory = Path.Combine(MediaToolchain.RepositoryRoot, "artifacts", "test-results", "audio-loopback");
         Directory.CreateDirectory(directory);
         await File.WriteAllLinesAsync(
             Path.Combine(directory, fileName), rows, TestContext.Current.CancellationToken);

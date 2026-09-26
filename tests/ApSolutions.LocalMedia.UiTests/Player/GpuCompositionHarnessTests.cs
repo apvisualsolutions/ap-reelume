@@ -16,13 +16,13 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
 /// What this repository's pixel harness can and cannot see of a GPU route, measured before
-/// `PLY-016` builds one on top of it.
+/// the video enhancement builds one on top of it.
 /// </summary>
 /// <remarks>
 /// <para>
 /// Avalonia's own documentation warns that <c>RenderTargetBitmap</c> renders in software and that
 /// «controls that rely on GPU-specific rendering paths … may not render correctly when captured
-/// this way» — and <c>CaptureRenderedFrame</c> is that capture. `PLY-016` ends in a shared D3D11
+/// this way» — and <c>CaptureRenderedFrame</c> is that capture. The enhancement ends in a shared D3D11
 /// texture imported into the composition, so a gate written on the harness without measuring it
 /// first would read a silence as «nothing changed», which is the worst failure this repository
 /// knows: a green that means nobody looked.
@@ -81,7 +81,7 @@ public sealed class GpuCompositionHarnessTests
     }
 
     /// <summary>
-    /// Whether the harness sees the composition layer at all, which is where `PLY-016` ends.
+    /// Whether the harness sees the composition layer at all, which is where the enhancement ends.
     /// </summary>
     /// <remarks>
     /// A composition child visual is not drawn by <c>Render</c>: it is handed to the compositor and
@@ -101,7 +101,7 @@ public sealed class GpuCompositionHarnessTests
             $"The scan found {found} green pixels where a CompositionSolidColorVisual of exactly "
                 + $"{Scene.MarkArea} was attached. Zero means the composition layer does not reach "
                 + "CaptureRenderedFrame at all, and any other number means it arrives cropped or "
-                + "rescaled — either way a `PLY-016` gate written on this harness would be reading "
+                + "rescaled — either way an enhancement gate written on this harness would be reading "
                 + "something other than the picture, and the chain has to be measured where the "
                 + "texture is instead.");
     }
@@ -125,7 +125,7 @@ public sealed class GpuCompositionHarnessTests
         Assert.True(
             interop is null,
             "The headless harness now offers GPU interop, which it did not when this was measured. "
-                + "That changes where `PLY-016` can be gated: re-measure and rewrite this.");
+                + "That changes where the enhancement can be gated: re-measure and rewrite this.");
     }
 
     private sealed class Scene : IDisposable
@@ -136,7 +136,7 @@ public sealed class GpuCompositionHarnessTests
         /// <summary>
         /// What a mark of this size has to measure, to the pixel. A threshold of «more than a
         /// thousand» would call a mark arriving at a quarter of its size a success, and «the
-        /// composition layer reaches the frame» is exactly the conclusion `PLY-016` inherits.
+        /// composition layer reaches the frame» is exactly the conclusion the enhancement inherits.
         /// </summary>
         public const int MarkArea = MarkWidth * MarkHeight;
 

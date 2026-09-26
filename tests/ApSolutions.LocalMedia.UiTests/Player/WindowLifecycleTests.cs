@@ -17,7 +17,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// <summary>
 /// Window modes must move the same surface rather than build a new one, and fullscreen must size
 /// itself in logical units. Sizing in physical pixels is exactly the defect that pushed the transport
-/// bar off a 150% display in the T18 spike.
+/// bar off a 150% display in the first player spike.
 /// </summary>
 public sealed class WindowLifecycleTests
 {
@@ -105,7 +105,7 @@ public sealed class WindowLifecycleTests
     /// Fullscreen is a window state and not just a size, and leaving it gives the state back.
     /// </summary>
     /// <remarks>
-    /// <b>It was only a size until 2026-09-02</b>, and the maintainer reported what that costs: the
+    /// <b>It was only a size until 2026-09-02</b>, and what that costs was reported: the
     /// Windows taskbar stayed on top of the picture. A window merely as large as the screen is not a
     /// fullscreen window — the taskbar is drawn over ordinary windows whatever their size and steps
     /// aside only for this state. Measured on a 2560x1440 display whose working area is 1392 tall:

@@ -4,7 +4,7 @@
 namespace ApSolutions.LocalMedia.Domain.Courses;
 
 /// <summary>
-/// One video file, as a lesson (CRS-001). <see cref="Name"/> is what the file is called and
+/// One video file, as a lesson. <see cref="Name"/> is what the file is called and
 /// <see cref="Title"/> is what is left once its leading number is read off, which are two different
 /// things: the name is what the order is computed from and the title is what a person reads.
 /// </summary>
@@ -21,7 +21,7 @@ public sealed record DetectedCourseSection(
     string? Title,
     IReadOnlyList<DetectedLesson> Lessons);
 
-/// <summary>A course folder and everything watchable under it (CRS-001).</summary>
+/// <summary>A course folder and everything watchable under it.</summary>
 public sealed record DetectedCourse(
     string RelativePath,
     string Name,
@@ -30,7 +30,7 @@ public sealed record DetectedCourse(
     IReadOnlyList<DetectedCourseSection> Sections);
 
 /// <summary>
-/// Which folders under a course root are courses, and what is inside them (ADR-0006 decision 3).
+/// Which folders under a course root are courses, and what is inside them.
 /// </summary>
 /// <remarks>
 /// The depth is declared and never guessed. Guessing was tried and measured not to work: the

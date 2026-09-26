@@ -113,7 +113,7 @@ public sealed class MovieDetailsViewModel : INotifyPropertyChanged
     public ICommand PlayTrailerCommand { get; }
 
     /// <summary>
-    /// Opens the provider's trailer in the browser (LIB-015). This is a separate offer from the one
+    /// Opens the provider's trailer in the browser. This is a separate offer from the one
     /// above and it leaves the application on purpose: playing YouTube inside would need a route
     /// their terms do not allow. The address was composed by <see cref="TrailerLinkPolicy"/> when
     /// the key arrived, so what travels from here is already the only shape this application builds.

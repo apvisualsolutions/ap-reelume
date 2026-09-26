@@ -10,14 +10,12 @@ using Xunit;
 namespace ApSolutions.LocalMedia.MediaTests.Playback;
 
 /// <summary>
-/// A frame really comes out of a real video, and the guards really refuse before anything opens
-/// (CRS-006).
+/// A frame really comes out of a real video, and the guards really refuse before anything opens.
 /// </summary>
 /// <remarks>
-/// The spike measured that this route works — «docs/evidence/stable/CRS-thumbnail-spike.md» — and
-/// this is the gate that keeps it working. Everything about <b>which</b> frame is
-/// <c>CourseThumbnailPolicy</c>'s and is covered without a decoder; what is here is the half that
-/// needs one.
+/// A spike measured that this route works, and this is the gate that keeps it working. Everything about
+/// <b>which</b> frame is <c>CourseThumbnailPolicy</c>'s and is covered without a decoder; what is here
+/// is the half that needs one.
 /// </remarks>
 public sealed class VideoFrameGrabberTests : IAsyncLifetime
 {
@@ -76,14 +74,14 @@ public sealed class VideoFrameGrabberTests : IAsyncLifetime
     }
 
     /// <summary>
-    /// What one batch of the frame pass costs (LIB-021): <c>CaptureTitleFrames.BatchSize</c> files,
+    /// What one batch of the frame pass costs: <c>CaptureTitleFrames.BatchSize</c> files,
     /// one after the other, the way the pass takes them.
     /// </summary>
     /// <remarks>
     /// The ceiling is the failure that matters and not a benchmark: a grabber that waited out its
     /// deadline on every file would spend 25 × 3 s on a batch and still take every frame, so no other
     /// test here would notice. The spike measured 433-472 ms a file; the figure goes to the output so
-    /// the evidence can quote a measurement instead of that estimate.
+    /// a measurement can be quoted instead of that estimate.
     /// </remarks>
     [Fact]
     public async Task A_batch_of_twenty_five_frames_costs_seconds_not_the_sum_of_every_deadline()
@@ -110,7 +108,7 @@ public sealed class VideoFrameGrabberTests : IAsyncLifetime
 
         watch.Stop();
         TestContext.Current.SendDiagnosticMessage(
-            $"LIB-021: {taken} of {Batch} frames in {watch.Elapsed.TotalSeconds:F1} s, {watch.Elapsed.TotalMilliseconds / Batch:F0} ms each.");
+            $"Frame pass: {taken} of {Batch} frames in {watch.Elapsed.TotalSeconds:F1} s, {watch.Elapsed.TotalMilliseconds / Batch:F0} ms each.");
         Assert.Equal(Batch, taken);
         Assert.True(
             watch.Elapsed < CourseThumbnailPolicy.Deadline * Batch / 2,

@@ -250,7 +250,7 @@ public sealed class LifecycleSettingsTests
     }
 
     /// <summary>
-    /// UX-010, measured on what was saved: this group's values reach a registry key and a settings
+    /// Restoring the defaults, measured on what was saved: this group's values reach a registry key and a settings
     /// file, so a reset that only moved the switches would leave the machine starting the
     /// application at sign-in while the screen said it did not.
     /// </summary>

@@ -16,7 +16,7 @@ public sealed record IdentifyScannedFilesResult(
 /// <summary>
 /// Runs identification over what a scan catalogued. This is the caller the audit found missing:
 /// <c>IdentifyMediaFile</c> was registered and tested, the scan produced files, and nothing joined
-/// the two — so the review inbox stayed empty forever (LIB-006/007).
+/// the two — so the review inbox stayed empty forever.
 /// </summary>
 /// <remarks>
 /// A file that already has candidates is left alone: an accepted or rejected decision must survive
@@ -119,7 +119,7 @@ public sealed class IdentifyScannedFiles
     }
 
     /// <summary>
-    /// The automatic half of LIB-007, which until now was calculated and thrown away. A candidate
+    /// The automatic half of identification, which until now was calculated and thrown away. A candidate
     /// the scorer trusted on its own is applied without asking, because the whole point of the
     /// threshold is that nobody should have to confirm what is not in doubt; anything below it stays
     /// in the inbox for a person. Only one candidate can reach that state, since it takes a score

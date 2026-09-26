@@ -29,11 +29,12 @@ public sealed class ArtifactContentsTests
         [".json", ".txt", ".md", ".xml", ".config", ".appxmanifest", ".ps1", ".runtimeconfig.json"];
 
     /// <summary>
-    /// Anything that names the machine that produced the artifact. The repository is going public and
-    /// the package travels further than the repository does.
+    /// Anything that names the machine that produced the artifact. The repository is public and the
+    /// package travels further than the repository does. A profile path with a drive letter in front
+    /// is caught by the backslash form, which it contains.
     /// </summary>
     private static readonly string[] PrivacyMarkers =
-        [@"C:\Users\", "C:/Users/", @"\Users\", "AP_LOCALMEDIA_TMDB_TOKEN="];
+        ["C:/Users/", @"\Users\", "AP_LOCALMEDIA_TMDB_TOKEN="];
 
     [Fact]
     public void Both_distribution_paths_exist_and_hash_to_what_the_release_publishes()

@@ -27,7 +27,7 @@ public interface IAppDataPaths
     string RemoteCacheDirectory { get; }
 
     /// <summary>
-    /// Frames taken from a course's own video to stand as its picture (CRS-006).
+    /// Frames taken from a course's own video to stand as its picture.
     /// </summary>
     /// <remarks>
     /// Beside the downloaded artwork rather than beside the personal kind, and that is the decision
@@ -41,7 +41,7 @@ public interface IAppDataPaths
 
     /// <summary>
     /// Where a frame taken from a film's or series' own video is kept, for a title with no other
-    /// cover (LIB-021, ADR-0009).
+    /// cover.
     /// </summary>
     /// <remarks>
     /// Beside the course thumbnails and for their reason: the application took these, every one can be

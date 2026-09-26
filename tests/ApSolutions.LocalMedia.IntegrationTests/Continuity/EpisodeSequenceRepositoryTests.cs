@@ -175,9 +175,9 @@ public sealed class EpisodeSequenceRepositoryTests
     /// The shape a real library actually has. Nothing in the application writes the <c>titles</c>
     /// table — <c>ApplyIdentification</c> says so, and its only writer has no caller outside these
     /// tests — so a scanned library is rows in <c>scanned_titles</c> whose title id is the media
-    /// file's own. Reading <c>titles</c> alone is what left Home blank on the maintainer's machine on
-    /// 2026-08-25: 102 scanned files, zero identified titles, four things half watched, and a Home
-    /// that showed none of them while the library listed all of them.
+    /// file's own. Reading <c>titles</c> alone is what left Home blank on a real library: about a
+    /// hundred scanned files, zero identified titles, a few things half watched, and a Home that
+    /// showed none of them while the library listed all of them.
     /// </summary>
     [Fact]
     public async Task Home_sees_a_library_that_was_scanned_and_never_identified()

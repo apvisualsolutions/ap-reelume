@@ -10,7 +10,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Settings;
 
 /// <summary>
-/// BUG-011: the window was pinned to Spanish while the update summary and the metadata followed
+/// The window was pinned to Spanish while the update summary and the metadata followed
 /// the machine's culture — two sources of truth for one question. The service is now the only
 /// answer, and applying it moves the resources and the thread culture together.
 /// </summary>

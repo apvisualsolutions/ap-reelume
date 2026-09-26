@@ -18,9 +18,10 @@ namespace ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 /// on its own. Nothing in the application writes that table — <c>ApplyIdentification</c> says so in
 /// its own words, and its only writer has no caller outside integration tests — so a real library is
 /// a set of scanned files whose title id is the media file's id. Reading <c>titles</c> alone is why
-/// Home came up empty on a machine with 102 scanned files and four things half watched: measured on
-/// 2026-08-25 against the maintainer's own database, which held 102 rows in <c>scanned_titles</c>, zero in
-/// <c>titles</c>, and four in <c>watch_state</c> that all joined to a scanned file and to nothing else.
+/// Home came up empty on a machine with about a hundred scanned files and a few things half watched:
+/// measured on 2026-08-25 against a real catalogue, which held about a hundred rows in
+/// <c>scanned_titles</c>, none in <c>titles</c>, and a handful in <c>watch_state</c> that all joined to
+/// a scanned file and to nothing else.
 /// </remarks>
 public sealed class HomeReadModel : IHomeReadModel
 {

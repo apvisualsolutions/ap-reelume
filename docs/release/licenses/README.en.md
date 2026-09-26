@@ -66,9 +66,9 @@ notice turns the test red instead of leaving the artifact distributing the previ
 
 ## What is still open
 
-The package carries the licences; the `REL-004` legal opinion is still pending and belongs to
+The package carries the licences; a professional legal opinion is still pending and belongs to
 whoever publishes, not to whoever writes code. Since 2026-09-18 the engine is a build of our own
 without GPL, so no plugin needs the GPL-2.0 §3 offer any more. The point left for it is which
 subsection of LGPL-2.1 §6 covers the way LibVLC travels here — a modified dynamic library, with its
-source attached, and replaceable. The `LGPL-3.0` of gmp, nettle and live555 was read on 2026-09-18
-(`ENG-028`) and the conclusion is in `LEGAL`.
+source attached, and replaceable. The `LGPL-3.0` of gmp, nettle and live555 was read on 2026-09-18,
+and the conclusion is at the end of the [third-party notices](../THIRD-PARTY-NOTICES.en.md).

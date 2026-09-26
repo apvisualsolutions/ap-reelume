@@ -9,7 +9,7 @@
     There is no .wapproj here. Building one needs Microsoft.DesktopBridge.targets, which ships with a
     Visual Studio workload rather than with the .NET SDK, so a packaging project would be a file this
     repository could not build and no test could verify. The layout is assembled here instead and
-    sealed with MakeAppx from the Windows SDK; ADR-0004 records the decision.
+    sealed with MakeAppx from the Windows SDK.
 
     Two things this script does that a default publish does not:
 
@@ -233,13 +233,13 @@ try {
     }
 
     # Line feeds and a trailing one, no BOM: these exact bytes are what the release signature is
-    # made over and what the updater reconstructs from the notes to verify it (SEC-003). CRLF here
+    # made over and what the updater reconstructs from the notes to verify it. CRLF here
     # would be a second, invisible variable in a signature check.
     $sumsPath = Join-Path $outputRoot 'SHA256SUMS.txt'
     [IO.File]::WriteAllText($sumsPath, (($sums -join "`n") + "`n"))
 
     # The signature travels with every release; the key never travels with the repository. The
-    # release workflow signs with its secret, the maintainer signs with the guarded local copy, and a
+    # release workflow signs with its secret, a local release signs with the guarded local copy, and a
     # build with neither stays honest: it says so, and prepare-release blocks on it.
     $signingSource =
         if ($env:RELEASE_SIGNING_SECRET_KEY) { 'RELEASE_SIGNING_SECRET_KEY' }

@@ -132,7 +132,7 @@ public sealed class AudioOutputViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
-    /// Applies a person's choice to the running session and stores it (AUD-A01). Optional the way
+    /// Applies a person's choice to the running session and stores it. Optional the way
     /// the gesture handler is: a surface built without it shows the machine's outputs and applies
     /// nothing, which is what a session-less context wants. The handler's answer is authoritative,
     /// because only it knows whether the device fell back or the layout was reduced.

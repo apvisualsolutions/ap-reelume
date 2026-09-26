@@ -39,7 +39,7 @@ public sealed class ShellLocalizationTests
     }
 
     /// <summary>
-    /// Six since 2026-08-30 (CRS-003). Names and order, not a count: the enum is not persisted
+    /// Six since 2026-08-30, when Courses arrived. Names and order, not a count: the enum is not persisted
     /// anywhere - checked before adding to it - so its order is free to say where the rail puts it.
     /// </summary>
     [Fact]
@@ -168,7 +168,7 @@ public sealed class ShellLocalizationTests
                 RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
-                "T2",
+                "shell-localization",
                 $"shell-{cultureName}.png");
             Directory.CreateDirectory(Path.GetDirectoryName(artifactPath)!);
             frame.Save(artifactPath, PngBitmapEncoderOptions.Default);

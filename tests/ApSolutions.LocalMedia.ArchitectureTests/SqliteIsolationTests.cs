@@ -77,5 +77,5 @@ public sealed class SqliteIsolationTests
     // The assertion that the composition selects the migration runner's constructor explicitly
     // lived here as a match on the source text — satisfiable by a comment or a coincidence of
     // characters. It moved to CompositionDescriptorTests (AccessibilityTests), which asserts the
-    // registered descriptor's factory instead (ARQ-006).
+    // registered descriptor's factory instead.
 }

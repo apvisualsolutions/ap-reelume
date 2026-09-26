@@ -22,7 +22,7 @@ public sealed record UpdateRelease(
 {
     /// <summary>
     /// True only when whoever produced this description proved the checksums were signed by the
-    /// release key (SEC-003). It is a verdict, not a claim from the source: the provider sets it
+    /// release key. It is a verdict, not a claim from the source: the provider sets it
     /// after verifying the minisign signature against the key this binary embeds.
     /// </summary>
     public bool Sha256Signed { get; init; }
@@ -50,7 +50,7 @@ public enum UpdateRejection
 
     /// <summary>
     /// The checksums were not proved signed by the release key, so the hash and the package it
-    /// vouches for come from the same unsigned answer (SEC-003).
+    /// vouches for come from the same unsigned answer.
     /// </summary>
     UnsignedChecksums,
 

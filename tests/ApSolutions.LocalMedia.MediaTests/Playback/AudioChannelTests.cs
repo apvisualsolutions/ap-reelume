@@ -101,7 +101,7 @@ public sealed class AudioChannelTests
             MediaToolchain.RepositoryRoot,
             "artifacts",
             "test-results",
-            "T23",
+            "audio-channels",
             "green",
             "source-channel-layouts.csv");
         Directory.CreateDirectory(Path.GetDirectoryName(report)!);

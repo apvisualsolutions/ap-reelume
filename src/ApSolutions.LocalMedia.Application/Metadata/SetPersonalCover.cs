@@ -18,7 +18,7 @@ public sealed record PersonalCoverResult(CoverImageVerdict Verdict, string? Path
 }
 
 /// <summary>
-/// Takes a file the person chose and makes it this title's cover (LIB-018).
+/// Takes a file the person chose and makes it this title's cover.
 /// </summary>
 /// <remarks>
 /// <b>This is the call that did not exist.</b> The store has known how to import a personal image

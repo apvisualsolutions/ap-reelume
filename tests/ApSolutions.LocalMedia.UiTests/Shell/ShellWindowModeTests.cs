@@ -18,8 +18,7 @@ namespace ApSolutions.LocalMedia.UiTests.Shell;
 /// The playback mode reaches the shell's own window, and not only its view model.
 /// </summary>
 /// <remarks>
-/// <b>It reached nothing until 2026-09-02</b>, and the maintainer reported it as «aun no funciona la
-/// pantalla completa». <c>ApplyPlaybackMode</c> set two flags — which arrow the transport draws —
+/// <b>It reached nothing until 2026-09-02</b>, and it was reported as fullscreen not working. <c>ApplyPlaybackMode</c> set two flags — which arrow the transport draws —
 /// and then built a window only for the mini player. <c>PlayerWindowCoordinator</c> had the
 /// fullscreen geometry, tested and reachable, and <b>nobody ever called it with that mode</b>. So
 /// pressing fullscreen swapped a glyph and left the window where it was.

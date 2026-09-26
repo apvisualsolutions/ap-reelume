@@ -39,7 +39,7 @@ public sealed class MetadataMergePolicyTests
     }
 
     /// <summary>
-    /// ADR-0009: the cover somebody picked lives apart from the provider's, so a refresh has no field
+    /// The cover somebody picked lives apart from the provider's, so a refresh has no field
     /// to overwrite it through — not even one with every lock cleared, which is what restoring the
     /// provider's fields does, and what used to orphan the chosen file.
     /// </summary>

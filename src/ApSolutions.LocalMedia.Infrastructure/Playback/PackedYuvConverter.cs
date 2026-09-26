@@ -18,7 +18,7 @@ namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 /// bytes changed, and the picture written to disk showed the line. The memory output tells the core
 /// it can take subpictures itself for the other formats, and the display callback LibVLC hands a
 /// managed application has no parameter to receive one, so every subtitle was dropped without a
-/// word. That is why the maintainer saw subtitles in VLC and none here.
+/// word. That is why the same file showed subtitles in VLC and none here.
 /// </para>
 /// <para>
 /// The price is this conversion and half the horizontal chroma resolution, which is what every

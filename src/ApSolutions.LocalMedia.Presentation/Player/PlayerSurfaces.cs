@@ -63,7 +63,7 @@ public sealed record PlayerSurfaces
     public LooseFileViewModel? LooseFile { get; init; }
 
     /// <summary>
-    /// The course around this lesson, and null for every session that is not one (CRS-004).
+    /// The course around this lesson, and null for every session that is not one.
     /// </summary>
     /// <remarks>
     /// Null is the panel's <b>absence</b> and not an empty panel, which is what the ficha asks for in

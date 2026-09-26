@@ -10,7 +10,7 @@ using ApSolutions.LocalMedia.Domain.Discovery;
 namespace ApSolutions.LocalMedia.Application.Courses;
 
 /// <summary>
-/// Declares a root to hold courses at <paramref name="CourseDepth"/> and reads it (CRS-001).
+/// Declares a root to hold courses at <paramref name="CourseDepth"/> and reads it.
 /// </summary>
 /// <param name="CourseDepth">
 /// How many folder levels down a course sits. It is the user's answer and never the program's:
@@ -19,7 +19,7 @@ namespace ApSolutions.LocalMedia.Application.Courses;
 /// <param name="OnlyRelativePaths">
 /// Which of the detected folders to actually mark, or <see langword="null"/> for all of them.
 /// Pointing at one course declares the depth for the whole root, and at that depth there may be
-/// neighbours the person has not said anything about yet — ADR-0006 amendment 1 has the application
+/// neighbours the person has not said anything about yet — the application has to
 /// ask before claiming them, so the first pass names the one folder and the answer decides the rest.
 /// </param>
 public sealed record MarkCoursesInRootCommand(
@@ -44,7 +44,7 @@ public sealed record MarkedCourses(IReadOnlyList<MarkedCourse> Marked, IReadOnly
 }
 
 /// <summary>
-/// Marking a folder of numbered videos as a course, and re-reading one that already is (CRS-001).
+/// Marking a folder of numbered videos as a course, and re-reading one that already is.
 /// </summary>
 /// <remarks>
 /// Nothing here reaches the network, and that is the point rather than an omission: a course root is

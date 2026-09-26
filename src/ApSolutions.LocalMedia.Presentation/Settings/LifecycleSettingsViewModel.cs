@@ -47,7 +47,7 @@ public sealed class LifecycleSettingsViewModel : INotifyPropertyChanged
 
     public ICommand DeclineStartupConsentCommand { get; }
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     public ICommand RestoreDefaultsCommand { get; }
 
     public bool TrayEnabled

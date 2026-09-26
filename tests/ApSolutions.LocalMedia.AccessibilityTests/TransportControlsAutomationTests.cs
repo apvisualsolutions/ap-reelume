@@ -59,7 +59,7 @@ public sealed class TransportControlsAutomationTests
                 RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
-                "T21",
+                "transport-controls",
                 $"transport-uia-{cultureName}.txt");
             Directory.CreateDirectory(Path.GetDirectoryName(treePath)!);
             File.WriteAllLines(treePath, controls.Select(control =>
@@ -315,7 +315,7 @@ public sealed class TransportControlsAutomationTests
     /// <para>
     /// What made it possible to ask the model instead is that the menu is now built from the policy
     /// rather than repeating it. Until then <see cref="PlaybackControlPolicy.SpeedSteps"/> was read
-    /// by nothing at all in <c>src/</c> — the characteristic defect of this repository, with the
+    /// by nothing at all in <c>src/</c> — built and never used, with the
     /// comment above it claiming the keyboard walked it.
     /// </para>
     /// </remarks>

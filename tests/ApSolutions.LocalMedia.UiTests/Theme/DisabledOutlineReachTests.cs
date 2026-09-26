@@ -18,8 +18,8 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// Where the dotted outline actually lands, view by view, with no data behind any of them.
 /// </summary>
 /// <remarks>
-/// «Los contornos punteados salen donde no van», the maintainer reported on 2026-08-25, naming seven
-/// screens and «algún elipse». The outline is drawn on a control that is disabled, so the question
+/// Dotted outlines appearing where they do not belong was reported on 2026-08-25, naming seven
+/// screens and an ellipse. The outline is drawn on a control that is disabled, so the question
 /// is not about the outline: it is which controls are disabled, and whether each one deserves to be.
 /// This is the instrument that answers it — it prints what it finds rather than judging, because
 /// what is right for one of them is a decision and not a rule.
@@ -34,7 +34,7 @@ public sealed class DisabledOutlineReachTests
     /// Measured before the change: 299 controls across the tree carried one with no data loaded,
     /// every one of them a command with nothing to act on. They are all genuinely disabled — the
     /// outline was never lying — and in light and dark the fill already says so. Seven screens' worth
-    /// of dotted rectangles over a grey that said it first is what the maintainer reported.
+    /// of dotted rectangles over a grey that said it first is what was reported.
     /// </remarks>
     [AvaloniaTheory]
     [InlineData("Light")]

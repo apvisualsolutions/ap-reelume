@@ -86,11 +86,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
       nobody using a desktop application opens NOTICE.
 
       The wording is NOT the prototype's. The prototype says "LibVLC · LGPL", and "LGPL" is not a
-      licence. The maintainer decided on 2026-09-06 that this row states the facts
-      docs/release/THIRD-PARTY-NOTICES.es.md establishes rather than the prototype's shorthand, and
-      those facts changed on 2026-09-18 (ENG-013): the engine is no longer VideoLAN's unmodified
-      build with GPL plugins in it, but one built without GPL code, and LGPL-2.1 §2(a) asks a
-      modified library to say that it was modified.
+      licence. This row states the facts docs/release/THIRD-PARTY-NOTICES.es.md establishes rather than
+      the prototype's shorthand, and those facts changed when the engine was rebuilt: it is no longer
+      VideoLAN's unmodified build with GPL plugins in it, but one built without GPL code, and LGPL-2.1
+      §2(a) asks a modified library to say that it was modified.
     -->
     <TextBlock Text="{DynamicResource AboutPlaybackEngineAttribution}" TextWrapping="Wrap" />
   </StackPanel>

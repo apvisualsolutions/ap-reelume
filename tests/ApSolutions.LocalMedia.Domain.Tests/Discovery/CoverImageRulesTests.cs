@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Discovery;
 
 /// <summary>
-/// What may be accepted when somebody chooses their own cover (LIB-018).
+/// What may be accepted when somebody chooses their own cover.
 /// </summary>
 /// <remarks>
 /// The lock that had to exist before the door: the import this guards read whatever file it was

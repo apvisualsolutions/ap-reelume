@@ -27,7 +27,6 @@ public static partial class CompositionRoot
     /// Finding the media and keeping the catalog honest about it: the scan, the watchers that start
     /// one, the reconciliation that survives a file moving, and the surfaces that show all of it.
     /// </summary>
-    /// <remarks>ARQ-006 step 2.</remarks>
     private static IServiceCollection AddLibrary(this IServiceCollection services) =>
         services
             .AddSingleton<ScanCoordinator>()
@@ -46,7 +45,7 @@ public static partial class CompositionRoot
                 () => provider.GetRequiredService<GroupScannedVersions>(),
                 () => provider.GetRequiredService<GroupScannedEpisodes>(),
                 () => provider.GetRequiredService<NameScannedTitles>(),
-                // LIB-021. Only told: the scan's summary goes back without waiting for the frames.
+                // Only told: the scan's summary goes back without waiting for the frames.
                 provider.GetRequiredService<Metadata.TitleFramePass>().Request))
             .AddSingleton<RootWatchCoordinator>()
             .AddSingleton<RootWatchBackground>()

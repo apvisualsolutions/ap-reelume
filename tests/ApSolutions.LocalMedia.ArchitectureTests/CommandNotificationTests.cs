@@ -8,7 +8,7 @@ using ApSolutions.LocalMedia.TestSupport;
 namespace ApSolutions.LocalMedia.ArchitectureTests;
 
 /// <summary>
-/// The gate on commands that never announce themselves (ARQ-004).
+/// The gate on commands that never announce themselves.
 /// </summary>
 /// <remarks>
 /// A private command class whose <c>CanExecuteChanged</c> has an empty add and remove throws every
@@ -64,7 +64,7 @@ public sealed class CommandNotificationTests
                     "public bool CanExecute(object? parameter) => parameter is ThemePreference;",
                     "public bool CanExecute(object? parameter) => AccentPalette.IsAccent(parameter as string);",
                     "public bool CanExecute(object? parameter) => parameter is T value && Enum.IsDefined(value);",
-                    // Five now, and the fifth is UX-010's «Restaurar valores por defecto»: a group
+                    // Five now, and the fifth is «Restaurar valores por defecto»: a group
                     // can always be put back, including when it is already where it started.
                     "public bool CanExecute(object? parameter) => true;",
                 ],
@@ -86,7 +86,7 @@ public sealed class CommandNotificationTests
             // an option. One command each, so choosing a subtitle cannot arrive at the audio half.
             ["src/ApSolutions.LocalMedia.Presentation/Player/TrackSelectorViewModel.cs"] =
                 ["public bool CanExecute(object? parameter) => parameter is TrackOption;"],
-            // LIB-021: the rows that say where this one title's cover comes from. The same question
+            // The rows that say where this one title's cover comes from. The same question
             // the two lists above ask — is this parameter one of the options — and the answer cannot
             // move while the editor is open: the four choices are the general order plus one per
             // origin, built once and never rebuilt.
@@ -100,7 +100,7 @@ public sealed class CommandNotificationTests
                 ],
             ["src/ApSolutions.LocalMedia.Presentation/Settings/LifecycleSettingsViewModel.cs"] =
                 ["public bool CanExecute(object? parameter) => true;"],
-            // UX-010's three first «Restaurar valores por defecto», and they ask nothing because
+            // The first three «Restaurar valores por defecto», and they ask nothing because
             // there is nothing to ask: a group can always be put back, including when it is already
             // where it started — restoring what is already the default writes nothing, which the
             // setters see to. The alternative was hiding the button while a group sat at its

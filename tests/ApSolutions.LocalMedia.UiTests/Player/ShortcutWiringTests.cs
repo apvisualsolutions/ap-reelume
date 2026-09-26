@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Player;
 
 /// <summary>
-/// Shortcuts and media keys existed as parts and never as a chain (PLY-014 / ARQ-002): the media
+/// Shortcuts and media keys existed as parts and never as a chain: the media
 /// key source was registered and its <c>StartAsync</c> never called, the router that stops a key
 /// from acting twice was never instantiated, the player had no key handling at all, and the
 /// settings editor could edit a map of its own instead of the one the application registered.

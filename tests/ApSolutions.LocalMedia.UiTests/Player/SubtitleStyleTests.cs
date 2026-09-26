@@ -57,7 +57,7 @@ public sealed class SubtitleStyleTests
     }
 
     /// <summary>
-    /// UX-010, and through the command rather than the method: <c>ResetAsync</c> had been here since
+    /// Restoring the defaults, and through the command rather than the method: <c>ResetAsync</c> had been here since
     /// this view model was written and <b>nothing called it</b> — registered and never fed, in the
     /// one method whose whole job is to undo. What this asserts is the wire, on the stored value.
     /// </summary>
@@ -125,7 +125,7 @@ public sealed class SubtitleStyleTests
     public void Every_style_control_is_named_focusable_and_rendered_at_each_supported_scaling()
     {
         Assert.NotNull(Avalonia.Application.Current);
-        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T20");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "subtitle-style");
         Directory.CreateDirectory(captures);
 
         foreach (var cultureName in new[] { "es-ES", "en-US" })
@@ -209,7 +209,7 @@ public sealed class SubtitleStyleTests
 
             var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
-            var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T20");
+            var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "subtitle-style");
             Directory.CreateDirectory(captures);
             frame.Save(
                 Path.Combine(captures, "subtitle-style-high-contrast.png"),

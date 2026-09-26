@@ -10,9 +10,9 @@ namespace ApSolutions.LocalMedia.Domain.Tests.Identification;
 /// A folder of episodes is a series, and this is the rule that says so.
 /// </summary>
 /// <remarks>
-/// Written against the two shows the maintainer actually put on the disk on 2026-08-25 — eight seasons
-/// and seventy-four episodes of one, three and twenty-five of the other — which arrived as a hundred
-/// and two loose cards because nothing in the application ever asked where an episode belonged.
+/// Written against two real shows on a real disk — one of eight seasons, the other of three —
+/// which arrived as about a hundred loose cards because nothing in the application ever asked
+/// where an episode belonged.
 /// </remarks>
 public sealed class LocalSeriesPolicyTests
 {

@@ -23,7 +23,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// <c>ViewOverflowTests</c> states this as the first of its two limitations — "a view mounted alone
 /// gets the whole 900, while inside the shell it gets 900 minus whatever the shell's own chrome
 /// takes: this catches a view too wide on its own and <b>cannot catch one only too wide once
-/// nested</b>". That sentence is also the shape of «secciones cortadas por el ancho», which the maintainer
+/// nested</b>". That sentence is also the shape of sections cut off by the width, which was
 /// reported in the original brief and which nobody had been able to locate: a view 880 wide passes
 /// the gate and is clipped in the application, because the rail alone takes 64.
 /// </para>

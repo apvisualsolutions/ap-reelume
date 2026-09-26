@@ -62,8 +62,7 @@ qué archivo habla, qué propone, con cuánta confianza y por qué — y lleva e
 ## Qué no es
 
 No hay cuentas, ni sincronización, ni nube. No convierte ni edita vídeo. No reproduce varios a la
-vez. La lista completa, con sus identificadores, está en la
-[hoja de ruta](docs/roadmap/README.es.md).
+vez, ni emite a otros dispositivos.
 
 ## Privacidad
 
@@ -96,14 +95,23 @@ donde estaban.
 |---|---|
 | [Manual de uso](docs/user-guide/README.es.md) | Cómo hacer cada cosa |
 | [Solución de problemas](docs/troubleshooting/README.es.md) | Qué hacer cuando algo no va |
-| [Hoja de ruta](docs/roadmap/README.es.md) | Qué viene y qué no se hará |
-| [Matriz de funcionalidades](docs/FEATURES.md) | El registro canónico del alcance |
 | [Privacidad](docs/privacy/PRIVACY.es.md) | Qué se guarda y qué no sale de aquí |
-| [Estado legal](docs/legal/LEGAL.es.md) | Licencia, terceros y qué sigue abierto |
 | [Cambios](docs/CHANGELOG.es.md) | Qué cambió en cada versión |
-| [Guía de desarrollo](docs/development/README.es.md) | Cómo compilar y verificar |
-| [Publicación](docs/release/RELEASING.es.md) | Cómo se corta una versión |
-| [Decisiones](docs/adr) | Por qué el proyecto es como es |
+| [SmartScreen](docs/release/SMARTSCREEN.es.md) | Por qué avisa Windows y qué comprobar |
+| [Avisos de terceros](docs/release/THIRD-PARTY-NOTICES.es.md) | Qué componentes lleva y con qué licencia |
+| [Seguridad](SECURITY.md) | Cómo avisar de una vulnerabilidad |
+
+## Compilar desde el código
+
+Hace falta Windows 11 x64 y el SDK de .NET que fija [`global.json`](global.json). Desde la raíz:
+
+```powershell
+dotnet build ApSolutions.LocalMedia.sln -c Release
+pwsh -NoProfile -File eng/verify.ps1
+```
+
+`eng/verify.ps1` es la misma verificación que corre la integración continua: formato, compilación,
+pruebas, documentación, empaquetado y cobertura.
 
 ## Licencia
 
@@ -112,6 +120,4 @@ Licencia de AP Reelume: gratuita para usar, sin derecho a modificar ni redistrib
 TMDB, pero no está avalado, certificado ni aprobado de ningún otro modo por TMDB.
 
 El programa se entrega **sin garantía alguna**, en la medida en que lo permita la ley aplicable:
-véanse las secciones 15 a 17 de la [licencia](LICENSE). Los límites jurídicos que siguen abiertos
-—entre ellos el dictamen profesional de `REL-004`— están nombrados en
-[el estado legal](docs/legal/LEGAL.es.md).
+véanse las secciones 15 a 17 de la [licencia](LICENSE).

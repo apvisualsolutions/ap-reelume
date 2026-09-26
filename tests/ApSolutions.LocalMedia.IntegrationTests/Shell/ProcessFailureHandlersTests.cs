@@ -11,12 +11,12 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Shell;
 /// The handler of last resort: what happens to a failure that reached no surface at all.
 /// </summary>
 /// <remarks>
-/// ARQ-004. A command that knows where its failure belongs puts it there. This is for the rest — a
+/// A command that knows where its failure belongs puts it there. This is for the rest — a
 /// task nobody awaited, a continuation on a thread with nothing listening, a failure thrown after the
 /// surface that started it was gone. Without it, those end the process; with it, they end as a code.
 /// <para>
-/// The handlers are methods on an instance rather than statics wired at class load, because ARQ-001
-/// spent this repository's patience on exactly one static field that nothing could release. Installing
+/// The handlers are methods on an instance rather than statics wired at class load, because this
+/// repository already paid for exactly one static field that nothing could release. Installing
 /// hands back something that unhooks.
 /// </para>
 /// </remarks>
@@ -83,7 +83,7 @@ public sealed class ProcessFailureHandlersTests
 
     /// <summary>
     /// Installing hooks the process's own events, and letting go unhooks them. Two applications in one
-    /// process is a thing this repository made possible on purpose (ARQ-001), so a handler that
+    /// process is a thing this repository made possible on purpose, so a handler that
     /// outlived its application would write another one's failures into a released log.
     /// </summary>
     [Fact]

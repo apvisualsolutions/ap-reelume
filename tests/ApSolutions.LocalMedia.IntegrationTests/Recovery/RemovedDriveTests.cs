@@ -76,8 +76,8 @@ public sealed class RemovedDriveTests
             Assert.Equal(0, await CountAvailableMediaAsync(factory));
 
             // The row the settings list reads. Marking the files and leaving the root saying
-            // "Available" is the whole of the defect: LIB-010 promises the disconnected drive is
-            // shown as unavailable, and the only surface that names a root is this column.
+            // "Available" is the whole of the defect: the application promises the disconnected drive
+            // is shown as unavailable, and the only surface that names a root is this column.
             var whileGone = await roots.GetAsync(root.Id, TestContext.Current.CancellationToken);
             Assert.NotNull(whileGone);
             Assert.Equal(RootAvailability.Unavailable, whileGone.Availability);

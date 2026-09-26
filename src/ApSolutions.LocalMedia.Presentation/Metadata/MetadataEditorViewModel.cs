@@ -65,7 +65,8 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
         // The editor listens rather than the picker reaching back into it: a cover that has been
         // imported is a new path for the poster field and a lock on it, and both of those are this
         // view model's to write. Without the lock the next provider refresh would put the
-        // provider's artwork back over the one somebody chose, which is the whole point of LIB-011.
+        // provider's artwork back over the one somebody chose, which is the whole point of editing by
+        // hand.
         ArtworkPicker.PropertyChanged += OnPickerChanged;
         ChooseCoverSourceCommand = new ChooseCoverSource(this);
         SaveCommand = new AsyncRelayCommand(SaveAsync);
@@ -99,7 +100,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
     public string? BackdropPath { get => _backdropPath; set => SetField(ref _backdropPath, value); }
 
     /// <summary>
-    /// The picked cover's file name, kept apart from <see cref="PosterPath"/> (LIB-021, ADR-0009).
+    /// The picked cover's file name, kept apart from <see cref="PosterPath"/>.
     /// Choosing a cover fills this and nothing else, so the provider's poster and its lock stay as
     /// they were.
     /// </summary>
@@ -107,7 +108,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
 
     /// <summary>
     /// Which cover wins for this one title: <c>0</c> follows the general order, and the rest name one
-    /// origin, in the order <see cref="CoverOrigin"/> declares them (LIB-021, ADR-0009 decision 4).
+    /// origin, in the order <see cref="CoverOrigin"/> declares them.
     /// </summary>
     /// <remarks>
     /// One drop-down rather than a second reorderer. Picking an origin puts it first and leaves the
@@ -269,7 +270,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
             return;
         }
 
-        // Its own field and nothing else (LIB-021). Until 2026-09-18 this wrote the chosen path into
+        // Its own field and nothing else. This used to write the chosen path into
         // PosterPath and set its lock, because the lock was all that kept the next refresh from
         // overwriting the choice — and restoring the provider's fields clears every lock.
         PersonalCover = PersonalCoverPathPolicy.TryGetCoverFileName(ArtworkPicker.SelectedPersonalPath);
@@ -340,7 +341,7 @@ public sealed class MetadataEditorViewModel : INotifyPropertyChanged
 }
 
 /// <summary>
-/// One of the places this title's cover may be taken from, as a row that can be picked (LIB-021).
+/// One of the places this title's cover may be taken from, as a row that can be picked.
 /// </summary>
 /// <param name="index">
 /// <c>0</c> for the general order, and <c>1 + (int)origin</c> for each origin — the same numbering

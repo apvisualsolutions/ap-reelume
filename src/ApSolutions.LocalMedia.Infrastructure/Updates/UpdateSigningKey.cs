@@ -4,11 +4,11 @@
 namespace ApSolutions.LocalMedia.Infrastructure.Updates;
 
 /// <summary>
-/// The public half of the release-signing key, embedded in the binary (SEC-003).
+/// The public half of the release-signing key, embedded in the binary.
 /// </summary>
 /// <remarks>
 /// Every release signs its <c>SHA256SUMS.txt</c> with the private half, which lives outside this
-/// repository — a GitHub Actions secret and the maintainer's guarded copy. The updater refuses any
+/// repository — a GitHub Actions secret and one guarded offline copy. The updater refuses any
 /// release whose checksums this key did not sign, which is what stops the expected hash from
 /// coming out of the same unsigned answer as the package it vouches for. Rotating the key means
 /// shipping a version that embeds the new public half; the file copy in

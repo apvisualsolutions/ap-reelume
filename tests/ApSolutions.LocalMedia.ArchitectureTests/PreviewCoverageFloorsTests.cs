@@ -8,7 +8,7 @@ using ApSolutions.LocalMedia.TestSupport;
 namespace ApSolutions.LocalMedia.ArchitectureTests;
 
 /// <summary>
-/// Guards ENG-016: <c>eng/preview-coverage-floors.ps1</c> has to see every source file CI will
+/// <c>eng/preview-coverage-floors.ps1</c> has to see every source file CI will
 /// measure as new, and a commit range does not — it only names what is already IN a commit, which
 /// is precisely what has not happened yet when somebody runs a preview.
 /// </summary>
@@ -90,20 +90,20 @@ public sealed class PreviewCoverageFloorsTests
     }
 
     /// <summary>
-    /// ENG-047: a git that cannot answer must not read as a clean tree. Measured on a copy with its
+    /// A git that cannot answer must not read as a clean tree. Measured on a copy with its
     /// <c>.git</c> removed, the script printed «No floor moves and no new file falls short» over
     /// exactly the file it exists to catch, and exited 0.
     /// </summary>
     /// <remarks>
-    /// <b>What this file still does not watch, and why it is a task and not an oversight.</b> The
-    /// mutation check measured on 2026-09-20 that putting the pre-ENG-016 commit range back into the
+    /// <b>What this file still does not watch, and why it is a known gap and not an oversight.</b>
+    /// Measured on 2026-09-20: putting the old commit range back into the
     /// REPORTING path leaves every case here green, because they all stop at <c>-ListNewFiles</c>.
     /// Covering that turned out to need more than a sixth case: the script answers
     /// <c>-ListNewFiles</c> from the working directory and then does <c>Push-Location</c> to this
     /// repository before the reporting path runs, so the seam and the path it stands for ask two
     /// different repositories, and no lying tree can reach the second. Closing it means making both
-    /// ask the same one, which rewrites the scene every case here is built on. It is written down
-    /// in ENG-047 rather than half-done.
+    /// ask the same one, which rewrites the scene every case here is built on. It is left as a
+    /// recorded gap rather than half-done.
     /// </remarks>
     [Fact]
     public void A_repository_git_cannot_read_is_refused_rather_than_reported_clean()

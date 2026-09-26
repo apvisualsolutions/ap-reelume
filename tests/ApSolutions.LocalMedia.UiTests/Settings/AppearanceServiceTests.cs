@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 using ApSolutions.LocalMedia.Application.Settings;
 using ApSolutions.LocalMedia.Domain.Appearance;
 using ApSolutions.LocalMedia.Presentation.Theme;
-using ApSolutions.LocalMedia.TestSupport;
+using ApSolutions.LocalMedia.UiTests.Fixtures;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -61,11 +60,11 @@ public sealed class AppearanceServiceTests
     /// Each density writes the row gap the prototype's own grid writes.
     /// </summary>
     /// <remarks>
-    /// The three numbers are read out of <c>design/</c> rather than listed here, for
-    /// <c>ButtonShapeTests</c>' reason: a table copied by hand agrees with itself forever. The
-    /// prototype's grid carries two gaps and not one — <c>gap: '12px 10px'</c>, <c>'18px 16px'</c>,
-    /// <c>'26px 22px'</c> — and the row one is the first of each pair. The column half of that
-    /// difference is still open, and registered.
+    /// The three numbers come from <see cref="PrototypeValues"/> rather than being listed here, for
+    /// <c>ButtonShapeTests</c>' reason: a table copied by hand agrees with itself forever, and that
+    /// one is compared with the prototype. The prototype's grid carries two gaps and not one —
+    /// <c>gap: '12px 10px'</c>, <c>'18px 16px'</c>, <c>'26px 22px'</c> — and the row one is the first
+    /// of each pair. The column half of that difference is still open.
     /// </remarks>
     [AvaloniaTheory]
     [InlineData(InterfaceDensity.Compact, "compact")]
@@ -79,33 +78,7 @@ public sealed class AppearanceServiceTests
 
         service.Apply(service.Current with { Density = density });
 
-        Assert.Equal(PrototypeRowGap(name), application.Resources["DensityRowGap"]);
-    }
-
-    /// <summary>The row gap the prototype's grid writes for one density, read from the design.</summary>
-    private static double PrototypeRowGap(string density)
-    {
-        var markup = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-
-        // The grid's own gap, and nothing else that happens to be written as two lengths: the
-        // pattern is anchored on the expression that chooses it. Unanchored it read 3, 13 and 6 from
-        // three shorthands elsewhere in the file, which is a table that agrees with itself.
-        var gap = Regex.Match(
-            markup,
-            @"gap: \(st\.opt\.density === 'compact' \? '(?<compact>\d+)px \d+px' : "
-                + @"st\.opt\.density === 'roomy' \? '(?<roomy>\d+)px \d+px' : "
-                + @"'(?<comfortable>\d+)px \d+px'\)",
-            RegexOptions.None,
-            TimeSpan.FromSeconds(5));
-
-        Assert.True(gap.Success, "the prototype's grid gap was not found, so nothing was read from the design.");
-
-        return density switch
-        {
-            "compact" => double.Parse(gap.Groups["compact"].Value, CultureInfo.InvariantCulture),
-            "roomy" => double.Parse(gap.Groups["roomy"].Value, CultureInfo.InvariantCulture),
-            _ => double.Parse(gap.Groups["comfortable"].Value, CultureInfo.InvariantCulture),
-        };
+        Assert.Equal(PrototypeValues.DensityRowGap[name], application.Resources["DensityRowGap"]);
     }
 
     [AvaloniaFact]
@@ -498,7 +471,7 @@ public sealed class AppearanceServiceTests
             "AccentTextBrush",
             "AccentTintOpacity",
             "DensityGutter",
-            // Added with the row gap on 2026-09-12, and pointed out by that batch's gate audit
+            // Added with the row gap on 2026-09-12, and pointed out by an audit of the gates
             // before it cost anything: LibraryView already places its rows from this one, so a run
             // that left a roomy 26 behind would move the grid of whatever ran next.
             "DensityRowGap",

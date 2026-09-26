@@ -60,7 +60,7 @@ public sealed class WindowsSystemHandoff : ISystemHandoff
     /// actually happens: on a clean Windows with nothing registered for <c>.msix</c> the shell call
     /// returns nothing and throws nothing, so a launcher that treated null as success would report an
     /// installation starting while nothing at all had. Where an App Installer exists it answers with
-    /// a process. Both halves are archived in docs/evidence/stable/updater-handover.json.
+    /// a process. Both halves were measured.
     /// </remarks>
     public bool TryOpenPackage(string package)
     {

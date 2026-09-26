@@ -31,7 +31,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// <para>
 /// It is asserted at 3:1 rather than 4.5:1 because what sits on this band is a glyph and not a
 /// sentence: that is the ratio WCAG asks of a graphical object, and it is the same one the accent
-/// cession in <c>docs/design/ELEMENTS.es.md</c> already argues from. The readout beside them carries
+/// cession of the design already argues from. The readout beside them carries
 /// words and is held to 4.5:1 separately below.
 /// </para>
 /// </remarks>

@@ -28,7 +28,7 @@ public static partial class CompositionRoot
     /// application is willing to say about itself.
     /// </summary>
     /// <remarks>
-    /// ARQ-006 step 2. Backup and privacy share a module because they answer the same question from
+    /// Backup and privacy share a module because they answer the same question from
     /// two sides: what leaves this machine, and under whose decision.
     /// </remarks>
     private static IServiceCollection AddSettingsAndBackup(this IServiceCollection services) =>
@@ -51,11 +51,11 @@ public static partial class CompositionRoot
             .AddSingleton<ExportLibrary>()
             .AddSingleton<IPrivacySettings, StoredPrivacySettings>()
 
-            // LIB-021. Read where a poster is resolved, which is the one place that knows whether
+            // Read where a poster is resolved, which is the one place that knows whether
             // the title being drawn overrides this order with one of its own.
             .AddSingleton<ICoverOrderSettings, StoredCoverOrderSettings>()
 
-            // ARQ-004. One per application, so two of them in one process do not write each other's
+            // One per application, so two of them in one process do not write each other's
             // failures into a log the other owns. It is read where the diagnostics inputs are built.
             .AddSingleton<ISessionFailureLog, InMemorySessionFailureLog>()
             .AddSingleton<IDiagnosticsBuilder, AllowlistedDiagnosticsBuilder>()
@@ -72,7 +72,7 @@ public static partial class CompositionRoot
                     .DiscardAsync(cancellationToken),
                 provider.GetRequiredService<IAutoRefreshSettings>(),
 
-                // LIB-016. The same consent the candidate source asks about, read the same way: the
+                // The same consent the candidate source asks about, read the same way: the
                 // token in place is the deliberate, revocable act, and without it the automatic
                 // refresh has nothing it could do — so its switch is not offered.
                 () => provider.GetRequiredService<TmdbOptions>().AccessToken is not null))

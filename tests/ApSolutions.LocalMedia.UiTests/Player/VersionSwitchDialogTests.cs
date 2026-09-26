@@ -133,7 +133,7 @@ public sealed class VersionSwitchDialogTests
     public void The_dialog_is_captured_in_both_languages()
     {
         Assert.NotNull(Avalonia.Application.Current);
-        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T27");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "version-switch");
         _ = Directory.CreateDirectory(captures);
 
         foreach (var cultureName in new[] { "es-ES", "en-US" })

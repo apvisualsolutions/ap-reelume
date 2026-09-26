@@ -184,7 +184,7 @@ public sealed class AppearanceRowsTests
     ];
 
     /// <summary>
-    /// UX-010, asserted on what the service holds rather than on the page: a reset that only
+    /// Restoring the defaults, asserted on what the service holds rather than on the page: a reset that only
     /// refreshed the view model would leave every row as it was the moment anything re-read it.
     /// </summary>
     [Fact]

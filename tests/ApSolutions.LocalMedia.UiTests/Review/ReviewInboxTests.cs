@@ -59,7 +59,7 @@ public sealed class ReviewInboxTests
                 RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
-                "T14",
+                "review-inbox",
                 $"review-{cultureName}.png");
             Directory.CreateDirectory(Path.GetDirectoryName(artifactPath)!);
             frame.Save(artifactPath, PngBitmapEncoderOptions.Default);
@@ -455,7 +455,7 @@ public sealed class ReviewInboxTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// §4 is explicit about this: the empty inbox is <b>the desirable state</b> — everything was
+    /// The redesign is explicit about this: the empty inbox is <b>the desirable state</b> — everything was
     /// identified without anybody being asked — so it takes <c>PositiveSurfaceBrush</c> and a glyph
     /// rather than being a blank panel that reads like something failed to load.
     /// </para>

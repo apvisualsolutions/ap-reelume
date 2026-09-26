@@ -67,7 +67,7 @@ public sealed class DuplicateReviewTests
                 RepositoryLayout.Root,
                 "artifacts",
                 "ui-captures",
-                "T15",
+                "duplicate-review",
                 $"duplicates-{cultureName}.png");
             Directory.CreateDirectory(Path.GetDirectoryName(artifactPath)!);
             frame.Save(artifactPath, PngBitmapEncoderOptions.Default);
@@ -80,7 +80,7 @@ public sealed class DuplicateReviewTests
     /// </summary>
     /// <remarks>
     /// <para>
-    /// §4 asks for a two-column comparison and says why: with the rows stacked one under another, two
+    /// The redesign asks for a two-column comparison and says why: with the rows stacked one under another, two
     /// files are compared by scrolling between them. Two columns put them side by side, and a
     /// <c>UniformGrid</c> of two wraps a third under the first without anybody choosing where.
     /// </para>

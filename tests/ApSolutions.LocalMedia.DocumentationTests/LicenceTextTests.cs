@@ -244,7 +244,7 @@ public sealed class LicenceTextTests
     /// </summary>
     /// <remarks>
     /// Until 2026-09-18 the engine was VideoLAN's NuGet package and its version came from the lock
-    /// file. Since ENG-013 it is a tree this repository builds and publishes, and the only statement
+    /// file. Since then it is a tree this repository builds and publishes, and the only statement
     /// of which one ships is <c>eng/libvlc/libvlc.lock.json</c>.
     /// </remarks>
     [Fact]
@@ -300,7 +300,7 @@ public sealed class LicenceTextTests
             .Single(source => source.GetProperty("name").GetString() == "libvlc-build");
         var pinned = lockFile.RootElement.GetProperty("sourceAsset");
 
-        // Two nulls are equal, and a mutation audit measured it: with both hashes emptied every test here
+        // Two nulls are equal, and that was measured: with both hashes emptied every test here
         // passed. The shape is asserted first, so an unpinned archive cannot compare equal to nothing.
         Assert.Matches("^[0-9a-f]{128}$", build.GetProperty("sha512").GetString() ?? string.Empty);
         Assert.Equal(pinned.GetProperty("fileName").GetString(), build.GetProperty("fileName").GetString());

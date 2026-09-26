@@ -13,7 +13,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.IntegrationTests.Metadata;
 
 /// <summary>
-/// LIB-016. The order is the policy: with a cap on the pass, whatever sorts last is what does not
+/// The order is the policy: with a cap on the pass, whatever sorts last is what does not
 /// get asked about, so it is measured against the real statement rather than against a double that
 /// would only be repeating it.
 /// </summary>

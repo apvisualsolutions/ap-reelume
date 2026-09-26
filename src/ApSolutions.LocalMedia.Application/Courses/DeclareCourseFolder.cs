@@ -9,7 +9,7 @@ using ApSolutions.LocalMedia.Domain.Discovery;
 namespace ApSolutions.LocalMedia.Application.Courses;
 
 /// <summary>
-/// One pointed-at folder, as a course (CRS-001, ADR-0006 amendment 1).
+/// One pointed-at folder, as a course.
 /// </summary>
 /// <param name="CourseFolderPath">The folder a person pointed at. Not a root: one course.</param>
 /// <param name="Kind">
@@ -41,11 +41,11 @@ public sealed record DeclaredCourseFolder(
     IReadOnlyList<string> Others);
 
 /// <summary>
-/// Turning "this folder is a course" into a declared root at a derived depth (CRS-001).
+/// Turning "this folder is a course" into a declared root at a derived depth.
 /// </summary>
 /// <remarks>
-/// This is the door ADR-0006 decision 2 asks for: the signal is the user's and never the program's.
-/// What amendment 1 changed is its shape — a folder is pointed at instead of a number being typed —
+/// This is the door the course design asks for: the signal is the user's and never the program's.
+/// What changed later is its shape — a folder is pointed at instead of a number being typed —
 /// and <see cref="CourseRootDeclarationPolicy"/> holds the derivation so this class only has to
 /// arrange the writes.
 /// <para>

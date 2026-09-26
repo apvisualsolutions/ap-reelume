@@ -39,10 +39,10 @@ public sealed class SubtitleStyleViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>The «Restaurar valores por defecto» of this group (UX-010).</summary>
+    /// <summary>The «Restaurar valores por defecto» of this group.</summary>
     /// <remarks>
-    /// <c>ResetAsync</c> had been here since the style was written and <b>nothing called it</b> —
-    /// the house defect, in the one method whose whole job is to undo. This button is what feeds it.
+    /// <c>ResetAsync</c> had been here since the style was written and <b>nothing called it</b>,
+    /// and it is the one method whose whole job is to undo. This button is what feeds it.
     /// </remarks>
     public ICommand RestoreDefaultsCommand { get; }
 
@@ -88,9 +88,9 @@ public sealed class SubtitleStyleViewModel : INotifyPropertyChanged
     /// Which swatch is the one in force, as a flag the style reads rather than a glyph on top of it.
     /// </summary>
     /// <remarks>
-    /// A ring around the chosen circle, which is what the prototype draws and what the maintainer asked
-    /// for: a ● inside a circle of colour reads as a radio button somebody dropped on a swatch. It
-    /// is still geometry, so both high contrast dictionaries keep the cue the glyph was there for.
+    /// A ring around the chosen circle, which is what the prototype draws: a ● inside a circle of
+    /// colour reads as a radio button somebody dropped on a swatch. It is still geometry, so both high
+    /// contrast dictionaries keep the cue the glyph was there for.
     /// </remarks>
     public bool IsFirstForeground => Chosen(ForegroundSwatches[0], ForegroundHex);
 

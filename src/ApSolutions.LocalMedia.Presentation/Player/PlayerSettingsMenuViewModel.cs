@@ -9,7 +9,7 @@ namespace ApSolutions.LocalMedia.Presentation.Player;
 
 /// <summary>
 /// The gear over the picture: a list of the groups decided while watching, and the group that
-/// replaces that list when one is chosen (ADR-0012).
+/// replaces that list when one is chosen.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -62,7 +62,7 @@ public sealed class PlayerSettingsMenuViewModel : INotifyPropertyChanged
     public PictureAdjustmentViewModel? Picture { get; }
 
     /// <summary>
-    /// The next-episode countdown, down from Settings on 2026-09-13 (ADR-0012). It keeps writing the
+    /// The next-episode countdown, down from Settings. It keeps writing the
     /// global row rather than this session's: ten seconds is an answer for the whole library, and
     /// making it per-series would be a change to the stored model that nobody asked for.
     /// </summary>

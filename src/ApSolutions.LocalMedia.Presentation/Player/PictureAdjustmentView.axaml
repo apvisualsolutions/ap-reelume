@@ -29,7 +29,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
           TextWrapping="Wrap"
           Text="{DynamicResource PictureAdjustmentDescription}" />
       <!--
-        UX-010: the button that puts this group back sits inside the group and never in a menu of its
+        The button that puts this group back sits inside the group and never in a menu of its
         own, and it says what it says through the one key every group shares.
       -->
       <Button

@@ -13,7 +13,7 @@ using VlcMedia = LibVLCSharp.Shared.Media;
 namespace ApSolutions.LocalMedia.Infrastructure.Playback;
 
 /// <summary>
-/// Takes one frame out of a video with LibVLC and writes it as a PNG (CRS-006).
+/// Takes one frame out of a video with LibVLC and writes it as a PNG.
 /// </summary>
 /// <remarks>
 /// <b>Everything this class decides lives one layer up.</b> Which lesson, which moment, whether the

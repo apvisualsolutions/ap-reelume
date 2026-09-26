@@ -14,11 +14,11 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Theme;
 
 /// <summary>
-/// Where every group of options lives, and that each one can be put back from inside it (UX-010).
+/// Where every group of options lives, and that each one can be put back from inside it.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Rule 11 has two halves and one closed list holds both. The first: a group whose value is chosen
+/// The placement rule has two halves and one closed list holds both. The first: a group whose value is chosen
 /// while watching something lives in the player's gear, and one configured once lives in Settings.
 /// <b>No test can judge that criterion</b> — «decided while watching» is not measurable — so what is
 /// required is the written decision, exactly as <c>LeadingActionTests</c> requires a written leading
@@ -43,7 +43,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// </remarks>
 public sealed class OptionGroupTests
 {
-    /// <summary>Where rule 11 says a group belongs.</summary>
+    /// <summary>Where the placement rule says a group belongs.</summary>
     private enum OptionPlace
     {
         /// <summary>Its value is chosen while watching something.</summary>
@@ -56,7 +56,7 @@ public sealed class OptionGroupTests
     /// <summary>
     /// One group of options: where it belongs, where it lives today, and the button that puts it back.
     /// </summary>
-    /// <param name="Place">The rule 11 decision, which no test can judge.</param>
+    /// <param name="Place">The placement decision, which no test can judge.</param>
     /// <param name="Home">The destination it is reached through today.</param>
     /// <param name="Surface">The view its reset button lives inside.</param>
     /// <param name="ResetButton">The button's <c>x:Name</c>, or null while it is still pending.</param>
@@ -144,10 +144,10 @@ public sealed class OptionGroupTests
             "SettingsSection.Covers",
             "CoverOrderSettingsView",
             "CoverOrderSettingsResetButton",
-            "Where a cover comes from is decided looking at the library, not at a video, so rule 11 "
+            "Where a cover comes from is decided looking at the library, not at a video, so the rule "
                 + "puts it in Settings and not in the player's gear. It has a destination of its own "
                 + "because SettingsSection.Library already hosts Scanning and this gate refuses two "
-                + "groups in one place (LIB-021, ADR-0009)."),
+                + "groups in one place."),
         ["Recommendations"] = new(
             OptionPlace.Settings,
             "SettingsSection.Recommendations",
@@ -201,8 +201,8 @@ public sealed class OptionGroupTests
         ["SettingsSection.Credits"] = "A page of names and licences, with nothing to choose.",
         ["RootManagementView"] = "The library's folders are data somebody added, not a preference. "
             + "«Putting them back» is emptying the library — the most destructive thing this "
-            + "application does, behind the most innocent word — which is the same trap ADR-0012 "
-            + "rejects when it turns down a global «reset everything».",
+            + "application does, behind the most innocent word — which is the same trap the gear "
+            + "avoids by having no global «reset everything».",
         ["BackupView"] = "Three actions and a path; nothing stored to put back.",
         ["RestoreWizardView"] = "Restoring a backup is an operation, and the «restore» in its name "
             + "is a different verb from this one.",
@@ -233,7 +233,7 @@ public sealed class OptionGroupTests
     /// valores», «Restaurar campos» or «Volver a 1», and a key reading «Restaurar ajustes
     /// predeterminados» — drawn on a real button, in a real panel the list still called
     /// buttonless — walked straight through with every suite green. A filter has to imagine in
-    /// advance every thing that can go wrong, which is the reason rule 3 exists.
+    /// advance every thing that can go wrong, which is why this is a closed list and not a filter.
     /// </para>
     /// <para>
     /// A button is one of these when its own name or the command behind it says so, which is this
@@ -269,7 +269,7 @@ public sealed class OptionGroupTests
         // «Confirmar restauración» runs a backup restore. Same verb in Spanish, different act: it
         // replaces the catalogue rather than putting a group's values back.
         ["RestoreWizardView#ConfirmRestoreButton"] = "RestoreConfirmLabel",
-        // «Ampliar» restores the window from the small player. The word is Windows', not UX-010's.
+        // «Ampliar» restores the window from the small player. The word is Windows', not a reset's.
         ["MiniPlayerChromeView#MiniPlayerRestore"] = "MiniPlayerRestore",
     };
 
@@ -305,7 +305,7 @@ public sealed class OptionGroupTests
         Assert.True(
             undecided.Length == 0,
             "these destinations are in the tree and nobody has decided whether they hold a group of "
-                + "options, so rule 11 has not been applied to them:\n  "
+                + "options, so the placement rule has not been applied to them:\n  "
                 + string.Join("\n  ", undecided));
 
         // Every classified destination has to exist. There was an exemption here while a group was
@@ -474,7 +474,7 @@ public sealed class OptionGroupTests
             .ToHashSet(StringComparer.Ordinal);
 
         // Three ways a group can fall short: no button, a destination that has not been built, or a
-        // group living somewhere other than where rule 11 puts it. That last one is checked in BOTH
+        // group living somewhere other than where the rule puts it. That last one is checked in BOTH
         // directions — a Settings group sitting in the gear is the same failure as a player group
         // sitting in Settings, and a rule about which of two places cannot be enforced over one.
         //
@@ -491,7 +491,7 @@ public sealed class OptionGroupTests
 
         Assert.True(
             owed.Length == 0,
-            "these groups do not satisfy rule 11 — no button, no destination, or living in the "
+            "these groups do not satisfy the placement rule — no button, no destination, or living in the "
                 + "place the list says they do not belong:\n  " + string.Join("\n  ", owed));
     }
 

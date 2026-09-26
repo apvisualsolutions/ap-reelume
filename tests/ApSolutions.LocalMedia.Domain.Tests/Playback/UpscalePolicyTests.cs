@@ -7,7 +7,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.Domain.Tests.Playback;
 
 /// <summary>
-/// PLY-016 decides here, and only here. The expensive half of the feature talks to a graphics card;
+/// Upscaling decides here, and only here. The expensive half of the feature talks to a graphics card;
 /// this half runs anywhere, so it is the half that is asserted — which picture is worth enlarging,
 /// and to exactly what size.
 /// </summary>

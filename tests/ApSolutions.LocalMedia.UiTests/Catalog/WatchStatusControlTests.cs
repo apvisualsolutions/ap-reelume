@@ -116,7 +116,7 @@ public sealed class WatchStatusControlTests
     public void The_control_is_captured_in_both_languages()
     {
         Assert.NotNull(Avalonia.Application.Current);
-        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "T26");
+        var captures = Path.Combine(RepositoryLayout.Root, "artifacts", "ui-captures", "watch-status");
         _ = Directory.CreateDirectory(captures);
 
         foreach (var cultureName in new[] { "es-ES", "en-US" })

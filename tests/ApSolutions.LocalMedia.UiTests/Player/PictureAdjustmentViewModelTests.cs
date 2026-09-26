@@ -123,7 +123,7 @@ public sealed class PictureAdjustmentViewModelTests
     }
 
     /// <summary>
-    /// Reset puts the three back and stores that, which is <c>UX-010</c>'s half of this panel. It
+    /// Reset puts the three back and stores that, which is the restore-defaults half of this panel. It
     /// stores rather than clearing, because a neutral somebody chose has to beat a wider scope.
     /// </summary>
     [Fact]

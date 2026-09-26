@@ -1066,7 +1066,7 @@ public sealed class UpdateWorkflowTests : IDisposable
     }
 
     /// <summary>
-    /// SEC-004: the address the bytes actually come from has to be one the allowlist covers, on
+    /// The address the bytes actually come from has to be one the allowlist covers, on
     /// every hop. Here the first hop is allowed and the redirect leaves the list — to the same
     /// server under another name, which is exactly what a compromised source would look like from
     /// the socket's side.
@@ -1092,7 +1092,7 @@ public sealed class UpdateWorkflowTests : IDisposable
     }
 
     /// <summary>
-    /// SEC-005: a server that keeps sending past the declared size is cut off as soon as the excess
+    /// A server that keeps sending past the declared size is cut off as soon as the excess
     /// is seen, not after it has been written whole and hashed. The exception reports how far the
     /// write got, which is nowhere near what the server had in store.
     /// </summary>
@@ -1117,7 +1117,7 @@ public sealed class UpdateWorkflowTests : IDisposable
     }
 
     /// <summary>
-    /// SEC-005: release metadata has a ceiling. A source that answers megabytes to "what is the
+    /// Release metadata has a ceiling. A source that answers megabytes to "what is the
     /// latest release?" is not answering the question, whatever its bytes parse as.
     /// </summary>
     [Fact]
@@ -1132,7 +1132,7 @@ public sealed class UpdateWorkflowTests : IDisposable
     }
 
     /// <summary>
-    /// SEC-003: a hash that travels unsigned next to the package it vouches for proves only that
+    /// A hash that travels unsigned next to the package it vouches for proves only that
     /// both came from the same answer. The refusal names the signature, not the hash — the hash is
     /// there, and saying it is not would send whoever publishes releases hunting the wrong absence.
     /// </summary>
@@ -1268,7 +1268,7 @@ public sealed class UpdateWorkflowTests : IDisposable
         if (includeHash && includeSignature)
         {
             // The shape a signed publication carries: the checksum block and the detached
-            // signature the release tooling appends over its exact bytes (SEC-003).
+            // signature the release tooling appends over its exact bytes.
             notes.Append(TestReleaseSigning.SignedChecksumSections(
                 string.Create(CultureInfo.InvariantCulture, $"{Sha256(Package)}  {AssetName}\n")));
         }

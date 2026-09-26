@@ -10,13 +10,13 @@ public readonly record struct CourseId(Guid Value);
 public readonly record struct LessonId(Guid Value);
 
 /// <summary>
-/// A course as it is stored: the folder somebody marked, under the root that declares it (CRS-001).
+/// A course as it is stored: the folder somebody marked, under the root that declares it.
 /// </summary>
 /// <remarks>
 /// <see cref="RelativePath"/> is relative to the root and not absolute, which is what lets a whole
 /// library move drive letters without every course losing itself. <see cref="Title"/> starts as the
 /// folder's name with its leading number read off and is editable afterwards with the protected
-/// editor that already exists (LIB-011).
+/// editor that already exists.
 /// </remarks>
 public sealed record Course(
     CourseId Id,
@@ -27,16 +27,16 @@ public sealed record Course(
     DateTimeOffset? LastOpenedAtUtc);
 
 /// <summary>
-/// One lesson of a course (CRS-005).
+/// One lesson of a course.
 /// </summary>
 /// <remarks>
-/// <see cref="MediaFileId"/> is LIB-009's identity, which is why moving or renaming the file keeps
+/// <see cref="MediaFileId"/> is the file identity the catalogue keeps, which is why moving or renaming the file keeps
 /// the progress: the lesson is anchored to what the file <i>is</i> and not to where it sits. It is
 /// nullable because a lesson whose file has gone is a lesson that is missing, and a surface has to
 /// be able to say so — dropping the row would turn it into a lesson that never existed.
 /// <para>
-/// There is no progress on this record and there will not be one. Progress is PLY-008's store and
-/// the watched threshold is PLY-009's; a second store would be a second answer to one question.
+/// There is no progress on this record and there will not be one. Progress lives in the continuity store
+/// and so does the watched threshold; a second store would be a second answer to one question.
 /// </para>
 /// <para>
 /// <see cref="Module"/> is the module's <i>title</i> with its leading number read off, beside
@@ -90,7 +90,7 @@ public interface ICourseRepository
     /// <remarks>
     /// The mirror of <c>IEpisodeSequenceRepository.FindByFileAsync</c>, and it is asked the same way
     /// for the same reason: a playing session holds a file and nothing else. The player's «Lecciones»
-    /// panel is <b>absent</b> outside a lesson session (CRS-004), so something has to answer whether
+    /// panel is <b>absent</b> outside a lesson session, so something has to answer whether
     /// this file is one — and the answer cannot travel on the request that opened it. The countdown
     /// opens the next lesson with nothing but a file id, and so does picking the thread up from the
     /// home rail; a course that rode along on the request would go missing down every path that
@@ -114,7 +114,7 @@ public interface ICourseRepository
 }
 
 /// <summary>
-/// Which roots declare they hold courses, and at what depth (ADR-0006 decisions 2 and 3).
+/// Which roots declare they hold courses, and at what depth.
 /// </summary>
 /// <remarks>
 /// One nullable column carries both answers: a root holds courses exactly when it has a depth. A

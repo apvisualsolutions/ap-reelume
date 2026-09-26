@@ -89,7 +89,7 @@ public sealed class CorruptMediaTests
         await using var factory = LibVlcFactory.CreateHeadless();
         await using var engine = new LibVlcMediaPlayerEngine(factory);
         await engine.InitializeAsync(TestContext.Current.CancellationToken);
-        var missing = Path.Combine(MediaToolchain.OutputRoot, "T19", "never-generated.mkv");
+        var missing = Path.Combine(MediaToolchain.OutputRoot, "codec-matrix", "never-generated.mkv");
 
         var failure = await Assert.ThrowsAsync<PlaybackFailureException>(
             () => engine.OpenAsync(

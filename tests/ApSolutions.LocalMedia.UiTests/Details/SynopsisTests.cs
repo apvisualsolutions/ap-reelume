@@ -12,7 +12,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Details;
 
 /// <summary>
-/// The synopsis reaches the cards (LIB-013).
+/// The synopsis reaches the cards.
 /// </summary>
 /// <remarks>
 /// It was stored, merged, editable and locked long before this: the provider read it, the database

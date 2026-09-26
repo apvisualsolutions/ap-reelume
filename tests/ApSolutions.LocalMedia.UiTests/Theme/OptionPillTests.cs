@@ -26,11 +26,11 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Until 2026-09-11 every pill in this tree carried a <c>●</c> or a <c>○</c> before its label, and the
-/// owner read it for what it looked like: «aparece el selector del radial». The prototype never draws
+/// Until 2026-09-11 every pill in this tree carried a <c>●</c> or a <c>○</c> before its label, and it
+/// read for what it looked like: a radio selector inside a pill. The prototype never draws
 /// one — not in the library's kind pills, not in the theme row, not in the player's column pills, and
 /// not in either high contrast mode, where it marks the chosen pill with a border the others do not
-/// have. That is the same answer the accent swatches got when the maintainer objected to the same circle
+/// have. That is the same answer the accent swatches got when the same circle was objected to
 /// there: a border is a shape, and a shape survives both high contrast dictionaries.
 /// </para>
 /// <para>
@@ -108,7 +108,7 @@ public sealed class OptionPillTests
         using var scope = new Scope(new AppearanceSettingsView { DataContext = page });
 
         // Three rows since 2026-09-13, where there were four: the language left this page for a
-        // destination of its own (UX-010) and is measured below, on the view it moved to. Measured
+        // destination of its own and is measured below, on the view it moved to. Measured
         // where it went rather than dropped, because a list that only got shorter would read the
         // same whether the pills moved or stopped painting.
         object[] inForce = [ThemePreference.System, InterfaceDensity.Comfortable, CornerRounding.Soft];

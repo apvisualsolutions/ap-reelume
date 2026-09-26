@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using ApSolutions.LocalMedia.Application.Settings;
 using ApSolutions.LocalMedia.Presentation.Theme;
 using ApSolutions.LocalMedia.TestSupport;
+using ApSolutions.LocalMedia.UiTests.Fixtures;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -20,7 +21,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// Every surface that is not a button draws the corner the prototype draws for it.
 /// </summary>
 /// <remarks>
-/// ADR-0007 says "every element", and <c>ButtonShapeTests</c> covers the fourteen button classes.
+/// The shape rule says "every element", and <c>ButtonShapeTests</c> covers the fourteen button classes.
 /// This is the rest of what declares a corner of its own: the <c>Border</c>s, the search field, the
 /// filter pill and the side list's row.
 /// <para>
@@ -38,7 +39,7 @@ namespace ApSolutions.LocalMedia.UiTests.Theme;
 /// because a hand-copied number is how the withdrawn shape rule survived a week.
 /// </para>
 /// </remarks>
-public sealed class SurfaceCornerTests
+public sealed partial class SurfaceCornerTests
 {
     /// <summary>
     /// Each surface class, the prototype element it draws, and how that element is found in the
@@ -125,7 +126,7 @@ public sealed class SurfaceCornerTests
     [
         ("Border.apr-shim",
             "the cover's skeleton, and it is the one surface whose corner is SUPPOSED to follow the "
-            + "«Redondeo de esquinas» preference: ADR-0007's third consequence says a preference "
+            + "«Redondeo de esquinas» preference: the shape rule says a preference "
             + "reaches only the elements the prototype gives it, and the prototype spends it on "
             + "artBox — the cover — alone. Pairing it with a fixed number here would undo that."),
         ("Border.option-row",
@@ -147,7 +148,7 @@ public sealed class SurfaceCornerTests
             + "the design DID decide is the card behind it, and that is what moved this notice off "
             + "the accent's wash and onto the card's own surface on 2026-09-03."),
         ("Border.player-overlay",
-            "the gear's panel over the picture (ADR-0012, 2026-09-12). The prototype has no such "
+            "the gear's panel over the picture (2026-09-12). The prototype has no such "
             + "surface: its player settings are a popup menu, and that container is precisely what "
             + "this tree cannot copy, because nothing inside a Flyout is reachable by the autonomous "
             + "walk. So there is no design element to pair it with, and inventing one would be a "
@@ -225,7 +226,7 @@ public sealed class SurfaceCornerTests
     }
 
     /// <summary>
-    /// The two literals this batch wrote are visible: a 10 px corner cuts more ink from a box than
+    /// The two literals the corners are made of are visible: a 10 px corner cuts more ink from a box than
     /// an 8 px one, and a 7 px row cuts more than a 4 px one.
     /// </summary>
     /// <remarks>
@@ -256,7 +257,7 @@ public sealed class SurfaceCornerTests
         Assert.True(
             large > small,
             $"a {bigger} px radius cuts {large} px of the corner and an {smaller} px one cuts {small}: "
-            + "the difference this batch wrote is not reaching the screen.");
+            + "the difference between the two corners is not reaching the screen.");
     }
 
     /// <summary>
@@ -328,34 +329,11 @@ public sealed class SurfaceCornerTests
         return pale;
     }
 
-    /// <summary>The radii the table claims are the ones the design writes.</summary>
-    /// <remarks>
-    /// Without this half the table is a second set of hand-copied numbers and a pairing that drifts
-    /// from the design certifies itself.
-    /// </remarks>
-    [Fact]
-    public void The_pairings_name_the_radius_the_design_writes()
-    {
-        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-
-        foreach (var pairing in Pairings)
-        {
-            var match = Regex.Match(design, pairing.Pattern, RegexOptions.None, TimeSpan.FromSeconds(5));
-
-            Assert.True(
-                match.Success,
-                $"the design no longer draws {pairing.Element}, so {pairing.Selector} is paired with nothing.");
-            Assert.Equal(
-                pairing.Radius,
-                int.Parse(match.Groups["radius"].Value, CultureInfo.InvariantCulture));
-        }
-    }
-
     /// <summary>
     /// Every non-button class that declares a corner is in one table or the other.
     /// </summary>
     /// <remarks>
-    /// The half ADR-0007 was missing when it left ten button classes unpaired without anything going
+    /// The half the shape rule was missing when it left ten button classes unpaired without anything going
     /// red: a gate over a hand-written list measures only what somebody remembered to list.
     /// </remarks>
     [Fact]
@@ -481,14 +459,7 @@ public sealed class SurfaceCornerTests
     [AvaloniaFact]
     public void The_row_box_draws_the_padding_beside_that_corner()
     {
-        var design = File.ReadAllText(RepositoryLayout.PathFromRoot("design/AP Reelume.dc.html"));
-        var written = Regex.Match(
-            design,
-            @"padding: '(?<down>[0-9]+)px (?<across>[0-9]+)px', border: '1px solid var\(--hair",
-            RegexOptions.None,
-            TimeSpan.FromSeconds(5));
-
-        Assert.True(written.Success, "the design no longer writes the row box's padding.");
+        var (down, across) = PrototypeValues.RowBoxPadding;
 
         var application = Avalonia.Application.Current!;
         using var scope = new ResourceScope(application);
@@ -508,9 +479,6 @@ public sealed class SurfaceCornerTests
         {
             window.Close();
         }
-
-        var down = double.Parse(written.Groups["down"].Value, CultureInfo.InvariantCulture);
-        var across = double.Parse(written.Groups["across"].Value, CultureInfo.InvariantCulture);
 
         Assert.Equal(across, drawn.Left);
         Assert.Equal(across, drawn.Right);

@@ -27,7 +27,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// exactly what nearest-neighbour gives, and the test next door says so literally. A yardstick whose
 /// best score belongs to the worst filter cannot be optimised against: pushing towards it pushes
 /// towards a hard threshold, which scores beautifully and draws staircased edges. Measured on
-/// 2026-09-13, trying to win on ramp width alone produced a picture the maintainer had already rejected
+/// 2026-09-13, trying to win on ramp width alone produced a picture that had already been rejected
 /// by eye.
 /// </para>
 /// <para>
@@ -72,10 +72,10 @@ public sealed class VideoUpscaleFidelityTests
     /// the change it guards.
     /// </para>
     /// <para>
-    /// <b>It was 30 for half an hour and the detour is the lesson.</b> The maintainer reported tonal squares
+    /// <b>It was 30 for half an hour and the detour is the lesson.</b> Tonal squares were reported
     /// around lettering, the sharpened cubic's ringing was the obvious suspect, and this floor came down
-    /// so a gentler coefficient could pass. Then he ran the control: <b>his gamma was at 1.5, and at 1.0
-    /// the squares stop</b> — the artefact was banding from an 8-bit tone curve (`ENG-021`) and had
+    /// so a gentler coefficient could pass. Then the control was run: <b>the display gamma was at 1.5, and at 1.0
+    /// the squares stop</b> — the artefact was banding from an 8-bit tone curve and had
     /// nothing to do with this. <b>A gate loosened to accommodate a misdiagnosis is worse than the
     /// defect</b>, so it is back at 35, which the shipping chain clears at 35,7 %.
     /// </para>
@@ -145,7 +145,7 @@ public sealed class VideoUpscaleFidelityTests
     /// </para>
     /// <para>
     /// <b>The enhancement is deliberately left off here, and saying so matters.</b> This read
-    /// <c>upscale: true</c> until the mutation check measured it on 2026-09-13 and found the distance
+    /// <c>upscale: true</c> until the gate auditor measured it on 2026-09-13 and found the distance
     /// identical either way — at 1:1 the chain answers <c>CompositionBilinear</c>, so the enhanced
     /// route is never entered and the argument was decoration that read like coverage. What this test
     /// measures is the yardstick's alignment, nothing else; that the chain leaves a 1:1 picture
@@ -165,12 +165,12 @@ public sealed class VideoUpscaleFidelityTests
     }
 
     /// <summary>
-    /// The case the maintainer reported by eye: a grainy source must not come out worse than untouched.
+    /// The case that was reported by eye: a grainy source must not come out worse than untouched.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>Why this test exists, which is the same reason the file does.</b> On 2026-09-13 the maintainer
-    /// looked at the enhancement and said it had improved a lot but still showed «artefactos o ruido».
+    /// <b>Why this test exists, which is the same reason the file does.</b> On 2026-09-13 the
+    /// enhancement was judged much improved but still showing «artefactos o ruido».
     /// Every measurement above is blind to that: the truth is drawn clean and the frame handed over is
     /// a clean shrink of it, so a chain that amplifies grain scores exactly as well as one that does
     /// not. <b>A decoded video is never clean</b> — compression leaves block noise and grain in every
@@ -199,7 +199,7 @@ public sealed class VideoUpscaleFidelityTests
             enhanced < composition,
             $"With grain in the source the enhancement lands {enhanced:F2} from the truth and leaving "
             + $"it alone lands {composition:F2}, so sharpening a real video makes it worse rather than "
-            + "better. This is the «artefactos o ruido» the maintainer reported on 2026-09-13, which every "
+            + "better. This is the «artefactos o ruido» reported on 2026-09-13, which every "
             + "other test here is blind to because their sources are clean.");
     }
 

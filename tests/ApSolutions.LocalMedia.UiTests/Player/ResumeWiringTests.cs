@@ -15,7 +15,7 @@ namespace ApSolutions.LocalMedia.UiTests.Player;
 /// The resume offer is only real when the assembly feeds it: the decision has to exist before the
 /// media opens, the media has to open at the chosen point, and the prompt's buttons have to reach
 /// the playback they claim to control. A prompt with no handler looks identical to a working one
-/// and leaves the video at zero — the defect the deep audit filed as BUG-002.
+/// and leaves the video at zero — a defect a deep audit found.
 /// </summary>
 public sealed class ResumeWiringTests
 {

@@ -16,7 +16,7 @@ namespace ApSolutions.LocalMedia.PackagingTests;
 /// <para>
 /// The package manifest's <c>BackgroundColor</c> is what Windows shows while the process starts, and
 /// <c>StartupView</c> is the first thing the application itself draws — over
-/// <c>ShellSurfaceBrush</c>. §4 asks for the two to be the same colour so the join does not show, and
+/// <c>ShellSurfaceBrush</c>. The design asks for the two to be the same colour so the join does not show, and
 /// today they are: both <c>#111827</c>. Nothing was watching that, so it was one edit away from
 /// becoming a flash on every launch.
 /// </para>

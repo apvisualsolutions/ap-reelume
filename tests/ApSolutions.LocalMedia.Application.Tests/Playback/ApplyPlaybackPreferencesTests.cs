@@ -12,8 +12,7 @@ namespace ApSolutions.LocalMedia.Application.Tests.Playback;
 /// What a session does with the tracks on its way in. The distinction under test is between a scope
 /// that <b>answered</b> and one that stayed silent: applying the resolved value either way is what
 /// made every first playback hand the engine <c>-1</c> for subtitles and switch off the track the
-/// container had marked as its default — reported by the maintainer on 2026-08-25, who watched the same
-/// episode show subtitles in VLC and none here.
+/// container had marked as its default — the same episode showed subtitles in VLC and none here.
 /// </summary>
 public sealed class ApplyPlaybackPreferencesTests
 {
@@ -117,7 +116,7 @@ public sealed class ApplyPlaybackPreferencesTests
     }
 
     /// <summary>
-    /// ENG-011. The speed was stored, resolved and written to SQLite, and <b>nobody applied it</b>:
+    /// The speed was stored, resolved and written to SQLite, and <b>nobody applied it</b>:
     /// `resolved.SpeedMultiplier` was read in exactly zero places across `src/`.
     /// </summary>
     [Fact]

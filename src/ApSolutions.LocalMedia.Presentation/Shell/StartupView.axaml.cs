@@ -10,7 +10,7 @@ namespace ApSolutions.LocalMedia.Presentation.Shell;
 /// What the window holds while the database is being made ready.
 /// </summary>
 /// <remarks>
-/// ARQ-005. It exists so the window can be shown in the first frame instead of after the work: the
+/// It exists so the window can be shown in the first frame instead of after the work: the
 /// preparation runs off the interface thread, and this is what stands in its place until the shell
 /// or the recovery screen replaces it.
 /// </remarks>

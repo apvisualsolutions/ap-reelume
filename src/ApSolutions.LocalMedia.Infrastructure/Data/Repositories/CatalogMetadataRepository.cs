@@ -165,7 +165,7 @@ public sealed class CatalogMetadataRepository : ICatalogMetadataRepository
         var poster = reader.IsDBNull(6) ? null : reader.GetString(6);
         var personal = reader.IsDBNull(14) ? null : reader.GetString(14);
 
-        // Stored the old way (before LIB-021): the picked cover lived in poster_path, as an absolute
+        // Stored the old way (before it had a column of its own): the picked cover lived in poster_path, as an absolute
         // path. It is read as what it is, so the next save writes the two apart; the rule that knows
         // what a picked cover's name looks like is PersonalCoverPathPolicy, not a copy of it in SQL.
         if (personal is null && PersonalCoverPathPolicy.TryGetCoverFileName(poster) is { } legacy)

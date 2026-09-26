@@ -138,7 +138,7 @@ public sealed class ThemeTests
             RepositoryLayout.Root,
             "artifacts",
             "ui-captures",
-            "T3");
+            "theme");
         Directory.CreateDirectory(artifacts);
 
         foreach (var mode in new[] { "System", "Light", "Dark" })
@@ -211,7 +211,7 @@ public sealed class ThemeTests
         // anything.
         //
         // Eleven and not thirteen since 2026-09-13: the two language choices left for a destination
-        // of their own (UX-010), and only one settings section is on screen at a time. They are
+        // of their own, and only one settings section is on screen at a time. They are
         // counted where they went rather than simply subtracted, because a count that only got
         // smaller would read the same whether they moved or were deleted.
         Assert.Equal(11, themeButtons.Length);

@@ -419,7 +419,7 @@ public sealed class AutomaticSegmentDetector : IAutomaticSegmentDetector
             var offset = offsetOf(prints[episode]);
             var supportShare = (double)(cluster.Count - 1) / Math.Max(1, episodeCount - 1);
 
-            // The emitted range is clamped to the episode it was measured in (BUG-009): a
+            // The emitted range is clamped to the episode it was measured in: a
             // recurring window that runs past a short episode's end would otherwise be stored as
             // a range no playback can ever reach.
             var duration = prints[episode].Duration;

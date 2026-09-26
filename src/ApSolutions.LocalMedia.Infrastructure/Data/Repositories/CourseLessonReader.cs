@@ -10,7 +10,7 @@ using Microsoft.Data.Sqlite;
 namespace ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 
 /// <summary>
-/// A course's lessons with their length and their progress joined on (CRS-002, CRS-003).
+/// A course's lessons with their length and their progress joined on.
 /// </summary>
 /// <remarks>
 /// Three tables answer one question, and they are joined here rather than read three times: the
@@ -19,7 +19,7 @@ namespace ApSolutions.LocalMedia.Infrastructure.Data.Repositories;
 /// has not seen has no length yet, and a lesson nobody has opened has no state, which is exactly
 /// what «not started» means.
 /// <para>
-/// The watch state is found by the key PLY-008 already stores it under:
+/// The watch state is found by the key the continuity store already keeps it under:
 /// <see cref="CourseProgressKey"/> puts the course where a title goes and the lesson where an
 /// episode goes, so this reads the same rows resume and the countdown do.
 /// </para>

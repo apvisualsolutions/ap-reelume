@@ -22,7 +22,7 @@ public interface IAudioOutputTarget
 }
 
 /// <summary>
-/// The live engine as an output switch sees it (AUD-A01). Pause and resume go through the same
+/// The live engine as an output switch sees it. Pause and resume go through the same
 /// engine calls the transport uses, and the device routing reaches the session that is actually
 /// playing — which is the half the audit found missing.
 /// </summary>

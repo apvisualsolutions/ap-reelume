@@ -8,7 +8,7 @@
   </ItemGroup>
   <ItemGroup>
     <!--
-      Ed25519 and Blake2b for minisign verification (SEC-003). The BCL ships neither: its Ed25519
+      Ed25519 and Blake2b for minisign verification. The BCL ships neither: its Ed25519
       only exists inside the composite post-quantum names, and Blake2b not at all. Managed-only,
       no native payload, pinned like everything else.
     -->
@@ -18,7 +18,7 @@
   </ItemGroup>
   <!--
     The native engine is not a NuGet package any more: VideoLAN.LibVLC.Windows carries GPL plugins,
-    and this is the tree built without them, pinned by hash (ENG-013).
+    and this is the tree built without them, pinned by hash.
   -->
   <Import Project="..\..\eng\libvlc\LibVlc.targets" />
   <ItemGroup>

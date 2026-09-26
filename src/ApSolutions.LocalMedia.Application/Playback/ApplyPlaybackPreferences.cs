@@ -76,7 +76,7 @@ public sealed class ApplyPlaybackPreferences
         }
 
         // The speed has exactly the shape of the comment above, and for five weeks nobody joined the
-        // two (ENG-011). It was stored, resolved and written to SQLite, and `resolved.SpeedMultiplier`
+        // two. It was stored, resolved and written to SQLite, and `resolved.SpeedMultiplier`
         // was read in zero places across src/: the chosen speed did not survive closing, and — the
         // half that is a defect rather than a forgotten setting — a film left at 1.5× handed the next
         // film 1.5×, because ControlPlayback is a singleton too and the screen reads its speed back
@@ -89,8 +89,8 @@ public sealed class ApplyPlaybackPreferences
         // A scope that answered is a decision somebody took; a scope that did not is silence, and
         // silence is not «off». Applying the resolved value either way is what made a first
         // playback disable subtitles the container had marked as its default — the engine had
-        // already selected the Spanish track, and this handed it -1 on the way in. Reported by the
-        // owner on 2026-08-25: the same episode showed subtitles in VLC and none here.
+        // already selected the Spanish track, and this handed it -1 on the way in. Seen on
+        // 2026-08-25: the same episode showed subtitles in VLC and none here.
         var audio = resolved.AudioSource is null
             ? Find(snapshot.Tracks, snapshot.ActiveAudioTrackId)
             : await SelectAsync(MediaTrackKind.Audio, resolved.Audio).ConfigureAwait(false);

@@ -100,10 +100,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
 
         It was 18 — half of ControlHeight — and that is exactly right for a 36 px control and one
         pixel short of round for anything taller: the player's 44 px targets came out as squares with
-        their corners taken off, which is what the maintainer saw on 2026-08-25 and what «nunca cuadrados»
-        refuses. A radius larger than half the shorter side is clamped to half of it when it is drawn,
-        so 999 is a circle on a square target, a pill on a wide one, and needs no second token to say
-        which. It is the prototype's own `border-radius: 999px`, and the reason that idiom exists.
+        their corners taken off, which is exactly what «nunca cuadrados» refuses. A radius larger
+        than half the shorter side is clamped to half of it when it is drawn, so 999 is a circle on a
+        square target, a pill on a wide one, and needs no second token to say which. It is the
+        prototype's own `border-radius: 999px`, and the reason that idiom exists.
       -->
       <CornerRadius x:Key="CornerRadiusPill">999</CornerRadius>
       <!--
@@ -251,8 +251,8 @@ SPDX-License-Identifier: LicenseRef-APSolutions
         application never drew. Its covers are four CSS backgrounds over one hue, listed top first:
         `repeating-linear-gradient(115deg, rgba(255,255,255,.055) 0 2px, transparent 2px 10px)`, a
         ring, a radial glow, and the two-stop gradient underneath. PosterArt built the glow and the
-        base and stopped there, so the wall of colour was flat where the prototype's is woven — which
-        is what the maintainer meant by the striped backgrounds being missing.
+        base and stopped there, so the wall of colour was flat where the prototype's is woven, and the
+        striped backgrounds were missing.
 
         Avalonia has no repeating gradient, and does not need one: a LinearGradientBrush with
         SpreadMethod="Repeat" tiles its own vector. The vector is ten pixels long at the CSS angle —
@@ -1301,7 +1301,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     `VerticalContentAlignment` starts at `Stretch`, this style set a height, a radius and a padding
     and never touched it, and a stretched TextBlock fills the whole button and draws its line at the
     TOP of that box: measured, a 36 px pill held a 34 px label box with the words riding about seven
-    pixels above centre. Every button in the application, and the maintainer saw it before any gate did.
+    pixels above centre. Every button in the application, and it was visible before any gate caught it.
 
     The prototype writes the same rule as one line of CSS on every button it draws —
     `display:inline-flex; align-items:center; justify-content:center` — and this is that line. The
@@ -1317,16 +1317,15 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   </Style>
   <!--
     And the ink inside that box, which is a second question and was still wrong after the first was
-    fixed: the box was centred and the words still looked low, which is what the maintainer reported
-    twice. The answer lives in the style below, and what it is worth is one pixel on the button's
-    content — measured by rasterising, not derived from the font's metrics.
+    fixed: the box was centred and the words still looked low. The answer lives in the style below, and
+    what it is worth is one pixel on the button's content — measured by rasterising, not derived from
+    the font's metrics.
 
     This block used to argue for five pixels on the label, from a 2.43 px asymmetry the metrics
     reported, and cited ButtonOpticalCentreTests. All of that is gone: the screen says the error is
     1 px, five moved the word by three, a margin on the label grows the panel and takes the icon
     with it, and that test is retired for computing the ink instead of looking at it.
-    ButtonPixelCentreTests holds the result now. See docs/design/ELEMENTS.es.md, which carries the
-    whole story and takes precedence over this file.
+    ButtonPixelCentreTests holds the result now.
   -->
   <!--
     And taken back off the buttons whose content is a shape rather than a sentence. A glyph is
@@ -1447,11 +1446,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     declared wins, and focus has to win over selection.
   -->
   <!--
-    One pixel and not two, and the neutral pair rather than the accent. The two-pixel accent
-    rectangle is what the maintainer was looking at on 2026-08-25 — «quiero cambiar los recuadros de
-    selección de los menús en general, no quiero un borde coloreado con el acento» — and it was
-    drawn around every selected row this application has, including a poster in a rail, where it
-    reads as a box somebody dropped on a picture.
+    One pixel and not two, and the neutral pair rather than the accent. The two-pixel accent rectangle
+    marked the selection in every menu with a border in the accent colour, and it was drawn around every
+    selected row this application has, including a poster in a rail, where it reads as a box somebody
+    dropped on a picture.
 
     What replaces it is what the prototype draws for a menu: a neutral wash, and the accent spent
     somewhere else. The border stays because ListRowStateTests measures one — see SelectionStrokeBrush
@@ -1501,12 +1499,12 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     Every button says what it does when the pointer rests on it, and it says exactly what a screen
     reader is told.
 
-    One style rather than an attribute on each button. The maintainer asked for tooltips «en todos los
-    botones, en especial los que sólo llevan icono», and there are more than two hundred of them:
-    written out one by one, that is two hundred chances for the tip and the accessible name to drift
-    apart, and nothing would notice for a year. Bound to the control's own name they are the same
-    string by construction, and ViewLiteralTests — which refuses a literal in ToolTip.Tip — keeps
-    that string a resource key, so both follow the language in force.
+    One style rather than an attribute on each button. Tooltips belong on every button, above all the
+    ones that carry only an icon, and there are more than two hundred of them: written out one by one,
+    that is two hundred chances for the tip and the accessible name to drift apart, and nothing would
+    notice for a year. Bound to the control's own name they are the same string by construction, and
+    ViewLiteralTests — which refuses a literal in ToolTip.Tip — keeps that string a resource key, so
+    both follow the language in force.
 
     A button that declares no accessible name gets no tip, which is the honest answer: there is
     nothing to say about it that has been written down. A button that already carries a tip of its
@@ -1522,9 +1520,8 @@ SPDX-License-Identifier: LicenseRef-APSolutions
 
     :focus-visible and not :focus, and the difference is the whole complaint. :focus is raised by a
     mouse too, so every checkbox somebody clicked answered with a two-pixel ring that stayed until
-    they clicked elsewhere — «al hacer clic en una casilla sale un reborde azul, y pasa en todas»,
-    reported on 2026-08-25 by the maintainer. The ring says where the keyboard is; a pointer already says
-    where it is by being there. Nothing is lost for a keyboard: Avalonia raises focus-visible for
+    they clicked elsewhere, on every checkbox. The ring says where the keyboard is; a pointer already
+    says where it is by being there. Nothing is lost for a keyboard: Avalonia raises focus-visible for
     Tab, for the arrow keys, and for a focus moved in code.
   -->
   <Style Selector="Button:focus-visible">
@@ -1576,10 +1573,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     disabled fill, the resting fill and the surface are one colour, the border is the theme's single
     border in all four states, and the disabled text is the primary text. Geometry is what is left.
 
-    Drawing it in all four themes made every command with nothing to act on wear a dotted rectangle
-    in the ordinary ones too, on top of a grey that already said the same thing. The maintainer counted
-    them on seven screens; the instrument counted 299 across the tree with no data loaded. So the
-    cue is spent where it is the only one, and the fill carries it where the fill can.
+    Drawing it in all four themes made every command with nothing to act on wear a dotted rectangle in
+    the ordinary ones too, on top of a grey that already said the same thing. They showed on seven
+    screens at a glance; the instrument counted 299 across the tree with no data loaded. So the cue is
+    spent where it is the only one, and the fill carries it where the fill can.
 
     A DynamicResource and not a code test of the theme: the adorner outlives a theme change, and a
     resource is what re-resolves when one happens. It is the same mechanism the whole file rests on.
@@ -1706,20 +1703,19 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     accent over a card, the warning or error ink over a notice — and over the video the same overline
     is dimmed rather than recoloured, so neither is set here.
 
-    Every number below is the design's, read out of «design/AP Reelume.dc.html» by OverlineTests
-    rather than restated: that gate pairs each class with the prototype control it draws and fails on
-    the number, which is the arrangement ADR-0007 put over the buttons and this is the same decision
-    reaching «todos los elementos».
+    Every number below is the design's, read out of the prototype by OverlineTests rather than
+    restated: that gate pairs each class with the prototype control it draws and fails on the
+    number, which is the arrangement the buttons already follow, reaching every other element.
 
     THE TRACKING IS PIXELS AND THE DESIGN'S IS EM, so each one is written as its em times the size on
     the line above it. Avalonia 12.1.1 documents TextElement.LetterSpacing as «specified in pixels»,
     and ScalarTokenTests does not watch LetterSpacing, so nothing else would catch a tracking left
     behind when its size moved.
 
-    TWO SIZES HERE ARE LITERALS — 10 and 10.5 — and that is ADR-0007's first consequence rather than
-    an oversight: the scale carries 11 at its smallest and the design draws below it. Rounding them
-    up to the footnote would draw a size the design does not have. ScalarTokenTests still forbids a
-    view writing a size that HAS a token, which is a different thing.
+    TWO SIZES HERE ARE LITERALS — 10 and 10.5 — and that is the rule for a value with no token
+    rather than an oversight: the scale carries 11 at its smallest and the design draws below it.
+    Rounding them up to the footnote would draw a size the design does not have. ScalarTokenTests still
+    forbids a view writing a size that HAS a token, which is a different thing.
   -->
 
   <!--
@@ -1984,11 +1980,10 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <!--
     Round, and not a square with softened corners.
 
-    <b>The medium radius again since 2026-09-01.</b> «Todos los botones o son redondos o son
-    píldoras, pero nunca cuadrados» made this a circle on 2026-08-25, and the maintainer withdrew that
-    rule the moment it was measured against the design: an element matches the prototype, and the
-    prototype draws <c>pbtn</c> — the player's icon buttons — at <c>borderRadius: 8</c>, which is
-    this scale's medium.
+    <b>The medium radius again.</b> «Todos los botones o son redondos o son píldoras, pero nunca
+    cuadrados» once made this a circle, and that rule no longer applies: measured against the design, an
+    element matches the prototype, and the prototype draws <c>pbtn</c> — the player's icon buttons — at
+    <c>borderRadius: 8</c>, which is this scale's medium.
 
     <b>The 44 px target is a separate decision and it stays.</b> The prototype draws pbtn at 36 by
     36; 44 is the accessible target size, and shrinking it would trade a measurable accessibility
@@ -2021,11 +2016,11 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     <Setter Property="MinHeight" Value="44" />
     <Setter Property="FontSize" Value="{DynamicResource FontSizeCaption}" />
     <!--
-      Back to the small radius on 2026-09-01. It drew one until 2026-08-25, when «a button is round
-      or a pill, never a square with its corners taken off» made it a pill; the maintainer withdrew that
-      rule the moment it was measured against the design, and the prototype draws pbtnAudio,
-      pbtnSubs, pbtnVideo, pbtnMarks and pbtnLessons at borderRadius: 4. The name stays because five
-      tests and the walk address it, and a rename buys nothing the comment does not.
+      Back to the small radius. It drew one until «a button is round or a pill, never a square with its
+      corners taken off» made it a pill; that rule no longer applies once measured against the design,
+      and the prototype draws pbtnAudio, pbtnSubs, pbtnVideo, pbtnMarks and pbtnLessons at
+      borderRadius: 4. The name stays because five tests and the walk address it, and a rename buys
+      nothing the comment does not.
     -->
     <Setter Property="CornerRadius" Value="{DynamicResource CornerRadiusSmall}" />
     <Setter Property="Background" Value="Transparent" />
@@ -2049,7 +2044,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   </Style>
 
   <!--
-    One lesson in the player's «Lecciones» column (CRS-004). The whole row is the button, which is
+    One lesson in the player's «Lecciones» column. The whole row is the button, which is
     what the prototype draws: a name held as text with a play button on the end would put the target
     on the smallest thing in the row.
 
@@ -2069,8 +2064,8 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     <!--
       7, which is the prototype's own and which none of the three radius tokens carries: the scale is
       4, 8 and the pill, and this sits between the first two. Written as the literal it is rather
-      than rounded to a token it is not - the maintainer's rule of 2026-09-01 is that an element matches
-      the design, and 4 or 8 here would be a shape the design does not draw.
+      than rounded to a token it is not - the rule is that an element matches the design, and 4 or 8
+      here would be a shape the design does not draw.
     -->
     <Setter Property="CornerRadius" Value="7" />
     <Setter Property="Background" Value="Transparent" />
@@ -2152,12 +2147,11 @@ SPDX-License-Identifier: LicenseRef-APSolutions
               CornerRadius="{TemplateBinding CornerRadius}">
             <Grid Margin="{TemplateBinding Padding}" ColumnDefinitions="Auto,*,Auto">
               <!--
-                One pixel of bottom margin on the words and none on the caret, which is the recipe
-                the buttons already carry and the reason it is written twice. A font's ascent and
-                descent are not symmetric, so a label centred to the pixel draws its ink below the
-                middle; the maintainer reported the same list on 2026-08-25 — «los desplegables tienen el
-                mismo problema de alineación vertical que tenían los botones». The chevron is left
-                alone because a glyph is centred by its geometry and has no baseline to answer for.
+                One pixel of bottom margin on the words and none on the caret, which is the recipe the
+                buttons already carry and the reason it is written twice. A font's ascent and descent
+                are not symmetric, so a label centred to the pixel draws its ink below the middle, and
+                the drop-downs showed the same vertical misalignment the buttons had. The chevron is
+                left alone because a glyph is centred by its geometry and has no baseline to answer for.
 
                 It was five until 2026-08-29 and that is the point of writing the number down: the
                 buttons moved to one and these two copies did not, which left every dropdown's label
@@ -2436,7 +2430,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     46 x 42 with a radius, and the radius is the 12 the prototype draws. This comment claimed
     CornerRadiusMedium until 2026-09-01 while the setter below wrote the pill — two numbers, neither
     of them the design's, and the reason given was that a third value for one consumer is the shape
-    FontSizeMono was refused for. ADR-0007 retires that reasoning: a value with no token is written
+    FontSizeMono was refused for. That reasoning no longer holds: a value with no token is written
     as a literal, because rounding 12 to a token draws a corner the design does not have.
 
     The open destination is told by a fill AND a 3 px bar, which is two signals with one of them not
@@ -2591,7 +2585,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <!--
       7, written as a literal because the scale has no 7 and rounding to the 4 next to it would draw
-      a shape the design does not have - ADR-0007's first consequence. The prototype's row is 32 px
+      a shape the design does not have. The prototype's row is 32 px
       tall with 5px 9px of padding, and it read as 4 until 2026-09-03.
     -->
     <Setter Property="CornerRadius" Value="7" />
@@ -2810,7 +2804,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
 
   <!--
     The chosen swatch, said with the swatch's own edge. It carried the ● and ○ every pill row in this
-    tree spends, and the maintainer was right that it does not belong on a circle of colour: a small ring
+    tree spends, and it does not belong on a circle of colour: a small ring
     drawn inside a large one reads as a radio button somebody dropped there. The prototype rings the
     chosen swatch in the page's ink instead, and that is geometry in exactly the way the glyph was —
     both high contrast dictionaries paint a border, so nothing is lost where colour says nothing.
@@ -2960,7 +2954,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     caller to write a duplicate instead.
   -->
   <!--
-    The gear's panel over the picture (ADR-0012). Its corner lives here and not in the view, which is
+    The gear's panel over the picture. Its corner lives here and not in the view, which is
     what SurfaceCornerTests asks for in so many words: this file is the one place the ratchet does not
     count, so a surface paired with a class costs no site at all while the same four lines written
     into a view cost one.
@@ -2980,7 +2974,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
     <!--
       10, and not the medium token: the design draws this row at 10 and the scale stops at 8. A value
       with no token is written as a literal, because rounding to the nearest one draws a shape the
-      design does not have - ADR-0007's first consequence, and ScalarTokenTests still forbids writing
+      design does not have, and ScalarTokenTests still forbids writing
       a number that HAS a token, which is a different thing.
     -->
     <Setter Property="CornerRadius" Value="10" />
@@ -3120,13 +3114,13 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   </Style>
 
   <!--
-    THE NOTICES STRIP, and the whole of ADR-0010 in one class: a notice that describes a STATE takes
-    space and pushes the grid down. The prototype's banner() is what it draws — 12 px of gap, 12 by 14
-    of padding, a 1 px border in the tone's own ink and its wash behind — and the radius of 10 comes
-    from there rather than from a token, which is why row-box already writes the same number.
+    THE NOTICES STRIP, and the whole rule for notices in one class: a notice that describes a STATE
+    takes space and pushes the grid down. The prototype's banner() is what it draws — 12 px of gap, 12
+    by 14 of padding, a 1 px border in the tone's own ink and its wash behind — and the radius of 10
+    comes from there rather than from a token, which is why row-box already writes the same number.
 
     The tone lives in the modifier because severity picks the colour and never the position, which is
-    the ADR's third point: an info scan and a refused share sit in exactly the same place.
+    the same rule: an info scan and a refused share sit in exactly the same place.
   -->
   <Style Selector="Border.notice-strip">
     <Setter Property="Padding" Value="12,14" />
@@ -3186,9 +3180,9 @@ SPDX-License-Identifier: LicenseRef-APSolutions
 
   <!--
     THE RULE ACROSS A COVER, which is a bar in name only: 3 px at the foot of the artwork, white at a
-    quarter for what is left and the accent for what is watched (design/AP Reelume.dc.html:312 and
-    :2417). MinHeight and MinWidth go with the height because the base ControlTheme sets minimums of
-    its own - 200 px wide inside a 148 px poster, measured in PosterCardView.
+    quarter for what is left and the accent for what is watched. MinHeight and MinWidth go with the
+    height because the base ControlTheme sets minimums of its own - 200 px wide inside a 148 px poster,
+    measured in PosterCardView.
 
     Its ends are square, and that is the one thing here that had to be said out loud: the base theme
     rounds them, and counted in pixels on 2026-09-12 a 42 % fill measured 57 px of accent where the

@@ -12,7 +12,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.UiTests.Courses;
 
 /// <summary>
-/// The courses grid (CRS-003): what it lists, the two separate offers a card makes, and the positive
+/// The courses grid: what it lists, the two separate offers a card makes, and the positive
 /// empty state that offers to mark a folder.
 /// </summary>
 /// <remarks>
