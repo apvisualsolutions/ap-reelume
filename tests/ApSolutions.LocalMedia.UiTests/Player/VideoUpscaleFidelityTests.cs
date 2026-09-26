@@ -145,7 +145,7 @@ public sealed class VideoUpscaleFidelityTests
     /// </para>
     /// <para>
     /// <b>The enhancement is deliberately left off here, and saying so matters.</b> This read
-    /// <c>upscale: true</c> until the gate auditor measured it on 2026-09-13 and found the distance
+    /// <c>upscale: true</c> until a mutation test measured it on 2026-09-13 and found the distance
     /// identical either way — at 1:1 the chain answers <c>CompositionBilinear</c>, so the enhanced
     /// route is never entered and the argument was decoration that read like coverage. What this test
     /// measures is the yardstick's alignment, nothing else; that the chain leaves a 1:1 picture

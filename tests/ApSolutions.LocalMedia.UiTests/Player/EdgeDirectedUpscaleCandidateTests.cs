@@ -174,8 +174,8 @@ public sealed class EdgeDirectedUpscaleCandidateTests
     /// what ships — because the shipping chain got softer, or the candidate was improved — then it
     /// wins on every yardstick at once and the decision not to build it changes. If it leaves 34,9 %, it has
     /// stopped being the alternative the evidence describes, and the record would be pointing at a
-    /// figure nobody can reproduce. The band is as narrow as the control's on purpose: the gate
-    /// auditor found that a floor of 33 let a candidate with its coherence dropped (33,9 %) or one
+    /// figure nobody can reproduce. The band is as narrow as the control's on purpose: a mutation
+    /// test found that a floor of 33 let a candidate with its coherence dropped (33,9 %) or one
     /// gradient mis-indexed (34,5 %) pass all three, measured on 2026-09-25.
     /// </para>
     /// </remarks>

@@ -24,7 +24,7 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Updates;
 /// complete one, that a redirect cannot quietly drop to plain HTTP — do not exist above the socket.
 /// <para>
 /// The one thing no case is allowed to do is reach the launcher without a confirmation. That is the
-/// claim `REL-003` actually makes, and it is asserted from both sides: the paths that must not launch
+/// update confirmation actually promises, and it is asserted from both sides: the paths that must not launch
 /// and the single path that may.
 /// </para>
 /// </remarks>

@@ -13,7 +13,7 @@ namespace ApSolutions.LocalMedia.MediaTests.Corpus;
 
 /// <summary>
 /// Detection is local by contract. This measures the managed side of that claim with the same event
-/// sources `PRI-001` uses: a real extraction and comparison of a whole series, with every HTTP
+/// sources the network privacy test uses: a real extraction and comparison of a whole series, with every HTTP
 /// request and name resolution the process makes recorded — and the record must stay empty. The
 /// native engine is governed by its own no-network options, set where the factory is built.
 /// </summary>
@@ -58,7 +58,7 @@ public sealed class SegmentDetectionPrivacyTests
             $"Detection resolved a name: {string.Join(" | ", listener.Resolutions.Take(3))}");
     }
 
-    /// <summary>The same in-process observation `PRI-001` verified end to end, reduced to what this needs.</summary>
+    /// <summary>The same in-process observation the network privacy test verified end to end, reduced to what this needs.</summary>
     private sealed class NetworkListener : EventListener
     {
         private readonly List<string> _requests = [];

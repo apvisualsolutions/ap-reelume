@@ -408,7 +408,7 @@ public sealed partial class OptionRowShapeTests
     /// <remarks>
     /// The whole reason <c>AudioOutputOption</c> carries two strings instead of one is that the
     /// design draws them in two weights — and until this was written that claim was asserted on the
-    /// model and nowhere else. Measured by the auditor: deleting the second <c>TextBlock</c> and its
+    /// model and nowhere else. Measured by mutation: deleting the second <c>TextBlock</c> and its
     /// style left every suite green with the capability gone from the row, because
     /// <c>Summary</c> is read from the model and from the transport's own literal.
     /// </remarks>
@@ -566,7 +566,7 @@ public sealed partial class OptionRowShapeTests
         using var scope = new ThemeScope(application);
 
         // All three lists and each one after its own command has run, which is what this had to
-        // become: measured by the auditor, deleting Mark(...) from the SelectedDevice setter and
+        // become: measured by mutation, deleting Mark(...) from the SelectedDevice setter and
         // from the SelectedSubtitle setter left every suite green. Loading lights the row, so a
         // surface asked only after it loads cannot tell a wash that follows the choice from a
         // photograph of the first one.

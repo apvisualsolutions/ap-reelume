@@ -11,7 +11,7 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 
 /// <summary>
 /// Whether the subtitle style a person chooses can reach the picture. It cannot, and this measures
-/// why — so A11Y-002 is blocked by a number rather than by somebody having looked at a screen.
+/// why — so the subtitle-style requirement is blocked by a number rather than by somebody having looked at a screen.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -70,7 +70,7 @@ public sealed class SubtitleStyleReachTests
                 configuring.Length == 0,
                 $"The {(headless ? "headless" : "shell")} instance is built with "
                     + $"{configuring.Length} subtitle drawing option(s): {string.Join(", ", configuring)}. "
-                    + "If that ever stops being zero, this test has outlived A11Y-002's blocker and the "
+                    + "If that ever stops being zero, this test has outlived the subtitle-style blocker and the "
                     + "matrix entry has to be revisited rather than this assertion relaxed.");
         }
     }
@@ -100,7 +100,7 @@ public sealed class SubtitleStyleReachTests
         Assert.True(
             naming.Length == 0,
             $"{naming.Length} source file(s) name a subtitle drawing option: {string.Join(", ", naming)}. "
-                + "That would be the blocker lifting, which is good news and still means A11Y-002 has "
+                + "That would be the blocker lifting, which is good news and still means the subtitle-style requirement has "
                 + "to be re-measured rather than this test edited.");
     }
 
@@ -124,7 +124,7 @@ public sealed class SubtitleStyleReachTests
         Assert.True(
             members.Length == 0,
             $"IMediaPlayerEngine now offers {string.Join(", ", members)}, so a style may have a route "
-                + "to the picture that A11Y-002 says it does not.");
+                + "to the picture that the subtitle-style requirement says it does not.");
 
         // And the style is a real thing with real values, so what is missing is the delivery rather
         // than the subject: a test that searched for something that does not exist would pass for

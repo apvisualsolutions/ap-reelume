@@ -111,7 +111,7 @@ public static class UpscaleChainPolicy
     // WHAT IS DELIBERATELY NOT HERE, and it was here for an hour on 2026-09-13: a method that took a
     // measured UpscaleCost and switched the link it belonged to off the table. It was written, tested
     // with six cases, and called from nowhere but its own test file — which is this repository's
-    // defining defect, and the gate auditor named it. Removing it is better than keeping a sixth
+    // defining defect, and a mutation test named it. Removing it is better than keeping a sixth
     // instance of «registered and never fed».
     //
     // Wiring it for real needs a clock in the drawing path, and that belongs with the frame-cost

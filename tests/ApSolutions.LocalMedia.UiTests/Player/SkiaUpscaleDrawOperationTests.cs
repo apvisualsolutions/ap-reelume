@@ -156,7 +156,7 @@ public sealed class SkiaUpscaleDrawOperationTests
     /// <b>The whole suite was blind to this until 2026-09-13.</b> Naming the other byte order swaps
     /// red and blue in every enlarged video, and the mutant survived all 1,437 tests because every
     /// test picture here was grey and the only one with colour anywhere was pure green — the single
-    /// colour that is identical in both orders. The gate auditor found it.
+    /// colour that is identical in both orders. A mutation test found it.
     /// </para>
     /// <para>
     /// The capture's own order is read from the frame rather than assumed, because it is one of two
@@ -244,7 +244,7 @@ public sealed class SkiaUpscaleDrawOperationTests
     /// side of an edge lighter and the dark side darker; on a picture that is already 0 and 255 the
     /// excess clamps away invisibly, so raising the strength from 0.6 to 1.0 changes nothing a
     /// saturated edge can show. It is this tree's own lesson — «un primario saturado no mide» — and
-    /// the gate auditor found it here on 2026-09-13.
+    /// a mutation test found it here on 2026-09-13.
     /// </para>
     /// <para>
     /// So the edge is grey against grey, 64 against 192, where there is room on both sides for the

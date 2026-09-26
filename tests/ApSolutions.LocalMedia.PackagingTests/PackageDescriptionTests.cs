@@ -9,7 +9,7 @@ namespace ApSolutions.LocalMedia.PackagingTests;
 
 /// <summary>
 /// What Windows tells somebody about this application before they run it, and whether it tells them
-/// in their own language (DES-001).
+/// in their own language.
 /// </summary>
 /// <remarks>
 /// <para>
