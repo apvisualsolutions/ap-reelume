@@ -43,3 +43,8 @@ coverage.*.xml
 *.ssa
 *.srt
 *.vtt
+
+# Third-party kits that must never be published: NVIDIA's RTX Video SDK forbids stand-alone
+# distribution and its guide is confidential (ENG-054). A dot folder on purpose: the privacy test
+# reads any other unknown folder at the root as the maintainer's own library.
+/.vendor/
