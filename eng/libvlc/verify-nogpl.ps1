@@ -23,7 +23,9 @@
          bootstrap writes nothing — and "GPL absent" passed on a file that could never contain it.
          Only the AD_CLAUSES half, which demands something, gave it away. Canary for the one such library the shipped package was found
          carrying (aribb24 inside libts, 2026-09-18): its log string must be in the reference and
-         absent here.
+         absent here. The same for libzvbi, whose recipe does not say GPL although two of its files
+         are: its log prefix must be in the reference's libzvbi_plugin.dll and in no binary here, and
+         neither teletext decoder (libzvbi_plugin, libtelx_plugin) may be in the tree at all.
       4. Subtitles still render: the FreeType text renderer must be in the tree, because the whole
          point of --enable-ad-clauses was to keep it.
 
@@ -134,6 +136,29 @@ if (-not $referenceTs -or -not (Test-FileContains $referenceTs.FullName $aribCan
 $aribHits = @(Get-ChildItem $plugins -Recurse -Filter '*.dll' | Where-Object { Test-FileContains $_.FullName $aribCanary } | ForEach-Object Name)
 if ($aribHits.Count -gt 0) { $failures.Add("aribb24 is linked into: $($aribHits -join ', ')") }
 
+# The second library of that kind: libzvbi, which the teletext decoder links. Two of its files,
+# src/packet-830.c and src/pdc.c, are GPL-2.0-only, and neither half of this script could see them:
+# its contrib recipe does not say REQUIRE_GPL, so --disable-gpl builds it, and the source scan reads
+# VLC's zvbi module, which is LGPL. The first published tree shipped it. build-nogpl.sh now leaves it
+# out by name, and telx with it — the decoder VLC builds instead, whose source says some of its code
+# was converted from a GPL decoder — so neither plugin may be here, whatever it contains.
+#
+# The canary is the library's own log prefix (src/misc.c), not the symbols of the two GPL files.
+# Measured in the reference on both architectures: the stripped DLL keeps none of those symbols and
+# none of those files' strings, so a canary on them would be blind; the log prefix is there, and VLC's
+# module does not write it. It is looked for in every binary, core included, because a library can be
+# linked anywhere.
+$zvbiCanary = 'libzvbi:%s: %s'
+$referenceZvbi = Get-ChildItem $Reference -Recurse -Filter 'libzvbi_plugin.dll' | Select-Object -First 1
+if (-not $referenceZvbi -or -not (Test-FileContains $referenceZvbi.FullName $zvbiCanary)) {
+    $failures.Add('Control failed: the reference has no libzvbi_plugin.dll carrying the libzvbi log prefix, so the zvbi canary is blind.')
+}
+$zvbiHits = @(Get-ChildItem $Destination -Recurse -Filter '*.dll' | Where-Object { Test-FileContains $_.FullName $zvbiCanary } | ForEach-Object Name)
+if ($zvbiHits.Count -gt 0) { $failures.Add("libzvbi is linked into: $($zvbiHits -join ', ')") }
+$teletextDecoders = @('libzvbi_plugin', 'libtelx_plugin')
+$teletextHits = @(Get-ChildItem $plugins -Recurse -Filter '*_plugin.dll' | Where-Object { $teletextDecoders -contains $_.BaseName } | ForEach-Object Name)
+if ($teletextHits.Count -gt 0) { $failures.Add("teletext decoders carrying GPL code are in the tree: $($teletextHits -join ', ')") }
+
 # The source scan reads the PATCHED tree, so it calls libdeinterlace clean whether or not the binary
 # was built from that tree: measured on 2026-09-18, VideoLAN's own libdeinterlace — yadif inside —
 # passed it. The binary has to say it too: the patch removes the "yadif" mode names, and the
@@ -158,7 +183,11 @@ if (-not (Get-ChildItem $plugins -Recurse -Filter 'libfreetype_plugin.dll')) {
 $removedNames = @($removed | ForEach-Object plugin)
 $ours = Get-PluginNames $plugins
 $missing = @(Get-PluginNames $Reference | Where-Object { $ours -notcontains $_ } | ForEach-Object {
-    [pscustomobject]@{ plugin = $_; reason = if ($removedNames -contains $_) { 'removed: GPL source' } else { 'not built' } }
+    # The teletext decoders are not built on purpose, and "not built" would read as nobody wanting them.
+    $reason = if ($removedNames -contains $_) { 'removed: GPL source' }
+              elseif ($teletextDecoders -contains $_) { 'left out: carries GPL code' }
+              else { 'not built' }
+    [pscustomobject]@{ plugin = $_; reason = $reason }
 })
 $extra = @($ours | Where-Object { (Get-PluginNames $Reference) -notcontains $_ })
 

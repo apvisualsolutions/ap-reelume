@@ -66,7 +66,13 @@ done
 # x264 and x265 have to be deselected by name (the spike saw bootstrap list them as "manually
 # deselected"). --enable-ad-clauses brings freetype2 back under its FTL licence, which the maintainer
 # chose on 2026-09-14 (ENG-025) — without it there are no subtitles.
-export CONTRIBFLAGS="--disable-gpl --disable-x264 --disable-x265 --enable-ad-clauses"
+#
+# --disable-zvbi is the same kind of deselection, and --disable-gpl cannot make it: libzvbi 0.2.35
+# carries two GPL-2.0-only files, src/packet-830.c and src/pdc.c, and contrib/src/zvbi/rules.mak
+# does not say REQUIRE_GPL. Nothing downstream would notice either: the licence scan reads VLC's
+# own zvbi module, which is LGPL, and the GPL code arrives inside the library it links. No other
+# contrib depends on zvbi, so deselecting it cannot bring it back as a dependency.
+export CONTRIBFLAGS="--disable-gpl --disable-x264 --disable-x265 --enable-ad-clauses --disable-zvbi"
 
 # VLC's own configure. configure.sh asks for these by name, and a named module whose library is
 # missing aborts configure instead of warning:
@@ -74,8 +80,14 @@ export CONTRIBFLAGS="--disable-gpl --disable-x264 --disable-x265 --enable-ad-cla
 #   lua, realrtsp,  their own sources are GPL (lua) or the module is (realrtsp, mpc); disabling them
 #   mpc             here saves building what the licence scan would drop anyway
 #   update-check    VLC's own updater, which needs libgcrypt and this application does not use
+#   zvbi            configure.sh passes --enable-zvbi; without the contrib above configure only
+#                   warns, and naming it keeps out a zvbi-0.2 that pkg-config finds some other way
+#   telx            the teletext decoder VLC offers when zvbi is absent. configure.sh already
+#                   disables it, and it is named here so that stays true if that script changes:
+#                   modules/codec/telx.c declares LGPL but says some of its code was converted from
+#                   the ProjectX DVB decoder, which is GPL. No teletext decoder is built at all
 # These come after configure.sh's own options, and the last one wins.
-export CONFIGFLAGS="--disable-faad --disable-lua --disable-realrtsp --disable-mpc --disable-update-check"
+export CONFIGFLAGS="--disable-faad --disable-lua --disable-realrtsp --disable-mpc --disable-update-check --disable-zvbi --disable-telx"
 
 cd "$SRC"
 
