@@ -6193,6 +6193,21 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         window.InvalidateMeasure();
         window.UpdateLayout();
         Dispatcher.UIThread.RunJobs();
+
+        // <b>And a rendered frame after it, because a hit test does not read the tree</b> — `ENG-026`,
+        // five reds in CI on runs that changed no code. The harness decides where a click is safe by
+        // asking InputHitTest (IsOnAPicture, the beside-click's description), and that answers from
+        // the last RENDERED frame: measured in HeadlessHitTestFrameTests, a control laid out over the
+        // point is still reported as the one beneath it. The input helpers render a frame themselves,
+        // so the click that followed saw a different screen from the one the point was chosen on: the
+        // player had appeared, the beside-click landed on the film and paused it.
+        //
+        // <b>CaptureRenderedFrame and not ForceRenderTimerTick</b>, and the difference is measured: in
+        // this suite's configuration the tick left the hit test stale in 10 of 10 tries, and the
+        // capture brought it up to date in 10 of 10. The tick was the first fix written; it would have
+        // gone green here and kept failing in CI.
+        _ = window.CaptureRenderedFrame();
+        Dispatcher.UIThread.RunJobs();
         if (Fits(host, control))
         {
             return scrollers;
@@ -6218,6 +6233,9 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             }
         }
 
+        // The scrolling above moved things again, and the choice that follows is made by hit test.
+        _ = window.CaptureRenderedFrame();
+        Dispatcher.UIThread.RunJobs();
         return scrollers;
     }
 

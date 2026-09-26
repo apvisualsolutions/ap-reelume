@@ -85,6 +85,11 @@ evidencia, es [FEATURES.md](FEATURES.md).
   gana es menos de un nivel de tono medio, que no se ve. Lo que quita bandas es un filtro específico,
   no esto. Una prueba falla si algún día esa alternativa gana. No cambia nada del programa
   (`ENG-023`).
+- **El paseo automático de la interfaz ya no elige dónde pulsar sobre una pantalla vieja.** Decidía si
+  un punto era seguro mirando el último fotograma dibujado, y el clic llegaba a uno más nuevo: con el
+  reproductor recién abierto, el clic de control caía en la película y la pausaba. Eso tumbaba la
+  verificación en CI casi una de cada dos veces sin que el código tuviera nada que ver. Ahora dibuja
+  el fotograma antes de decidir. No cambia nada del programa (`ENG-026`).
 - **La herramienta que este repositorio recomienda para auditar sus propias comprobaciones ya no
   rompe una de ellas.** Correr esa auditoría en una copia de trabajo aparte ponía roja la
   comprobación de enlaces de evidencia, porque barría también las copias del repositorio que otras

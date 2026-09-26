@@ -82,6 +82,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   them worse in others, and what it gains is under one level of average tone, which cannot be seen.
   Removing bands takes a dedicated filter, not this. A test fails if that alternative ever wins.
   Nothing in the program changes (`ENG-023`).
+- **The automated interface walk no longer chooses where to click on a stale screen.** It decided
+  whether a point was safe by looking at the last frame drawn, while the click reached a newer one:
+  with the player just opened, the control click landed on the film and paused it. That failed
+  verification in CI nearly every other run with the code playing no part. It now draws the frame
+  before deciding. Nothing in the program changes (`ENG-026`).
 - **The tool this repository recommends for auditing its own checks no longer breaks one of them.**
   Running that audit in a separate working copy turned the evidence-link check red, because it swept
   the copies of the repository other sessions keep open inside the tree and read their documents as
