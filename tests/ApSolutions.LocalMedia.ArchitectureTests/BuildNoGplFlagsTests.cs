@@ -14,7 +14,7 @@ namespace ApSolutions.LocalMedia.ArchitectureTests;
 /// The build runs only inside VideoLAN's images, so what can be asserted here is what the script
 /// hands to VideoLAN's: the two variables build.sh reads. Whether the result carries libzvbi is
 /// measured on the binaries by verify-nogpl.ps1, whose canary <see cref="VerifyNoGplTeletextTests"/>
-/// provokes; this catches the flag going missing before an hour of build finds it.
+/// provokes; this catches the flag going missing, or being taken back, before an hour of build finds it.
 /// </remarks>
 public sealed partial class BuildNoGplFlagsTests
 {
@@ -38,6 +38,24 @@ public sealed partial class BuildNoGplFlagsTests
     public void VLC_is_configured_without_a_teletext_decoder(string flag)
     {
         Assert.Contains(flag, Flags("CONFIGFLAGS"));
+    }
+
+    /// <summary>
+    /// The refusals above hold only while nothing on the same line takes them back: configure and
+    /// bootstrap read their arguments in order and the last word wins, so a flag that switches the
+    /// decoder back on sits beside the one that refuses it and the presence checks stay green.
+    /// </summary>
+    [Theory]
+    [InlineData("CONTRIBFLAGS", "--enable-zvbi")]
+    [InlineData("CONTRIBFLAGS", "--enable-telx")]
+    [InlineData("CONFIGFLAGS", "--enable-zvbi")]
+    [InlineData("CONFIGFLAGS", "--enable-telx")]
+    public void Nothing_on_the_line_turns_a_teletext_decoder_back_on(string variable, string flag)
+    {
+        var flags = Flags(variable);
+
+        Assert.DoesNotContain(flags, candidate =>
+            candidate == flag || candidate.StartsWith(flag + "=", StringComparison.Ordinal));
     }
 
     private static string[] Flags(string variable)

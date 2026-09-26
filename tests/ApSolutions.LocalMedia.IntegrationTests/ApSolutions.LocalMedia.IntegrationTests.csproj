@@ -26,6 +26,7 @@
     <Compile Include="..\Shared\ScanWatchStubs.cs" Link="ScanWatchStubs.cs" />
     <Compile Include="..\Shared\FakeReleaseServer.cs" Link="Updates\FakeReleaseServer.cs" />
     <Compile Include="..\Shared\TestReleaseSigning.cs" Link="Updates\TestReleaseSigning.cs" />
+    <Compile Include="..\Shared\PublishedFiles.cs" Link="Privacy\PublishedFiles.cs" />
   </ItemGroup>
   <ItemGroup>
     <!--

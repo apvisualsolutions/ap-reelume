@@ -22,20 +22,41 @@ namespace ApSolutions.LocalMedia.ArchitectureTests;
 /// fails the moment another one appears.
 /// </para>
 /// <para>
-/// <b>A project git ignores is not the repository's</b>, so it is not asked for. A working copy can
-/// hold projects that are never published — a runner's unpacked actions, or a machine's own tools
-/// kept out with local exclude rules — and a clone has none of them. Demanding them in the solution
-/// would make the solution name projects a clone cannot restore, which breaks every build there.
+/// <b>A project git ignores is not asked for, but only when it is on a closed list.</b> A working
+/// copy can hold a project that is never published, and demanding it in the solution would make the
+/// solution name a project a clone cannot restore, which breaks every build there. Exempting
+/// whatever git ignores was the first version of this rule, and it was blind: the benchmark project
+/// compiles a fixture of the performance suite, a change to that fixture broke it, and nothing said
+/// so, because an ignored project was simply not looked at. So each project allowed to stay out is
+/// named here, and one that is not named fails like a forgotten one. Whether a named one still
+/// compiles is checked where it exists.
 /// </para>
 /// </remarks>
 public sealed class SolutionCoverageTests
 {
+    /// <summary>
+    /// The projects that git ignores in some working copies and that may stay out of the solution,
+    /// with forward slashes. Nothing else may.
+    /// </summary>
+    /// <remarks>
+    /// The benchmarks are run by hand and are not part of the published tree. They link
+    /// <c>Catalog10kBuilder.cs</c> from the performance suite, which is why their build is not left to
+    /// chance.
+    /// </remarks>
+    internal static readonly string[] IgnoredAndAllowed =
+    [
+        "benchmarks/ApSolutions.LocalMedia.Benchmarks/ApSolutions.LocalMedia.Benchmarks.csproj",
+    ];
+
+    private const string NotAllowedToStayOut = " (ignored by git, and not one of the projects allowed to stay out)";
+
     [Fact]
     public void Every_project_in_the_tree_is_built_by_the_solution()
     {
         var missing = ProjectsOutsideTheSolution(
             RepositoryLayout.Root,
-            File.ReadAllText(RepositoryLayout.SolutionPath));
+            File.ReadAllText(RepositoryLayout.SolutionPath),
+            IgnoredAndAllowed);
 
         Assert.True(
             missing is [],
@@ -45,36 +66,57 @@ public sealed class SolutionCoverageTests
     }
 
     /// <summary>
-    /// The rule against a repository made for it: one project the solution names, one it forgets,
-    /// and one git ignores. Only the forgotten one may be reported.
+    /// The rule against a repository made for it. Of the six projects there, one is named by the
+    /// solution, one is ignored and on the list, and one belongs to another checkout nested inside:
+    /// those three are silent. The other three must be reported — one forgotten, one ignored and not
+    /// on the list, and one still in the index although a rule ignores it, which a clone receives
+    /// all the same.
     /// </summary>
     /// <remarks>
     /// Asked of this checkout the rule only ever answers "nothing is missing", which is also what it
     /// would answer if it had stopped looking. The scene is where it has to say something.
     /// </remarks>
     [Fact]
-    public void A_forgotten_project_is_reported_and_an_ignored_one_is_not()
+    public void A_forgotten_project_is_reported_and_only_a_listed_ignored_one_is_not()
     {
         var root = Path.Combine(Path.GetTempPath(), "solution-coverage-" + Guid.NewGuid().ToString("n")[..12]);
         Directory.CreateDirectory(root);
         try
         {
             Git(root, "init", "--quiet");
-            Write(root, ".gitignore", "/kept-out/\n");
             Write(root, "src/Named/Named.csproj", "<Project />\n");
             Write(root, "src/Forgotten/Forgotten.csproj", "<Project />\n");
             Write(root, "kept-out/Tool/Tool.csproj", "<Project />\n");
+            Write(root, "kept-out/Stray/Stray.csproj", "<Project />\n");
+            Write(root, "tracked-out/Old/Old.csproj", "<Project />\n");
+            Git(root, "add", "tracked-out/Old/Old.csproj");
+            Write(root, ".gitignore", "/kept-out/\n/tracked-out/\n");
+            Directory.CreateDirectory(Path.Combine(root, "nested"));
+            Git(Path.Combine(root, "nested"), "init", "--quiet");
+            Write(root, "nested/Other/Other.csproj", "<Project />\n");
             const string solution = @"Project(""{FAE04EC0}"") = ""Named"", ""src\Named\Named.csproj"", ""{1}""";
 
-            Assert.Equal([@"src\Forgotten\Forgotten.csproj"], ProjectsOutsideTheSolution(root, solution));
+            Assert.Equal(
+                [
+                    Path.Combine("kept-out", "Stray", "Stray.csproj") + NotAllowedToStayOut,
+                    Path.Combine("src", "Forgotten", "Forgotten.csproj"),
+                    Path.Combine("tracked-out", "Old", "Old.csproj"),
+                ],
+                ProjectsOutsideTheSolution(root, solution, ["kept-out/Tool/Tool.csproj"]));
         }
         finally
         {
+            foreach (var file in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories))
+            {
+                // Git writes its objects read-only, and a recursive delete refuses a read-only file.
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
+
             Directory.Delete(root, recursive: true);
         }
     }
 
-    private static string[] ProjectsOutsideTheSolution(string root, string solution)
+    private static string[] ProjectsOutsideTheSolution(string root, string solution, IReadOnlyCollection<string> ignoredAndAllowed)
     {
         var projects = Directory
             .EnumerateFiles(root, "*.csproj", SearchOption.AllDirectories)
@@ -83,25 +125,47 @@ public sealed class SolutionCoverageTests
             // Build output never holds a project of its own; skipping it keeps the ignore query short.
             .Where(relative => !relative.Split(Path.DirectorySeparatorChar).Any(segment =>
                 segment is "bin" or "obj"))
+            .Where(relative => !IsInsideAnotherCheckout(root, relative))
             .ToArray();
 
         var ignored = Ignored(root, projects);
         return
         [
             .. projects
-                .Where(relative => !ignored.Contains(relative.Replace('\\', '/')))
-                .Where(relative => !solution.Contains(
-                    relative.Replace('/', '\\'),
-                    StringComparison.OrdinalIgnoreCase))
+                .Select(relative => (Relative: relative, Slashed: relative.Replace('\\', '/')))
+                .Where(project => ignored.Contains(project.Slashed)
+                    ? !ignoredAndAllowed.Contains(project.Slashed, StringComparer.Ordinal)
+                    : !solution.Contains(project.Relative.Replace('/', '\\'), StringComparison.OrdinalIgnoreCase))
+                .Select(project => ignored.Contains(project.Slashed) ? project.Relative + NotAllowedToStayOut : project.Relative)
                 .Order(StringComparer.Ordinal),
         ];
+    }
+
+    /// <summary>
+    /// Whether a directory between <paramref name="root"/> and the project holds its own <c>.git</c>:
+    /// a nested clone or a worktree is another checkout, answerable to its own solution.
+    /// </summary>
+    private static bool IsInsideAnotherCheckout(string root, string relative)
+    {
+        var directory = root;
+        foreach (var segment in Path.GetDirectoryName(relative)!.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries))
+        {
+            directory = Path.Combine(directory, segment);
+            if (Path.Exists(Path.Combine(directory, ".git")))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>The paths among these that git ignores, with forward slashes.</summary>
     /// <remarks>
     /// Outside a repository nothing is ignored, and the rule asks for every project it finds.
-    /// <c>--no-index</c> because a project still in the index but already matched by the ignore
-    /// rules is on its way out of the repository, and a clone will not have it either.
+    /// A project still in the index is never ignored here, even when a rule matches it: ignoring
+    /// stops a file from being added and never removes one, so a clone still receives it and the
+    /// solution has to build it. That is why the question goes to the index and not around it.
     /// </remarks>
     private static HashSet<string> Ignored(string root, string[] relativePaths)
     {
@@ -118,7 +182,7 @@ public sealed class SolutionCoverageTests
             RedirectStandardError = true,
             UseShellExecute = false,
         };
-        foreach (var argument in (string[])["-c", "safe.directory=*", "-c", "core.quotepath=off", "-C", root, "check-ignore", "--no-index", "--stdin", "-z"])
+        foreach (var argument in (string[])["-c", "safe.directory=*", "-c", "core.quotepath=off", "-C", root, "check-ignore", "--stdin", "-z"])
         {
             start.ArgumentList.Add(argument);
         }

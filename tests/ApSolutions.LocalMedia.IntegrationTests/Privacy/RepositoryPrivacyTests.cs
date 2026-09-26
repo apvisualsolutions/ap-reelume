@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
-using System.Diagnostics;
 using ApSolutions.LocalMedia.TestSupport;
 using Xunit;
 
@@ -24,7 +23,8 @@ namespace ApSolutions.LocalMedia.IntegrationTests.Privacy;
 /// <b>What is read is what git publishes, not what the disk holds.</b> A working copy also holds
 /// build output, the library itself and whatever a machine keeps out with its own exclude rules;
 /// none of that reaches a clone, and a sweep of the disk would report it or, worse, would be the
-/// only thing looking at a file while the file that actually ships goes unread.
+/// only thing looking at a file while the file that actually ships goes unread. "Published" is the
+/// one definition every sweep shares, <see cref="PublishedFiles"/>.
 /// </para>
 /// <para>
 /// What this cannot do is recognise a translation. A show named in one language in a folder and in
@@ -57,21 +57,16 @@ public sealed partial class RepositoryPrivacyTests
     [Fact]
     public void No_versioned_file_names_the_person_or_the_machine_that_built_it()
     {
-        var forbidden = new List<(string Kind, string Value)>
-        {
+        (string Kind, string Value)[] machine =
+        [
             ("the account name", Environment.UserName),
             ("the computer name", Environment.MachineName),
             ("the profile path", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)),
             ("the repository path", RepositoryLayout.Root),
-        };
+        ];
 
-        var leaks = VersionedTexts()
-            .SelectMany(file => forbidden
-                .Where(entry => entry.Value.Length > 3
-                    && file.Text.Contains(entry.Value, StringComparison.OrdinalIgnoreCase))
-                .Select(entry => $"{Relative(file.Path)} carries {entry.Kind}"))
-            .Order(StringComparer.Ordinal)
-            .ToArray();
+        // Three letters or fewer is a word, not a name, and would be found in every file.
+        var leaks = Leaks(RepositoryLayout.Root, [.. machine.Where(entry => entry.Value.Length > 3)]);
 
         Assert.True(leaks.Length == 0, string.Join("\n", leaks));
     }
@@ -87,20 +82,19 @@ public sealed partial class RepositoryPrivacyTests
         var ignored = IgnoredNeighbours();
         Assert.SkipWhen(ignored.Count == 0, "There is no ignored folder beside the repository to check against.");
 
-        var leaks = VersionedTexts()
-            .SelectMany(file => ignored
-                .Where(name => file.Text.Contains(name, StringComparison.OrdinalIgnoreCase))
-                .Select(_ => $"{Relative(file.Path)} names one of the ignored folders beside the repository"))
-            .Distinct(StringComparer.Ordinal)
-            .Order(StringComparer.Ordinal)
-            .ToArray();
+        // One kind for every folder on purpose: the report must not print the name it found, or the
+        // failure message would publish what the rule protects.
+        var leaks = Leaks(
+            RepositoryLayout.Root,
+            [.. ignored.Select(name => ("the name of an ignored folder beside the repository", name))]);
 
         Assert.True(leaks.Length == 0, string.Join("\n", leaks));
     }
 
     /// <summary>
-    /// Proves the check is not simply blind: the values it looks for have to be findable at all. A
-    /// suite that searched for the empty string would pass forever and mean nothing.
+    /// Proves the check is not simply blind: the values it looks for have to be real ones, and the
+    /// list it reads has to be the repository. A suite that searched for the empty string, or read an
+    /// empty list, would pass forever and mean nothing.
     /// </summary>
     [Fact]
     public void The_values_this_looks_for_are_real_ones()
@@ -114,10 +108,44 @@ public sealed partial class RepositoryPrivacyTests
         Assert.True(versioned.Count >= 500, $"only {versioned.Count} published text files were read.");
         Assert.Contains(versioned, file => string.Equals(
             Path.GetFullPath(file), Path.GetFullPath(RepositoryLayout.SolutionPath), StringComparison.OrdinalIgnoreCase));
+    }
 
-        // And the search itself works: the repository path is in this file's own location.
-        var probe = Path.Combine(RepositoryLayout.Root, "docs");
-        Assert.Contains(RepositoryLayout.Root, probe, StringComparison.Ordinal);
+    /// <summary>
+    /// The search both sweeps above run, over a repository made for it: one published file carries a
+    /// planted value and must be reported, one carries nothing and must stay silent.
+    /// </summary>
+    /// <remarks>
+    /// Asked of this checkout the sweeps only ever answer "nothing leaked", which is also what they
+    /// would answer if the search had stopped matching. This used to be checked by asserting that the
+    /// repository path contains itself, which holds whatever the search does. The value is invented
+    /// here, so nothing about this machine is written to the scene, and it is planted in upper case
+    /// because the sweeps match regardless of case.
+    /// </remarks>
+    [Fact]
+    public void The_search_reports_a_planted_value_and_stays_silent_on_a_clean_file()
+    {
+        var planted = "planted-" + Guid.NewGuid().ToString("n")[..12];
+        var root = Path.Combine(Path.GetTempPath(), "repository-privacy-" + Guid.NewGuid().ToString("n")[..12]);
+        Directory.CreateDirectory(root);
+        try
+        {
+            PublishedFiles.Git(root, "init", "--quiet");
+            Directory.CreateDirectory(Path.Combine(root, "docs"));
+            Directory.CreateDirectory(Path.Combine(root, "src"));
+            File.WriteAllText(Path.Combine(root, "docs", "leaky.md"), $"Built on {planted.ToUpperInvariant()}.\n");
+            File.WriteAllText(Path.Combine(root, "src", "clean.cs"), "// Nothing about anybody.\n");
+            PublishedFiles.Git(root, "add", "docs/leaky.md", "src/clean.cs");
+
+            // Both files are read, so the silence about the clean one is an answer and not a skip.
+            Assert.Equal(
+                ["docs/leaky.md", "src/clean.cs"],
+                Texts(root).Select(file => Relative(root, file.Path)).Order(StringComparer.Ordinal).ToArray());
+            Assert.Equal(["docs/leaky.md carries the planted value"], Leaks(root, [("the planted value", planted)]));
+        }
+        finally
+        {
+            DeleteScene(root);
+        }
     }
 
     /// <summary>
@@ -133,9 +161,11 @@ public sealed partial class RepositoryPrivacyTests
     [Fact]
     public void Nothing_the_ignore_rules_exclude_is_still_published()
     {
-        Assert.SkipUnless(IsRepository(RepositoryLayout.Root), "This tree is not a git checkout, so nothing is published from it.");
+        Assert.SkipUnless(
+            PublishedFiles.IsRepository(RepositoryLayout.Root),
+            "This tree is not a git checkout, so nothing is published from it.");
 
-        var excluded = Git(RepositoryLayout.Root, "ls-files", "-z", "--cached", "--ignored", "--exclude-standard");
+        var excluded = PublishedFiles.Git(RepositoryLayout.Root, "ls-files", "-z", "--cached", "--ignored", "--exclude-standard");
 
         Assert.True(
             excluded.Length == 0,
@@ -155,27 +185,21 @@ public sealed partial class RepositoryPrivacyTests
         Directory.CreateDirectory(root);
         try
         {
-            Git(root, "init", "--quiet");
+            PublishedFiles.Git(root, "init", "--quiet");
             File.WriteAllText(Path.Combine(root, "kept.md"), "kept\n");
             File.WriteAllText(Path.Combine(root, "left-in.md"), "excluded and never removed\n");
             File.WriteAllText(Path.Combine(root, "new.md"), "not yet added\n");
-            Git(root, "add", "kept.md", "left-in.md");
+            PublishedFiles.Git(root, "add", "kept.md", "left-in.md");
             File.WriteAllText(Path.Combine(root, ".git", "info", "exclude"), "/left-in.md\n");
 
             Assert.Equal(
                 ["kept.md", "new.md"],
-                PublishedFiles(root).Select(path => Path.GetFileName(path)).Order(StringComparer.Ordinal).ToArray());
-            Assert.Equal(["left-in.md"], Git(root, "ls-files", "-z", "--cached", "--ignored", "--exclude-standard"));
+                PublishedFiles.Under(root).Select(path => Path.GetFileName(path)).Order(StringComparer.Ordinal).ToArray());
+            Assert.Equal(["left-in.md"], PublishedFiles.Git(root, "ls-files", "-z", "--cached", "--ignored", "--exclude-standard"));
         }
         finally
         {
-            // Git writes its objects read-only, and a recursive delete refuses a read-only file.
-            foreach (var file in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories))
-            {
-                File.SetAttributes(file, FileAttributes.Normal);
-            }
-
-            Directory.Delete(root, recursive: true);
+            DeleteScene(root);
         }
     }
 
@@ -208,64 +232,35 @@ public sealed partial class RepositoryPrivacyTests
     /// never opened: a sweep that names extensions one by one is a filter for what somebody thought of.
     /// </summary>
     private static List<string> VersionedFiles() =>
-        [.. PublishedFiles(RepositoryLayout.Root).Where(IsText)];
+        [.. PublishedFiles.All.Where(IsText)];
 
-    /// <summary>Each published text file read once, rather than once per value looked for.</summary>
-    private static IEnumerable<(string Path, string Text)> VersionedTexts() =>
-        VersionedFiles().Select(path => (path, File.ReadAllText(path)));
+    /// <summary>Each published text file under a root, read once rather than once per value looked for.</summary>
+    private static IEnumerable<(string Path, string Text)> Texts(string root) =>
+        PublishedFiles.Under(root).Where(IsText).Select(path => (path, File.ReadAllText(path)));
 
     /// <summary>
-    /// What git follows or would follow if added now, minus what the ignore rules exclude although it
-    /// is still in the index. Without a repository around the tree, the disk is all there is.
+    /// The search every sweep here runs: each published text file under <paramref name="root"/> that
+    /// carries one of the values, reported by its path and the kind of value, never by the value.
     /// </summary>
-    private static List<string> PublishedFiles(string root)
-    {
-        if (!IsRepository(root))
-        {
-            return [.. Directory
-                .EnumerateFiles(root, "*", SearchOption.AllDirectories)
-                .Where(file => !Skipped.Any(skipped =>
-                    file.Contains($"{Path.DirectorySeparatorChar}{skipped}{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase)))];
-        }
-
-        var excluded = Git(root, "ls-files", "-z", "--cached", "--ignored", "--exclude-standard")
-            .ToHashSet(StringComparer.Ordinal);
-        return [.. Git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard")
-            .Where(relative => !excluded.Contains(relative))
+    private static string[] Leaks(string root, IReadOnlyCollection<(string Kind, string Value)> forbidden) =>
+    [
+        .. Texts(root)
+            .SelectMany(file => forbidden
+                .Where(entry => file.Text.Contains(entry.Value, StringComparison.OrdinalIgnoreCase))
+                .Select(entry => $"{Relative(root, file.Path)} carries {entry.Kind}"))
             .Distinct(StringComparer.Ordinal)
-            .Select(relative => Path.GetFullPath(Path.Combine(root, relative)))
-            .Where(File.Exists)];
-    }
+            .Order(StringComparer.Ordinal),
+    ];
 
-    private static bool IsRepository(string root) =>
-        Directory.Exists(Path.Combine(root, ".git")) || File.Exists(Path.Combine(root, ".git"));
-
-    private static string[] Git(string root, params string[] arguments)
+    private static void DeleteScene(string root)
     {
-        var start = new ProcessStartInfo("git")
+        // Git writes its objects read-only, and a recursive delete refuses a read-only file.
+        foreach (var file in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories))
         {
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-        };
-        foreach (var argument in (string[])["-c", "safe.directory=*", "-c", "core.quotepath=off", "-C", root, .. arguments])
-        {
-            start.ArgumentList.Add(argument);
+            File.SetAttributes(file, FileAttributes.Normal);
         }
 
-        using var process = Process.Start(start)
-            ?? throw new InvalidOperationException("git could not be started, so nothing is known about what is published.");
-        var errors = process.StandardError.ReadToEndAsync();
-        var output = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
-
-        // A git that failed would otherwise read as a repository with nothing in it.
-        if (process.ExitCode != 0)
-        {
-            throw new InvalidOperationException($"git {string.Join(' ', arguments)} exited {process.ExitCode}: {errors.Result}");
-        }
-
-        return output.Split('\0', StringSplitOptions.RemoveEmptyEntries);
+        Directory.Delete(root, recursive: true);
     }
 
     private static bool IsText(string path) => Path.GetExtension(path).ToLowerInvariant() switch
@@ -276,6 +271,6 @@ public sealed partial class RepositoryPrivacyTests
         _ => false,
     };
 
-    private static string Relative(string path) =>
-        Path.GetRelativePath(RepositoryLayout.Root, path).Replace('\\', '/');
+    private static string Relative(string root, string path) =>
+        Path.GetRelativePath(root, path).Replace('\\', '/');
 }

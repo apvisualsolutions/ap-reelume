@@ -3,6 +3,8 @@
 
 using System.Diagnostics;
 
+using ApSolutions.LocalMedia.TestSupport;
+
 namespace ApSolutions.LocalMedia.DocumentationTests;
 
 /// <summary>
