@@ -43,7 +43,7 @@ asked for directly.
 | Tmds.DBus.Protocol | 0.94.1 | MIT |
 | BouncyCastle.Cryptography | 2.7.0 | MIT |
 | LibVLCSharp | 3.10.0 | LGPL-2.1-or-later |
-| LibVLC, built by AP Solutions without GPL | 3.0.23-nogpl.1 | LGPL-2.1-or-later |
+| LibVLC, built by AP Solutions without GPL | 3.0.23-nogpl.2 | LGPL-2.1-or-later |
 | GNU MP (GMP), inside four LibVLC plugins | 6.3.0 | LGPL-3.0-or-later, chosen from its dual licence with GPL-2.0-or-later |
 | GNU Nettle, inside four LibVLC plugins | 3.7.3 | LGPL-3.0-or-later, chosen from its dual licence with GPL-2.0-or-later |
 | LIVE555 Streaming Media, inside one LibVLC plugin | 2016.11.28 | LGPL-3.0-or-later |
@@ -102,7 +102,7 @@ is not built either**, because both of VLC's decoders carry GPL code: `libzvbi_p
 library, two of whose files are `GPL-2.0-only` although its build recipe does not declare it, and
 `libtelx_plugin` says in its source that part of it was converted from a GPL decoder. Neither
 travels, nor does the library, and the same gate checks it in the binaries. This repository
-publishes it as `libvlc-3.0.23-nogpl.1`, pinned by the hash of each file. **It is modified**, and both
+publishes it as `libvlc-3.0.23-nogpl.2`, pinned by the hash of each file. **It is modified**, and both
 modifications take GPL pieces out: the yadif deinterlacing algorithm from the `libdeinterlace` plugin,
 and the libdvdread library from the build script. The files touched say so in their header, with a
 date, as LGPL-2.1 §2(b) asks.

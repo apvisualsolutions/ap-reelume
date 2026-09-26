@@ -10,12 +10,12 @@
     "scripts at the commit that built them, and every contrib tarball the build fetched."
   ],
   "repository": "apvisualsolutions/ap-reelume",
-  "tag": "libvlc-3.0.23-nogpl.1",
+  "tag": "libvlc-3.0.23-nogpl.2",
   "vlcVersion": "3.0.23",
-  "buildRun": 35336630543,
+  "buildRun": 36266387229,
   "assets": {
-    "x64": { "fileName": "libvlc-nogpl-x64.zip", "sha512": "d4996823a2b9720f867d5489b6c760b0aa411373245a000033659e2f4cded479949d1a59f6d1594f7a1802230255199adc4a1205367480741ef33ab73426b12d" },
-    "arm64": { "fileName": "libvlc-nogpl-arm64.zip", "sha512": "4735e3b105c46f8abc4aab2716f07ac73ea09847b39a9a4aa7ff3c576f66f511902d3f3d1ccab6d2bb2f6f73892b40ad37c74b190dd339ba3f01cc7bbd45eb99" }
+    "x64": { "fileName": "libvlc-nogpl-x64.zip", "sha512": "ec4beeee0d34e5d9646a1cddb90214c05c052f13ea9aee2b68c2484e9425d23e64d7b41746f9451e5ffc935dbcd9a68757d88ccd554e989bfb8499ead6af53fb" },
+    "arm64": { "fileName": "libvlc-nogpl-arm64.zip", "sha512": "28b009da4def803cef49cd63406d2005c73aa7c8fd4e33439197a8fd77c2a8541ee27dc2d728ad182a664e29b0b4dca85918fefd2842886ece508899cba19c16" }
   },
-  "sourceAsset": { "fileName": "libvlc-3.0.23-nogpl.1-source.tar", "sha512": "76c136190cb760d11f1b09053d411575adec9eb0987b186df55f6faec37c55e350c8996e660678f598ff456574b6525e83c620b7369119b1c01aefb6ad42ebd7" }
+  "sourceAsset": { "fileName": "libvlc-3.0.23-nogpl.2-source.tar", "sha512": "97f22d873e36bbaa0c1a2474ae9b29f403d6f95b7c77f8817f3b55a5736decffc0855586d1c1833f7bcecda0db40bfe55fad51e3de1c4c8ba02935176649e411" }
 }
