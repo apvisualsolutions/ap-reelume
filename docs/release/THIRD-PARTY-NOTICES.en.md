@@ -97,7 +97,11 @@ what puts several hundred Microsoft-licensed files inside the package.
 **Since 2026-09-18 the engine is not VideoLAN's package but a build of our own without GPL**
 (`ENG-013`). It is built from the same VLC release, 3.0.23, with VideoLAN's build script and build
 images, third-party libraries configured with `--disable-gpl`, and FreeType under its FTL. Every plugin
-whose source code is GPL is then removed, and a gate demands that none is left. This repository
+whose source code is GPL is then removed, and a gate demands that none is left. **Teletext decoding
+is not built either**, because both of VLC's decoders carry GPL code: `libzvbi_plugin` links the zvbi
+library, two of whose files are `GPL-2.0-only` although its build recipe does not declare it, and
+`libtelx_plugin` says in its source that part of it was converted from a GPL decoder. Neither
+travels, nor does the library, and the same gate checks it in the binaries. This repository
 publishes it as `libvlc-3.0.23-nogpl.1`, pinned by the hash of each file. **It is modified**, and both
 modifications take GPL pieces out: the yadif deinterlacing algorithm from the `libdeinterlace` plugin,
 and the libdvdread library from the build script. The files touched say so in their header, with a
@@ -107,7 +111,7 @@ Everything that travels — `libvlc.dll`, `libvlccore.dll` and the plugins in `p
 `LGPL-2.1-or-later`. The text travels as `licenses/LGPL-2.1.txt`, and `licenses/NOTICE-VideoLAN.txt`
 details the build and where its source code is. Which plugins are missing compared with VideoLAN's
 package, and why, is recorded in the `manifest.json` published with the engine: the ones that were GPL,
-and the ones neither that package nor this build uses.
+the teletext decoders, and the ones neither that package nor this build uses.
 
 **Three third-party libraries are linked inside five plugins under `LGPL-3.0-or-later`**, and
 VideoLAN's package carried them too: GNU MP and GNU Nettle inside `libgnutls`, `libaccess_srt`,
@@ -127,7 +131,9 @@ carried fourteen GPL plugins on x64 and eleven on ARM64. `libavcodec_plugin.dll`
 `libswscale_plugin.dll` were GPL because their FFmpeg was built with `--enable-gpl`. Eleven more were
 because their source code is GPL, among them `liblua`, `libdeinterlace` and `libhqdn3d`, and
 `libts_plugin.dll` because it links aribb24. The list comes from `eng/libvlc/scan-plugin-licenses.ps1`
-(evidence `audit-eng027-plugin-gpl-sources.md`).
+(evidence `audit-eng027-plugin-gpl-sources.md`). One more on each architecture carries GPL code its
+source code does not show, which is why that list did not name it: `libzvbi_plugin.dll`, through the
+zvbi library it links.
 
 **This was closed on 2026-08-10 and reopened on 2026-09-13, and not because it was wrong.** The
 reasoning then was: for a program released under `GPL-3.0-or-later`, a `GPL-2.0-or-later` plugin is

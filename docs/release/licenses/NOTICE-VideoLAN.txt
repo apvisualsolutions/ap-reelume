@@ -16,10 +16,16 @@ Copyright © the VideoLAN project and its contributors.
 Why the engine is not VideoLAN's own build. VideoLAN's Windows package is compiled with GPL code in
 it: read from the VLC 3.0.23 sources, fourteen of its plugins are GPL on x64 and eleven on ARM64 —
 FFmpeg built with --enable-gpl, VLC modules whose own sources are GPL, and a demuxer linking the
-aribb24 library. A GPL plugin cannot ship inside a program under a licence of its own, so the engine
-this artifact carries is built from the same VLC release with GPL switched off, and every plugin
-whose sources are GPL is left out. What was built, how, and why each plugin is absent is recorded in
-the manifest.json published with the engine.
+aribb24 library. One more on each architecture carries GPL code its own sources do not show: the
+teletext decoder, through the libzvbi library it links, two of whose files are GPL-2.0-only. A GPL
+plugin cannot ship inside a program under a licence of its own, so the engine this artifact carries
+is built from the same VLC release with GPL switched off, and every plugin whose sources are GPL is
+left out. What was built, how, and why each plugin is absent is recorded in the manifest.json
+published with the engine.
+
+Teletext is not decoded. Both of VLC's teletext decoders carry GPL code: the zvbi plugin through
+libzvbi, and telx, whose source says part of it was converted from a GPL decoder. Neither is built,
+and libzvbi is not built either.
 
 It is modified, and these are the modifications:
 
@@ -29,8 +35,9 @@ It is modified, and these are the modifications:
 
 Nothing else in VLC's source was changed. The build runs VideoLAN's own script
 (extras/package/win32/build.sh) inside VideoLAN's own build images, with third-party libraries
-configured by contrib/bootstrap --disable-gpl, and FreeType under its FreeType Licence rather than
-the GPL (see the third-party notices).
+configured by contrib/bootstrap --disable-gpl, libzvbi deselected by name because its build recipe
+does not declare its GPL files, and FreeType under its FreeType Licence rather than the GPL (see the
+third-party notices).
 
 LGPL-2.1.txt covers the binding, the core and the plugins. GPL-2.0.txt is in this folder because it is
 VLC's licence for the VLC media player as a whole, which vlc_about.h compiles into libvlc as the text

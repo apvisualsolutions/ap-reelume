@@ -98,7 +98,12 @@ comodidad es lo que mete varios cientos de archivos con licencia de Microsoft de
 (`ENG-013`). Se construye desde la misma versión de VLC, la 3.0.23, con el guion y las imágenes de
 compilación de VideoLAN, las bibliotecas de terceros configuradas con `--disable-gpl` y FreeType bajo su
 FTL. Después se retira todo plugin cuyo código fuente sea GPL, y una puerta exige que no quede
-ninguno. La publica este repositorio como `libvlc-3.0.23-nogpl.1`, fijada por el hash de cada archivo.
+ninguno. **Tampoco se compila la decodificación de teletexto**, porque los dos decodificadores de VLC
+llevan código GPL: `libzvbi_plugin` enlaza la biblioteca zvbi, dos de cuyos ficheros son
+`GPL-2.0-only` aunque su receta de compilación no lo declare, y `libtelx_plugin` dice en su código que
+parte de él se convirtió de un decodificador GPL. No viaja ninguno de los dos, ni la biblioteca, y la
+misma puerta lo comprueba en los binarios. La publica este repositorio como `libvlc-3.0.23-nogpl.1`,
+fijada por el hash de cada archivo.
 **Está modificada**, y las dos modificaciones son quitar piezas GPL: el algoritmo de desentrelazado
 yadif del plugin `libdeinterlace` y la biblioteca libdvdread del guion de compilación. Los
 ficheros tocados lo dicen en su cabecera, con fecha, como pide el §2(b) de la LGPL-2.1.
@@ -106,8 +111,8 @@ ficheros tocados lo dicen en su cabecera, con fecha, como pide el §2(b) de la L
 Todo lo que viaja —`libvlc.dll`, `libvlccore.dll` y los plugins de `plugins/`— es
 `LGPL-2.1-or-later`. El texto viaja en `licenses/LGPL-2.1.txt`, y en `licenses/NOTICE-VideoLAN.txt` el
 detalle de la compilación y dónde está su código fuente. Qué plugins faltan respecto al paquete de
-VideoLAN, y por qué, lo registra el `manifest.json` que se publica con el motor: los que eran GPL y
-los que ni ese paquete ni esta compilación usan.
+VideoLAN, y por qué, lo registra el `manifest.json` que se publica con el motor: los que eran GPL,
+los de teletexto y los que ni ese paquete ni esta compilación usan.
 
 **Tres bibliotecas de terceros van enlazadas dentro de cinco plugins bajo `LGPL-3.0-or-later`**,
 y el paquete de VideoLAN también las llevaba: GNU MP y GNU Nettle dentro de `libgnutls`,
@@ -127,7 +132,9 @@ llevaba catorce plugins GPL en x64 y once en ARM64. `libavcodec_plugin.dll` y
 `libswscale_plugin.dll` lo eran porque su FFmpeg se compiló con `--enable-gpl`. Once más lo eran porque
 su código fuente es GPL, entre ellos `liblua`, `libdeinterlace` y `libhqdn3d`, y `libts_plugin.dll`
 porque enlaza aribb24. La lista sale de `eng/libvlc/scan-plugin-licenses.ps1` (evidencia
-`audit-eng027-plugin-gpl-sources.md`).
+`audit-eng027-plugin-gpl-sources.md`). Uno más en cada arquitectura lleva código GPL que su código
+fuente no enseña, y por eso aquella lista no lo nombraba: `libzvbi_plugin.dll`, por la biblioteca zvbi
+que enlaza.
 
 **Esto estuvo cerrado desde el 2026-08-10 y se reabrió el 2026-09-13, y el motivo no fue un error.**
 El razonamiento de entonces era: para un programa publicado bajo `GPL-3.0-or-later`, un plugin
