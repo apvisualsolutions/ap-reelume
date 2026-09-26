@@ -6,7 +6,7 @@ Two pieces of it travel in this artifact:
 
     LibVLCSharp 3.10.0              the managed binding, as VideoLAN            LGPL-2.1-or-later
                                     publishes it on NuGet, unmodified
-    LibVLC libvlc-3.0.23-nogpl.2    libvlc.dll, libvlccore.dll and the          LGPL-2.1-or-later
+    LibVLC libvlc-3.0.23-nogpl.3    libvlc.dll, libvlccore.dll and the          LGPL-2.1-or-later
                                     plugins under plugins/, built by
                                     AP Solutions from vlc 3.0.23 without
                                     GPL code, and the hearing model in
@@ -83,13 +83,13 @@ It travels with the release. Every release that carries these binaries also carr
 alongside them, the corresponding source archives:
 
     vlc-3.0.23.tar.xz                     https://download.videolan.org/vlc/3.0.23/vlc-3.0.23.tar.xz
-    libvlc-3.0.23-nogpl.2-source.tar      https://github.com/apvisualsolutions/ap-reelume/releases/download/libvlc-3.0.23-nogpl.2/libvlc-3.0.23-nogpl.2-source.tar
+    libvlc-3.0.23-nogpl.3-source.tar      https://github.com/apvisualsolutions/ap-reelume/releases/download/libvlc-3.0.23-nogpl.3/libvlc-3.0.23-nogpl.3-source.tar
     LibVLCSharp-3.10.0.tar.gz             https://codeload.github.com/videolan/libvlcsharp/tar.gz/refs/tags/3.10.0
 
 The second archive is everything needed to rebuild these exact binaries: VLC's git tree at the tag the build compiled, the two
 patches and the scripts that built them, and the source tarball of every third-party library the build
 fetched (FFmpeg among them), each checked against the digest VLC's own contrib system pins. The engine
-release it belongs to, libvlc-3.0.23-nogpl.2, publishes it beside the binaries.
+release it belongs to, libvlc-3.0.23-nogpl.3, publishes it beside the binaries.
 
 That is the point of section 6(d) of the LGPL-2.1: where an executable is offered for download from a
 designated place, offering equivalent access to copy the source from that same place is distribution

@@ -43,7 +43,7 @@ el paquete se pidió directamente o llegó arrastrado.
 | Tmds.DBus.Protocol | 0.94.1 | MIT |
 | BouncyCastle.Cryptography | 2.7.0 | MIT |
 | LibVLCSharp | 3.10.0 | LGPL-2.1-or-later |
-| LibVLC, compilado por AP Solutions sin GPL | 3.0.23-nogpl.2 | LGPL-2.1-or-later |
+| LibVLC, compilado por AP Solutions sin GPL | 3.0.23-nogpl.3 | LGPL-2.1-or-later |
 | GNU MP (GMP), dentro de cuatro plugins de LibVLC | 6.3.0 | LGPL-3.0-or-later, elegida de su doble licencia con GPL-2.0-or-later |
 | GNU Nettle, dentro de cuatro plugins de LibVLC | 3.7.3 | LGPL-3.0-or-later, elegida de su doble licencia con GPL-2.0-or-later |
 | LIVE555 Streaming Media, dentro de un plugin de LibVLC | 2016.11.28 | LGPL-3.0-or-later |
@@ -102,7 +102,7 @@ ninguno. **Tampoco se compila la decodificación de teletexto**, porque los dos 
 llevan código GPL: `libzvbi_plugin` enlaza la biblioteca zvbi, dos de cuyos ficheros son
 `GPL-2.0-only` aunque su receta de compilación no lo declare, y `libtelx_plugin` dice en su código que
 parte de él se convirtió de un decodificador GPL. No viaja ninguno de los dos, ni la biblioteca, y la
-misma puerta lo comprueba en los binarios. La publica este repositorio como `libvlc-3.0.23-nogpl.2`,
+misma puerta lo comprueba en los binarios. La publica este repositorio como `libvlc-3.0.23-nogpl.3`,
 fijada por el hash de cada archivo.
 **Está modificada**, y las dos modificaciones son quitar piezas GPL: el algoritmo de desentrelazado
 yadif del plugin `libdeinterlace` y la biblioteca libdvdread del guion de compilación. Los
