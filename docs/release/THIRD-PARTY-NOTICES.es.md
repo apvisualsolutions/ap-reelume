@@ -108,11 +108,11 @@ fijada por el hash de cada archivo.
 yadif del plugin `libdeinterlace` y la biblioteca libdvdread del guion de compilación. Los
 ficheros tocados lo dicen en su cabecera, con fecha, como pide el §2(b) de la LGPL-2.1.
 
-Todo lo que viaja —`libvlc.dll`, `libvlccore.dll` y los plugins de `plugins/`— es
+Todo lo que viaja —`libvlc.dll`, `libvlccore.dll`, los plugins de `plugins/` y el modelo de audición de `hrtfs/` (Copyright © 2017 3D Sound Labs)— es
 `LGPL-2.1-or-later`. El texto viaja en `licenses/LGPL-2.1.txt`, y en `licenses/NOTICE-VideoLAN.txt` el
 detalle de la compilación y dónde está su código fuente. Qué plugins faltan respecto al paquete de
 VideoLAN, y por qué, lo registra el `manifest.json` que se publica con el motor: los que eran GPL,
-los de teletexto y los que ni ese paquete ni esta compilación usan.
+los dos decodificadores de teletexto (zvbi y telx, que se dejan fuera a propósito y figuran en `disabledOnPurpose`) y los que ni ese paquete ni esta compilación usan.
 
 **Tres bibliotecas de terceros van enlazadas dentro de cinco plugins bajo `LGPL-3.0-or-later`**,
 y el paquete de VideoLAN también las llevaba: GNU MP y GNU Nettle dentro de `libgnutls`,

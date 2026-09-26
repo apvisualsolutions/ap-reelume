@@ -29,7 +29,7 @@ reproduced. Naming the component in a table is neither of those.
 | `NOTICE-SQLitePCLRaw.txt` | Assembled notice | SQLitePCLRaw |
 | `NOTICE-VideoLAN.txt` | Assembled notice | LibVLC and its plugins |
 
-There is no catalogue licence text for the program itself: its own licence's own licence travels as `LICENSE` at the root of the package,
+There is no catalogue licence text for the program itself: its own licence travels as `LICENSE` at the root of the package,
 which is where anyone looks for it.
 
 ## Where each text came from
@@ -44,7 +44,7 @@ that already distributed it and contrasted with a second, independent copy befor
 - **GPL-2.0**: from VLC's own tree. VideoLAN's package carries it as the string `vlc_about.h`
   compiles into `libvlc`; it was extracted from there and contrasted with the copy HandBrake
   distributes, and they agree apart from one trailing blank line. It is the licence VLC displays for
-  itself, which is exactly the one binding its plugins.
+  itself; no plugin this artifact carries is under it.
 - **LGPL-3.0** and **GPL-3.0**: GMP 6.3.0's `COPYING.LESSERv3` and `COPYINGv3`, as they travel in the
   engine's source archive, checked against Nettle 3.7.3's: identical byte for byte. They are the texts
   those libraries deliver with their code, which is what binds them.

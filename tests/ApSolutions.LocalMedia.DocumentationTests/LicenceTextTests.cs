@@ -351,7 +351,7 @@ public sealed class LicenceTextTests
             StringComparison.Ordinal);
     }
 
-    /// <summary>The engine release the build pins, e.g. <c>libvlc-3.0.23-nogpl.1</c>.</summary>
+    /// <summary>The engine release the build pins, e.g. <c>libvlc-3.0.23-nogpl.3</c>.</summary>
     private static string EngineTag()
     {
         using var lockFile = JsonDocument.Parse(

@@ -30,7 +30,7 @@ on:
         description: The libvlc-nogpl.yml run whose trees are published
         required: true
       tag:
-        description: Release tag, e.g. libvlc-3.0.23-nogpl.1
+        description: Release tag, libvlc-<vlc version>-nogpl.<n>
         required: true
 
 permissions:
@@ -131,11 +131,22 @@ jobs:
           # sha256sum -c only reads lower case (and has no option to ignore it).
           (cd "$S" && echo "$(echo "$sum" | tr 'A-F' 'a-f')  $vlc" | sha256sum -c -)
 
+          # The distribution tarball above is not the tree the engine was built from: build-nogpl.sh
+          # clones VLC's git tag, and the tarball lacks files that tree has and a patch edits
+          # (extras/package/win32/build.sh among them). The exact tree goes in too, checked against
+          # the commit the build pins, so the patches apply and the build can be repeated offline.
+          vlc_tag=$(sed -n 's/^VLC_TAG=//p' eng/libvlc/build-nogpl.sh)
+          vlc_commit=$(sed -n 's/^VLC_COMMIT=//p' eng/libvlc/build-nogpl.sh)
+          vlc_repo=$(sed -n 's/^VLC_REPO=//p' eng/libvlc/build-nogpl.sh)
+          git clone -q --depth 1 --branch "$vlc_tag" "$vlc_repo" "$P/vlc-git"
+          [ "$(git -C "$P/vlc-git" rev-parse HEAD)" = "$vlc_commit" ] || { echo "tag $vlc_tag is not $vlc_commit" >&2; exit 1; }
+          git -C "$P/vlc-git" archive --format=tar --prefix="vlc-$vlc_tag/" HEAD > "$S/vlc-$vlc_tag-git.tar"
           git archive --format=tar --prefix=build/ HEAD eng/libvlc .github/workflows/libvlc-nogpl.yml | tar -x -C "$S"
           cat > "$S/README.txt" <<EOF
           Corresponding source of the LibVLC trees in release $TAG.
 
           $vlc   VLC $(jq -r '.sources[] | select(.name=="vlc") | .version' eng/corresponding-source.json), as VideoLAN publishes it (SHA-256 $sum).
+          vlc-$vlc_tag-git.tar   VLC's git tree at tag $vlc_tag, commit $vlc_commit: the exact tree the build compiled and the patches apply to.
           build/               The scripts and patches that built the trees, at commit $BUILD_SHA.
                                build/eng/libvlc/build-nogpl.sh is the entry point; it applies build/eng/libvlc/patches.
           contrib-tarballs/    Every third-party source the build fetched, each checked against the
@@ -150,7 +161,7 @@ jobs:
 
           # The archive may hold these four things and nothing else. Anything outside them — this
           # repository's own code first of all — is refused before a byte is uploaded.
-          unexpected=$(tar -tf "$D/$TAG-source.tar" | grep -v -E "^\./(\$|README\.txt\$|$vlc\$|contrib-tarballs/|build/(\$|eng/(\$|libvlc/)|\.github/(\$|workflows/(\$|libvlc-nogpl\.yml\$))))" || true)
+          unexpected=$(tar -tf "$D/$TAG-source.tar" | grep -v -E "^\./(\$|README\.txt\$|$vlc\$|vlc-$vlc_tag-git\.tar\$|contrib-tarballs/|build/(\$|eng/(\$|libvlc/)|\.github/(\$|workflows/(\$|libvlc-nogpl\.yml\$))))" || true)
           if [ -n "$unexpected" ]; then
             echo "the source archive holds entries it must not:" >&2
             echo "$unexpected" | head -20 >&2

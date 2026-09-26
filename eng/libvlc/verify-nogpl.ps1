@@ -84,6 +84,18 @@ New-Item -ItemType Directory $Destination | Out-Null
 Copy-Item (Join-Path $bin 'libvlc.dll'), (Join-Path $bin 'libvlccore.dll') $Destination
 Copy-Item $pluginsIn (Join-Path $Destination 'plugins') -Recurse
 if (Test-Path (Join-Path $Install 'hrtfs')) { Copy-Item (Join-Path $Install 'hrtfs') $Destination -Recurse }
+# The tree is also published on its own, so it carries the licences it needs: LGPL-2.1 for LibVLC,
+# LGPL-3.0 with the GPL-3.0 it builds on for GMP, Nettle and LIVE555 inside five plugins, and a
+# notice that names them. The notice is static on purpose: the release tag is chosen after the build.
+# The application does not copy this folder; it carries its own licences.
+$licencesIn = Join-Path $PSScriptRoot '../../docs/release/licenses'
+$licencesOut = New-Item -ItemType Directory (Join-Path $Destination 'licenses')
+foreach ($name in 'LGPL-2.1.txt', 'LGPL-3.0.txt', 'GPL-3.0.txt') {
+    $text = Join-Path $licencesIn $name
+    if (-not (Test-Path $text)) { throw "The licence text '$text' is missing: the tree cannot be published without it." }
+    Copy-Item $text $licencesOut
+}
+Copy-Item (Join-Path $PSScriptRoot 'NOTICE.txt') $licencesOut
 # Only the DLLs travel: import libraries, libtool files and a plugin cache that would list plugins
 # this script is about to remove.
 Get-ChildItem (Join-Path $Destination 'plugins') -Recurse -File |
@@ -207,6 +219,12 @@ $manifest = [ordered]@{
     removedAsGpl    = $removed
     missingVsReference = $missing
     extraVsReference   = $extra
+    # Left out on purpose by build-nogpl.sh, whether or not the reference carries them: VideoLAN's
+    # package has no telx, so missingVsReference alone could never say why it is absent here.
+    disabledOnPurpose  = @(
+        [ordered]@{ plugin = 'libzvbi_plugin'; reason = 'links libzvbi, whose packet-830.c and pdc.c are GPL-2.0-only' }
+        [ordered]@{ plugin = 'libtelx_plugin'; reason = 'carries code converted from ProjectX, which is GPL-2.0-or-later' }
+    )
     failures        = $failures
     files           = $files
 }

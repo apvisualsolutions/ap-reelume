@@ -43,7 +43,7 @@ fuente que ya lo distribuía y se contrastó con una segunda copia independiente
 - **GPL-2.0**: del propio árbol de VLC. El paquete de VideoLAN la lleva como la cadena que
   `vlc_about.h` compila dentro de `libvlc`; se extrajo de ahí y se contrastó con la copia que
   distribuye HandBrake, y coinciden salvo una línea en blanco final. Es la licencia que VLC muestra
-  de sí mismo, que es exactamente la que obliga a sus plugins.
+  de sí mismo; ningún plugin de este artefacto está bajo ella.
 - **LGPL-3.0** y **GPL-3.0**: los `COPYING.LESSERv3` y `COPYINGv3` de GMP 6.3.0, tal como viajan en
   el paquete de fuentes del motor, contrastados con los de Nettle 3.7.3: idénticos byte a byte. Son
   los textos que esas bibliotecas entregan con su código, que es lo que las obliga.

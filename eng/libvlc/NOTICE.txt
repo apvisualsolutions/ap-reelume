@@ -1,0 +1,21 @@
+LibVLC for Windows, built without GPL code by AP Solutions for AP Reelume.
+
+This tree is VLC media player's library (libvlc.dll, libvlccore.dll, plugins/ and hrtfs/),
+Copyright (C) the VideoLAN team and its contributors, built from VLC 3.0.23 with the patches and
+scripts published beside it. It is modified: the build leaves out every module and third-party
+library whose licence is the GPL, among them the two teletext decoders (zvbi and telx), so teletext
+subtitles are not decoded.
+
+Licences
+  LibVLC and its plugins           LGPL-2.1-or-later          licenses/LGPL-2.1.txt
+  hrtfs/dodeca_and_7channel_3DSL_HRTF.sofa
+                                   LGPL-2.1-or-later,         licenses/LGPL-2.1.txt
+                                   Copyright (C) 2017 3D Sound Labs
+  GMP, Nettle and LIVE555, linked  LGPL-3.0, which adds to   licenses/LGPL-3.0.txt
+  inside five of the plugins       the terms of the GPL-3.0   licenses/GPL-3.0.txt
+
+No plugin in this tree is under the GPL. The corresponding source of this tree - VLC at the tag it
+was built from, the patches and scripts that built it, and every third-party source the build
+fetched - is published as the "-source.tar" asset of the same release, and anyone may rebuild these
+binaries from it. The manifest.json beside this folder lists every file with its SHA-256, the
+plugins left out, and why.

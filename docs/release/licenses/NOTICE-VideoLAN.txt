@@ -9,7 +9,9 @@ Two pieces of it travel in this artifact:
     LibVLC libvlc-3.0.23-nogpl.2    libvlc.dll, libvlccore.dll and the          LGPL-2.1-or-later
                                     plugins under plugins/, built by
                                     AP Solutions from vlc 3.0.23 without
-                                    GPL code
+                                    GPL code, and the hearing model in
+                                    hrtfs/ (Copyright (C) 2017 3D Sound
+                                    Labs)
 
 Copyright © the VideoLAN project and its contributors.
 
@@ -84,7 +86,7 @@ alongside them, the corresponding source archives:
     libvlc-3.0.23-nogpl.2-source.tar      https://github.com/apvisualsolutions/ap-reelume/releases/download/libvlc-3.0.23-nogpl.2/libvlc-3.0.23-nogpl.2-source.tar
     LibVLCSharp-3.10.0.tar.gz             https://codeload.github.com/videolan/libvlcsharp/tar.gz/refs/tags/3.10.0
 
-The second archive is everything needed on top of the first to rebuild these exact binaries: the two
+The second archive is everything needed to rebuild these exact binaries: VLC's git tree at the tag the build compiled, the two
 patches and the scripts that built them, and the source tarball of every third-party library the build
 fetched (FFmpeg among them), each checked against the digest VLC's own contrib system pins. The engine
 release it belongs to, libvlc-3.0.23-nogpl.2, publishes it beside the binaries.

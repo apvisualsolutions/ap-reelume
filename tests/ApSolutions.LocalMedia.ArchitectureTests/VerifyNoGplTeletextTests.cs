@@ -129,6 +129,52 @@ public sealed class VerifyNoGplTeletextTests
 
         Assert.Equal("left out: carries GPL code", reason);
     }
+
+    /// <summary>
+    /// VideoLAN's package has no telx, so comparing against it can never say why telx is absent
+    /// here. The manifest names both decoders the build leaves out, each with its reason.
+    /// </summary>
+    [Fact]
+    public void The_manifest_names_both_teletext_decoders_left_out_on_purpose()
+    {
+        using var scene = new NoGplScene();
+
+        var (exitCode, output) = scene.Verify();
+        Assert.True(exitCode == 0, output);
+
+        using var manifest = JsonDocument.Parse(File.ReadAllText(scene.ManifestPath));
+        var disabled = manifest.RootElement.GetProperty("disabledOnPurpose").EnumerateArray()
+            .ToDictionary(entry => entry.GetProperty("plugin").GetString()!, entry => entry.GetProperty("reason").GetString()!);
+
+        Assert.Equal(["libtelx_plugin", "libzvbi_plugin"], disabled.Keys.Order(StringComparer.Ordinal));
+        Assert.All(disabled.Values, reason => Assert.Contains("GPL", reason, StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// The tree is also published on its own, as a release asset, so it has to carry the licences
+    /// that bind it: LGPL-2.1 for LibVLC, and LGPL-3.0 with the GPL-3.0 it builds on for the
+    /// libraries linked inside five plugins, with a notice that names them. The manifest lists them,
+    /// so a tree that lost one fails the fetch before it reaches anybody.
+    /// </summary>
+    [Fact]
+    public void The_tree_carries_its_licences_and_its_manifest_lists_them()
+    {
+        using var scene = new NoGplScene();
+
+        var (exitCode, output) = scene.Verify();
+        Assert.True(exitCode == 0, output);
+
+        string[] expected = ["licenses/GPL-3.0.txt", "licenses/LGPL-2.1.txt", "licenses/LGPL-3.0.txt", "licenses/NOTICE.txt"];
+        using var manifest = JsonDocument.Parse(File.ReadAllText(scene.ManifestPath));
+        var listed = manifest.RootElement.GetProperty("files").EnumerateArray()
+            .Select(entry => entry.GetProperty("path").GetString()!)
+            .Where(path => path.StartsWith("licenses/", StringComparison.Ordinal))
+            .Order(StringComparer.Ordinal);
+
+        Assert.Equal(expected, listed);
+        var destination = Path.GetDirectoryName(scene.ManifestPath)!;
+        Assert.All(expected, path => Assert.True(new FileInfo(Path.Combine(destination, path)).Length > 1000, path));
+    }
 }
 
 /// <summary>

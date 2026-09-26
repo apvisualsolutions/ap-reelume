@@ -107,11 +107,11 @@ modifications take GPL pieces out: the yadif deinterlacing algorithm from the `l
 and the libdvdread library from the build script. The files touched say so in their header, with a
 date, as LGPL-2.1 §2(b) asks.
 
-Everything that travels — `libvlc.dll`, `libvlccore.dll` and the plugins in `plugins/` — is
+Everything that travels — `libvlc.dll`, `libvlccore.dll`, the plugins in `plugins/` and the hearing model in `hrtfs/` (Copyright © 2017 3D Sound Labs) — is
 `LGPL-2.1-or-later`. The text travels as `licenses/LGPL-2.1.txt`, and `licenses/NOTICE-VideoLAN.txt`
 details the build and where its source code is. Which plugins are missing compared with VideoLAN's
 package, and why, is recorded in the `manifest.json` published with the engine: the ones that were GPL,
-the teletext decoders, and the ones neither that package nor this build uses.
+the two teletext decoders (zvbi and telx, left out on purpose and listed under `disabledOnPurpose`), and the ones neither that package nor this build uses.
 
 **Three third-party libraries are linked inside five plugins under `LGPL-3.0-or-later`**, and
 VideoLAN's package carried them too: GNU MP and GNU Nettle inside `libgnutls`, `libaccess_srt`,
