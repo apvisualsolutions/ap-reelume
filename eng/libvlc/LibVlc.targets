@@ -52,14 +52,14 @@
   <!-- A target and not a static ItemGroup: the tree does not exist until FetchLibVlc has run. -->
   <Target Name="CollectLibVlcFiles" AfterTargets="FetchLibVlc" BeforeTargets="BeforeBuild">
     <ItemGroup Condition="'$(LibVlcX64Enabled)' == 'true'">
-      <LibVlcX64File Include="$(LibVlcDirectory)win-x64\libvlc.dll;$(LibVlcDirectory)win-x64\libvlccore.dll;$(LibVlcDirectory)win-x64\hrtfs\**;$(LibVlcDirectory)win-x64\plugins\**" />
+      <LibVlcX64File Include="$(LibVlcDirectory)win-x64\libvlc.dll;$(LibVlcDirectory)win-x64\libvlccore.dll;$(LibVlcDirectory)win-x64\hrtfs\**;$(LibVlcDirectory)win-x64\licenses\**;$(LibVlcDirectory)win-x64\plugins\**" />
       <Content Include="@(LibVlcX64File)">
         <Link>libvlc\win-x64\$([MSBuild]::MakeRelative($(LibVlcDirectory)win-x64\, %(FullPath)))</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
     <ItemGroup Condition="'$(LibVlcArm64Enabled)' == 'true'">
-      <LibVlcArm64File Include="$(LibVlcDirectory)win-arm64\libvlc.dll;$(LibVlcDirectory)win-arm64\libvlccore.dll;$(LibVlcDirectory)win-arm64\hrtfs\**;$(LibVlcDirectory)win-arm64\plugins\**" />
+      <LibVlcArm64File Include="$(LibVlcDirectory)win-arm64\libvlc.dll;$(LibVlcDirectory)win-arm64\libvlccore.dll;$(LibVlcDirectory)win-arm64\hrtfs\**;$(LibVlcDirectory)win-arm64\licenses\**;$(LibVlcDirectory)win-arm64\plugins\**" />
       <Content Include="@(LibVlcArm64File)">
         <Link>libvlc\win-arm64\$([MSBuild]::MakeRelative($(LibVlcDirectory)win-arm64\, %(FullPath)))</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
