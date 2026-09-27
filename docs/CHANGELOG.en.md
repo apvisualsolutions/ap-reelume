@@ -69,6 +69,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- Switching to another version of a film and choosing **Start again** now starts it from the
+  beginning next time too: sometimes a minute of the previous version stayed stored.
 - Closing the application after watching a video no longer ends in a crash.
 - The player controls hide by themselves after three seconds without mouse movement while the film
   plays, and the pointer with them.

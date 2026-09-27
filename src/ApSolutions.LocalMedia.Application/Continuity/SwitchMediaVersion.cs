@@ -104,10 +104,10 @@ public sealed class SwitchMediaVersion
             return new SwitchMediaVersionResult(decision, Opened: false, exception.Failure);
         }
 
+        // Written THROUGH the tracker and not beside it: the tracker still follows the session that is
+        // ending, and a periodic write of its already under way would otherwise land after this one
+        // and overwrite it. The write and the re-attachment are one step in its queue.
         await RecordAsync(command, decision, stored, cancellationToken).ConfigureAwait(false);
-        _ = await _tracker
-            .BeginAsync(command.Content, command.Target.MediaFileId, cancellationToken)
-            .ConfigureAwait(false);
         return new SwitchMediaVersionResult(decision, Opened: true);
     }
 
@@ -118,8 +118,8 @@ public sealed class SwitchMediaVersion
         CancellationToken cancellationToken)
     {
         var now = _clock.UtcNow;
-        await _repository
-            .SaveAsync(
+        await _tracker
+            .ReplaceAsync(
                 new WatchState
                 {
                     Content = command.Content,

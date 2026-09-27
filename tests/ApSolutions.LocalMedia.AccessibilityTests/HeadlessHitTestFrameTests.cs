@@ -48,14 +48,25 @@ public sealed class HeadlessHitTestFrameTests
 {
     private static readonly Point Middle = new(200, 150);
 
+    /// <summary>
+    /// Runs <see cref="HeadlessFrame.SettleAndDraw"/>, the walk's own lines, and not a copy of them:
+    /// until 2026-09-27 this test carried its own layout-and-capture, so it fixed a fact about Avalonia
+    /// and nothing about the walk.
+    /// </summary>
+    /// <remarks>
+    /// <b>Its limit, measured and written here because it cannot be asserted:</b> a mutant that
+    /// removes the capture from the helper dies when this test runs alone, and only sometimes inside
+    /// the full suite, where the real render timer may tick on its own during the test. The walk's
+    /// reds are that same timer not having ticked, so this test is the detector for the isolated
+    /// case and CI's two passes are the one for the other.
+    /// </remarks>
     [AvaloniaFact]
     public void Capturing_the_rendered_frame_brings_the_hit_test_up_to_date()
     {
         var (window, over) = ShowCoveredLater();
 
-        Reveal(window, over);
-        _ = window.CaptureRenderedFrame();
-        Dispatcher.UIThread.RunJobs();
+        over.IsVisible = true;
+        HeadlessFrame.SettleAndDraw(window);
 
         Assert.Equal("Over", NameAt(window));
         window.Close();
@@ -72,15 +83,6 @@ public sealed class HeadlessHitTestFrameTests
         Dispatcher.UIThread.RunJobs();
         Assert.Equal("Under", NameAt(window));
         return (window, over);
-    }
-
-    /// <summary>Shows the cover and lays it out the way the walk's Reveal does.</summary>
-    private static void Reveal(Window window, Border over)
-    {
-        over.IsVisible = true;
-        window.InvalidateMeasure();
-        window.UpdateLayout();
-        Dispatcher.UIThread.RunJobs();
     }
 
     private static string? NameAt(Window window) => (window.InputHitTest(Middle) as Control)?.Name;

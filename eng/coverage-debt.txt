@@ -22,7 +22,6 @@ src/ApSolutions.LocalMedia.Application/Backup/RestoreBackup.cs                  
 src/ApSolutions.LocalMedia.Application/Catalog/GroupMediaVersions.cs                          96  90
 src/ApSolutions.LocalMedia.Application/Catalog/GroupScannedVersions.cs                        96  84
 src/ApSolutions.LocalMedia.Application/Catalog/SetPreferredVersion.cs                        100  75
-src/ApSolutions.LocalMedia.Application/Continuity/PlaybackProgressTracker.cs                  97  90
 src/ApSolutions.LocalMedia.Application/Continuity/ResumePlayback.cs                          100  87
 src/ApSolutions.LocalMedia.Application/Continuity/StartNextEpisodeCountdown.cs               100  94
 src/ApSolutions.LocalMedia.Application/Continuity/SwitchMediaVersion.cs                      100  80

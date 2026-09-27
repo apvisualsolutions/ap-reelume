@@ -79,6 +79,43 @@ public sealed class PlaybackProgressTracker : IAsyncDisposable
     }
 
     /// <summary>
+    /// Writes a state that replaces the session's progress and attaches the tracker to it, as one
+    /// step and in the same queue as every other write of this tracker.
+    /// <para>
+    /// A switch of version used to write its new position straight to storage and attach the tracker
+    /// afterwards, so a periodic write already under way for the session that was ending — carrying
+    /// a late playhead of it — could reach storage after the new position and overwrite it. That is
+    /// the «Start over» that stored a minute instead of zero (2026-09-27). Queued behind the gate, a
+    /// write that started first also lands first, and the one that must win lands last.
+    /// </para>
+    /// </summary>
+    public async Task ReplaceAsync(WatchState state, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await _repository.SaveAsync(state, cancellationToken).ConfigureAwait(false);
+            lock (_observationSync)
+            {
+                _content = state.Content;
+                _source = state.SourceMediaFileId;
+                _lastPersisted = state.Position;
+                _position = state.Position;
+                _duration = state.ObservedDuration;
+                _hasSession = true;
+            }
+
+            _ = Interlocked.Increment(ref _writeCount);
+        }
+        finally
+        {
+            _ = _gate.Release();
+        }
+    }
+
+    /// <summary>
     /// Records what the engine is playing right now. This is called from the engine's position event,
     /// so it performs no input or output and never blocks.
     /// </summary>

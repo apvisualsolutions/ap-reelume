@@ -41,6 +41,94 @@ public sealed class ProgressTrackerTests
     }
 
     [Fact]
+    public async Task An_interval_given_at_construction_replaces_the_approved_one()
+    {
+        var repository = new RecordingWatchStateRepository();
+        var clock = new ManualClock();
+        await using var tracker = new PlaybackProgressTracker(repository, clock, TimeSpan.FromSeconds(2));
+        _ = await tracker.BeginAsync(Content, Source, TestContext.Current.CancellationToken);
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            TestContext.Current.CancellationToken);
+
+        var loop = tracker.RunAsync(cancellation.Token);
+        await clock.WaitForDelayAsync(TestContext.Current.CancellationToken);
+        await cancellation.CancelAsync();
+        clock.ReleaseAll();
+        await loop;
+
+        Assert.Equal(TimeSpan.FromSeconds(2), clock.Delays[0]);
+    }
+
+    /// <summary>
+    /// A wait that ends normally on a session that was cancelled meanwhile writes nothing: the loop
+    /// looks at the token after the wait, not only through it.
+    /// </summary>
+    [Fact]
+    public async Task A_wait_that_ends_after_the_session_was_cancelled_writes_nothing()
+    {
+        var repository = new RecordingWatchStateRepository();
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(
+            TestContext.Current.CancellationToken);
+        await using var tracker = new PlaybackProgressTracker(repository, new CancelsDuringDelayClock(cancellation));
+        _ = await tracker.BeginAsync(Content, Source, TestContext.Current.CancellationToken);
+        tracker.Observe(TimeSpan.FromMinutes(3), TimeSpan.FromMinutes(50));
+
+        await tracker.RunAsync(cancellation.Token);
+
+        Assert.Empty(repository.Writes);
+    }
+
+    /// <summary>
+    /// A position announced without a length keeps the length already known, and the write is still
+    /// clamped into it.
+    /// </summary>
+    [Fact]
+    public async Task An_observation_without_a_length_keeps_the_one_already_known()
+    {
+        var repository = new RecordingWatchStateRepository();
+        await using var tracker = new PlaybackProgressTracker(repository, new ManualClock());
+        _ = await tracker.BeginAsync(Content, Source, TestContext.Current.CancellationToken);
+
+        tracker.Observe(TimeSpan.FromMinutes(10), TimeSpan.FromMinutes(50));
+        tracker.Observe(TimeSpan.FromMinutes(90), duration: null);
+        _ = await tracker.FlushAsync(PersistenceTrigger.Close, TestContext.Current.CancellationToken);
+
+        Assert.Equal(TimeSpan.FromMinutes(50), repository.Writes[^1].Position);
+        Assert.Equal(TimeSpan.FromMinutes(50), repository.Writes[^1].ObservedDuration);
+    }
+
+    /// <summary>
+    /// With no length observed at all, the write keeps the one somebody else stored meanwhile rather
+    /// than erasing it.
+    /// </summary>
+    [Fact]
+    public async Task With_no_length_observed_the_stored_one_survives_the_write()
+    {
+        var repository = new RecordingWatchStateRepository();
+        await using var tracker = new PlaybackProgressTracker(repository, new ManualClock());
+        _ = await tracker.BeginAsync(Content, Source, TestContext.Current.CancellationToken);
+        await repository.SaveAsync(
+            new WatchState
+            {
+                Content = Content,
+                Position = TimeSpan.Zero,
+                ObservedDuration = TimeSpan.FromMinutes(42),
+                SourceMediaFileId = Source,
+                Status = WatchStatus.InProgress,
+                IsManualOverride = false,
+                StartedUtc = DateTimeOffset.UnixEpoch,
+                UpdatedUtc = DateTimeOffset.UnixEpoch,
+            },
+            TestContext.Current.CancellationToken);
+
+        tracker.Observe(TimeSpan.FromMinutes(7), duration: null);
+        _ = await tracker.FlushAsync(PersistenceTrigger.Close, TestContext.Current.CancellationToken);
+
+        Assert.Equal(TimeSpan.FromMinutes(7), repository.Writes[^1].Position);
+        Assert.Equal(TimeSpan.FromMinutes(42), repository.Writes[^1].ObservedDuration);
+    }
+
+    [Fact]
     public async Task A_tick_persists_the_latest_observation_only_once()
     {
         var repository = new RecordingWatchStateRepository();
@@ -337,6 +425,18 @@ public sealed class ProgressTrackerTests
         StartedUtc = DateTimeOffset.UnixEpoch,
         UpdatedUtc = DateTimeOffset.UnixEpoch,
     };
+
+    /// <summary>Cancels the session while the loop waits, and then lets the wait end normally.</summary>
+    private sealed class CancelsDuringDelayClock(CancellationTokenSource session) : IClock
+    {
+        public DateTimeOffset UtcNow { get; } = new(2026, 8, 2, 12, 0, 0, TimeSpan.Zero);
+
+        public Task DelayAsync(TimeSpan delay, CancellationToken cancellationToken = default)
+        {
+            session.Cancel();
+            return Task.CompletedTask;
+        }
+    }
 
     private sealed class ManualClock : IClock
     {

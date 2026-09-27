@@ -474,7 +474,15 @@ try {
     # modo sin ventana y cerrar el reproductor mientras se espera un cambio de modo. Queda la pantalla
     # sin nombre de ScreenOf, que su comentario ya declara inalcanzable. Leído con
     # preview-coverage-floors sobre UiTests sola, que es la lectura que el paseo no puede tapar.
-    $debtRatchet = 184
+    #
+    # 183 el 2026-09-27, por mejora: PlaybackProgressTracker.cs llega a 99/100 y sale de la lista. El
+    # arreglo de «Empezar de nuevo» le dio un método nuevo, la previsualización lo leyó subiendo
+    # (97/90 → 98/90) y en vez de copiar un suelo se cubrieron las cuatro ramas que faltaban: un
+    # intervalo dado al construirlo, una espera que termina con la sesión ya cancelada, una posición
+    # anunciada sin duración y una escritura sin duración observada. Leído con
+    # preview-coverage-floors sobre Application.Tests; la fila sale podando el artefacto
+    # coverage-debt del run 36282317575, idéntico fila a fila al fichero.
+    $debtRatchet = 183
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

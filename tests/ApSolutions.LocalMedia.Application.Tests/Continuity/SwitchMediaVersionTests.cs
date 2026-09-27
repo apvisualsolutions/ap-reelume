@@ -142,6 +142,44 @@ public sealed class SwitchMediaVersionTests
         Assert.Equal(Other, stored.SourceMediaFileId);
     }
 
+    /// <summary>
+    /// The walk's sixth intermittent red: «Start over» stored 00:01:00 on a sixty-second cut instead
+    /// of zero. The zero was written straight to storage, beside the tracker instead of through it,
+    /// while the tracker still followed the session that was ending — so a periodic write that had
+    /// already read a late playhead of the longer version, clamped to the shorter one's end, could
+    /// reach storage after the zero and stay there. Measured on 2026-09-27 by logging every write of
+    /// the walk's scene: the zero and the tracker's re-attachment are two steps, and only the second
+    /// one waits for the tracker's own writes.
+    /// </summary>
+    [Fact]
+    public async Task A_periodic_write_already_under_way_cannot_land_after_the_zero_of_a_start_over()
+    {
+        var harness = await Harness.WithProgressAsync(TimeSpan.FromMinutes(50), Feature);
+        var target = Version(Other, TimeSpan.FromMinutes(130));
+        harness.Tracker.Observe(TimeSpan.FromMinutes(51), Feature);
+        var slowDisk = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Task<bool>? periodic = null;
+        harness.Coordinator.WhileOpening = () =>
+        {
+            // The ending version is still announcing its playhead while the other one opens, and the
+            // periodic write picks it up and starts towards a disk that is slow for this one write.
+            harness.Tracker.Observe(TimeSpan.FromMinutes(55), Feature);
+            harness.Repository.HoldNextSave = slowDisk;
+            periodic = harness.Tracker.FlushAsync(PersistenceTrigger.Tick, TestContext.Current.CancellationToken);
+        };
+
+        var switching = harness.SwitchAsync(target, confirmed: true, restartFromZero: true);
+        slowDisk.SetResult();
+        var result = await switching;
+        Assert.NotNull(periodic);
+        Assert.True(await periodic!, "The periodic write never happened, so nothing raced the zero.");
+
+        Assert.True(result.Opened);
+        var stored = await harness.Repository.GetAsync(Content, TestContext.Current.CancellationToken);
+        Assert.Equal(TimeSpan.Zero, stored!.Position);
+        Assert.Equal(Other, stored.SourceMediaFileId);
+    }
+
     [Fact]
     public async Task A_version_that_refuses_to_open_leaves_the_progress_and_its_source_untouched()
     {
@@ -292,6 +330,12 @@ public sealed class SwitchMediaVersionTests
 
         public List<string> Journal { get; } = [];
 
+        /// <summary>
+        /// When set, the next save reaches storage only once this completes: a disk that is slow for
+        /// one write, which is what lets a write that started first land last.
+        /// </summary>
+        public TaskCompletionSource? HoldNextSave { get; set; }
+
         public Task<WatchState?> GetAsync(ContentKey content, CancellationToken cancellationToken = default) =>
             Task.FromResult(_stored.TryGetValue(content.Value, out var state) ? state : null);
 
@@ -301,8 +345,18 @@ public sealed class SwitchMediaVersionTests
         public Task SaveAsync(WatchState state, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(state);
-            _stored[state.Content.Value] = state;
             Journal.Add("save");
+            if (HoldNextSave is { } hold)
+            {
+                HoldNextSave = null;
+                return hold.Task.ContinueWith(
+                    _ => _stored[state.Content.Value] = state,
+                    CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously,
+                    TaskScheduler.Default);
+            }
+
+            _stored[state.Content.Value] = state;
             return Task.CompletedTask;
         }
     }
@@ -315,12 +369,16 @@ public sealed class SwitchMediaVersionTests
 
         public List<PlaybackRequest> Requests { get; } = [];
 
+        /// <summary>What happens inside the engine while the other version opens.</summary>
+        public Action? WhileOpening { get; set; }
+
         public Task<PlaybackSession> StartAsync(
             PlaybackRequest request,
             CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(request);
             journal.Add("open");
+            WhileOpening?.Invoke();
             if (FailureOnStart is { } failure)
             {
                 throw new PlaybackFailureException(failure);

@@ -6190,24 +6190,18 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         // <b>It is not reproducible on this machine</b> — the case alone and the whole suite have run
         // green here every time, across all three dates — so what confirms the red is CI's second
         // pass. What is measurable here is the mechanism above, and that is what was measured.
-        window.InvalidateMeasure();
-        window.UpdateLayout();
-        Dispatcher.UIThread.RunJobs();
-
+        //
         // <b>And a rendered frame after it, because a hit test does not read the tree</b> — five
         // reds in CI on runs that changed no code. The harness decides where a click is safe by
         // asking InputHitTest (IsOnAPicture, the beside-click's description), and that answers from
-        // the last RENDERED frame: measured in HeadlessHitTestFrameTests, a control laid out over the
-        // point is still reported as the one beneath it. The input helpers render a frame themselves,
-        // so the click that followed saw a different screen from the one the point was chosen on: the
-        // player had appeared, the beside-click landed on the film and paused it.
+        // the last RENDERED frame. The input helpers render a frame themselves, so the click that
+        // followed saw a different screen from the one the point was chosen on: the player had
+        // appeared, the beside-click landed on the film and paused it.
         //
-        // <b>CaptureRenderedFrame and not ForceRenderTimerTick</b>, and the difference is measured: in
-        // this suite's configuration the tick left the hit test stale in 10 of 10 tries, and the
-        // capture brought it up to date in 10 of 10. The tick was the first fix written; it would have
-        // gone green here and kept failing in CI.
-        _ = window.CaptureRenderedFrame();
-        Dispatcher.UIThread.RunJobs();
+        // Both halves live in HeadlessFrame.SettleAndDraw, which HeadlessHitTestFrameTests runs too:
+        // until 2026-09-27 that test carried its own copy, and removing the capture from HERE left every
+        // test green.
+        HeadlessFrame.SettleAndDraw(window);
         if (Fits(host, control))
         {
             return scrollers;
@@ -6234,8 +6228,8 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
         }
 
         // The scrolling above moved things again, and the choice that follows is made by hit test.
-        _ = window.CaptureRenderedFrame();
-        Dispatcher.UIThread.RunJobs();
+        // The same helper as above, so the one test that guards it guards this call too.
+        HeadlessFrame.SettleAndDraw(window);
         return scrollers;
     }
 
@@ -6670,11 +6664,6 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
 
         Dispatcher.UIThread.RunJobs();
     }
-
-    /// <summary>Whether a click at this point would land on that control, or inside it.</summary>
-    private static bool IsUnder(ShellHost host, Point point, Control control) =>
-        host.Window.InputHitTest(point) is Visual hit
-        && (ReferenceEquals(hit, control) || hit.GetVisualAncestors().Contains(control));
 
     /// <summary>
     /// A title somebody already identified, plus the provider answer a previous lookup cached.

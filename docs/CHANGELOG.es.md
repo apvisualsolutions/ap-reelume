@@ -71,6 +71,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Corregido
 
+- Al cambiar a otra versión de una película y elegir **Empezar de nuevo**, la próxima vez vuelve a
+  empezar desde el principio: a veces se quedaba guardado un minuto de la versión anterior.
 - Cerrar la aplicación después de ver un vídeo ya no termina en un fallo.
 - Los controles del reproductor se ocultan solos a los tres segundos de no mover el ratón mientras la
   película avanza, y el puntero con ellos.
