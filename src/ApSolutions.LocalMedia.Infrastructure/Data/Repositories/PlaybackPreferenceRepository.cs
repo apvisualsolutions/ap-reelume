@@ -20,7 +20,7 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
         subtitles_enabled, speed_multiplier, volume_percent, audio_output_device_id,
         subtitle_font_size_percent, subtitle_font_family, subtitle_foreground, subtitle_background,
         subtitle_background_opacity, subtitle_outline_thickness,
-        picture_brightness, picture_contrast, picture_gamma
+        picture_brightness, picture_contrast, picture_gamma, picture_denoise
         """;
 
     private readonly SqliteConnectionFactory _connectionFactory;
@@ -60,14 +60,14 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
                 subtitles_enabled, speed_multiplier, volume_percent, audio_output_device_id,
                 subtitle_font_size_percent, subtitle_font_family, subtitle_foreground,
                 subtitle_background, subtitle_background_opacity, subtitle_outline_thickness,
-                picture_brightness, picture_contrast, picture_gamma,
+                picture_brightness, picture_contrast, picture_gamma, picture_denoise,
                 updated_at)
             VALUES (
                 $scope, $key, $audioLanguage, $audioChannels, $audioCodec, $audioExternal,
                 $subtitleLanguage, $subtitleChannels, $subtitleCodec, $subtitleExternal,
                 $subtitlesEnabled, $speed, $volume, $device,
                 $fontSize, $fontFamily, $foreground, $background, $backgroundOpacity, $outline,
-                $brightness, $contrast, $gamma,
+                $brightness, $contrast, $gamma, $denoise,
                 $updatedAt)
             ON CONFLICT(scope, scope_key) DO UPDATE SET
                 audio_language = excluded.audio_language,
@@ -91,6 +91,7 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
                 picture_brightness = excluded.picture_brightness,
                 picture_contrast = excluded.picture_contrast,
                 picture_gamma = excluded.picture_gamma,
+                picture_denoise = excluded.picture_denoise,
                 updated_at = excluded.updated_at;
             """;
         command.Parameters.AddWithValue("$scope", (int)preference.Scope);
@@ -110,6 +111,7 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
         AddNullable(command, "$brightness", preference.Picture?.Brightness);
         AddNullable(command, "$contrast", preference.Picture?.Contrast);
         AddNullable(command, "$gamma", preference.Picture?.Gamma);
+        AddNullable(command, "$denoise", preference.Picture?.Denoise);
         command.Parameters.AddWithValue(
             "$updatedAt",
             DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture));
@@ -174,10 +176,12 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
     }
 
     /// <summary>
-    /// Reads the three picture columns, and answers «nobody stored one» for a row that cannot make a
-    /// valid adjustment. <see cref="PictureAdjustment"/> rejects a value outside its range instead of
+    /// Reads the picture columns, and answers «nobody stored one» for a row that cannot make a valid
+    /// adjustment. <see cref="PictureAdjustment"/> rejects a value outside its range instead of
     /// clamping it, which is right for a control but would turn a hand-edited database into a film
     /// that will not open. Falling through to the next scope is what a missing column already means.
+    /// The noise reduction is the exception: a NULL there is a row stored before it existed, and it
+    /// reads as off so that the gamma in the same row still reaches its film.
     /// </summary>
     private static PictureAdjustment? ReadPicture(SqliteDataReader reader, int offset)
     {
@@ -191,7 +195,8 @@ public sealed class PlaybackPreferenceRepository : IPlaybackPreferenceRepository
             return new PictureAdjustment(
                 reader.GetDouble(offset),
                 reader.GetDouble(offset + 1),
-                reader.GetDouble(offset + 2));
+                reader.GetDouble(offset + 2),
+                reader.IsDBNull(offset + 3) ? 0d : reader.GetDouble(offset + 3));
         }
         catch (ArgumentOutOfRangeException)
         {

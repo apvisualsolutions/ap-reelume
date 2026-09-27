@@ -3180,7 +3180,16 @@ public sealed class AssembledPhysicalWalkTests : IDisposable
             "PictureGammaLabel",
             () => picture.Gamma,
             "dragging the gamma never changed the gamma the session carries");
-        Assert.False(picture.IsNeutral, "none of the three controls moved, so the reset has nothing to do.");
+
+        // The noise reduction needs no trip to the end of its range first: it starts at zero, which
+        // is its own end, so the click in the slider's first quarter is already a change.
+        await PressAsync(
+            host,
+            "PictureDenoiseLabel",
+            () => picture.Denoise,
+            "dragging the noise reduction never changed the reduction the session carries");
+        Assert.True(picture.Denoise > 0d, "the noise reduction is still off after the click.");
+        Assert.False(picture.IsNeutral, "none of the four controls moved, so the reset has nothing to do.");
 
         // «Restaurar valores por defecto», which is absent while there is nothing to come
         // back from — so the three above are what puts it on the screen, and pressing it takes it off

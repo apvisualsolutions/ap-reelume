@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 AP Solutions
 // SPDX-License-Identifier: LicenseRef-APSolutions
 
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using ApSolutions.LocalMedia.Domain.Playback;
@@ -68,6 +69,9 @@ public sealed class LibVlcMediaPlayerEngine
     private YuvColourMatrix _frameMatrix;
     private PictureAdjustment _pictureAdjustment = PictureAdjustment.Neutral;
     private int[]? _lumaLookup;
+    private readonly OverlappedDctDenoiser _denoiser = new();
+    private readonly DenoiseCadence _denoiseCadence = new();
+    private long _lastFrameTimestamp;
     private object? _formatCallback;
     private object? _cleanupCallback;
     private object? _lockCallback;
@@ -134,7 +138,7 @@ public sealed class LibVlcMediaPlayerEngine
         {
             ArgumentNullException.ThrowIfNull(value);
             _pictureAdjustment = value;
-            _lumaLookup = value.IsNeutral ? null : value.BuildLookup();
+            _lumaLookup = value.IsToneNeutral ? null : value.BuildLookup();
         }
     }
 
@@ -561,6 +565,7 @@ public sealed class LibVlcMediaPlayerEngine
             // The picture arrives packed and leaves as BGRA, which is the price of asking LibVLC for
             // the one format that hands this callback a frame with the subtitles already in it.
             Marshal.Copy(_frameBuffer, packed, 0, packed.Length);
+            Denoise(packed, _pictureAdjustment.Denoise);
 
             // Read once into a local, so a control turned mid-frame cannot change the table between
             // two pixels of the same picture. Null is «nothing to apply», which is what the neutral
@@ -585,6 +590,30 @@ public sealed class LibVlcMediaPlayerEngine
 
         player.SetVideoFormatCallbacks(formatCallback, cleanupCallback);
         player.SetVideoCallbacks(lockCallback, null, displayCallback);
+    }
+
+    /// <summary>
+    /// Takes the compression noise out of the frame's luma before the tone curve reads it, at the step
+    /// the machine can hold, and learns from what this frame cost.
+    /// </summary>
+    /// <remarks>
+    /// Before the curve and not after, because the curve is what makes the noise visible: a lifted
+    /// gamma stretches the blocks the encoder left, and smoothing them first means there is nothing
+    /// left to stretch. And on the packed frame, where the eight-pixel grid still sits where the
+    /// encoder put it.
+    /// </remarks>
+    private void Denoise(byte[] packed, double strength)
+    {
+        var now = Stopwatch.GetTimestamp();
+        var interval = _lastFrameTimestamp == 0 ? 0d : Stopwatch.GetElapsedTime(_lastFrameTimestamp, now).TotalMilliseconds;
+        _lastFrameTimestamp = now;
+        if (strength <= 0d)
+        {
+            return;
+        }
+
+        _denoiser.Denoise(packed, _visibleWidth, _visibleHeight, _packedStride, (float)strength, _denoiseCadence.Step);
+        _denoiseCadence.Record(Stopwatch.GetElapsedTime(now).TotalMilliseconds, interval);
     }
 
     private uint OnVideoFormat(
@@ -629,6 +658,11 @@ public sealed class LibVlcMediaPlayerEngine
         // where the geometry is settled. The height asked is the published one rather than the
         // decoder's aligned buffer: what a person sees is 1080 rows, not the 1088 LibVLC offered.
         _frameMatrix = YuvMatrixPolicy.For(_visibleHeight);
+
+        // A new film or a new size starts the noise reducer at its finest step again: what the last
+        // one cost says nothing about this one.
+        _denoiseCadence.Reset();
+        _lastFrameTimestamp = 0;
         return 1;
     }
 

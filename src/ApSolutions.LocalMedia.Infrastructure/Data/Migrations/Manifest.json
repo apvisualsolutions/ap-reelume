@@ -150,6 +150,12 @@
       "name": "cover_order",
       "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0025_cover_order.sql",
       "sha256": "310D0A705ABD982CEF2D5EBE0F65CD873B379FE022252CC26C08546CFAF65A7A"
+    },
+    {
+      "version": 26,
+      "name": "picture_denoise",
+      "resource": "ApSolutions.LocalMedia.Infrastructure.Data.Migrations.0026_picture_denoise.sql",
+      "sha256": "021B0823319DA84BDF643D9314B816D886880801ABEA9AF796ADF515ADB9335D"
     }
   ]
 }

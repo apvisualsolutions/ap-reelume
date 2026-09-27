@@ -11,8 +11,8 @@ using ApSolutions.LocalMedia.Presentation.Commands;
 namespace ApSolutions.LocalMedia.Presentation.Player;
 
 /// <summary>
-/// Brightness, contrast and gamma while the film is on screen, stored for the scope the person is
-/// in and pushed at the engine the instant a control moves.
+/// Brightness, contrast, gamma and the noise reduction while the film is on screen, stored for the
+/// scope the person is in and pushed at the engine the instant a control moves.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -72,16 +72,20 @@ public sealed class PictureAdjustmentViewModel : INotifyPropertyChanged
     /// <summary>Whether the picture is being left exactly as it arrived.</summary>
     public bool IsNeutral => _adjustment.IsNeutral;
 
-    // Each setter rebuilds the record rather than using «with», and that is not style: the three
+    public static double MaximumDenoise => PictureAdjustment.MaximumDenoise;
+
+    // Each setter rebuilds the record rather than using «with», and that is not style: the four
     // properties are declared get-only on top of the positional ones so the validation runs, which
-    // leaves «with» unable to assign any of them.
+    // leaves «with» unable to assign any of them. And each passes all four, the reduction included:
+    // rebuilt from three, the first nudge of any curve control would switch the reduction off.
     public double Brightness
     {
         get => _adjustment.Brightness;
         set => Update(new PictureAdjustment(
             Clamp(value, MinimumBrightness, MaximumBrightness),
             _adjustment.Contrast,
-            _adjustment.Gamma));
+            _adjustment.Gamma,
+            _adjustment.Denoise));
     }
 
     public double Contrast
@@ -90,7 +94,8 @@ public sealed class PictureAdjustmentViewModel : INotifyPropertyChanged
         set => Update(new PictureAdjustment(
             _adjustment.Brightness,
             Clamp(value, MinimumContrast, MaximumContrast),
-            _adjustment.Gamma));
+            _adjustment.Gamma,
+            _adjustment.Denoise));
     }
 
     public double Gamma
@@ -99,7 +104,22 @@ public sealed class PictureAdjustmentViewModel : INotifyPropertyChanged
         set => Update(new PictureAdjustment(
             _adjustment.Brightness,
             _adjustment.Contrast,
-            Clamp(value, MinimumGamma, MaximumGamma)));
+            Clamp(value, MinimumGamma, MaximumGamma),
+            _adjustment.Denoise));
+    }
+
+    /// <summary>
+    /// How much compression noise to take out before the curve, from nothing to the most the
+    /// reducer takes. It sits with the curve because it answers what the curve reveals.
+    /// </summary>
+    public double Denoise
+    {
+        get => _adjustment.Denoise;
+        set => Update(new PictureAdjustment(
+            _adjustment.Brightness,
+            _adjustment.Contrast,
+            _adjustment.Gamma,
+            Clamp(value, 0d, MaximumDenoise)));
     }
 
     /// <summary>Reads the scope's stored adjustment, or the neutral when it stored none.</summary>
@@ -128,7 +148,7 @@ public sealed class PictureAdjustmentViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Puts the three back where they came from and stores that, rather than clearing the field:
+    /// Puts the four back where they came from and stores that, rather than clearing the field:
     /// a neutral somebody chose has to beat whatever a wider scope says, or undoing an adjustment
     /// for one film would hand it the global one instead.
     /// </summary>
@@ -179,6 +199,7 @@ public sealed class PictureAdjustmentViewModel : INotifyPropertyChanged
             nameof(Brightness),
             nameof(Contrast),
             nameof(Gamma),
+            nameof(Denoise),
             nameof(IsNeutral),
         })
         {

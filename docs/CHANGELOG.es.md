@@ -26,6 +26,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
   no cambie.
 - **Brillo, contraste y gamma** en la reproducción, para aclarar un vídeo oscuro. Dejarlos como vienen
   no cambia la imagen.
+- **Reducción de ruido.** Junto al brillo y la gamma, quita los cuadros que deja la compresión de un
+  vídeo de poca calidad, que son los que se ven al aclararlo. Empieza apagada y se recuerda como el
+  resto de la imagen. Si el equipo no llega a limpiar cada fotograma a tiempo, la aplicación lo
+  limpia algo menos antes que dejar que el vídeo dé tirones.
 - **Un vídeo más pequeño que la ventana se ve más nítido.** La aplicación lo amplía con un escalado
   propio que viene encendido y funciona en cualquier tarjeta gráfica; apagarlo devuelve la imagen
   exactamente como antes.

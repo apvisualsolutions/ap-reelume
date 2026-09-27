@@ -163,6 +163,36 @@ public sealed class PictureAdjustmentTests
         Assert.False(new PictureAdjustment(0d, 1.2d, 1d).IsNeutral);
     }
 
+    [Fact]
+    public void A_noise_reduction_alone_is_not_neutral_and_leaves_the_curve_alone()
+    {
+        // Two different questions, and the engine asks both: whether anything at all was asked for
+        // — which is what shows «Restore defaults» — and whether the tone curve was, which is what
+        // decides if the conversion reads a table. A reduction with the curve untouched must not
+        // make every pixel pay for an identity table.
+        var denoised = new PictureAdjustment(0d, 1d, 1d, Denoise: 3d);
+
+        Assert.False(denoised.IsNeutral);
+        Assert.True(denoised.IsToneNeutral);
+        Assert.False(new PictureAdjustment(0d, 1d, 1.6d).IsToneNeutral);
+        Assert.Equal(PictureAdjustment.Neutral.BuildLookup(), denoised.BuildLookup());
+    }
+
+    [Fact]
+    public void The_noise_reduction_starts_off()
+    {
+        // Off by default: a clean file gains nothing from it and pays for it on every frame.
+        Assert.Equal(0d, PictureAdjustment.Neutral.Denoise);
+        Assert.Equal(0d, new PictureAdjustment(0.1d, 1d, 1.6d).Denoise);
+    }
+
+    [Theory]
+    [InlineData(-0.5d)]
+    [InlineData(PictureAdjustment.MaximumDenoise + 0.5d)]
+    [InlineData(double.NaN)]
+    public void A_noise_reduction_outside_its_range_is_refused(double denoise) =>
+        Assert.ThrowsAny<ArgumentException>(() => new PictureAdjustment(0d, 1d, 1d, denoise));
+
     /// <summary>
     /// The level one entry of the curve paints.
     /// </summary>

@@ -57,7 +57,6 @@ src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/HomeReadModel.cs    
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MatchCandidateRepository.cs       99  76
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/MediaFileRepository.cs            98  89
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PersonalStateRepository.cs        96  95
-src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/PlaybackPreferenceRepository.cs  100  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/Repositories/RecommendationReadModel.cs       100  90
 src/ApSolutions.LocalMedia.Infrastructure/Data/SqliteConnectionFactory.cs                     92  64
 src/ApSolutions.LocalMedia.Infrastructure/FileSystem/DebouncedFileWatcher.cs                 100  95

@@ -34,7 +34,7 @@ public sealed class PlaybackPreferenceRepositoryTests
             VolumePercent = 140,
             AudioOutputDeviceId = "stable-endpoint-id",
             SubtitleStyle = SubtitleStyle.Create(150, "Verdana", "#FFFFFF00", "#80101010", 0.6, 2.5),
-            Picture = new PictureAdjustment(0.35, 1.2, 1.6),
+            Picture = new PictureAdjustment(0.35, 1.2, 1.6, Denoise: 2.5),
         };
 
         await repository.SaveAsync(preference, TestContext.Current.CancellationToken);
@@ -51,7 +51,144 @@ public sealed class PlaybackPreferenceRepositoryTests
         Assert.Equal(140, restored.VolumePercent);
         Assert.Equal("stable-endpoint-id", restored.AudioOutputDeviceId);
         Assert.Equal(preference.SubtitleStyle, restored.SubtitleStyle);
-        Assert.Equal(new PictureAdjustment(0.35, 1.2, 1.6), restored.Picture);
+        Assert.Equal(new PictureAdjustment(0.35, 1.2, 1.6, Denoise: 2.5), restored.Picture);
+    }
+
+    /// <summary>
+    /// A picture stored before the noise reduction existed has its three curve columns and a NULL
+    /// in the fourth, and it has to come back as the adjustment it was with the reduction off — not
+    /// as «nobody stored one», which would quietly drop a gamma somebody chose for that film.
+    /// </summary>
+    [Fact]
+    public async Task A_picture_stored_before_the_noise_reduction_comes_back_with_it_off()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
+        var key = PlaybackPreference.FileKey(Guid.Empty);
+
+        await using (var connection = await factory.OpenAsync(TestContext.Current.CancellationToken))
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                INSERT INTO playback_preferences (
+                    scope, scope_key, picture_brightness, picture_contrast, picture_gamma, updated_at)
+                VALUES ($scope, $key, 0.4, 1.0, 1.6, '2026-09-12T00:00:00.0000000+00:00');
+                """;
+            command.Parameters.AddWithValue("$scope", (int)PreferenceScope.File);
+            command.Parameters.AddWithValue("$key", key);
+            _ = await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        }
+
+        var stored = await new PlaybackPreferenceRepository(factory).GetAsync(
+            PreferenceScope.File,
+            key,
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal(new PictureAdjustment(0.4, 1.0, 1.6), stored!.Picture);
+    }
+
+    /// <summary>
+    /// A track choice written without its «external» column — by an older build or by hand — still
+    /// reads back as the choice it names, whichever of the three it names, and as a choice of the
+    /// embedded track. Only a row that names none of them is no choice at all.
+    /// </summary>
+    [Theory]
+    [InlineData("'spa'", "NULL", "NULL")]
+    [InlineData("NULL", "6", "NULL")]
+    [InlineData("NULL", "NULL", "'eac3'")]
+    public async Task A_track_choice_without_its_external_column_still_reads_back(string language, string channels, string codec)
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
+        var key = PlaybackPreference.FileKey(Guid.Empty);
+
+        await using (var connection = await factory.OpenAsync(TestContext.Current.CancellationToken))
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = $"""
+                INSERT INTO playback_preferences (
+                    scope, scope_key, audio_language, audio_channels, audio_codec, updated_at)
+                VALUES ($scope, $key, {language}, {channels}, {codec}, '2026-09-27T00:00:00.0000000+00:00');
+                """;
+            command.Parameters.AddWithValue("$scope", (int)PreferenceScope.File);
+            command.Parameters.AddWithValue("$key", key);
+            _ = await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        }
+
+        var stored = await new PlaybackPreferenceRepository(factory).GetAsync(
+            PreferenceScope.File,
+            key,
+            TestContext.Current.CancellationToken);
+
+        Assert.NotNull(stored!.Audio);
+        Assert.False(stored.Audio!.PreferExternal);
+        Assert.Null(stored.Subtitle);
+    }
+
+    /// <summary>
+    /// A subtitle style that stored only its size and font — the two columns it cannot do without —
+    /// fills the rest from the engine's own defaults instead of reading back as no style.
+    /// </summary>
+    [Fact]
+    public async Task A_subtitle_style_with_only_its_size_and_font_takes_the_rest_from_the_defaults()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
+        var key = PlaybackPreference.FileKey(Guid.Empty);
+
+        await using (var connection = await factory.OpenAsync(TestContext.Current.CancellationToken))
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                INSERT INTO playback_preferences (
+                    scope, scope_key, subtitle_font_size_percent, subtitle_font_family, updated_at)
+                VALUES ($scope, $key, 150, 'Verdana', '2026-09-27T00:00:00.0000000+00:00');
+                """;
+            command.Parameters.AddWithValue("$scope", (int)PreferenceScope.File);
+            command.Parameters.AddWithValue("$key", key);
+            _ = await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        }
+
+        var stored = await new PlaybackPreferenceRepository(factory).GetAsync(
+            PreferenceScope.File,
+            key,
+            TestContext.Current.CancellationToken);
+
+        var style = stored!.SubtitleStyle;
+        Assert.NotNull(style);
+        Assert.Equal("Verdana", style!.FontFamily);
+        Assert.Equal(SubtitleStyle.EngineDefault.ForegroundHex, style.ForegroundHex);
+        Assert.Equal(SubtitleStyle.EngineDefault.BackgroundHex, style.BackgroundHex);
+        Assert.Equal(SubtitleStyle.EngineDefault.BackgroundOpacity, style.BackgroundOpacity);
+        Assert.Equal(SubtitleStyle.EngineDefault.OutlineThickness, style.OutlineThickness);
+    }
+
+    [Fact]
+    public async Task A_noise_reduction_outside_its_range_reads_back_as_no_adjustment()
+    {
+        using var directory = new DatabaseTestDirectory();
+        var factory = await MigratedSchemaTemplate.CreateFactoryAsync(directory.DatabasePath, TestContext.Current.CancellationToken);
+        var key = PlaybackPreference.FileKey(Guid.Empty);
+
+        await using (var connection = await factory.OpenAsync(TestContext.Current.CancellationToken))
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                INSERT INTO playback_preferences (
+                    scope, scope_key, picture_brightness, picture_contrast, picture_gamma, picture_denoise, updated_at)
+                VALUES ($scope, $key, 0.0, 1.0, 1.0, 40.0, '2026-09-27T00:00:00.0000000+00:00');
+                """;
+            command.Parameters.AddWithValue("$scope", (int)PreferenceScope.File);
+            command.Parameters.AddWithValue("$key", key);
+            _ = await command.ExecuteNonQueryAsync(TestContext.Current.CancellationToken);
+        }
+
+        var stored = await new PlaybackPreferenceRepository(factory).GetAsync(
+            PreferenceScope.File,
+            key,
+            TestContext.Current.CancellationToken);
+
+        Assert.Null(stored!.Picture);
     }
 
     /// <summary>

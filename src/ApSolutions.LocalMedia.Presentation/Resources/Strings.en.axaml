@@ -227,10 +227,11 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="PlayerSettingsBackAction">Back to the settings</x:String>
   <x:String x:Key="PlayerSettingsCloseAction">Close the settings</x:String>
   <x:String x:Key="PlayerSettingsGroupPicture">Picture</x:String>
-  <x:String x:Key="PictureAdjustmentDescription">Raise the gamma to see the shadows of a dark film. At its default values the picture comes out exactly as it arrived.</x:String>
+  <x:String x:Key="PictureAdjustmentDescription">Raise the gamma to see the shadows of a dark film; if blocks appear, raise the noise reduction. At its default values the picture comes out exactly as it arrived.</x:String>
   <x:String x:Key="PictureBrightnessLabel">Brightness</x:String>
   <x:String x:Key="PictureContrastLabel">Contrast</x:String>
   <x:String x:Key="PictureGammaLabel">Gamma</x:String>
+  <x:String x:Key="PictureDenoiseLabel">Noise reduction</x:String>
   <x:String x:Key="ScanSettingsAccessibleName">Scan settings</x:String>
   <x:String x:Key="ScanSettingsTitle">Scanning and watching</x:String>
   <!-- The page had a title and two controls and nothing between them: a page of switches with no

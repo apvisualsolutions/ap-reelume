@@ -108,6 +108,42 @@ public sealed class EnginePictureAdjustmentTests
     }
 
     [Fact]
+    public async Task A_noise_reduction_reaches_the_frames_the_engine_publishes()
+    {
+        // The sample carries grain on purpose, which is what makes it the right one: the reduction
+        // has to show up as a smoother picture on the frames a person would see, not only in the
+        // reducer's own tests.
+        Assert.SkipWhen(MediaToolchain.EncoderPath is null, MediaToolchain.MissingEncoderReason);
+        var path = await MediaToolchain.EnsureSampleAsync(
+            SampleRelativePath, SampleRecipe, TestContext.Current.CancellationToken);
+
+        var plain = await FirstLitFrameAsync(path, PictureAdjustment.Neutral);
+        var reduced = await FirstLitFrameAsync(path, new PictureAdjustment(0d, 1d, 1d, Denoise: PictureAdjustment.MaximumDenoise));
+
+        // Roughness is the mean step between neighbouring pixels: grain raises it, and taking grain
+        // out lowers it. The mean level is the control — a reduction that darkened the picture would
+        // lower roughness too, and that is not what was asked for.
+        Assert.True(
+            reduced.Roughness < plain.Roughness * 0.8,
+            $"roughness only went from {plain.Roughness:F2} to {reduced.Roughness:F2}.");
+        Assert.InRange(reduced.Mean, plain.Mean - 2d, plain.Mean + 2d);
+    }
+
+    [Fact]
+    public async Task A_noise_reduction_alone_carries_no_tone_table()
+    {
+        // The reduction runs before the curve and has no table; asking for it with the curve left
+        // straight must not make every pixel pay for reading an identity.
+        await using var factory = LibVlcFactory.CreateHeadless();
+        await using var engine = new LibVlcMediaPlayerEngine(factory);
+
+        engine.PictureAdjustment = new PictureAdjustment(0d, 1d, 1d, Denoise: 3d);
+
+        Assert.False(engine.CarriesPictureLookup);
+        Assert.Equal(3d, engine.PictureAdjustment.Denoise);
+    }
+
+    [Fact]
     public async Task An_absent_adjustment_is_refused_rather_than_stored_as_nothing()
     {
         // Null would sail through the property and then throw from the frame callback instead —
@@ -142,6 +178,52 @@ public sealed class EnginePictureAdjustmentTests
         var mean = await collector.CollectAsync();
         await engine.StopAsync(TestContext.Current.CancellationToken);
         return mean;
+    }
+
+    private static async Task<(double Mean, double Roughness)> FirstLitFrameAsync(string path, PictureAdjustment adjustment)
+    {
+        await using var factory = LibVlcFactory.CreateHeadless();
+        await using var engine = new LibVlcMediaPlayerEngine(factory);
+        await engine.InitializeAsync(TestContext.Current.CancellationToken);
+        engine.PictureAdjustment = adjustment;
+
+        var frame = new TaskCompletionSource<(double, double)>(TaskCreationOptions.RunContinuationsAsynchronously);
+        engine.FrameRendered += (_, args) =>
+        {
+            var pixels = args.Pixels.Span;
+            double total = 0, steps = 0;
+            long counted = 0, stepped = 0;
+            for (var row = 0; row < args.Height; row++)
+            {
+                var line = pixels.Slice(row * args.Stride, args.Width * 4);
+                for (var x = 0; x < args.Width; x++)
+                {
+                    // The green channel carries most of the luma, and one channel is enough to
+                    // compare a picture with itself.
+                    total += line[(x * 4) + 1];
+                    counted++;
+                    if (x > 0)
+                    {
+                        steps += Math.Abs(line[(x * 4) + 1] - line[((x - 1) * 4) + 1]);
+                        stepped++;
+                    }
+                }
+            }
+
+            // The same guard as the brightness collector: a black frame before anything decoded
+            // would measure nothing while looking like a measurement.
+            if (total / counted >= 8d)
+            {
+                _ = frame.TrySetResult((total / counted, steps / stepped));
+            }
+        };
+
+        await engine.OpenAsync(new PlaybackRequest(new MediaFileId(Guid.NewGuid()), path), TestContext.Current.CancellationToken);
+        await engine.PlayAsync(TestContext.Current.CancellationToken);
+        var finished = await Task.WhenAny(frame.Task, Task.Delay(TimeSpan.FromSeconds(20), TestContext.Current.CancellationToken));
+        await engine.StopAsync(TestContext.Current.CancellationToken);
+        Assert.True(finished == frame.Task, "No frame with anything in it arrived within 20 seconds.");
+        return await frame.Task;
     }
 
     private sealed class BrightnessCollector : IDisposable

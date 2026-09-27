@@ -227,10 +227,11 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="PlayerSettingsBackAction">Volver a los ajustes</x:String>
   <x:String x:Key="PlayerSettingsCloseAction">Cerrar los ajustes</x:String>
   <x:String x:Key="PlayerSettingsGroupPicture">Imagen</x:String>
-  <x:String x:Key="PictureAdjustmentDescription">Sube la gamma para ver las sombras de una película oscura. En sus valores por defecto la imagen sale exactamente como viene.</x:String>
+  <x:String x:Key="PictureAdjustmentDescription">Sube la gamma para ver las sombras de una película oscura; si aparecen cuadros, sube la reducción de ruido. En sus valores por defecto la imagen sale exactamente como viene.</x:String>
   <x:String x:Key="PictureBrightnessLabel">Brillo</x:String>
   <x:String x:Key="PictureContrastLabel">Contraste</x:String>
   <x:String x:Key="PictureGammaLabel">Gamma</x:String>
+  <x:String x:Key="PictureDenoiseLabel">Reducción de ruido</x:String>
   <x:String x:Key="ScanSettingsAccessibleName">Configuración de escaneo</x:String>
   <x:String x:Key="ScanSettingsTitle">Escaneo y vigilancia</x:String>
   <!-- The page had a title and two controls and nothing between them: a page of switches with no

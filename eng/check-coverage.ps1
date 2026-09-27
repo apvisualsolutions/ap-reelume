@@ -482,7 +482,14 @@ try {
     # anunciada sin duración y una escritura sin duración observada. Leído con
     # preview-coverage-floors sobre Application.Tests; la fila sale podando el artefacto
     # coverage-debt del run 36282317575, idéntico fila a fila al fichero.
-    $debtRatchet = 183
+    #
+    # 182 desde el 2026-09-27 (noche), otra vez por mejora: PlaybackPreferenceRepository.cs ganó la
+    # columna del reductor de ruido con sus dos ramas cubiertas, la previsualización lo leyó subiendo
+    # (100/90 → 100/91) y en vez de copiar un suelo se cubrieron las siete que faltaban —una pista
+    # guardada sin su columna de «externa» por cada una de las tres que puede nombrar, y un estilo de
+    # subtítulos con sólo tamaño y fuente—. Queda en 100/100 con IntegrationTests; la fila sale
+    # podando el artefacto coverage-debt del run 36315610319, idéntico fila a fila al fichero.
+    $debtRatchet = 182
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

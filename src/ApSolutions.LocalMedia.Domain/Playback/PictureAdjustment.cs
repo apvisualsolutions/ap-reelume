@@ -46,8 +46,17 @@ namespace ApSolutions.LocalMedia.Domain.Playback;
 /// moving black or white, which is the whole reason this feature exists. FFmpeg allows 0.1 to 10,
 /// and both ends of that are unwatchable.
 /// </param>
-public sealed record PictureAdjustment(double Brightness, double Contrast, double Gamma)
+/// <param name="Denoise">
+/// How much compression noise to take out before the curve, 0 to 5 levels of luma, where 0 leaves
+/// the picture alone and is where it starts. It lives here and not beside the other video options
+/// because it answers the same complaint the curve raises: a lifted gamma stretches the blocks the
+/// encoder left, and taking them out first is what makes the lift watchable.
+/// </param>
+public sealed record PictureAdjustment(double Brightness, double Contrast, double Gamma, double Denoise = 0d)
 {
+    /// <inheritdoc cref="MinimumBrightness"/>
+    public const double MaximumDenoise = 5d;
+
     /// <summary>The smallest and largest each control accepts.</summary>
     public const double MinimumBrightness = -1d;
 
@@ -80,11 +89,20 @@ public sealed record PictureAdjustment(double Brightness, double Contrast, doubl
     /// <inheritdoc cref="PictureAdjustment(double, double, double)"/>
     public double Gamma { get; } = Validated(Gamma, MinimumGamma, MaximumGamma, nameof(Gamma));
 
+    /// <inheritdoc cref="PictureAdjustment(double, double, double, double)"/>
+    public double Denoise { get; } = Validated(Denoise, 0d, MaximumDenoise, nameof(Denoise));
+
     /// <summary>
-    /// Whether this asks for nothing at all, which is what lets the conversion skip the table and
-    /// the feature cost nothing until somebody turns a dial.
+    /// Whether this asks for nothing at all, which is what lets the feature cost nothing until
+    /// somebody turns a dial.
     /// </summary>
-    public bool IsNeutral => Brightness == 0d && Contrast == 1d && Gamma == 1d;
+    public bool IsNeutral => IsToneNeutral && Denoise == 0d;
+
+    /// <summary>
+    /// Whether the tone curve is the straight line, which is what lets the conversion skip the table.
+    /// The noise reduction does not enter into it: it runs before the curve and has no table.
+    /// </summary>
+    public bool IsToneNeutral => Brightness == 0d && Contrast == 1d && Gamma == 1d;
 
     /// <summary>How much of a level the fixed-point curve keeps below the whole number.</summary>
     /// <remarks>

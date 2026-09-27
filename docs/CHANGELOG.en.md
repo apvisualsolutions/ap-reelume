@@ -24,6 +24,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   gives way to playback or a scan, and each file is decoded only once while it does not change.
 - **Brightness, contrast and gamma** during playback, to lift a dark video. Leaving them as they come
   does not change the picture.
+- **Noise reduction.** Next to brightness and gamma, it takes out the blocks compression leaves in a
+  low-quality video, which are the ones that show when it is lifted. It starts off and is remembered
+  like the rest of the picture. If the computer cannot clean every frame in time, the application
+  cleans it a little less rather than let the video stutter.
 - **A video smaller than its window looks sharper.** The application enlarges it with a scaler of its
   own that comes switched on and works on any graphics card; switching it off returns the picture
   exactly as it was.

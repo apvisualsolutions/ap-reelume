@@ -237,6 +237,81 @@ public sealed class PictureAdjustmentViewModelTests
     }
 
     [Fact]
+    public async Task The_noise_reduction_reaches_the_engine_and_is_stored_with_the_rest()
+    {
+        var repository = new InMemoryPreferences();
+        var engine = new RecordingTarget();
+        var model = new PictureAdjustmentViewModel(repository, engine) { Gamma = 1.6 };
+
+        model.Denoise = 2.5;
+        await model.SaveAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(new PictureAdjustment(0d, 1d, 1.6, Denoise: 2.5), engine.PictureAdjustment);
+        var restored = new PictureAdjustmentViewModel(repository, new RecordingTarget());
+        await restored.LoadAsync(TestContext.Current.CancellationToken);
+        Assert.Equal(2.5, restored.Denoise);
+    }
+
+    /// <summary>
+    /// Moving any of the three curve controls keeps the reduction where it was. They rebuild the
+    /// adjustment from its parts, and the version before the reduction existed rebuilt it from three:
+    /// the first nudge of the brightness would have switched the reduction off without a word.
+    /// </summary>
+    [Fact]
+    public void Moving_a_curve_control_keeps_the_noise_reduction()
+    {
+        var engine = new RecordingTarget();
+        var model = new PictureAdjustmentViewModel(new InMemoryPreferences(), engine) { Denoise = 3d };
+
+        model.Brightness = 0.1;
+        model.Contrast = 1.2;
+        model.Gamma = 1.4;
+
+        Assert.Equal(3d, model.Denoise);
+        Assert.Equal(3d, engine.PictureAdjustment.Denoise);
+    }
+
+    [Fact]
+    public async Task Restoring_the_defaults_switches_the_noise_reduction_off_too()
+    {
+        var engine = new RecordingTarget();
+        var model = new PictureAdjustmentViewModel(new InMemoryPreferences(), engine) { Denoise = 3d };
+
+        Assert.False(model.IsNeutral);
+        await model.ResetAsync(TestContext.Current.CancellationToken);
+
+        Assert.Equal(0d, model.Denoise);
+        Assert.Equal(PictureAdjustment.Neutral, engine.PictureAdjustment);
+    }
+
+    [Theory]
+    [InlineData(-1d, 0d)]
+    [InlineData(9d, PictureAdjustment.MaximumDenoise)]
+    [InlineData(double.NaN, 0d)]
+    public void A_reduction_past_the_end_of_its_slider_is_clamped_instead_of_throwing(double asked, double expected)
+    {
+        var model = new PictureAdjustmentViewModel(new InMemoryPreferences(), new RecordingTarget())
+        {
+            Denoise = asked,
+        };
+
+        Assert.Equal(expected, model.Denoise);
+    }
+
+    [Fact]
+    public void Moving_the_reduction_announces_it()
+    {
+        var model = new PictureAdjustmentViewModel(new InMemoryPreferences(), new RecordingTarget());
+        var announced = new List<string?>();
+        model.PropertyChanged += (_, args) => announced.Add(args.PropertyName);
+
+        model.Denoise = 2d;
+
+        Assert.Contains(nameof(PictureAdjustmentViewModel.Denoise), announced);
+        Assert.Contains(nameof(PictureAdjustmentViewModel.IsNeutral), announced);
+    }
+
+    [Fact]
     public void A_panel_with_nothing_to_store_in_or_nothing_to_adjust_is_refused()
     {
         Assert.Throws<ArgumentNullException>(
