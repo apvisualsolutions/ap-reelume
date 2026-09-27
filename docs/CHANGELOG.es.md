@@ -76,6 +76,10 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Corregido
 
+- Una película en **HDR10** se ve ahora con la luz y los colores con los que se hizo, convertidos a
+  rango estándar para la pantalla, en vez de apagada y grisácea; el panel de vídeo la marca como
+  **HDR10** y dice que se ha convertido, donde antes ponía **SDR**. Y un vídeo abierto con doble clic
+  desde el explorador enseña su propio estado de vídeo, no el del anterior.
 - Al cambiar a otra versión de una película y elegir **Empezar de nuevo**, la próxima vez vuelve a
   empezar desde el principio: a veces se quedaba guardado un minuto de la versión anterior.
 - Al pasar de un vídeo a otro, sobre todo desde una carpeta de red, el siguiente ya no recibe las

@@ -23,7 +23,8 @@ public sealed class VideoOutputPolicyTests
             new VideoSourceCapabilities(HdrFormat.Hdr10, 3840, 2160),
             HdrDisplay,
             hardwareRequested: true,
-            hardwareAvailable: true);
+            hardwareAvailable: true,
+            outputCarriesHdr: true);
 
         Assert.Equal(VideoOutputPath.Hdr10Passthrough, decision.Path);
         Assert.True(decision.HardwareAccelerationActive);
@@ -40,10 +41,30 @@ public sealed class VideoOutputPolicyTests
             new VideoSourceCapabilities(HdrFormat.Hdr10, 3840, 2160),
             new DisplayCapabilities(supports, enabled),
             hardwareRequested: true,
-            hardwareAvailable: true);
+            hardwareAvailable: true,
+            outputCarriesHdr: true);
 
         Assert.Equal(VideoOutputPath.SdrToneMapped, decision.Path);
         Assert.Null(decision.UnsupportedReason);
+    }
+
+    /// <summary>
+    /// A display with HDR switched on is not enough: the picture has to reach it as HDR, and an
+    /// output that draws eight-bit standard range cannot carry it. Promising the passthrough there
+    /// would be the same false label the «SDR» badge on an HDR10 film was, pointing the other way.
+    /// </summary>
+    [Fact]
+    public void An_output_that_cannot_carry_HDR_tone_maps_even_on_an_HDR_display()
+    {
+        var decision = VideoOutputPolicy.Decide(
+            new VideoSourceCapabilities(HdrFormat.Hdr10, 3840, 2160),
+            HdrDisplay,
+            hardwareRequested: false,
+            hardwareAvailable: false,
+            outputCarriesHdr: false);
+
+        Assert.Equal(VideoOutputPath.SdrToneMapped, decision.Path);
+        Assert.True(decision.DisplaySupportsHdr);
     }
 
     [Fact]
@@ -55,7 +76,8 @@ public sealed class VideoOutputPolicyTests
                 new VideoSourceCapabilities(HdrFormat.None, 1920, 1080),
                 display,
                 hardwareRequested: false,
-                hardwareAvailable: true);
+                hardwareAvailable: true,
+            outputCarriesHdr: true);
 
             Assert.Equal(VideoOutputPath.Sdr, decision.Path);
             Assert.False(decision.HardwareAccelerationActive);
@@ -69,7 +91,8 @@ public sealed class VideoOutputPolicyTests
             new VideoSourceCapabilities(HdrFormat.Hdr10, 3840, 2160),
             HdrDisplay,
             hardwareRequested: true,
-            hardwareAvailable: false);
+            hardwareAvailable: false,
+            outputCarriesHdr: true);
 
         Assert.Equal(VideoOutputPath.Hdr10Passthrough, decision.Path);
         Assert.True(decision.HardwareAccelerationRequested);
@@ -85,7 +108,8 @@ public sealed class VideoOutputPolicyTests
             new VideoSourceCapabilities(HdrFormat.DolbyVision, 3840, 2160),
             HdrDisplay,
             hardwareRequested: true,
-            hardwareAvailable: true);
+            hardwareAvailable: true,
+            outputCarriesHdr: true);
 
         Assert.Equal(PlaybackFailureCode.UnsupportedCapability, decision.UnsupportedReason);
         Assert.Equal(VideoOutputPath.SdrToneMapped, decision.Path);
@@ -108,7 +132,8 @@ public sealed class VideoOutputPolicyTests
             new VideoSourceCapabilities(HdrFormat.None, 1280, 720),
             SdrDisplay,
             hardwareRequested: true,
-            hardwareAvailable: false);
+            hardwareAvailable: false,
+            outputCarriesHdr: true);
 
         Assert.True(software.FellBackToSoftware);
         Assert.False(software.HardwareAccelerationActive);
@@ -125,10 +150,11 @@ public sealed class VideoOutputPolicyTests
     [Fact]
     public void The_policy_rejects_a_missing_source_or_display()
     {
-        Assert.Throws<ArgumentNullException>(() => VideoOutputPolicy.Decide(null!, SdrDisplay, true, true));
+        Assert.Throws<ArgumentNullException>(() => VideoOutputPolicy.Decide(null!, SdrDisplay, true, true, true));
         Assert.Throws<ArgumentNullException>(() => VideoOutputPolicy.Decide(
             new VideoSourceCapabilities(HdrFormat.None, 1, 1),
             null!,
+            true,
             true,
             true));
     }

@@ -74,6 +74,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- An **HDR10** film now shows with the light and colours it was made with, brought down to standard
+  range for the display, instead of dim and greyish; the video panel labels it **HDR10** and says it
+  was converted, where it used to read **SDR**. And a video opened by double-clicking it in the file
+  explorer shows its own video status, not the previous one's.
 - Switching to another version of a film and choosing **Start again** now starts it from the
   beginning next time too: sometimes a minute of the previous version stayed stored.
 - Moving from one video to another, above all from a network folder, the next one no longer receives

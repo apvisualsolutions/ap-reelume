@@ -389,7 +389,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="TransportBoostWarningText">Volume is above 100%. The peak limiter is engaged to prevent distortion.</x:String>
   <x:String x:Key="VideoStatusAccessibleName">Video status</x:String>
   <x:String x:Key="VideoStatusHdrPassthrough">HDR10 sent straight to a capable display.</x:String>
-  <x:String x:Key="VideoStatusToneMapped">HDR source tone mapped to SDR for this display.</x:String>
+  <x:String x:Key="VideoStatusToneMapped">HDR10 source tone mapped to standard range for this display.</x:String>
   <x:String x:Key="VideoStatusStandardRange">Standard dynamic range.</x:String>
   <x:String x:Key="VideoStatusHardware">Hardware-accelerated decoding.</x:String>
   <x:String x:Key="VideoStatusSoftwareFallback">Hardware acceleration was unavailable; decoding in software.</x:String>

@@ -27,6 +27,13 @@ public sealed class VideoStatusViewModel : INotifyPropertyChanged
 
     public bool IsStandardDynamicRange => _capabilities?.OutputPath == VideoOutputPath.Sdr;
 
+    /// <summary>
+    /// The film itself is HDR10, whatever path its picture takes. The badge names the source and the
+    /// line under it names the path; until 2026-09-27 the badge followed the path, so an HDR10 film
+    /// brought down to standard range was labelled «SDR».
+    /// </summary>
+    public bool IsHdrSource => _capabilities?.SourceHdr == HdrFormat.Hdr10;
+
     public bool IsHardwareAccelerated => _capabilities?.HardwareAccelerationActive == true;
 
     /// <summary>True when acceleration was asked for and the engine had to decode in software.</summary>
@@ -34,8 +41,6 @@ public sealed class VideoStatusViewModel : INotifyPropertyChanged
 
     /// <summary>True when the source declares a format this release does not implement.</summary>
     public bool IsUnsupportedFormat => _capabilities?.SourceHdr == HdrFormat.DolbyVision;
-
-    public bool DisplaySupportsHdr => _capabilities?.DisplaySupportsHdr == true;
 
     /// <summary>
     /// Something worth stating about how this is being decoded — a fact, not a problem.
@@ -68,10 +73,10 @@ public sealed class VideoStatusViewModel : INotifyPropertyChanged
             nameof(IsHdrPassthrough),
             nameof(IsToneMapped),
             nameof(IsStandardDynamicRange),
+            nameof(IsHdrSource),
             nameof(IsHardwareAccelerated),
             nameof(FellBackToSoftware),
             nameof(IsUnsupportedFormat),
-            nameof(DisplaySupportsHdr),
             nameof(HasDecodeFacts),
             nameof(HasDecodeWarnings),
         })

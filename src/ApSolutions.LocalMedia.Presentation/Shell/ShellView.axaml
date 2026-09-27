@@ -1134,13 +1134,13 @@ SPDX-License-Identifier: LicenseRef-APSolutions
                           FontSize="{DynamicResource FontSizeCaption}"
                           FontWeight="SemiBold"
                           Foreground="{DynamicResource TextPrimaryBrush}"
-                          IsVisible="{Binding IsHdrPassthrough}"
+                          IsVisible="{Binding IsHdrSource}"
                           Text="{DynamicResource PlayerVideoHdrBadge}" />
                       <TextBlock
                           FontSize="{DynamicResource FontSizeCaption}"
                           FontWeight="SemiBold"
                           Foreground="{DynamicResource TextPrimaryBrush}"
-                          IsVisible="{Binding !IsHdrPassthrough}"
+                          IsVisible="{Binding !IsHdrSource}"
                           Text="{DynamicResource PlayerVideoSdrBadge}" />
                     </Panel>
                   </Border>

@@ -187,8 +187,7 @@ public sealed record PlaybackRequest
         MediaFileId mediaFileId,
         string path,
         TimeSpan startPosition = default,
-        bool useHardwareAcceleration = true,
-        HdrFormat sourceHdr = HdrFormat.None)
+        bool useHardwareAcceleration = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentOutOfRangeException.ThrowIfLessThan(startPosition, TimeSpan.Zero);
@@ -196,7 +195,6 @@ public sealed record PlaybackRequest
         Path = path;
         StartPosition = startPosition;
         UseHardwareAcceleration = useHardwareAcceleration;
-        SourceHdr = sourceHdr;
     }
 
     public MediaFileId MediaFileId { get; }
@@ -206,12 +204,6 @@ public sealed record PlaybackRequest
     public TimeSpan StartPosition { get; }
 
     public bool UseHardwareAcceleration { get; }
-
-    /// <summary>
-    /// What the catalogue already knows about the picture. LibVLC 3 does not expose transfer
-    /// characteristics on its tracks, so the caller states what the media probe read.
-    /// </summary>
-    public HdrFormat SourceHdr { get; }
 }
 
 /// <summary>An immutable observation of the engine taken without mutating it.</summary>

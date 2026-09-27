@@ -76,7 +76,6 @@ src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbRateLimiter.cs           
 src/ApSolutions.LocalMedia.Infrastructure/Playback/ExternalSubtitleDiscovery.cs           87  73
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs            89  87
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs             93  80
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcVideoCapabilities.cs             77  66
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/AllowlistedDiagnosticsBuilder.cs       100  83
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/NetworkPurposeRegistry.cs              100  87
 src/ApSolutions.LocalMedia.Infrastructure/Settings/JsonSettingsStore.cs                   96  75
@@ -149,7 +148,6 @@ src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchDialog.axaml        
 src/ApSolutions.LocalMedia.Presentation/Player/VersionSwitchViewModel.cs                  97  85
 src/ApSolutions.LocalMedia.Presentation/Player/VideoFrameView.cs                         100  94
 src/ApSolutions.LocalMedia.Presentation/Player/VideoStatusOverlay.axaml                  100  50
-src/ApSolutions.LocalMedia.Presentation/Player/VideoStatusViewModel.cs                    96  87
 src/ApSolutions.LocalMedia.Presentation/Recovery/DatabaseRecoveryView.axaml              100  50
 src/ApSolutions.LocalMedia.Presentation/Recovery/DatabaseRecoveryViewModel.cs            100  50
 src/ApSolutions.LocalMedia.Presentation/Resources/Brand.axaml                            100  50

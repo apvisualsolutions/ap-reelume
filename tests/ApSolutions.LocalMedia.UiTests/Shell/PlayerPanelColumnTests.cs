@@ -213,6 +213,58 @@ public sealed class PlayerPanelColumnTests
         window.Close();
     }
 
+    /// <summary>
+    /// An HDR10 film brought down to standard range is still an HDR10 film: the badge names the source
+    /// and the line under it names the path. Until 2026-09-27 the badge followed the path, and a film
+    /// that was HDR10 was labelled «SDR» on every display this player can draw on.
+    /// </summary>
+    [AvaloniaFact]
+    public async Task An_HDR10_film_brought_down_to_standard_range_is_labelled_HDR10_and_says_so()
+    {
+        var (window, view, viewModel) = await ShowSessionAsync();
+        viewModel.Player!.VideoStatus!.Apply(
+            new PlaybackCapabilities(
+                HardwareAccelerationRequested: false,
+                HardwareAccelerationActive: false,
+                SourceHdr: HdrFormat.Hdr10,
+                DisplaySupportsHdr: true,
+                OutputPath: VideoOutputPath.SdrToneMapped),
+            fellBackToSoftware: false);
+
+        viewModel.TogglePlayerPanelCommand.Execute(PlayerPanel.Video);
+        Dispatcher.UIThread.RunJobs();
+
+        var written = Column(view).GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Where(block => block.IsEffectivelyVisible)
+            .Select(block => block.Text ?? string.Empty)
+            .ToArray();
+        Assert.Contains("HDR10", written, StringComparer.Ordinal);
+        Assert.DoesNotContain("SDR", written, StringComparer.Ordinal);
+        Assert.Contains("Fuente HDR10 convertida a rango estándar para verse en esta pantalla.", written, StringComparer.Ordinal);
+        window.Close();
+    }
+
+    /// <summary>And the control: a standard-range film is still labelled SDR.</summary>
+    [AvaloniaFact]
+    public async Task A_standard_range_film_is_labelled_SDR()
+    {
+        var (window, view, viewModel) = await ShowSessionAsync();
+        viewModel.Player!.VideoStatus!.Apply(new PlaybackCapabilities(false, false), fellBackToSoftware: false);
+
+        viewModel.TogglePlayerPanelCommand.Execute(PlayerPanel.Video);
+        Dispatcher.UIThread.RunJobs();
+
+        var written = Column(view).GetVisualDescendants()
+            .OfType<TextBlock>()
+            .Where(block => block.IsEffectivelyVisible)
+            .Select(block => block.Text ?? string.Empty)
+            .ToArray();
+        Assert.Contains("SDR", written, StringComparer.Ordinal);
+        Assert.DoesNotContain("HDR10", written, StringComparer.Ordinal);
+        window.Close();
+    }
+
     [AvaloniaFact]
     public async Task The_session_badge_counts_the_sessions_and_the_column_closes_when_one_is_replaced()
     {

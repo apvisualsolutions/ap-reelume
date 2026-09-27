@@ -59,6 +59,7 @@ public sealed class YuvMatrixPolicyTests
     [Theory]
     [InlineData(YuvColourSpace.Bt601, 298, 409, 100, 208, 516)]
     [InlineData(YuvColourSpace.Bt709, 298, 459, 55, 136, 541)]
+    [InlineData(YuvColourSpace.Bt2020, 298, 430, 48, 167, 548)]
     public void Each_matrix_carries_the_coefficients_its_recommendation_defines(
         YuvColourSpace space,
         int luma,
@@ -83,6 +84,24 @@ public sealed class YuvMatrixPolicyTests
         int frameHeight,
         YuvColourSpace expected) =>
         Assert.Equal(YuvMatrixPolicy.MatrixFor(expected), YuvMatrixPolicy.For(frameHeight));
+
+    /// <summary>
+    /// What the file declares wins over what its height suggests, in both directions: an HDR10 film
+    /// is BT.2020 whatever its size, and a declared BT.601 picture is not decoded as high definition
+    /// because it happens to be tall.
+    /// </summary>
+    [Theory]
+    [InlineData(240, 9, YuvColourSpace.Bt2020)]
+    [InlineData(2160, 9, YuvColourSpace.Bt2020)]
+    [InlineData(480, 1, YuvColourSpace.Bt709)]
+    [InlineData(1080, 6, YuvColourSpace.Bt601)]
+    [InlineData(1080, 5, YuvColourSpace.Bt601)]
+    [InlineData(1080, 2, YuvColourSpace.Bt709)]
+    [InlineData(480, null, YuvColourSpace.Bt601)]
+    public void A_declared_matrix_is_preferred_to_the_height(int frameHeight, int? declared, YuvColourSpace expected) =>
+        Assert.Equal(
+            YuvMatrixPolicy.MatrixFor(expected),
+            YuvMatrixPolicy.For(frameHeight, new SourceColour(null, null, declared, null)));
 
     [Fact]
     public void A_space_outside_the_two_that_exist_is_refused_rather_than_given_a_default()

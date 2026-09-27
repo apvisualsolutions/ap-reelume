@@ -1071,17 +1071,19 @@ public static partial class CompositionRoot
             Transport = provider.GetRequiredService<TransportControlsViewModel>(),
         };
 
-        var videoStatus = new VideoStatusViewModel();
-        var capabilities = provider.GetRequiredService<LibVlcMediaPlayerEngine>().Capabilities;
-        videoStatus.Apply(
-            capabilities,
-            capabilities is { HardwareAccelerationRequested: true, HardwareAccelerationActive: false });
-
         var banner = provider.GetRequiredService<LooseFileViewModel>();
         banner.Apply(session);
 
         await player.OpenAsync(session.MediaFileId, session.Path, cancellationToken: cancellationToken)
             .ConfigureAwait(true);
+
+        // After the open and not before it: the engine describes the film it has open, so reading it
+        // first showed the previous film's picture, or nothing at all for the first one.
+        var videoStatus = new VideoStatusViewModel();
+        var capabilities = provider.GetRequiredService<LibVlcMediaPlayerEngine>().Capabilities;
+        videoStatus.Apply(
+            capabilities,
+            capabilities is { HardwareAccelerationRequested: true, HardwareAccelerationActive: false });
 
         return new PlayerSurfaces
         {

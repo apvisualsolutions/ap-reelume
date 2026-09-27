@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using ApSolutions.LocalMedia.Domain.Catalog;
 using ApSolutions.LocalMedia.Domain.Playback;
+using ApSolutions.LocalMedia.Infrastructure.Media;
 using ApSolutions.LocalMedia.Infrastructure.Playback;
 using ApSolutions.LocalMedia.MediaTests.Fixtures;
 using Xunit;
@@ -18,41 +19,111 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 [Trait("Category", "RealMedia")]
 public sealed class HdrAccelerationTests
 {
-    [Fact]
-    public async Task An_HDR10_source_is_recognised_from_its_transfer_characteristics()
+    /// <summary>
+    /// The container's own declaration, read the way the player reads it, agrees with ffprobe — which
+    /// is a second, independent reader, and the one this suite trusted before the player had its own.
+    /// </summary>
+    [Theory]
+    [InlineData("mkv-hevc-hdr10", "smpte2084", 16, 9, 9)]
+    [InlineData("mkv-hevc-sdr", "bt709", 1, 1, 1)]
+    public async Task The_player_reads_the_same_colour_ffprobe_reads(
+        string id,
+        string ffprobeTransfer,
+        int transfer,
+        int matrix,
+        int primaries)
     {
-        var sample = MediaManifest.Require("mkv-hevc-hdr10");
-        var path = await CodecMatrixTests.RequireSampleAsync(sample);
-
-        var transfer = await ReadColourTransferAsync(path);
+        var path = await CodecMatrixTests.RequireSampleAsync(MediaManifest.Require(id));
 
         // No skip on a missing curve: it skipped on the server for months because ffmpeg 9.0 left it out
         // of the container, and the recipe now tags the frames. A build that loses it again is red.
-        Assert.Equal("smpte2084", transfer);
-        var described = LibVlcVideoCapabilities.WithColourTransfer(
-            new VideoSourceCapabilities(HdrFormat.None, 320, 240),
-            transfer);
-        Assert.Equal(HdrFormat.Hdr10, described.Hdr);
+        Assert.Equal(ffprobeTransfer, await ReadColourTransferAsync(path));
+        var declared = ContainerColourReader.Read(path);
+        Assert.Equal(transfer, declared.Transfer);
+        Assert.Equal(matrix, declared.Matrix);
+        Assert.Equal(primaries, declared.Primaries);
     }
 
+    /// <summary>
+    /// Dolby Vision is recognised from LibVLC's own description and stays what it is when its base
+    /// layer also declares PQ; anything else takes what the file declares.
+    /// </summary>
     [Fact]
-    public async Task An_SDR_source_is_never_promoted_to_HDR()
+    public void The_declared_colour_never_downgrades_Dolby_Vision()
     {
-        var sample = MediaManifest.Require("mkv-hevc-sdr");
-        var path = await CodecMatrixTests.RequireSampleAsync(sample);
+        var pq = new SourceColour(9, 16, 9, null);
 
-        var transfer = await ReadColourTransferAsync(path);
-        var described = LibVlcVideoCapabilities.WithColourTransfer(
-            new VideoSourceCapabilities(HdrFormat.None, 320, 240),
-            transfer);
-
-        Assert.Equal(HdrFormat.None, described.Hdr);
+        Assert.Equal(
+            HdrFormat.DolbyVision,
+            LibVlcVideoCapabilities.WithDeclaredColour(new VideoSourceCapabilities(HdrFormat.DolbyVision, 1, 1), pq).Hdr);
+        Assert.Equal(
+            HdrFormat.Hdr10,
+            LibVlcVideoCapabilities.WithDeclaredColour(new VideoSourceCapabilities(HdrFormat.None, 1, 1), pq).Hdr);
+        Assert.Equal(
+            HdrFormat.None,
+            LibVlcVideoCapabilities.WithDeclaredColour(new VideoSourceCapabilities(HdrFormat.None, 1, 1), SourceColour.Undeclared).Hdr);
     }
 
     [Theory]
+    [InlineData("Dolby Vision", null, null, HdrFormat.DolbyVision)]
+    [InlineData("HEVC", null, "x265 dvhe.08.06", HdrFormat.DolbyVision)]
+    [InlineData(null, "DOVI profile 8", null, HdrFormat.DolbyVision)]
+    [InlineData("H.265/HEVC", null, "Lavf61", HdrFormat.None)]
+    [InlineData(null, null, null, HdrFormat.None)]
+    public void Dolby_Vision_is_recognised_from_what_LibVLC_says_about_the_stream(
+        string? codec,
+        string? description,
+        string? encodedBy,
+        HdrFormat expected) =>
+        Assert.Equal(expected, LibVlcVideoCapabilities.RecogniseDolbyVision(codec, description, encodedBy));
+
+    /// <summary>A file with no picture has nothing to describe, and is played as standard range.</summary>
+    [Fact]
+    public async Task A_file_with_no_picture_is_described_as_standard_range()
+    {
+        Assert.SkipWhen(MediaToolchain.EncoderPath is null, MediaToolchain.MissingEncoderReason);
+        var path = await MediaToolchain.EnsureSampleAsync(
+            "hdr/audio-only.mka",
+            "-f lavfi -i sine=frequency=440:duration=1 -c:a flac",
+            TestContext.Current.CancellationToken);
+        await using var factory = LibVlcFactory.CreateHeadless();
+        await using var engine = new LibVlcMediaPlayerEngine(factory);
+        await engine.InitializeAsync(TestContext.Current.CancellationToken);
+
+        await engine.OpenAsync(new PlaybackRequest(new MediaFileId(Guid.NewGuid()), path), TestContext.Current.CancellationToken);
+
+        Assert.Equal(HdrFormat.None, engine.Capabilities!.SourceHdr);
+        Assert.Equal(VideoOutputPath.Sdr, engine.Capabilities.OutputPath);
+        Assert.False(engine.CarriesToneMapping);
+        await engine.StopAsync(TestContext.Current.CancellationToken);
+    }
+
+    /// <summary>The same for MP4, whose declaration lives in a <c>colr</c> box and not an element.</summary>
+    [Fact]
+    public async Task An_HDR10_MP4_is_read_from_its_colour_box()
+    {
+        Assert.SkipUnless(MediaToolchain.HasEncoder("libx265"), "libx265 is not available to write the MP4 sample.");
+        var path = await MediaToolchain.EnsureSampleAsync(
+            "hdr/mp4-hevc-hdr10.mp4",
+            "-f lavfi -i testsrc2=size=320x240:rate=15:duration=1 -an "
+            + "-vf setparams=color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc "
+            + "-c:v libx265 -preset ultrafast -x265-params log-level=error -pix_fmt yuv420p10le -tag:v hvc1 "
+            + "-color_primaries bt2020 -color_trc smpte2084 -colorspace bt2020nc -movflags +write_colr",
+            TestContext.Current.CancellationToken);
+
+        Assert.Equal("smpte2084", await ReadColourTransferAsync(path));
+        Assert.Equal(new SourceColour(9, 16, 9, null), ContainerColourReader.Read(path) with { MaxContentLight = null });
+    }
+
+    /// <summary>
+    /// Nothing tells the engine the film is HDR10 but the film: it reads the curve, brings the picture
+    /// down, and says so. And a display with HDR switched on changes nothing, because this output
+    /// draws eight-bit standard range and cannot carry HDR to it.
+    /// </summary>
+    [Theory]
     [InlineData("mkv-hevc-hdr10", HdrFormat.Hdr10)]
     [InlineData("mkv-hevc-sdr", HdrFormat.None)]
-    public async Task The_engine_reports_the_path_it_took_for_the_display_it_is_on(string id, HdrFormat hdr)
+    public async Task The_engine_recognises_HDR10_from_the_file_and_brings_it_down(string id, HdrFormat hdr)
     {
         var sample = MediaManifest.Require(id);
         var path = await CodecMatrixTests.RequireSampleAsync(sample);
@@ -62,7 +133,7 @@ public sealed class HdrAccelerationTests
         await engine.InitializeAsync(TestContext.Current.CancellationToken);
 
         await engine.OpenAsync(
-            new PlaybackRequest(new MediaFileId(Guid.NewGuid()), path, sourceHdr: hdr),
+            new PlaybackRequest(new MediaFileId(Guid.NewGuid()), path),
             TestContext.Current.CancellationToken);
         await engine.PlayAsync(TestContext.Current.CancellationToken);
         _ = await CodecMatrixTests.WaitForPositionAsync(engine, TimeSpan.FromMilliseconds(150));
@@ -71,8 +142,9 @@ public sealed class HdrAccelerationTests
         Assert.Equal(hdr, engine.Capabilities!.SourceHdr);
         Assert.True(engine.Capabilities.DisplaySupportsHdr);
         Assert.Equal(
-            hdr == HdrFormat.Hdr10 ? VideoOutputPath.Hdr10Passthrough : VideoOutputPath.Sdr,
+            hdr == HdrFormat.Hdr10 ? VideoOutputPath.SdrToneMapped : VideoOutputPath.Sdr,
             engine.Capabilities.OutputPath);
+        Assert.Equal(hdr == HdrFormat.Hdr10, engine.CarriesToneMapping);
         Assert.True(engine.DecodedFrameCount > 0, $"'{id}' decoded no frame.");
         await engine.StopAsync(TestContext.Current.CancellationToken);
     }
@@ -88,7 +160,7 @@ public sealed class HdrAccelerationTests
         await engine.InitializeAsync(TestContext.Current.CancellationToken);
 
         await engine.OpenAsync(
-            new PlaybackRequest(new MediaFileId(Guid.NewGuid()), path, sourceHdr: HdrFormat.Hdr10),
+            new PlaybackRequest(new MediaFileId(Guid.NewGuid()), path),
             TestContext.Current.CancellationToken);
         await engine.PlayAsync(TestContext.Current.CancellationToken);
         _ = await CodecMatrixTests.WaitForPositionAsync(engine, TimeSpan.FromMilliseconds(150));

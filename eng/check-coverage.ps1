@@ -489,7 +489,7 @@ try {
     # guardada sin su columna de «externa» por cada una de las tres que puede nombrar, y un estilo de
     # subtítulos con sólo tamaño y fuente—. Queda en 100/100 con IntegrationTests; la fila sale
     # podando el artefacto coverage-debt del run 36315610319, idéntico fila a fila al fichero.
-    $debtRatchet = 182
+    $debtRatchet = 180
     $debtFile = Join-Path $PSScriptRoot 'coverage-debt.txt'
 
     # Every file in src/ that this run measures below the bar, with the floor it would be given.

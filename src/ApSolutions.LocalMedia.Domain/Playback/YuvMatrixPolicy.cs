@@ -13,6 +13,9 @@ public enum YuvColourSpace
 
     /// <summary>High definition, the matrix of Rec. ITU-R BT.709.</summary>
     Bt709 = 1,
+
+    /// <summary>Ultra high definition and HDR10, the non-constant luminance matrix of Rec. ITU-R BT.2020.</summary>
+    Bt2020 = 2,
 }
 
 /// <summary>
@@ -40,19 +43,16 @@ public readonly record struct YuvColourMatrix(
 /// </summary>
 /// <remarks>
 /// <para>
-/// The height decides because nothing available here declares the space. LibVLC 3 publishes a video
-/// track's geometry, aspect, cadence and orientation and no colour information at all, and reading
-/// it out of the container would mean shipping a second decoder for the job — <c>ffprobe</c>, which
-/// the HDR suite uses, is a test tool and is not on the machine of whoever runs the application. So
-/// the rule is the industry's own: 720 lines and above is BT.709, below it is BT.601. A file that
-/// disagrees with its own height is rare and its error is smaller than the one this replaces.
+/// What the file declares decides when it declares anything, and the height decides when it does
+/// not. LibVLC 3 publishes a video track's geometry, aspect, cadence and orientation and no colour
+/// information at all, so the declaration is read out of the container itself — Matroska's
+/// <c>Colour</c> element or the MP4 <c>colr</c> box — as a <see cref="SourceColour"/>. Until
+/// 2026-09-27 nothing read it, and an HDR10 film, which is BT.2020, was decoded with BT.709.
 /// </para>
 /// <para>
-/// There is deliberately no way to pass a space in. Preferring what the source declares is the right
-/// answer the day anything in the tree can read it — the upscaler's graphics path will have to tell the
-/// video processor what it is handed — and this is the one place that will change. Until something
-/// supplies that value, a parameter for it would be a door nobody walks through, which is this
-/// repository's characteristic defect rather than a head start.
+/// Without a declaration the rule is the industry's own: 720 lines and above is BT.709, below it is
+/// BT.601. A file that disagrees with its own height and says nothing is rare, and its error is
+/// smaller than the one the rule replaced.
 /// </para>
 /// </remarks>
 public static class YuvMatrixPolicy
@@ -67,6 +67,8 @@ public static class YuvMatrixPolicy
 
     private static readonly YuvColourMatrix Bt709Matrix = new(298, 459, 55, 136, 541);
 
+    private static readonly YuvColourMatrix Bt2020Matrix = new(298, 430, 48, 167, 548);
+
     /// <summary>
     /// The space a picture <paramref name="frameHeight"/> lines tall was encoded in. A degenerate
     /// height is standard definition rather than a guess, which is also what it was before.
@@ -79,6 +81,7 @@ public static class YuvMatrixPolicy
     {
         YuvColourSpace.Bt601 => Bt601Matrix,
         YuvColourSpace.Bt709 => Bt709Matrix,
+        YuvColourSpace.Bt2020 => Bt2020Matrix,
         _ => throw new ArgumentOutOfRangeException(nameof(space), space, "There is no such matrix."),
     };
 
@@ -87,4 +90,20 @@ public static class YuvMatrixPolicy
     /// every decoder wants.
     /// </summary>
     public static YuvColourMatrix For(int frameHeight) => MatrixFor(Choose(frameHeight));
+
+    /// <summary>
+    /// The coefficients for a picture that may declare its own matrix: the declaration when it names
+    /// one of the three, the height otherwise.
+    /// </summary>
+    public static YuvColourMatrix For(int frameHeight, SourceColour colour)
+    {
+        ArgumentNullException.ThrowIfNull(colour);
+        return colour.Matrix switch
+        {
+            SourceColour.Bt2020NonConstantMatrix => Bt2020Matrix,
+            1 => Bt709Matrix,
+            5 or 6 => Bt601Matrix,
+            _ => For(frameHeight),
+        };
+    }
 }

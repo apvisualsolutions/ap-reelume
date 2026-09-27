@@ -41,6 +41,14 @@ public static class PackedYuvConverter
     /// <summary>Bytes one pixel of the destination occupies.</summary>
     public const int DestinationBytesPerPixel = 4;
 
+    private static readonly float[] Gamut = [.. HdrToneCurve.Bt2020ToBt709.Select(coefficient => (float)coefficient)];
+
+    /// <summary>The same ceiling the noise reducer measured: past sixteen threads a frame gets no faster.</summary>
+    private static readonly ParallelOptions ToneParallelism = new()
+    {
+        MaxDegreeOfParallelism = Math.Min(Environment.ProcessorCount, 16),
+    };
+
     /// <summary>
     /// A width LibVLC can publish as <c>UYVY</c>: the format pairs neighbouring pixels, so an odd
     /// one has no partner. Never below two, which is the smallest picture the pairing allows.
@@ -69,33 +77,7 @@ public static class PackedYuvConverter
         YuvColourMatrix matrix,
         ReadOnlySpan<int> lumaLookup = default)
     {
-        // The width is paired rather than merely positive: the format carries one chroma sample for
-        // every two pixels, so an odd width names a pixel with no partner. Refusing it here is what
-        // lets the loop below be the loop and nothing else — the caller aligns first, and AlignWidth
-        // is the one place that decides how.
-        ArgumentOutOfRangeException.ThrowIfNotEqual(width, AlignWidth(width));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
-        ArgumentOutOfRangeException.ThrowIfLessThan(sourceStride, width * SourceBytesPerPixel);
-        ArgumentOutOfRangeException.ThrowIfLessThan(destinationStride, width * DestinationBytesPerPixel);
-        if (source.Length < sourceStride * height || destination.Length < destinationStride * height)
-        {
-            throw new ArgumentException(
-                "The conversion was given fewer rows than it was told to convert.",
-                nameof(source));
-        }
-
-        // A table of any other size is an indexed read off the end of it, which paints whatever
-        // follows in memory and does so differently every run. Empty means «leave the luma alone».
-        // Its entries are fixed point with PictureAdjustment.FractionBits of fraction, so the level
-        // written comes out of PictureAdjustment.Quantise and not out of a cast.
-        if (lumaLookup.Length is not (0 or 256))
-        {
-            throw new ArgumentException(
-                "A luma lookup has one entry per level or none at all.",
-                nameof(lumaLookup));
-        }
-
-        var adjusted = lumaLookup.Length == 256;
+        var adjusted = ValidateBgra(source, destination, width, height, sourceStride, destinationStride, lumaLookup);
         var pairs = width / 2;
         for (var row = 0; row < height; row++)
         {
@@ -116,6 +98,77 @@ public static class PackedYuvConverter
                 WritePixel(write[((pair * 8) + 4)..], secondLuma, u, v, matrix);
             }
         }
+    }
+
+    /// <summary>
+    /// Writes <paramref name="height"/> rows of an HDR10 picture, carried as UYVY, into
+    /// <paramref name="destination"/> as BGRA for a standard display.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The picture still arrives as eight-bit UYVY, and that is deliberate: it is the only format that
+    /// receives the subtitle, measured on 2026-08-25 and written above. LibVLC's own conversion from
+    /// the ten-bit decode keeps the PQ signal as it is and drops two bits, so what reaches here is
+    /// HDR10 in BT.2020 at 220 luma steps — coarser than the source, and the right curve, where the
+    /// plain conversion showed it washed out and grey.
+    /// </para>
+    /// <para>
+    /// Per pixel: the BT.2020 matrix gives the PQ signal of each channel at ten-bit precision;
+    /// <paramref name="signal"/> turns each into light already rolled off for the display; BT.2087
+    /// changes the primaries to BT.709 on that light; and <paramref name="encode"/> writes it for
+    /// the display's gamma. Both tables come from <see cref="HdrToneCurve"/>, built once per film.
+    /// </para>
+    /// <para>
+    /// <b>The rows run in parallel</b>, which the plain conversion does not need: three table reads
+    /// and a change of primaries per pixel cost 49 ms for a 1080p frame on one thread, measured on
+    /// 2026-09-27, against the 41 ms a frame lasts at 24 per second. Arrays rather than spans for the
+    /// same reason — a span cannot be handed to the threads.
+    /// </para>
+    /// </remarks>
+    public static void UyvyToBgraToneMapped(
+        byte[] source,
+        byte[] destination,
+        int width,
+        int height,
+        int sourceStride,
+        int destinationStride,
+        YuvColourMatrix matrix,
+        float[] signal,
+        byte[] encode,
+        int[]? lumaLookup = null)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(destination);
+        ArgumentNullException.ThrowIfNull(signal);
+        ArgumentNullException.ThrowIfNull(encode);
+        var adjusted = ValidateBgra(source, destination, width, height, sourceStride, destinationStride, lumaLookup);
+        if (signal.Length != HdrToneCurve.SignalLevels || encode.Length != HdrToneCurve.EncodeLevels)
+        {
+            throw new ArgumentException(
+                "The tone tables have one entry per signal level and per encoding step.",
+                nameof(signal));
+        }
+
+        var pairs = width / 2;
+        _ = Parallel.For(0, height, ToneParallelism, row =>
+        {
+            ReadOnlySpan<byte> read = source.AsSpan(row * sourceStride, pairs * 4);
+            var write = destination.AsSpan(row * destinationStride, pairs * 8);
+            for (var pair = 0; pair < pairs; pair++)
+            {
+                var at = pair * 4;
+                var u = read[at] - 128;
+                var v = read[at + 2] - 128;
+                var firstLuma = adjusted
+                    ? PictureAdjustment.Quantise(lumaLookup![read[at + 1]]) - 16
+                    : read[at + 1] - 16;
+                var secondLuma = adjusted
+                    ? PictureAdjustment.Quantise(lumaLookup![read[at + 3]]) - 16
+                    : read[at + 3] - 16;
+                WriteToneMappedPixel(write[(pair * 8)..], firstLuma, u, v, matrix, signal, encode);
+                WriteToneMappedPixel(write[((pair * 8) + 4)..], secondLuma, u, v, matrix, signal, encode);
+            }
+        });
     }
 
     /// <summary>
@@ -203,6 +256,82 @@ public static class PackedYuvConverter
             }
         }
     }
+
+    /// <summary>The guards both BGRA conversions share; true when a luma table is to be applied.</summary>
+    private static bool ValidateBgra(
+        ReadOnlySpan<byte> source,
+        Span<byte> destination,
+        int width,
+        int height,
+        int sourceStride,
+        int destinationStride,
+        ReadOnlySpan<int> lumaLookup)
+    {
+        // The width is paired rather than merely positive: the format carries one chroma sample for
+        // every two pixels, so an odd width names a pixel with no partner. Refusing it here is what
+        // lets the loop be the loop and nothing else — the caller aligns first, and AlignWidth is the
+        // one place that decides how.
+        ArgumentOutOfRangeException.ThrowIfNotEqual(width, AlignWidth(width));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
+        ArgumentOutOfRangeException.ThrowIfLessThan(sourceStride, width * SourceBytesPerPixel);
+        ArgumentOutOfRangeException.ThrowIfLessThan(destinationStride, width * DestinationBytesPerPixel);
+        if (source.Length < sourceStride * height || destination.Length < destinationStride * height)
+        {
+            throw new ArgumentException(
+                "The conversion was given fewer rows than it was told to convert.",
+                nameof(source));
+        }
+
+        // A table of any other size is an indexed read off the end of it, which paints whatever
+        // follows in memory and does so differently every run. Empty means «leave the luma alone».
+        // Its entries are fixed point with PictureAdjustment.FractionBits of fraction, so the level
+        // written comes out of PictureAdjustment.Quantise and not out of a cast.
+        if (lumaLookup.Length is not (0 or 256))
+        {
+            throw new ArgumentException(
+                "A luma lookup has one entry per level or none at all.",
+                nameof(lumaLookup));
+        }
+
+        return lumaLookup.Length == 256;
+    }
+
+    /// <summary>
+    /// One pixel of the HDR path. The matrix works in the same fixed point as the standard one — a
+    /// level of 0 to 255 scaled by 256 — and instead of dropping the fraction the signal level is
+    /// rescaled to the table's 1023 steps, which keeps the two bits the shift would throw away.
+    /// </summary>
+    private static void WriteToneMappedPixel(
+        Span<byte> destination,
+        int luma,
+        int u,
+        int v,
+        YuvColourMatrix matrix,
+        float[] signal,
+        byte[] encode)
+    {
+        var scaled = matrix.Luma * luma;
+        var red = signal[SignalLevel(scaled + (matrix.RedFromV * v))];
+        var green = signal[SignalLevel(scaled - (matrix.GreenFromU * u) - (matrix.GreenFromV * v))];
+        var blue = signal[SignalLevel(scaled + (matrix.BlueFromU * u))];
+        var m = Gamut;
+        destination[0] = encode[EncodeStep((m[6] * red) + (m[7] * green) + (m[8] * blue))];
+        destination[1] = encode[EncodeStep((m[3] * red) + (m[4] * green) + (m[5] * blue))];
+        destination[2] = encode[EncodeStep((m[0] * red) + (m[1] * green) + (m[2] * blue))];
+        destination[3] = 255;
+    }
+
+    /// <summary>
+    /// 1023 / (255 × 256) as sixteen bits of fraction: 1027.01, so the one it drops moves no level by
+    /// more than a fiftieth of a step. A division here was the most expensive thing on the pixel.
+    /// </summary>
+    private const int SignalScale = 1027;
+
+    private static int SignalLevel(int scaled) =>
+        Math.Clamp(((scaled * SignalScale) + 32768) >> 16, 0, HdrToneCurve.SignalLevels - 1);
+
+    private static int EncodeStep(float light) =>
+        (int)((Math.Clamp(light, 0f, 1f) * (HdrToneCurve.EncodeLevels - 1)) + 0.5f);
 
     private static void WritePixel(Span<byte> destination, int luma, int u, int v, YuvColourMatrix matrix)
     {

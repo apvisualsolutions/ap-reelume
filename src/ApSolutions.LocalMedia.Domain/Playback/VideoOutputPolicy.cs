@@ -47,7 +47,10 @@ public sealed record VideoOutputDecision(
 }
 
 /// <summary>
-/// Chooses the output path from the real state of the source and the display. Hardware acceleration
+/// Chooses the output path from the real state of the source, the display and the output that draws
+/// the picture. The passthrough needs all three: a display with HDR on is not reached as HDR by an
+/// output that draws eight-bit standard range, and this application's own output is that one — it
+/// composes subtitles into a picture Skia draws as BGRA. Hardware acceleration
 /// is a request that may fail; failing changes only the decoder, never the output path, and never
 /// stops playback. Dolby Vision is answered with an explicit unsupported capability.
 /// </summary>
@@ -61,7 +64,8 @@ public static class VideoOutputPolicy
         VideoSourceCapabilities source,
         DisplayCapabilities display,
         bool hardwareRequested,
-        bool hardwareAvailable)
+        bool hardwareAvailable,
+        bool outputCarriesHdr)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(display);
@@ -75,7 +79,7 @@ public static class VideoOutputPolicy
             // Dolby Vision is tone mapped as ordinary HDR metadata would be, but the reason is
             // reported so the interface can say the format itself is out of scope.
             HdrFormat.DolbyVision => (VideoOutputPath.SdrToneMapped, (PlaybackFailureCode?)PlaybackFailureCode.UnsupportedCapability),
-            HdrFormat.Hdr10 when displayHdr => (VideoOutputPath.Hdr10Passthrough, null),
+            HdrFormat.Hdr10 when displayHdr && outputCarriesHdr => (VideoOutputPath.Hdr10Passthrough, null),
             HdrFormat.Hdr10 => (VideoOutputPath.SdrToneMapped, null),
             _ => (VideoOutputPath.Sdr, null),
         };

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using ApSolutions.LocalMedia.Domain.Playback;
+using ApSolutions.LocalMedia.Infrastructure.Media;
 using LibVLCSharp.Shared;
 using DomainMediaTrack = ApSolutions.LocalMedia.Domain.Playback.MediaTrack;
 using VlcMedia = LibVLCSharp.Shared.Media;
@@ -33,6 +34,9 @@ public sealed class LibVlcMediaPlayerEngine
     // Long enough for the quiescence window of this engine's media and of whatever else is resting
     // in the shared queue; short enough that a busy catalogue scan cannot hold up a shutdown.
     private static readonly TimeSpan ReleaseFlushCeiling = TimeSpan.FromSeconds(5);
+
+    // The display's encoding depends on nothing about the film, so one table serves every HDR10 one.
+    private static readonly byte[] ToneEncode = HdrToneCurve.BuildEncodeTable();
 
     // A near-unity threshold with a limiter-grade ratio: transparent below the ceiling, hard above
     // it. These mirror PeakLimiterAudioFilter, which is the managed reference implementation.
@@ -69,6 +73,8 @@ public sealed class LibVlcMediaPlayerEngine
     private YuvColourMatrix _frameMatrix;
     private PictureAdjustment _pictureAdjustment = PictureAdjustment.Neutral;
     private int[]? _lumaLookup;
+    private SourceColour _sourceColour = SourceColour.Undeclared;
+    private float[]? _toneSignal;
     private readonly OverlappedDctDenoiser _denoiser = new();
     private readonly DenoiseCadence _denoiseCadence = new();
     private long _lastFrameTimestamp;
@@ -157,6 +163,13 @@ public sealed class LibVlcMediaPlayerEngine
     /// </remarks>
     public bool CarriesPictureLookup => _lumaLookup is not null;
 
+    /// <summary>
+    /// Whether the open film is being brought down from HDR10 to standard range, which is the
+    /// difference between the curve it was graded with and the washed-out grey of reading PQ as if it
+    /// were BT.709. Like <see cref="CarriesPictureLookup"/>, invisible from outside without it.
+    /// </summary>
+    public bool CarriesToneMapping => _toneSignal is not null;
+
     /// <summary>Frames the decoder actually produced for the active media.</summary>
     public int DecodedFrameCount => Volatile.Read(ref _decodedFrameCount);
 
@@ -241,7 +254,13 @@ public sealed class LibVlcMediaPlayerEngine
                 }
 
                 _tracks = observed;
-                var source = LibVlcVideoCapabilities.Describe(media) with { Hdr = request.SourceHdr };
+                // LibVLC 3 says nothing about colour, so the declaration is read from the container
+                // itself. The tone table goes by the curve and not by the format: a Dolby Vision film
+                // whose base layer is HDR10 is still PQ, and still needs bringing down.
+                var colour = ContainerColourReader.Read(request.Path);
+                var source = LibVlcVideoCapabilities.WithDeclaredColour(LibVlcVideoCapabilities.Describe(media), colour);
+                _sourceColour = colour;
+                _toneSignal = colour.Hdr == HdrFormat.Hdr10 ? HdrToneCurve.BuildSignalTable(colour.MaxContentLight) : null;
 
                 // What the picture really measures, which is not what the video callback is handed:
                 // LibVLC asks for the decoder's aligned buffer — 1088 or 1090 rows for a picture of
@@ -260,7 +279,8 @@ public sealed class LibVlcMediaPlayerEngine
                         source,
                         _displays.GetCurrentDisplay(),
                         hardwareRequested: false,
-                        hardwareAvailable: false)
+                        hardwareAvailable: false,
+                        outputCarriesHdr: false)
                     .ToCapabilities();
                 _duration = media.Duration > 0 ? TimeSpan.FromMilliseconds(media.Duration) : null;
                 _mediaPlayer!.Media = media;
@@ -571,15 +591,32 @@ public sealed class LibVlcMediaPlayerEngine
             // two pixels of the same picture. Null is «nothing to apply», which is what the neutral
             // setting stores.
             var lookup = _lumaLookup;
-            PackedYuvConverter.UyvyToBgra(
-                packed,
-                managed,
-                _visibleWidth,
-                _visibleHeight,
-                _packedStride,
-                _frameStride,
-                _frameMatrix,
-                lookup ?? ReadOnlySpan<int>.Empty);
+            if (_toneSignal is { } signal)
+            {
+                PackedYuvConverter.UyvyToBgraToneMapped(
+                    packed,
+                    managed,
+                    _visibleWidth,
+                    _visibleHeight,
+                    _packedStride,
+                    _frameStride,
+                    _frameMatrix,
+                    signal,
+                    ToneEncode,
+                    lookup);
+            }
+            else
+            {
+                PackedYuvConverter.UyvyToBgra(
+                    packed,
+                    managed,
+                    _visibleWidth,
+                    _visibleHeight,
+                    _packedStride,
+                    _frameStride,
+                    _frameMatrix,
+                    lookup ?? ReadOnlySpan<int>.Empty);
+            }
             handler(this, new VideoFrameEventArgs(managed, _visibleWidth, _visibleHeight, _frameStride));
         });
 
@@ -657,7 +694,7 @@ public sealed class LibVlcMediaPlayerEngine
         // Once per playback and not once per frame, because the geometry is what decides and this is
         // where the geometry is settled. The height asked is the published one rather than the
         // decoder's aligned buffer: what a person sees is 1080 rows, not the 1088 LibVLC offered.
-        _frameMatrix = YuvMatrixPolicy.For(_visibleHeight);
+        _frameMatrix = YuvMatrixPolicy.For(_visibleHeight, _sourceColour);
 
         // A new film or a new size starts the noise reducer at its finest step again: what the last
         // one cost says nothing about this one.

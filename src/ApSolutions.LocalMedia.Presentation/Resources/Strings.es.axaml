@@ -389,7 +389,7 @@ SPDX-License-Identifier: LicenseRef-APSolutions
   <x:String x:Key="TransportBoostWarningText">El volumen supera el 100 %. El limitador de picos está activo para evitar distorsión.</x:String>
   <x:String x:Key="VideoStatusAccessibleName">Estado del vídeo</x:String>
   <x:String x:Key="VideoStatusHdrPassthrough">HDR10 directo a una pantalla compatible.</x:String>
-  <x:String x:Key="VideoStatusToneMapped">Fuente HDR convertida a SDR para esta pantalla.</x:String>
+  <x:String x:Key="VideoStatusToneMapped">Fuente HDR10 convertida a rango estándar para verse en esta pantalla.</x:String>
   <x:String x:Key="VideoStatusStandardRange">Rango dinámico estándar.</x:String>
   <x:String x:Key="VideoStatusHardware">Decodificación acelerada por hardware.</x:String>
   <x:String x:Key="VideoStatusSoftwareFallback">La aceleración por hardware no estaba disponible; se decodifica por software.</x:String>
