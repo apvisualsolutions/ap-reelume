@@ -76,6 +76,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 - Switching to another version of a film and choosing **Start again** now starts it from the
   beginning next time too: sometimes a minute of the previous version stayed stored.
+- Moving from one video to another, above all from a network folder, the next one no longer receives
+  the positions of the one being watched while it opens, so it cannot be left with a resume point
+  that is not its own.
 - Closing the application after watching a video no longer ends in a crash.
 - The player controls hide by themselves after three seconds without mouse movement while the film
   plays, and the pointer with them.

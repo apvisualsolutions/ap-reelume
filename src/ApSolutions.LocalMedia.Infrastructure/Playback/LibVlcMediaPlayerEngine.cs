@@ -797,12 +797,26 @@ public sealed class LibVlcMediaPlayerEngine
         StateChanged?.Invoke(this, new PlaybackStateChangedEventArgs(previous, next));
     }
 
-    private void OnTimeChanged(object? sender, MediaPlayerTimeChangedEventArgs args) =>
+    /// <remarks>
+    /// Nothing is announced while the engine is opening the next video. The one before goes on playing
+    /// until the new media is handed to the player, after the new file has been analysed, and every
+    /// position it reports in between belongs to it — while whoever listens is already the next
+    /// video's session. Measured on 2026-09-27: an opening of 304 ms let a position of the previous
+    /// video out, and a slower one seventeen of them; from a network share such openings are common.
+    /// </remarks>
+    private void OnTimeChanged(object? sender, MediaPlayerTimeChangedEventArgs args)
+    {
+        if (_state == PlaybackState.Opening)
+        {
+            return;
+        }
+
         PositionChanged?.Invoke(
             this,
             new PlaybackPositionChangedEventArgs(
                 TimeSpan.FromMilliseconds(Math.Max(0, args.Time)),
                 _duration));
+    }
 
     /// <summary>
     /// Raised on LibVLC's event thread, which must never call back into the player; the transition
