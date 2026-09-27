@@ -16,5 +16,5 @@ namespace ApSolutions.LocalMedia.Infrastructure.Updates;
 /// </remarks>
 public static class UpdateSigningKey
 {
-    public const string PublicKey = "RWRQ2KXP9uXn7h101YR8sVrCc4DzWuj+aVUiWAhQRy7jZ/bW+KOFGHHb";
+    public const string PublicKey = "RWTnzH0X9Phns/IIMorPQwevjzJTZz4hKIHLKshZY/vfi2iHm2gDvM+c";
 }
