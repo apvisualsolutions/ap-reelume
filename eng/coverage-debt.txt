@@ -75,7 +75,7 @@ src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbOptions.cs               
 src/ApSolutions.LocalMedia.Infrastructure/Metadata/TmdbRateLimiter.cs                    100  50
 src/ApSolutions.LocalMedia.Infrastructure/Playback/ExternalSubtitleDiscovery.cs           87  73
 src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcAudioOutputAdapter.cs            89  87
-src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs             93  80
+src/ApSolutions.LocalMedia.Infrastructure/Playback/LibVlcMediaPlayerEngine.cs             93  81
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/AllowlistedDiagnosticsBuilder.cs       100  83
 src/ApSolutions.LocalMedia.Infrastructure/Privacy/NetworkPurposeRegistry.cs              100  87
 src/ApSolutions.LocalMedia.Infrastructure/Settings/JsonSettingsStore.cs                   96  75
