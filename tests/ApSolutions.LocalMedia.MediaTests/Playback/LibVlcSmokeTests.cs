@@ -11,6 +11,7 @@ using Xunit;
 namespace ApSolutions.LocalMedia.MediaTests.Playback;
 
 [Trait("Category", "RealMedia")]
+[Collection(ProcessResourceSuites.Name)]
 public sealed class LibVlcSmokeTests
 {
     private const string H264Recipe =

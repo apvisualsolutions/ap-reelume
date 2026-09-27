@@ -28,6 +28,7 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 /// </para>
 /// </summary>
 [Trait("Category", "RealMedia")]
+[Collection(ProcessResourceSuites.Name)]
 public sealed class HandleGrowthTests
 {
     private const string PhaseVariable = "AP_LOCALMEDIA_HANDLE_PHASE";

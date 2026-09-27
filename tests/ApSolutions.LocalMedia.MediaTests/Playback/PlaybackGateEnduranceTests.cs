@@ -17,6 +17,7 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 /// and there must never be two engines or two sessions alive at once.
 /// </summary>
 [Trait("Category", "RealMedia")]
+[Collection(ProcessResourceSuites.Name)]
 public sealed class PlaybackGateEnduranceTests
 {
     private const int Cycles = 50;
