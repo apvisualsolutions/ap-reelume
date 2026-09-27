@@ -98,7 +98,8 @@ internal static class MediaToolchain
     public static async Task<string> EnsureSampleAsync(
         string relativePath,
         string arguments,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        TimeSpan? timeout = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(relativePath);
         ArgumentException.ThrowIfNullOrWhiteSpace(arguments);
@@ -114,8 +115,30 @@ internal static class MediaToolchain
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-            await RunAsync(encoder, $"-hide_banner -loglevel error -nostdin {arguments} \"{destination}\"", cancellationToken)
-                .ConfigureAwait(false);
+            var limit = timeout ?? DefaultGenerationTimeout;
+            try
+            {
+                await RunAsync(
+                        encoder,
+                        $"-hide_banner -loglevel error -nostdin {arguments} \"{destination}\"",
+                        limit,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (TimeoutException exception)
+            {
+                DeletePartial(destination);
+                throw new TimeoutException(
+                    $"The encoder was stopped after {limit} producing '{relativePath}', so the recipe "
+                    + $"never ends — a duration placed where it bounds only one input is the usual cause. Recipe: {arguments}",
+                    exception);
+            }
+            catch
+            {
+                DeletePartial(destination);
+                throw;
+            }
+
             if (!File.Exists(destination))
             {
                 throw new InvalidOperationException($"The encoder did not produce '{relativePath}'.");
@@ -129,7 +152,39 @@ internal static class MediaToolchain
         }
     }
 
-    private static async Task RunAsync(string fileName, string arguments, CancellationToken cancellationToken)
+    /// <summary>
+    /// Generous for samples of a few seconds, and short enough that a recipe with no end is stopped
+    /// long before it fills a disk: one wrote 13.9 GB into the working tree in 47 minutes.
+    /// </summary>
+    public static TimeSpan DefaultGenerationTimeout { get; } = TimeSpan.FromMinutes(5);
+
+    /// <summary>
+    /// A sample that exists with a non-zero length is reused as it is, so a half-written one left
+    /// behind would be read by every later run as a real sample.
+    /// </summary>
+    private static void DeletePartial(string destination)
+    {
+        if (File.Exists(destination))
+        {
+            File.Delete(destination);
+        }
+    }
+
+    /// <summary>
+    /// Runs the encoder and waits for it, killing it — with anything it started — when the time is up
+    /// or the caller cancels.
+    /// </summary>
+    /// <remarks>
+    /// The streams are read without the token on purpose: a read from a process pipe does not answer
+    /// a cancellation on Windows, so the earlier version, which read with the token, went on waiting
+    /// while the encoder went on writing. The wait is what gets cancelled, and the kill is what ends
+    /// the reads.
+    /// </remarks>
+    private static async Task RunAsync(
+        string fileName,
+        string arguments,
+        TimeSpan timeout,
+        CancellationToken cancellationToken)
     {
         using var process = new Process
         {
@@ -143,8 +198,26 @@ internal static class MediaToolchain
         };
 
         _ = process.Start();
-        var error = await process.StandardError.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
-        await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+        var output = process.StandardOutput.ReadToEndAsync(CancellationToken.None);
+        var errorRead = process.StandardError.ReadToEndAsync(CancellationToken.None);
+
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        deadline.CancelAfter(timeout);
+        try
+        {
+            await process.WaitForExitAsync(deadline.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            process.Kill(entireProcessTree: true);
+            await process.WaitForExitAsync(CancellationToken.None).ConfigureAwait(false);
+            await Task.WhenAll(output, errorRead).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            throw new TimeoutException();
+        }
+
+        _ = await output.ConfigureAwait(false);
+        var error = await errorRead.ConfigureAwait(false);
         if (process.ExitCode != 0)
         {
             throw new InvalidOperationException($"Encoder failed with exit code {process.ExitCode}: {error}");
