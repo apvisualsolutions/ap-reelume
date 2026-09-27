@@ -63,7 +63,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
   texto está en [LICENSE](../LICENSE).
 - **El motor de vídeo se compila sin código GPL**, a partir de la misma versión de VLC, y reproduce
   los mismos formatos que antes, subtítulos incluidos. Los avisos de terceros y los textos de todas
-  las licencias viajan dentro del paquete.
+  las licencias viajan dentro del paquete, incluidos los de las 71 bibliotecas que el motor lleva
+  dentro —FFmpeg, FreeType, libass y las demás—, cada una con su propio texto.
 - **La valoración es de cinco estrellas.**
 - **La biblioteca estira las portadas hasta llenar cada fila**, y las pantallas siguen el diseño de la
   aplicación: iconos, botones, menús y marcas sobre las portadas.

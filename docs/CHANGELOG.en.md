@@ -61,7 +61,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   with. The text is in [LICENSE](../LICENSE).
 - **The video engine is built without GPL code**, from the same VLC version, and plays the same
   formats as before, subtitles included. The third-party notices and the text of every licence
-  travel inside the package.
+  travel inside the package, including those of the 71 libraries the engine carries inside it —
+  FFmpeg, FreeType, libass and the rest — each with its own text.
 - **Ratings are five stars.**
 - **The library stretches its covers to fill each row**, and the screens follow the application's
   design: icons, buttons, menus and the marks over covers.

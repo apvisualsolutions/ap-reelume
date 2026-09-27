@@ -28,6 +28,7 @@ copyright. Nombrar el componente en una tabla no es ninguna de las dos cosas.
 | `NOTICE-SQLite.txt` | Copia literal del paquete | SQLite (dominio público) |
 | `NOTICE-SQLitePCLRaw.txt` | Aviso compuesto | SQLitePCLRaw |
 | `NOTICE-VideoLAN.txt` | Aviso compuesto | LibVLC y sus plugins |
+| `NOTICE-LibVLC-contribs.txt` | Textos literales del archivo de fuentes de cada biblioteca | Las 71 bibliotecas de terceros enlazadas dentro de los plugins de LibVLC: FFmpeg, FreeType, libass, dav1d y las demás |
 
 No hay texto de una licencia de catálogo para el propio programa: su licencia del propio programa viaja como `LICENSE` en la raíz del paquete,
 que es donde se busca.
@@ -50,6 +51,10 @@ fuente que ya lo distribuía y se contrastó con una segunda copia independiente
 - **BSD-3-Clause**: del mismo directorio SPDX. Su reproducción con titular concreto es
   `NOTICE-ANGLE.txt`, que es el archivo que el propio paquete de ANGLE publica.
 - **MIT**: el texto canónico, con los avisos de copyright que cada paquete declara en sus metadatos.
+- **Las bibliotecas de dentro de LibVLC**: cada texto de `NOTICE-LibVLC-contribs.txt` se extrajo del
+  archivo de la propia biblioteca dentro del `-source.tar` del motor, en la ruta que nombra su
+  apartado. Qué bibliotecas viajan, y con qué licencia, es `eng/libvlc/contrib-licences.json`, leído
+  de esos archivos y de los binarios publicados el 2026-09-27.
 
 Las copias literales se toman del paquete NuGet restaurado, no se transcriben.
 `LicenceTextTests` las compara byte a byte contra el paquete que la compilación consumió, de modo que

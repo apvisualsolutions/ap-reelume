@@ -28,6 +28,7 @@ reproduced. Naming the component in a table is neither of those.
 | `NOTICE-SQLite.txt` | Verbatim copy from the package | SQLite (public domain) |
 | `NOTICE-SQLitePCLRaw.txt` | Assembled notice | SQLitePCLRaw |
 | `NOTICE-VideoLAN.txt` | Assembled notice | LibVLC and its plugins |
+| `NOTICE-LibVLC-contribs.txt` | Verbatim texts from each library's own source archive | The 71 third-party libraries linked inside the LibVLC plugins: FFmpeg, FreeType, libass, dav1d and the rest |
 
 There is no catalogue licence text for the program itself: its own licence travels as `LICENSE` at the root of the package,
 which is where anyone looks for it.
@@ -51,6 +52,10 @@ that already distributed it and contrasted with a second, independent copy befor
 - **BSD-3-Clause**: from the same SPDX directory. Its reproduction with a concrete holder is
   `NOTICE-ANGLE.txt`, which is the file ANGLE's own package publishes.
 - **MIT**: the canonical text, with the copyright notice each package declares in its metadata.
+- **The libraries inside LibVLC**: every text in `NOTICE-LibVLC-contribs.txt` was extracted from the
+  library's own archive in the engine's `-source.tar`, at the path its section names. Which libraries
+  ship, and under which licence, is `eng/libvlc/contrib-licences.json`, read from those archives and
+  from the published binaries on 2026-09-27.
 
 Verbatim copies are taken from the restored NuGet package, never transcribed. `LicenceTextTests`
 compares them byte for byte against the package the build consumed, so a version bump that changes a

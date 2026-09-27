@@ -123,6 +123,11 @@ jobs:
             fi
           done
 
+          # The notice of the libraries inside the engine is written from eng/libvlc/contrib-licences.json,
+          # read from one build. A build that fetched one more source, or one fewer, would publish an
+          # engine that notice does not describe, so it stops here, before anything is uploaded.
+          pwsh -NoProfile -File eng/libvlc/check-contrib-licences.ps1 -Tarballs "$S/contrib-tarballs"
+
           url=$(jq -r '.sources[] | select(.name=="vlc") | .url' eng/corresponding-source.json)
           sum=$(jq -r '.sources[] | select(.name=="vlc") | .sha256' eng/corresponding-source.json)
           vlc=$(basename "$url")

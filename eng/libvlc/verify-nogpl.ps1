@@ -96,6 +96,11 @@ foreach ($name in 'LGPL-2.1.txt', 'LGPL-3.0.txt', 'GPL-3.0.txt') {
     Copy-Item $text $licencesOut
 }
 Copy-Item (Join-Path $PSScriptRoot 'NOTICE.txt') $licencesOut
+# And the texts of the third-party libraries linked inside the plugins, which the three licences above
+# do not cover: forty of them ask for their own copyright notice to travel with the binary.
+$contribs = Join-Path $licencesIn 'NOTICE-LibVLC-contribs.txt'
+if (-not (Test-Path $contribs)) { throw "The notice '$contribs' is missing: the tree cannot be published without it." }
+Copy-Item $contribs $licencesOut
 # Only the DLLs travel: import libraries, libtool files and a plugin cache that would list plugins
 # this script is about to remove.
 Get-ChildItem (Join-Path $Destination 'plugins') -Recurse -File |

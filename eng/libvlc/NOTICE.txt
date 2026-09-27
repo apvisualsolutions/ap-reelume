@@ -13,6 +13,8 @@ Licences
                                    Copyright (C) 2017 3D Sound Labs
   GMP, Nettle and LIVE555, linked  LGPL-3.0, which adds to   licenses/LGPL-3.0.txt
   inside five of the plugins       the terms of the GPL-3.0   licenses/GPL-3.0.txt
+  Every third-party library        each its own, permissive   licenses/NOTICE-LibVLC-contribs.txt
+  linked inside the plugins        or LGPL                    (their own texts, verbatim)
 
 No plugin in this tree is under the GPL. The corresponding source of this tree - VLC at the tag it
 was built from, the patches and scripts that built it, and every third-party source the build

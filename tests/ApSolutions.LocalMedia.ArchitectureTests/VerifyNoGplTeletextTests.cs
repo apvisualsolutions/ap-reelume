@@ -164,7 +164,7 @@ public sealed class VerifyNoGplTeletextTests
         var (exitCode, output) = scene.Verify();
         Assert.True(exitCode == 0, output);
 
-        string[] expected = ["licenses/GPL-3.0.txt", "licenses/LGPL-2.1.txt", "licenses/LGPL-3.0.txt", "licenses/NOTICE.txt"];
+        string[] expected = ["licenses/GPL-3.0.txt", "licenses/LGPL-2.1.txt", "licenses/LGPL-3.0.txt", "licenses/NOTICE-LibVLC-contribs.txt", "licenses/NOTICE.txt"];
         using var manifest = JsonDocument.Parse(File.ReadAllText(scene.ManifestPath));
         var listed = manifest.RootElement.GetProperty("files").EnumerateArray()
             .Select(entry => entry.GetProperty("path").GetString()!)

@@ -1,0 +1,638 @@
+{
+  "comment": [
+    "Every third-party source the LibVLC build fetched (contrib/tarballs, as published in the -source.tar asset),",
+    "whether it ends up in the shipped tree, and the licence read from its own text. check-contrib-licences.ps1",
+    "refuses a build that fetched anything this list does not name, and NOTICE-LibVLC-contribs.txt carries the text",
+    "of every entry that ships. «headers-only» is code compiled in from headers without a library behind it."
+  ],
+  "engine": "libvlc-3.0.23-nogpl.3",
+  "sources": [
+    {
+      "tarball": "libpng-1.6.50.tar.xz",
+      "name": "libpng",
+      "version": "1.6.50",
+      "licence": "libpng-2.0",
+      "ships": "yes",
+      "text": "libpng-1.6.50.tar.xz:libpng-1.6.50/LICENSE"
+    },
+    {
+      "tarball": "mfx-7efc7505465bc1f16fbd1da3d24aa5bd9d46c5ca.tar.xz",
+      "name": "mfx (Intel Media SDK dispatcher)",
+      "version": "git 7efc7505465bc1f16fbd1da3d24aa5bd9d46c5ca",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "mfx-7efc7505465bc1f16fbd1da3d24aa5bd9d46c5ca.tar.xz:mfx-7efc7505465bc1f16fbd1da3d24aa5bd9d46c5ca/LICENSE"
+    },
+    {
+      "tarball": "nettle-3.7.3.tar.gz",
+      "name": "nettle",
+      "version": "3.7.3",
+      "licence": "LGPL-3.0-or-later OR GPL-2.0-or-later",
+      "ships": "yes",
+      "text": "nettle-3.7.3.tar.gz:nettle-3.7.3/COPYING.LESSERv3"
+    },
+    {
+      "tarball": "speexdsp-1.2.1.tar.gz",
+      "name": "speexdsp",
+      "version": "1.2.1",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "speexdsp-1.2.1.tar.gz:speexdsp-1.2.1/COPYING"
+    },
+    {
+      "tarball": "libmodplug-0.8.9.0.tar.gz",
+      "name": "libmodplug",
+      "version": "0.8.9.0",
+      "licence": "LicenseRef-PublicDomain",
+      "ships": "yes",
+      "text": "libmodplug-0.8.9.0.tar.gz:libmodplug-0.8.9.0/COPYING"
+    },
+    {
+      "tarball": "chromaprint-1.4.2.tar.gz",
+      "name": "chromaprint",
+      "version": "1.4.2",
+      "licence": "MIT AND LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "chromaprint-1.4.2.tar.gz:chromaprint-1.4.2/LICENSE.md"
+    },
+    {
+      "tarball": "mingw-w64-v10.0.0.tar.bz2",
+      "name": "mingw-w64 (winpthreads, dxva.h and dxvahd.h)",
+      "version": "v10.0.0",
+      "licence": "MIT AND BSD-3-Clause AND LGPL-2.1-or-later",
+      "ships": "yes",
+      "reason": "winpthreads is linked into eight x64 plugins; dxva.h and dxvahd.h, which come from Wine under LGPL-2.1-or-later, are compiled in as headers. On ARM64 winpthreads comes from the toolchain, not from this tarball",
+      "text": "mingw-w64-v10.0.0.tar.bz2:mingw-w64-v10.0.0/mingw-w64-libraries/winpthreads/COPYING"
+    },
+    {
+      "tarball": "ffmpeg-4.4.5.tar.xz",
+      "name": "FFmpeg (libavcodec, libavformat, libavutil, libswscale)",
+      "version": "4.4.5",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "ffmpeg-4.4.5.tar.xz:ffmpeg-4.4.5/LICENSE.md"
+    },
+    {
+      "tarball": "regex-0.13.tar.gz",
+      "name": "GNU regex",
+      "version": "0.13",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "regex-0.13.tar.gz:regex-0.13/COPYING.LIB"
+    },
+    {
+      "tarball": "qt-5.6.3.tar.xz",
+      "name": "Qt (qtbase)",
+      "version": "5.6.3",
+      "licence": "LGPL-2.1-only OR LGPL-3.0-only OR GPL-3.0-only",
+      "ships": "no",
+      "reason": "VLC is built without its Qt interface (build.sh -z)"
+    },
+    {
+      "tarball": "libarchive-3.8.0.tar.gz",
+      "name": "libarchive",
+      "version": "3.8.0",
+      "licence": "BSD-2-Clause",
+      "ships": "yes",
+      "text": "libarchive-3.8.0.tar.gz:libarchive-3.8.0/COPYING"
+    },
+    {
+      "tarball": "libdvbpsi-1.3.3.tar.bz2",
+      "name": "libdvbpsi",
+      "version": "1.3.3",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "libdvbpsi-1.3.3.tar.bz2:libdvbpsi-1.3.3/COPYING"
+    },
+    {
+      "tarball": "protobuf-3.1.0-cpp.tar.gz",
+      "name": "protobuf (protobuf-lite)",
+      "version": "3.1.0",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "protobuf-3.1.0-cpp.tar.gz:protobuf-3.1.0/LICENSE"
+    },
+    {
+      "tarball": "libssh2-1.10.0.tar.gz",
+      "name": "libssh2",
+      "version": "1.10.0",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "libssh2-1.10.0.tar.gz:libssh2-1.10.0/COPYING"
+    },
+    {
+      "tarball": "x86_64/fluidlite-238997654efb20e736512847f3f5f6d618de9423.tar.xz",
+      "name": "FluidLite (x64 archive)",
+      "version": "git 238997654efb20e736512847f3f5f6d618de9423",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "x86_64/fluidlite-238997654efb20e736512847f3f5f6d618de9423.tar.xz:fluidlite-238997654efb20e736512847f3f5f6d618de9423/LICENSE"
+    },
+    {
+      "tarball": "libgpg-error-1.27.tar.bz2",
+      "name": "libgpg-error",
+      "version": "1.27",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "libgpg-error-1.27.tar.bz2:libgpg-error-1.27/COPYING.LIB"
+    },
+    {
+      "tarball": "fontconfig-2.12.3.tar.gz",
+      "name": "fontconfig",
+      "version": "2.12.3",
+      "licence": "HPND-sell-variant",
+      "ships": "yes",
+      "text": "fontconfig-2.12.3.tar.gz:fontconfig-2.12.3/COPYING"
+    },
+    {
+      "tarball": "SDL-1.2.15.tar.gz",
+      "name": "SDL",
+      "version": "1.2.15",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "SDL-1.2.15.tar.gz:SDL-1.2.15/COPYING"
+    },
+    {
+      "tarball": "dav1d-1.5.1.tar.xz",
+      "name": "dav1d",
+      "version": "1.5.1",
+      "licence": "BSD-2-Clause",
+      "ships": "yes",
+      "text": "dav1d-1.5.1.tar.xz:dav1d-1.5.1/COPYING"
+    },
+    {
+      "tarball": "libgcrypt-1.10.1.tar.bz2",
+      "name": "libgcrypt",
+      "version": "1.10.1",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "libgcrypt-1.10.1.tar.bz2:libgcrypt-1.10.1/COPYING.LIB"
+    },
+    {
+      "tarball": "libvpx-1.15.2.tar.gz",
+      "name": "libvpx",
+      "version": "1.15.2",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "libvpx-1.15.2.tar.gz:libvpx-1.15.2/LICENSE"
+    },
+    {
+      "tarball": "libebml-1.4.3.tar.xz",
+      "name": "libebml",
+      "version": "1.4.3",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "libebml-1.4.3.tar.xz:libebml-1.4.3/LICENSE.LGPL"
+    },
+    {
+      "tarball": "twolame-0.4.0.tar.gz",
+      "name": "TwoLAME",
+      "version": "0.4.0",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "twolame-0.4.0.tar.gz:twolame-0.4.0/COPYING"
+    },
+    {
+      "tarball": "libcddb-1.3.2.tar.bz2",
+      "name": "libcddb",
+      "version": "1.3.2",
+      "licence": "LGPL-2.0-or-later",
+      "ships": "yes",
+      "text": "libcddb-1.3.2.tar.bz2:libcddb-1.3.2/COPYING"
+    },
+    {
+      "tarball": "AMF-1.4.34.tar.gz",
+      "name": "AMD AMF (headers)",
+      "version": "1.4.34",
+      "licence": "MIT",
+      "ships": "headers-only",
+      "reason": "x64 only: its headers are compiled into the Direct3D 11 plugins, which load AMD's runtime if present; no AMD library is distributed",
+      "text": "AMF-1.4.34.tar.gz:AMF/core/Factory.h (lines 1-32)"
+    },
+    {
+      "tarball": "taglib-1.13.1.tar.gz",
+      "name": "TagLib",
+      "version": "1.13.1",
+      "licence": "LGPL-2.1-only OR MPL-1.1",
+      "ships": "yes",
+      "text": "taglib-1.13.1.tar.gz:taglib-1.13.1/COPYING.LGPL"
+    },
+    {
+      "tarball": "game-music-emu-0.6.3.tar.gz",
+      "name": "Game_Music_Emu (libgme)",
+      "version": "0.6.3",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "game-music-emu-0.6.3.tar.gz:game-music-emu-0.6.3/license.txt"
+    },
+    {
+      "tarball": "libmysofa-0.5.tar.gz",
+      "name": "libmysofa",
+      "version": "0.5",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "libmysofa-0.5.tar.gz:libmysofa-0.5/LICENSE"
+    },
+    {
+      "tarball": "flac-1.3.4.tar.xz",
+      "name": "FLAC (libFLAC)",
+      "version": "1.3.4",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "flac-1.3.4.tar.xz:flac-1.3.4/COPYING.Xiph"
+    },
+    {
+      "tarball": "libaom-3.5.0.tar.gz",
+      "name": "libaom",
+      "version": "3.5.0",
+      "licence": "BSD-2-Clause",
+      "ships": "yes",
+      "text": "libaom-3.5.0.tar.gz:libaom-3.5.0/LICENSE"
+    },
+    {
+      "tarball": "libgsm_1.0.13.tar.gz",
+      "name": "libgsm",
+      "version": "1.0.13",
+      "licence": "TU-Berlin-1.0",
+      "ships": "yes",
+      "text": "libgsm_1.0.13.tar.gz:gsm-1.0-pl13/COPYRIGHT"
+    },
+    {
+      "tarball": "gettext-0.22.5.tar.gz",
+      "name": "GNU gettext",
+      "version": "0.22.5",
+      "licence": "LGPL-2.1-or-later AND GPL-3.0-or-later",
+      "ships": "no",
+      "reason": "native language support is off: no libintl code in the binaries"
+    },
+    {
+      "tarball": "musepack_src_r481.tar.gz",
+      "name": "Musepack (libmpcdec)",
+      "version": "r481",
+      "licence": "BSD-3-Clause",
+      "ships": "no",
+      "reason": "built with --disable-mpc"
+    },
+    {
+      "tarball": "libmatroska-1.7.0.tar.xz",
+      "name": "libmatroska",
+      "version": "1.7.0",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "libmatroska-1.7.0.tar.xz:libmatroska-1.7.0/LICENSE.LGPL"
+    },
+    {
+      "tarball": "speex-1.2.1.tar.gz",
+      "name": "Speex",
+      "version": "1.2.1",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "speex-1.2.1.tar.gz:speex-1.2.1/COPYING"
+    },
+    {
+      "tarball": "jpegsrc.v9b.tar.gz",
+      "name": "IJG libjpeg",
+      "version": "9b",
+      "licence": "IJG",
+      "ships": "yes",
+      "text": "jpegsrc.v9b.tar.gz:jpeg-9b/README (lines 99-162)"
+    },
+    {
+      "tarball": "wix3.5.2519.0.zip",
+      "name": "WiX Toolset (wixlzx)",
+      "version": "3.5.2519.0",
+      "licence": "CPL-1.0",
+      "ships": "no",
+      "reason": "a tool for MSI packaging; nothing of it is linked"
+    },
+    {
+      "tarball": "orc-0.4.33.tar.bz2",
+      "name": "Orc",
+      "version": "0.4.33",
+      "licence": "BSD-2-Clause AND BSD-3-Clause",
+      "ships": "yes",
+      "text": "orc-0.4.33.tar.bz2:orc-0.4.33/COPYING"
+    },
+    {
+      "tarball": "crystalhd_lgpl_includes_v1.zip",
+      "name": "Broadcom Crystal HD (headers)",
+      "version": "v1",
+      "licence": "LGPL-2.1-only",
+      "ships": "headers-only",
+      "reason": "its headers are compiled into the Crystal HD plugin, which loads Broadcom's runtime if present; no Broadcom library is distributed",
+      "text": "crystalhd_lgpl_includes_v1.zip:bc_dts_defs.h (lines 1-21)"
+    },
+    {
+      "tarball": "schroedinger-1.0.11.tar.gz",
+      "name": "Schroedinger",
+      "version": "1.0.11",
+      "licence": "MPL-1.1 OR LGPL-2.0-only OR GPL-2.0-only OR MIT",
+      "ships": "yes",
+      "text": "schroedinger-1.0.11.tar.gz:schroedinger-1.0.11/COPYING"
+    },
+    {
+      "tarball": "pupnp-release-1.14.13.tar.gz",
+      "name": "pupnp (libupnp)",
+      "version": "1.14.13",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "pupnp-release-1.14.13.tar.gz:pupnp-release-1.14.13/COPYING"
+    },
+    {
+      "tarball": "live.2016.11.28.tar.gz",
+      "name": "LIVE555 Streaming Media",
+      "version": "2016.11.28",
+      "licence": "LGPL-3.0-or-later",
+      "ships": "yes",
+      "text": "live.2016.11.28.tar.gz:live/COPYING.LESSER"
+    },
+    {
+      "tarball": "tiff-4.0.9.tar.gz",
+      "name": "libtiff",
+      "version": "4.0.9",
+      "licence": "libtiff",
+      "ships": "yes",
+      "text": "tiff-4.0.9.tar.gz:tiff-4.0.9/COPYRIGHT"
+    },
+    {
+      "tarball": "libiconv-1.17.tar.gz",
+      "name": "GNU libiconv",
+      "version": "1.17",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "libiconv-1.17.tar.gz:libiconv-1.17/COPYING.LIB"
+    },
+    {
+      "tarball": "libxml2-2.9.14.tar.xz",
+      "name": "libxml2",
+      "version": "2.9.14",
+      "licence": "MIT",
+      "ships": "yes",
+      "text": "libxml2-2.9.14.tar.xz:libxml2-2.9.14/Copyright"
+    },
+    {
+      "tarball": "opus-1.3.tar.gz",
+      "name": "Opus",
+      "version": "1.3",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "opus-1.3.tar.gz:opus-1.3/COPYING"
+    },
+    {
+      "tarball": "gmp-6.3.0.tar.xz",
+      "name": "GNU MP",
+      "version": "6.3.0",
+      "licence": "LGPL-3.0-or-later OR GPL-2.0-or-later",
+      "ships": "yes",
+      "text": "gmp-6.3.0.tar.xz:gmp-6.3.0/COPYING.LESSERv3"
+    },
+    {
+      "tarball": "wix3.14.1.8722.zip",
+      "name": "WiX Toolset",
+      "version": "3.14.1.8722",
+      "licence": "MS-RL",
+      "ships": "no",
+      "reason": "a tool for MSI packaging; nothing of it is linked"
+    },
+    {
+      "tarball": "freetype-2.13.1.tar.xz",
+      "name": "FreeType",
+      "version": "2.13.1",
+      "licence": "FTL OR GPL-2.0-or-later",
+      "ships": "yes",
+      "text": "freetype-2.13.1.tar.xz:freetype-2.13.1/LICENSE.TXT"
+    },
+    {
+      "tarball": "goom-2k4-0-src.tar.gz",
+      "name": "Goom",
+      "version": "2k4-0",
+      "licence": "LicenseRef-LGPL-unversioned",
+      "ships": "yes",
+      "text": "goom-2k4-0-src.tar.gz:goom2k4-0/COPYING"
+    },
+    {
+      "tarball": "gnutls-3.8.10.tar.xz",
+      "name": "GnuTLS",
+      "version": "3.8.10",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "gnutls-3.8.10.tar.xz:gnutls-3.8.10/COPYING.LESSERv2"
+    },
+    {
+      "tarball": "lame-3.100.tar.gz",
+      "name": "LAME (libmp3lame)",
+      "version": "3.100",
+      "licence": "LGPL-2.0-or-later",
+      "ships": "yes",
+      "text": "lame-3.100.tar.gz:lame-3.100/COPYING"
+    },
+    {
+      "tarball": "mpg123-1.30.1.tar.bz2",
+      "name": "mpg123 (libmpg123)",
+      "version": "1.30.1",
+      "licence": "LGPL-2.1-only",
+      "ships": "yes",
+      "text": "mpg123-1.30.1.tar.bz2:mpg123-1.30.1/COPYING"
+    },
+    {
+      "tarball": "libogg-1.3.6.tar.xz",
+      "name": "libogg",
+      "version": "1.3.6",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "libogg-1.3.6.tar.xz:libogg-1.3.6/COPYING"
+    },
+    {
+      "tarball": "zlib-1.3.1.tar.xz",
+      "name": "zlib",
+      "version": "1.3.1",
+      "licence": "Zlib",
+      "ships": "yes",
+      "text": "zlib-1.3.1.tar.xz:zlib-1.3.1/LICENSE"
+    },
+    {
+      "tarball": "libvorbis-1.3.6.tar.xz",
+      "name": "libvorbis",
+      "version": "1.3.6",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "libvorbis-1.3.6.tar.xz:libvorbis-1.3.6/COPYING"
+    },
+    {
+      "tarball": "srt-1.5.3.tar.gz",
+      "name": "SRT (libsrt)",
+      "version": "1.5.3",
+      "licence": "MPL-2.0",
+      "ships": "yes",
+      "text": "srt-1.5.3.tar.gz:srt-1.5.3/LICENSE"
+    },
+    {
+      "tarball": "libcaca-0.99.beta20.tar.gz",
+      "name": "libcaca",
+      "version": "0.99.beta20",
+      "licence": "WTFPL",
+      "ships": "yes",
+      "text": "libcaca-0.99.beta20.tar.gz:libcaca-0.99.beta20/COPYING"
+    },
+    {
+      "tarball": "libbluray-1.4.0.tar.xz",
+      "name": "libbluray",
+      "version": "1.4.0",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "libbluray-1.4.0.tar.xz:libbluray-1.4.0/COPYING"
+    },
+    {
+      "tarball": "lua-5.1.5.tar.gz",
+      "name": "Lua",
+      "version": "5.1.5",
+      "licence": "MIT",
+      "ships": "no",
+      "reason": "built with --disable-lua"
+    },
+    {
+      "tarball": "microdns-0.1.2.tar.xz",
+      "name": "libmicrodns",
+      "version": "0.1.2",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "microdns-0.1.2.tar.xz:microdns-0.1.2/COPYING"
+    },
+    {
+      "tarball": "libtheora-1.1.1.tar.xz",
+      "name": "libtheora",
+      "version": "1.1.1",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "libtheora-1.1.1.tar.xz:libtheora-1.1.1/COPYING"
+    },
+    {
+      "tarball": "fribidi-1.0.12.tar.xz",
+      "name": "GNU FriBidi",
+      "version": "1.0.12",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "fribidi-1.0.12.tar.xz:fribidi-1.0.12/COPYING"
+    },
+    {
+      "tarball": "aribb25-0.2.7.tar.gz",
+      "name": "libaribb25",
+      "version": "0.2.7",
+      "licence": "ISC",
+      "ships": "yes",
+      "text": "aribb25-0.2.7.tar.gz:aribb25-0.2.7/LICENCE"
+    },
+    {
+      "tarball": "spatialaudio-0.3.0.tar.bz2",
+      "name": "libspatialaudio",
+      "version": "0.3.0",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "spatialaudio-0.3.0.tar.bz2:spatialaudio-0.3.0/LICENSE"
+    },
+    {
+      "tarball": "libnfs-5.0.1.tar.gz",
+      "name": "libnfs",
+      "version": "5.0.1",
+      "licence": "LGPL-2.1-or-later AND BSD-2-Clause",
+      "ships": "yes",
+      "text": "libnfs-5.0.1.tar.gz:libnfs-libnfs-5.0.1/COPYING"
+    },
+    {
+      "tarball": "asdcplib-2.7.19.tar.gz",
+      "name": "asdcplib",
+      "version": "2.7.19",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "asdcplib-2.7.19.tar.gz:asdcplib-2.7.19/COPYING"
+    },
+    {
+      "tarball": "harfbuzz-11.5.0.tar.xz",
+      "name": "HarfBuzz",
+      "version": "11.5.0",
+      "licence": "MIT-Modern-Variant AND MIT",
+      "ships": "yes",
+      "text": "harfbuzz-11.5.0.tar.xz:harfbuzz-11.5.0/COPYING"
+    },
+    {
+      "tarball": "libass-0.17.3.tar.gz",
+      "name": "libass",
+      "version": "0.17.3",
+      "licence": "ISC",
+      "ships": "yes",
+      "text": "libass-0.17.3.tar.gz:libass-0.17.3/COPYING"
+    },
+    {
+      "tarball": "libplacebo-0.2.1.tar.gz",
+      "name": "libplacebo",
+      "version": "0.2.1",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "libplacebo-0.2.1.tar.gz:libplacebo-0.2.1/LICENSE"
+    },
+    {
+      "tarball": "libshout-2.4.1.tar.gz",
+      "name": "libshout",
+      "version": "2.4.1",
+      "licence": "LGPL-2.0-or-later",
+      "ships": "yes",
+      "text": "libshout-2.4.1.tar.gz:libshout-2.4.1/COPYING"
+    },
+    {
+      "tarball": "SDL_image-1.2.12.tar.gz",
+      "name": "SDL_image",
+      "version": "1.2.12",
+      "licence": "Zlib",
+      "ships": "yes",
+      "text": "SDL_image-1.2.12.tar.gz:SDL_image-1.2.12/COPYING"
+    },
+    {
+      "tarball": "libkate-0.4.1.tar.gz",
+      "name": "libkate",
+      "version": "0.4.1",
+      "licence": "BSD-3-Clause",
+      "ships": "yes",
+      "text": "libkate-0.4.1.tar.gz:libkate-0.4.1/COPYING"
+    },
+    {
+      "tarball": "qtsvg-5.6.3.tar.xz",
+      "name": "Qt SVG",
+      "version": "5.6.3",
+      "licence": "LGPL-2.1-only OR LGPL-3.0-only OR GPL-3.0-only",
+      "ships": "no",
+      "reason": "VLC is built without its Qt interface (build.sh -z)"
+    },
+    {
+      "tarball": "glew-2.1.0.tgz",
+      "name": "GLEW",
+      "version": "2.1.0",
+      "licence": "BSD-3-Clause AND MIT",
+      "ships": "yes",
+      "text": "glew-2.1.0.tgz:glew-2.1.0/LICENSE.txt"
+    },
+    {
+      "tarball": "projectM-2.0.1-Source.tar.gz",
+      "name": "projectM (libprojectM)",
+      "version": "2.0.1",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "projectM-2.0.1-Source.tar.gz:projectM-2.0.1-Source/COPYING"
+    },
+    {
+      "tarball": "openjpeg-2.5.0.tar.gz",
+      "name": "OpenJPEG",
+      "version": "2.5.0",
+      "licence": "BSD-2-Clause",
+      "ships": "yes",
+      "text": "openjpeg-2.5.0.tar.gz:openjpeg-2.5.0/LICENSE"
+    },
+    {
+      "tarball": "aarch64/fluidlite-238997654efb20e736512847f3f5f6d618de9423.tar.xz",
+      "name": "FluidLite (ARM64 archive)",
+      "version": "git 238997654efb20e736512847f3f5f6d618de9423",
+      "licence": "LGPL-2.1-or-later",
+      "ships": "yes",
+      "text": "aarch64/fluidlite-238997654efb20e736512847f3f5f6d618de9423.tar.xz:fluidlite-238997654efb20e736512847f3f5f6d618de9423/LICENSE"
+    }
+  ]
+}

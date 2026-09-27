@@ -47,6 +47,7 @@ asked for directly.
 | GNU MP (GMP), inside four LibVLC plugins | 6.3.0 | LGPL-3.0-or-later, chosen from its dual licence with GPL-2.0-or-later |
 | GNU Nettle, inside four LibVLC plugins | 3.7.3 | LGPL-3.0-or-later, chosen from its dual licence with GPL-2.0-or-later |
 | LIVE555 Streaming Media, inside one LibVLC plugin | 2016.11.28 | LGPL-3.0-or-later |
+| The other third-party libraries inside the LibVLC plugins — FFmpeg, FreeType, libass, dav1d and 67 more | as built into libvlc-3.0.23-nogpl.3 | Each its own, permissive or LGPL-2.1-or-later; every one named with its licence, and its own text reproduced, in `licenses/NOTICE-LibVLC-contribs.txt` |
 | Microsoft.Data.Sqlite | 10.0.10 | MIT |
 | Microsoft.Data.Sqlite.Core | 10.0.10 | MIT |
 | SQLitePCLRaw.bundle_e_sqlite3 | 2.1.11 | Apache-2.0 |
