@@ -19,6 +19,10 @@ namespace ApSolutions.LocalMedia.MediaTests.Playback;
 [Trait("Category", "RealMedia")]
 public sealed class HdrAccelerationTests
 {
+    // Measured on 2026-09-27 on the two samples: 33.0 levels with the conversion and 16.1 without it
+    // (what is left is the BT.2020 matrix alone), the same in two runs each. Halfway between.
+    private const double MeanGreenDifferenceFloor = 24d;
+
     /// <summary>
     /// The container's own declaration, read the way the player reads it, agrees with ffprobe — which
     /// is a second, independent reader, and the one this suite trusted before the player had its own.
@@ -76,6 +80,45 @@ public sealed class HdrAccelerationTests
         string? encodedBy,
         HdrFormat expected) =>
         Assert.Equal(expected, LibVlcVideoCapabilities.RecogniseDolbyVision(codec, description, encodedBy));
+
+    /// <summary>
+    /// The frames themselves go through the conversion. The two samples carry the same pixels — the
+    /// HDR10 one only tags them as PQ — so the first frame of each, read the way each declares, has to
+    /// differ pixel by pixel: the curve lifts the mid-tones and sinks the shadows. The average is no
+    /// measure of it, and that was measured: the two movements cancel, 125.5 against 124.0.
+    /// </summary>
+    [Fact]
+    public async Task The_frames_of_an_HDR10_film_come_out_converted()
+    {
+        var hdr = await FirstFrameAsync("mkv-hevc-hdr10");
+        var sdr = await FirstFrameAsync("mkv-hevc-sdr");
+        Assert.Equal(sdr.Length, hdr.Length);
+
+        var difference = 0L;
+        for (var at = 1; at < hdr.Length; at += 4)
+        {
+            difference += Math.Abs(hdr[at] - sdr[at]);
+        }
+
+        var mean = difference / (hdr.Length / 4d);
+        Assert.True(mean > MeanGreenDifferenceFloor, $"The HDR10 frame differs from the same pixels in SDR by {mean:F1} levels of green on average.");
+    }
+
+    private static async Task<byte[]> FirstFrameAsync(string id)
+    {
+        var path = await CodecMatrixTests.RequireSampleAsync(MediaManifest.Require(id));
+        await using var factory = LibVlcFactory.CreateHeadless();
+        await using var engine = new LibVlcMediaPlayerEngine(factory);
+        await engine.InitializeAsync(TestContext.Current.CancellationToken);
+        var first = new TaskCompletionSource<byte[]>(TaskCreationOptions.RunContinuationsAsynchronously);
+        engine.FrameRendered += (_, frame) => first.TrySetResult(frame.Pixels.ToArray());
+
+        await engine.OpenAsync(new PlaybackRequest(new MediaFileId(Guid.NewGuid()), path), TestContext.Current.CancellationToken);
+        await engine.PlayAsync(TestContext.Current.CancellationToken);
+        var pixels = await first.Task.WaitAsync(TimeSpan.FromSeconds(30), TestContext.Current.CancellationToken);
+        await engine.StopAsync(TestContext.Current.CancellationToken);
+        return pixels;
+    }
 
     /// <summary>A file with no picture has nothing to describe, and is played as standard range.</summary>
     [Fact]
