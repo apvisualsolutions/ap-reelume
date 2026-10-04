@@ -1,0 +1,21 @@
+{
+  "formatVersion": 1,
+  "comment": [
+    "The LibVLC the application ships: the trees libvlc-nogpl.yml built without GPL code,",
+    "promoted by libvlc-publish.yml to a prerelease of this repository and pinned here by the SHA-512",
+    "of each asset as published. The build is not reproducible byte for byte, so the hash of what was",
+    "verified is the only thing that can name it. fetch-libvlc.ps1 refuses any other bytes, and the",
+    "MSBuild import in eng/libvlc/LibVlc.targets calls it before the tree is copied anywhere.",
+    "sourceAsset is the corresponding source of exactly these trees: VLC at the tag, the patches and",
+    "scripts at the commit that built them, and every contrib tarball the build fetched."
+  ],
+  "repository": "apvisualsolutions/ap-reelume",
+  "tag": "libvlc-3.0.23-nogpl.3",
+  "vlcVersion": "3.0.23",
+  "buildRun": 36271706844,
+  "assets": {
+    "x64": { "fileName": "libvlc-nogpl-x64.zip", "sha512": "ace7c679d877a7e21430a52d6fcb842bf37e7ea3cf93354cad6e0f0feac2ebd993777b05b7ac4b013380c97558652c2ae81e77e78457d33b1d403ec3af3446c8" },
+    "arm64": { "fileName": "libvlc-nogpl-arm64.zip", "sha512": "5d26ec1c7fcce716a86be5149649933e45208966a04da626afea3f901b655aa8a444c50fd87867fdc30a8f43edd2a9b2bb963f2dfb35d4243c34f0152b432a7c" }
+  },
+  "sourceAsset": { "fileName": "libvlc-3.0.23-nogpl.3-source.tar", "sha512": "acb9f7d3c5c6f6c5bf8d62eb3fa8c4c6b41e10c66d004e9602ddb3f9e7d64cde65f35e6eb26db33b85e5e31b798fd549cc939b145ee6d0e7a8563d94f52edbd8" }
+}

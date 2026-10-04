@@ -1,0 +1,115 @@
+VideoLAN — LibVLC, its core and its plugins
+===========================================
+
+AP Reelume decodes and plays video through LibVLC, the engine of the VLC media player by VideoLAN.
+Two pieces of it travel in this artifact:
+
+    LibVLCSharp 3.10.0              the managed binding, as VideoLAN            LGPL-2.1-or-later
+                                    publishes it on NuGet, unmodified
+    LibVLC libvlc-3.0.23-nogpl.3    libvlc.dll, libvlccore.dll and the          LGPL-2.1-or-later
+                                    plugins under plugins/, built by
+                                    AP Solutions from vlc 3.0.23 without
+                                    GPL code, and the hearing model in
+                                    hrtfs/ (Copyright (C) 2017 3D Sound
+                                    Labs)
+
+Copyright © the VideoLAN project and its contributors.
+
+Why the engine is not VideoLAN's own build. VideoLAN's Windows package is compiled with GPL code in
+it: read from the VLC 3.0.23 sources, fourteen of its plugins are GPL on x64 and eleven on ARM64 —
+FFmpeg built with --enable-gpl, VLC modules whose own sources are GPL, and a demuxer linking the
+aribb24 library. One more on each architecture carries GPL code its own sources do not show: the
+teletext decoder, through the libzvbi library it links, two of whose files are GPL-2.0-only. A GPL
+plugin cannot ship inside a program under a licence of its own, so the engine this artifact carries
+is built from the same VLC release with GPL switched off, and every plugin whose sources are GPL is
+left out. What was built, how, and why each plugin is absent is recorded in the manifest.json
+published with the engine.
+
+Teletext is not decoded. Both of VLC's teletext decoders carry GPL code: the zvbi plugin through
+libzvbi, and telx, whose source says part of it was converted from a GPL decoder. Neither is built,
+and libzvbi is not built either.
+
+It is modified, and these are the modifications:
+
+    0001-deinterlace-drop-yadif.patch    removes the yadif deinterlacing algorithm, which is GPL, from
+                                         the deinterlace plugin; the other algorithms remain
+    0002-build-sh-no-dvdread.patch       removes libdvdread, which is GPL, from VideoLAN's build script
+
+Nothing else in VLC's source was changed. The build runs VideoLAN's own script
+(extras/package/win32/build.sh) inside VideoLAN's own build images, with third-party libraries
+configured by contrib/bootstrap --disable-gpl, libzvbi deselected by name because its build recipe
+does not declare its GPL files, and FreeType under its FreeType Licence rather than the GPL (see the
+third-party notices).
+
+LGPL-2.1.txt covers the binding, the core and the plugins. GPL-2.0.txt is in this folder because it is
+VLC's licence for the VLC media player as a whole, which vlc_about.h compiles into libvlc as the text
+the player displays for itself; no plugin this artifact carries is under it.
+
+Three third-party libraries are linked statically into some of the plugins, and they are under the
+GNU Lesser General Public License version 3 or later. LGPL-3.0.txt and GPL-3.0.txt, which that
+licence is written on, are in this folder:
+
+    GNU MP (GMP) 6.3.0          plugins/misc/libgnutls_plugin.dll,           LGPL-3.0-or-later, chosen from
+                                plugins/access/libaccess_srt_plugin.dll,     its dual licence with
+                                plugins/access_output/                       GPL-2.0-or-later
+                                  libaccess_output_srt_plugin.dll,
+                                plugins/access/libdcp_plugin.dll
+                                Copyright 1991, 1993-1997, 1999-2016, 2020, 2021 Free Software
+                                Foundation, Inc.
+    GNU Nettle 3.7.3            the same four plugins                        LGPL-3.0-or-later, chosen from
+                                Copyright Niels Möller and the other         its dual licence with
+                                authors each source file names               GPL-2.0-or-later
+    LIVE555 Streaming Media     plugins/access/liblive555_plugin.dll         LGPL-3.0-or-later
+      2016.11.28                Copyright (c) 1996-2017 Live Networks, Inc.
+
+Each of those plugins is the combined work the LGPL-3.0 speaks of, and every line of source in it is
+open: VLC's module, GnuTLS, SRT, asdcplib and the library itself. Their complete source, with the
+scripts that link them, is in the second archive below, which is how LGPL-3.0 §4(d)(0) is met. The
+plugins are separate files this program loads at run time, so a rebuilt plugin replaces the one here
+by overwriting it. No Installation Information is owed under §4(e): that obligation comes from GPL-3.0
+§6 and applies only to a User Product, a tangible consumer device, which a program delivered as a
+download is not.
+
+The libraries are separate dynamic libraries that the program loads at run time. Replacing them with
+another build of the same library — VideoLAN's own, or one built from the source below — is a matter
+of overwriting the files, and the program will use the replacement as long as it is
+interface-compatible.
+
+
+Where to get the corresponding source
+-------------------------------------
+
+It travels with the release. Every release that carries these binaries also carries, as attachments
+alongside them, the corresponding source archives:
+
+    vlc-3.0.23.tar.xz                     https://download.videolan.org/vlc/3.0.23/vlc-3.0.23.tar.xz
+    libvlc-3.0.23-nogpl.3-source.tar      https://github.com/apvisualsolutions/ap-reelume/releases/download/libvlc-3.0.23-nogpl.3/libvlc-3.0.23-nogpl.3-source.tar
+    LibVLCSharp-3.10.0.tar.gz             https://codeload.github.com/videolan/libvlcsharp/tar.gz/refs/tags/3.10.0
+
+The second archive is everything needed to rebuild these exact binaries: VLC's git tree at the tag the build compiled, the two
+patches and the scripts that built them, and the source tarball of every third-party library the build
+fetched (FFmpeg among them), each checked against the digest VLC's own contrib system pins. The engine
+release it belongs to, libvlc-3.0.23-nogpl.3, publishes it beside the binaries.
+
+That is the point of section 6(d) of the LGPL-2.1: where an executable is offered for download from a
+designated place, offering equivalent access to copy the source from that same place is distribution
+of the source. The archives are fetched during the release with their digests recorded in
+SHA256SUMS.txt, which the release signs; the VLC archive is checked against the digest VideoLAN
+publishes for it, and the engine archive against the SHA-512 this repository pins for it.
+
+The work that uses the library is this program itself. Its source is public at
+https://github.com/apvisualsolutions/ap-reelume, though since 2026-09-13 under a licence of its own
+rather than a free one, so LGPL-2.1 §6(a) is not the route. The route is the one that is true in fact:
+anyone who wants to modify LibVLC and use the result has the library's source above, and does not have
+to relink anything, because the libraries are separate files this program loads at run time and
+anybody may replace. As LGPL-2.1 §6 and LGPL-3.0 §4 ask, the program's own licence permits modifying
+the program for your own use, to use it with a modified version of these libraries, and reverse
+engineering it to debug those modifications: see the exception below the list in point 2 of LICENSE.
+
+For any channel where "the same place" means nothing — a store, a mirror, a copy passed on by hand —
+this offer stands instead, and it stands for any third party, not only for whoever received the
+binary: valid for three years from the date of the release this artifact belongs to, AP Solutions
+will supply the complete corresponding machine-readable source code of LibVLC, of its plugins, of the
+third-party libraries linked into them and of LibVLCSharp as distributed here, on a medium customarily
+used for software interchange, for no more than the cost of performing the distribution. Write to the
+address in SECURITY.md.
