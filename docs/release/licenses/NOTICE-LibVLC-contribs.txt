@@ -5,7 +5,7 @@ The LibVLC tree this artifact carries, libvlc-3.0.23-nogpl.3, links third-party 
 its plugins: the ones VLC's build fetches and compiles under contrib/. This file names every one of
 them that ends up in the tree and reproduces, verbatim, the licence or copyright text it ships
 with, taken from its own source archive. Those archives are published beside the engine, in the
-libvlc-3.0.23-nogpl.3-source.tar asset of the release of the same name, under contrib-tarballs/.
+libvlc-3.0.23-nogpl.3-source.tar asset of the release libvlc-3.0.23-nogpl.4, under contrib-tarballs/.
 
 The list is eng/libvlc/contrib-licences.json in the source repository. It also names what the build
 fetched and does not ship (the Qt interface, Lua, gettext, Musepack and the WiX packaging tools),

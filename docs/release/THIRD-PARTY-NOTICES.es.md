@@ -103,8 +103,8 @@ ninguno. **Tampoco se compila la decodificación de teletexto**, porque los dos 
 llevan código GPL: `libzvbi_plugin` enlaza la biblioteca zvbi, dos de cuyos ficheros son
 `GPL-2.0-only` aunque su receta de compilación no lo declare, y `libtelx_plugin` dice en su código que
 parte de él se convirtió de un decodificador GPL. No viaja ninguno de los dos, ni la biblioteca, y la
-misma puerta lo comprueba en los binarios. La publica este repositorio como `libvlc-3.0.23-nogpl.3`,
-fijada por el hash de cada archivo.
+misma puerta lo comprueba en los binarios. Este repositorio la compila como `libvlc-3.0.23-nogpl.3` y la
+publica en la versión `libvlc-3.0.23-nogpl.4`, fijada por el hash de cada archivo.
 **Está modificada**, y las dos modificaciones son quitar piezas GPL: el algoritmo de desentrelazado
 yadif del plugin `libdeinterlace` y la biblioteca libdvdread del guion de compilación. Los
 ficheros tocados lo dicen en su cabecera, con fecha, como pide el §2(b) de la LGPL-2.1.

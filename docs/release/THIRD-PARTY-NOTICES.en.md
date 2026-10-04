@@ -103,7 +103,8 @@ is not built either**, because both of VLC's decoders carry GPL code: `libzvbi_p
 library, two of whose files are `GPL-2.0-only` although its build recipe does not declare it, and
 `libtelx_plugin` says in its source that part of it was converted from a GPL decoder. Neither
 travels, nor does the library, and the same gate checks it in the binaries. This repository
-publishes it as `libvlc-3.0.23-nogpl.3`, pinned by the hash of each file. **It is modified**, and both
+builds it as `libvlc-3.0.23-nogpl.3` and publishes it in the release `libvlc-3.0.23-nogpl.4`, pinned
+by the hash of each file. **It is modified**, and both
 modifications take GPL pieces out: the yadif deinterlacing algorithm from the `libdeinterlace` plugin,
 and the libdvdread library from the build script. The files touched say so in their header, with a
 date, as LGPL-2.1 §2(b) asks.

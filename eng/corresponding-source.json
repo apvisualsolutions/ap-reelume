@@ -29,7 +29,7 @@
       "version": "3.0.23-nogpl.3",
       "carriedBy": "libvlc-3.0.23-nogpl.3 (eng/libvlc/libvlc.lock.json)",
       "note": "The rest of the engine's corresponding source, published with the engine by libvlc-publish.yml: the patches and scripts at the commit that built it, VLC at the tag, and every third-party contrib tarball the build fetched (FFmpeg among them). Pinned by the SHA-512 in eng/libvlc/libvlc.lock.json. A tar whose first entry is ./, hence the magic.",
-      "url": "https://github.com/apvisualsolutions/ap-reelume/releases/download/libvlc-3.0.23-nogpl.3/libvlc-3.0.23-nogpl.3-source.tar",
+      "url": "https://github.com/apvisualsolutions/ap-reelume/releases/download/libvlc-3.0.23-nogpl.4/libvlc-3.0.23-nogpl.3-source.tar",
       "fileName": "libvlc-3.0.23-nogpl.3-source.tar",
       "sizeBytes": 516966400,
       "sha256": null,

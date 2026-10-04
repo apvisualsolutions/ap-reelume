@@ -7,10 +7,14 @@
     "verified is the only thing that can name it. fetch-libvlc.ps1 refuses any other bytes, and the",
     "MSBuild import in eng/libvlc/LibVlc.targets calls it before the tree is copied anywhere.",
     "sourceAsset is the corresponding source of exactly these trees: VLC at the tag, the patches and",
-    "scripts at the commit that built them, and every contrib tarball the build fetched."
+    "scripts at the commit that built them, and every contrib tarball the build fetched.",
+    "tag names the build; release is the prerelease its assets are downloaded from. They differ since",
+    "2026-10-04: the build's own tag stayed reserved under the repository's former name, because GitHub",
+    "never lets the tag of an immutable release be used again, so the same bytes moved to a new release."
   ],
   "repository": "apvisualsolutions/ap-reelume",
   "tag": "libvlc-3.0.23-nogpl.3",
+  "release": "libvlc-3.0.23-nogpl.4",
   "vlcVersion": "3.0.23",
   "buildRun": 36271706844,
   "assets": {

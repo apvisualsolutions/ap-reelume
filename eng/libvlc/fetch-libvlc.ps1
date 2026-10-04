@@ -111,7 +111,7 @@ try {
         if ($current -ceq $expected -and (Test-Path $target)) { continue }
 
         $zip = "$staged.zip"
-        $url = "https://github.com/$($lock.repository)/releases/download/$($lock.tag)/$($asset.fileName)"
+        $url = "https://github.com/$($lock.repository)/releases/download/$($lock.release)/$($asset.fileName)"
         foreach ($attempt in 1..3) {
             try { Invoke-WebRequest $url -OutFile $zip; break }
             catch { if ($attempt -eq 3) { throw }; Start-Sleep -Seconds (10 * $attempt) }
