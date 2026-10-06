@@ -1,6 +1,6 @@
 # Third-party notices
 
-AP Reelume by AP Solutions is released under a licence of its own, `LicenseRef-APSolutions`,
+AP Reelume by AP Smart Code Solutions is released under a licence of its own, `LicenseRef-APSolutions`,
 whose text is in `LICENSE`. This document records the
 third-party components the published artifact carries and the licence each one declares. This file is
 updated by every increment that adds or removes a dependency, and **travels inside the artifact**,
@@ -43,7 +43,7 @@ asked for directly.
 | Tmds.DBus.Protocol | 0.94.1 | MIT |
 | BouncyCastle.Cryptography | 2.7.0 | MIT |
 | LibVLCSharp | 3.10.0 | LGPL-2.1-or-later |
-| LibVLC, built by AP Solutions without GPL | 3.0.23-nogpl.3 | LGPL-2.1-or-later |
+| LibVLC, built by AP Smart Code Solutions without GPL | 3.0.23-nogpl.3 | LGPL-2.1-or-later |
 | GNU MP (GMP), inside four LibVLC plugins | 6.3.0 | LGPL-3.0-or-later, chosen from its dual licence with GPL-2.0-or-later |
 | GNU Nettle, inside four LibVLC plugins | 3.7.3 | LGPL-3.0-or-later, chosen from its dual licence with GPL-2.0-or-later |
 | LIVE555 Streaming Media, inside one LibVLC plugin | 2016.11.28 | LGPL-3.0-or-later |
@@ -72,7 +72,7 @@ publishes. What is in it and where each text came from is in
 
 **That sentence is an obligation, not a courtesy**, and this section exists to meet it. FreeType is
 distributed under **two mutually exclusive licences** and one must be chosen: the **FreeType License**
-(FTL), BSD-like, or the **GPL-2.0**. AP Solutions chooses the **FTL**, decided on 2026-09-14,
+(FTL), BSD-like, or the **GPL-2.0**. The owner chooses the **FTL**, decided on 2026-09-14,
 because the other route is incompatible with a proprietary licence — and FreeType's own
 `LICENSE.TXT` says the FTL "is suited to products which don't use the GNU General Public License".
 

@@ -98,12 +98,13 @@ of the source. The archives are fetched during the release with their digests re
 SHA256SUMS.txt, which the release signs; the VLC archive is checked against the digest VideoLAN
 publishes for it, and the engine archive against the SHA-512 this repository pins for it.
 
-The work that uses the library is this program itself. Its source is public at
-https://github.com/apvisualsolutions/ap-reelume, though since 2026-09-13 under a licence of its own
-rather than a free one, so LGPL-2.1 §6(a) is not the route. The route is the one that is true in fact:
-anyone who wants to modify LibVLC and use the result has the library's source above, and does not have
-to relink anything, because the libraries are separate files this program loads at run time and
-anybody may replace. As LGPL-2.1 §6 and LGPL-3.0 §4 ask, the program's own licence permits modifying
+The work that uses the library is this program itself. It is proprietary software under a licence of
+its own since 2026-09-13, and its source is not published, so LGPL-2.1 §6(a) is not the route. What
+is public, at https://github.com/apvisualsolutions/ap-reelume, is everything on the library's side:
+LibVLC's source, the patches and scripts that build it, and the engine releases above. The route is
+the one that is true in fact: anyone who wants to modify LibVLC and use the result has the library's
+source there, and does not have to relink anything, because the libraries are separate files this
+program loads at run time and anybody may replace. As LGPL-2.1 §6 and LGPL-3.0 §4 ask, the program's own licence permits modifying
 the program for your own use, to use it with a modified version of these libraries, and reverse
 engineering it to debug those modifications: see the exception below the list in point 2 of LICENSE.
 

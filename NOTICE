@@ -1,5 +1,6 @@
-AP Reelume by AP Solutions
-Copyright © AP Solutions 2026
+AP Reelume by AP Smart Code Solutions
+Copyright © 2026 Carlos Armando Puche Martín, trading as AP Smart Code Solutions /
+que opera como AP Smart Code Solutions
 
 This product is licensed under the AP Reelume Licence. See LICENSE.
 Este producto se licencia bajo la Licencia de AP Reelume. Véase LICENSE.
@@ -14,7 +15,7 @@ otherwise approved by TMDB. The attribution is readable in the application,
 under Settings.
 
 Video playback is done by LibVLC, from VideoLAN, under LGPL-2.1-or-later, in a
-build by AP Solutions without GPL code: its GPL plugins and two GPL parts of its
+build by AP Smart Code Solutions without GPL code: its GPL plugins and two GPL parts of its
 source were taken out. licenses/NOTICE-VideoLAN.txt says what changed and where
 its source is. That attribution is readable in the application too, under
 Settings.
@@ -29,7 +30,7 @@ aprobado de ningún otro modo por TMDB. La atribución se lee en la aplicación,
 Ajustes.
 
 La reproducción de vídeo la hace LibVLC, de VideoLAN, bajo LGPL-2.1-or-later, en
-una compilación de AP Solutions sin código GPL: se le quitaron los complementos
+una compilación de AP Smart Code Solutions sin código GPL: se le quitaron los complementos
 GPL y dos piezas GPL de su código. licenses/NOTICE-VideoLAN.txt dice qué cambió y
 dónde está su código fuente. Esa atribución también se lee en la aplicación, en
 Ajustes.

@@ -1,7 +1,8 @@
 AP REELUME LICENCE 1.0 / LICENCIA DE AP REELUME 1.0
 
 SPDX-License-Identifier: LicenseRef-APSolutions
-Copyright (c) 2026 AP Solutions. Todos los derechos reservados. All rights reserved.
+Copyright (c) 2026 Carlos Armando Puche Martín, que opera como AP Smart Code Solutions.
+Todos los derechos reservados. All rights reserved.
 
 El texto en español es el auténtico y el que prevalece. La traducción inglesa que
 sigue se ofrece por comodidad y no tiene valor interpretativo.
@@ -14,14 +15,15 @@ interpretive value.
 LICENCIA DE USO DE AP REELUME (versión auténtica)
 ===============================================================================
 
-AP Reelume (en adelante, «el Programa») es propiedad de AP Solutions. Esta
-licencia describe lo que usted puede y no puede hacer con él. Al instalar,
-copiar o usar el Programa, usted acepta estas condiciones. Si no las acepta, no
-lo instale ni lo use.
+AP Reelume (en adelante, «el Programa») es propiedad de Carlos Armando Puche Martín, que opera
+como AP Smart Code Solutions (en adelante, «el Titular»). Esta licencia describe
+lo que usted puede y no puede hacer con él. Al instalar, copiar o usar el
+Programa, usted acepta estas condiciones. Si no las acepta, no lo instale ni lo
+use.
 
 1. LO QUE SE LE PERMITE
 
-AP Solutions le concede un derecho gratuito, mundial, no exclusivo, no
+El Titular le concede un derecho gratuito, mundial, no exclusivo, no
 transferible y revocable a:
 
   1.1 Instalar y usar el Programa en cuantos dispositivos quiera, sin coste y
@@ -29,13 +31,11 @@ transferible y revocable a:
   1.2 Usarlo con cualquier finalidad, personal o profesional, incluida la
       actividad comercial de quien lo usa.
   1.3 Hacer copias de seguridad del instalador para su propio uso.
-  1.4 Consultar el código fuente allí donde AP Solutions lo publique, con la
-      única finalidad de examinarlo, auditar su comportamiento y comprobar lo
-      que el Programa afirma sobre sí mismo.
-  1.5 Compilar el código fuente por su cuenta, para sí mismo y sin modificarlo,
-      con el único fin de comprobar que el programa que AP Solutions distribuye
-      se corresponde con el código publicado. El resultado de esa compilación es
-      para su uso personal y queda sujeto a esta misma licencia.
+  1.4 Consultar el código fuente de los componentes de terceros que el Programa
+      incorpora, allí donde se publique, en los términos de sus propias
+      licencias, y comprobar con las sumas de verificación firmadas que
+      acompañan a cada versión que el programa que descarga es el que el
+      Titular publicó.
 
 No hay que pagar, ni registrarse, ni crear ninguna cuenta.
 
@@ -54,8 +54,12 @@ usted no puede:
       medida en que la ley imperativa lo autorice.
   2.5 Retirar ni alterar los avisos de copyright, de licencia o de atribución,
       ni las marcas.
-  2.6 Usar el nombre «AP Reelume», «AP Solutions» ni sus logotipos para
-      identificar o promocionar ningún otro producto o servicio.
+  2.6 Usar los nombres «AP Reelume» o «AP Smart Code Solutions», ni sus
+      logotipos, para identificar o promocionar ningún otro producto o servicio.
+
+Esta licencia no le concede ningún derecho sobre los nombres «AP Reelume» ni «AP
+Smart Code Solutions», ni sobre sus logotipos o signos distintivos, salvo el de
+mencionarlos para identificar el Programa con veracidad.
 
 Como excepción a 2.1, 2.4 y a la cláusula 3, puede modificar el Programa para
 su propio uso, con el fin de usarlo con una versión modificada de las
@@ -63,16 +67,12 @@ bibliotecas que la cláusula 4 identifica bajo licencias LGPL, y aplicarle
 ingeniería inversa para depurar esas modificaciones. Esta excepción no le
 autoriza a redistribuir el Programa modificado.
 
-Publicar el código fuente no es concederle derechos sobre él. Que usted pueda
-leerlo no le autoriza a copiarlo, reutilizarlo ni incorporarlo a ningún otro
-trabajo.
-
 3. PROPIEDAD
 
-El Programa se licencia, no se vende. AP Solutions conserva la titularidad y
-todos los derechos de propiedad intelectual e industrial sobre él, incluidos los
-que esta licencia no menciona expresamente. Solo AP Solutions puede modificar el
-Programa y solo AP Solutions decide si se comercializa y en qué condiciones.
+El Programa se licencia, no se vende. El Titular conserva la titularidad y todos
+los derechos de propiedad intelectual e industrial sobre él, incluidos los que
+esta licencia no menciona expresamente. Solo el Titular puede modificar el
+Programa y solo el Titular decide si se comercializa y en qué condiciones.
 
 4. COMPONENTES DE TERCEROS
 
@@ -85,29 +85,21 @@ texto íntegro de cada licencia viajan dentro del paquete, en la carpeta
 Nada de esta licencia limita ni pretende limitar los derechos que esas licencias
 de terceros le concedan a usted sobre esos componentes.
 
-5. EL REPOSITORIO PÚBLICO, Y QUÉ CONCEDE Y QUÉ NO
+5. EL CÓDIGO FUENTE Y LAS APORTACIONES
 
-AP Solutions publica el código fuente del Programa en un repositorio público
-alojado por un tercero (la «Plataforma»), con dos finalidades: que cualquiera
-pueda examinarlo, y que las máquinas de compilación y verificación del proyecto
-puedan trabajar sobre él.
+El código fuente del Programa no se publica. Lo que el Titular publica en un
+repositorio público alojado por un tercero son los avisos de licencia, el código
+fuente de los componentes de terceros que sus licencias exigen y las versiones
+del Programa para descargar. Nada de eso le concede derechos sobre el Programa
+más allá de los de esta licencia, y lo previsto en la sección 2 sigue prohibido.
 
-Los términos de servicio de la Plataforma conceden a sus usuarios, por sí mismos
-y al margen de esta licencia, la facultad de ver el repositorio y de crear copias
-dentro de la propia Plataforma. Esta licencia no pretende revocar esa facultad,
-que AP Solutions no controla, y su ejercicio dentro de los límites que la
-Plataforma imponga no constituye incumplimiento de esta licencia.
+Si por cualquier vía llegara a conocer el código fuente del Programa, eso no le
+autoriza a copiarlo, reutilizarlo ni incorporarlo a ningún otro trabajo.
 
-Fuera de eso, no se concede nada. En particular, y sin que la existencia de esa
-copia lo autorice, sigue prohibido lo previsto en la sección 2: modificar el
-código, crear obras derivadas, usarlo o incorporarlo a cualquier otro programa,
-distribuirlo fuera de la Plataforma, publicar compilaciones propias y ofrecerlo a
-terceros bajo cualquier forma.
-
-AP Solutions no acepta aportaciones de código de terceros y rechazará las que
+El Titular no acepta aportaciones de código de terceros y rechazará las que
 reciba. Si alguna persona remite código, sugerencias o comentarios por cualquier
-vía, y AP Solutions decide incorporarlos, cede con ello a AP Solutions el derecho
-a usarlos sin límite, sin contraprestación y sin obligación de atribución, y
+vía, y el Titular decide incorporarlos, cede con ello al Titular el derecho a
+usarlos sin límite, sin contraprestación y sin obligación de atribución, y
 declara tener derecho a hacerlo.
 
 6. SIN GARANTÍA
@@ -117,7 +109,7 @@ ningún tipo, expresa o implícita, incluidas, sin carácter limitativo, las de
 comerciabilidad, idoneidad para un fin determinado, exactitud y ausencia de
 infracción.
 
-AP Solutions no garantiza que el Programa funcione sin interrupciones ni errores,
+El Titular no garantiza que el Programa funcione sin interrupciones ni errores,
 ni que los resultados que produzca —identificación de títulos, detección de
 segmentos, recomendaciones o mejoras de imagen— sean correctos. Son estimaciones
 hechas en el propio equipo.
@@ -128,13 +120,13 @@ derecho alguno sobre su contenido.
 
 7. LÍMITE DE RESPONSABILIDAD
 
-En la máxima medida que permita la ley aplicable, AP Solutions no responderá de
+En la máxima medida que permita la ley aplicable, el Titular no responderá de
 daños indirectos, incidentales, especiales o consecuentes, ni del lucro cesante,
 la pérdida de datos o la interrupción de la actividad, derivados del uso o de la
 imposibilidad de uso del Programa, aunque se hubiera advertido de su posibilidad.
 
-Dado que el Programa se entrega gratuitamente, la responsabilidad total de AP
-Solutions por cualquier concepto queda limitada a cero euros (0 €).
+Dado que el Programa se entrega gratuitamente, la responsabilidad total del
+Titular por cualquier concepto queda limitada a cero euros (0 €).
 
 Nada de esta licencia excluye ni limita la responsabilidad que no pueda excluirse
 ni limitarse legalmente, en particular por dolo o por daños personales causados
@@ -143,8 +135,8 @@ por negligencia.
 8. PRIVACIDAD
 
 El Programa funciona en local. No crea cuentas, no envía telemetría y no
-sincroniza nada con ningún servidor de AP Solutions. Solo sale a internet si
-quien lo usa activa expresamente una función que lo requiera, y siempre hacia los
+sincroniza nada con ningún servidor del Titular. Solo sale a internet si quien lo
+usa activa expresamente una función que lo requiera, y siempre hacia los
 destinos declarados en la documentación del Programa.
 
 9. VIGENCIA Y TERMINACIÓN
@@ -157,7 +149,7 @@ Las secciones 3, 6, 7 y 11 siguen vigentes tras la extinción.
 
 10. CAMBIOS DE LICENCIA
 
-AP Solutions puede publicar versiones futuras del Programa bajo condiciones
+El Titular puede publicar versiones futuras del Programa bajo condiciones
 distintas. Eso no altera la licencia de la versión que usted ya tenga, que se
 rige por el texto que la acompañaba.
 
@@ -170,24 +162,26 @@ atribuya la competencia a otro fuero.
 
 12. INTEGRIDAD DEL ACUERDO
 
-Este documento constituye el acuerdo completo entre usted y AP Solutions respecto
+Este documento constituye el acuerdo completo entre usted y el Titular respecto
 del Programa. Si alguna cláusula se declarase nula, las demás seguirán en vigor.
 
 13. CONTACTO
 
-AP Solutions — Santa Cruz de Tenerife, España.
+Carlos Armando Puche Martín, que opera como AP Smart Code Solutions — Santa Cruz de Tenerife,
+España.
 
 ===============================================================================
 AP REELUME LICENCE (English translation, for convenience only)
 ===============================================================================
 
-AP Reelume (the "Program") is owned by AP Solutions. This licence describes what
-you may and may not do with it. By installing, copying or using the Program you
-accept these terms. If you do not accept them, do not install or use it.
+AP Reelume (the "Program") is owned by Carlos Armando Puche Martín, trading as AP Smart Code
+Solutions (the "Owner"). This licence describes what you may and may not do with
+it. By installing, copying or using the Program you accept these terms. If you
+do not accept them, do not install or use it.
 
 1. WHAT YOU MAY DO
 
-AP Solutions grants you a free of charge, worldwide, non-exclusive,
+The Owner grants you a free of charge, worldwide, non-exclusive,
 non-transferable and revocable right to:
 
   1.1 Install and use the Program on as many devices as you wish, at no cost and
@@ -195,13 +189,10 @@ non-transferable and revocable right to:
   1.2 Use it for any purpose, personal or professional, including the commercial
       activity of the person using it.
   1.3 Make backup copies of the installer for your own use.
-  1.4 Read the source code wherever AP Solutions publishes it, for the sole
-      purpose of examining it, auditing its behaviour and checking what the
-      Program claims about itself.
-  1.5 Build the source code yourself, for yourself and without modifying it, for
-      the sole purpose of checking that the program AP Solutions distributes
-      corresponds to the published source. The result of that build is for your
-      personal use and remains subject to this licence.
+  1.4 Read the source code of the third-party components the Program
+      incorporates, wherever it is published, under the terms of their own
+      licences, and check with the signed checksums that accompany each release
+      that the program you download is the one the Owner published.
 
 There is nothing to pay, no registration and no account.
 
@@ -218,8 +209,12 @@ you may not:
   2.4 Decompile, disassemble or reverse engineer it, except to the extent
       mandatory law allows.
   2.5 Remove or alter copyright, licence or attribution notices, or the marks.
-  2.6 Use the names "AP Reelume" or "AP Solutions", or their logos, to identify
-      or promote any other product or service.
+  2.6 Use the names "AP Reelume" or "AP Smart Code Solutions", or their logos, to
+      identify or promote any other product or service.
+
+This licence grants you no right over the names "AP Reelume" or "AP Smart Code
+Solutions", nor over their logos or distinctive signs, other than to mention
+them in order to identify the Program truthfully.
 
 As an exception to 2.1, 2.4 and clause 3, you may modify the Program for your
 own use, in order to use it with a modified version of the libraries that
@@ -227,15 +222,12 @@ clause 4 identifies as under LGPL licences, and reverse engineer it to debug
 those modifications. This exception does not entitle you to redistribute the
 modified Program.
 
-Publishing the source code grants you no rights over it. Being able to read it
-does not entitle you to copy it, reuse it or incorporate it into any other work.
-
 3. OWNERSHIP
 
-The Program is licensed, not sold. AP Solutions retains ownership and all
+The Program is licensed, not sold. The Owner retains ownership and all
 intellectual property rights in it, including those this licence does not
-expressly mention. Only AP Solutions may modify the Program, and only AP
-Solutions decides whether it is commercialised and on what terms.
+expressly mention. Only the Owner may modify the Program, and only the Owner
+decides whether it is commercialised and on what terms.
 
 4. THIRD-PARTY COMPONENTS
 
@@ -248,28 +240,21 @@ the NOTICE file.
 Nothing in this licence limits, or is intended to limit, the rights those
 third-party licences grant you over those components.
 
-5. THE PUBLIC REPOSITORY, AND WHAT IT GRANTS AND WHAT IT DOES NOT
+5. THE SOURCE CODE AND CONTRIBUTIONS
 
-AP Solutions publishes the Program's source code in a public repository hosted by
-a third party (the "Platform"), for two purposes: so that anyone may examine it,
-and so that the project's build and verification machines can work on it.
+The Program's source code is not published. What the Owner publishes in a public
+repository hosted by a third party is the licence notices, the source code of
+the third-party components their licences require, and the releases of the
+Program for download. None of that grants you any right over the Program beyond
+those of this licence, and everything set out in section 2 remains prohibited.
 
-The Platform's terms of service grant its users, of their own force and
-independently of this licence, the ability to view the repository and to create
-copies within the Platform itself. This licence does not purport to revoke that
-ability, which AP Solutions does not control, and exercising it within the limits
-the Platform imposes is not a breach of this licence.
+Should you come to know the Program's source code by any means, that does not
+entitle you to copy it, reuse it or incorporate it into any other work.
 
-Beyond that, nothing is granted. In particular, and without the existence of such
-a copy authorising it, everything set out in section 2 remains prohibited:
-modifying the code, creating derivative works, using it or incorporating it into
-any other program, distributing it outside the Platform, publishing your own
-builds and offering it to third parties in any form.
-
-AP Solutions does not accept third-party code contributions and will reject those
-it receives. If any person submits code, suggestions or comments by any means and
-AP Solutions decides to incorporate them, that person thereby grants AP Solutions
-the right to use them without limit, without consideration and without any
+The Owner does not accept third-party code contributions and will reject those
+received. If any person submits code, suggestions or comments by any means and
+the Owner decides to incorporate them, that person thereby grants the Owner the
+right to use them without limit, without consideration and without any
 attribution obligation, and represents that they are entitled to do so.
 
 6. NO WARRANTY
@@ -278,7 +263,7 @@ The Program is provided "as is" and "as available", without warranty of any kind
 express or implied, including without limitation warranties of merchantability,
 fitness for a particular purpose, accuracy and non-infringement.
 
-AP Solutions does not warrant that the Program will operate uninterrupted or
+The Owner does not warrant that the Program will operate uninterrupted or
 error-free, nor that the results it produces —title identification, segment
 detection, recommendations or picture enhancement— are correct. They are
 estimates made on the user's own machine.
@@ -289,13 +274,13 @@ right over its content.
 
 7. LIMITATION OF LIABILITY
 
-To the maximum extent permitted by applicable law, AP Solutions shall not be
-liable for indirect, incidental, special or consequential damages, nor for lost
-profits, loss of data or business interruption, arising from the use or inability
-to use the Program, even if advised of the possibility.
+To the maximum extent permitted by applicable law, the Owner shall not be liable
+for indirect, incidental, special or consequential damages, nor for lost profits,
+loss of data or business interruption, arising from the use or inability to use
+the Program, even if advised of the possibility.
 
-Given that the Program is supplied free of charge, AP Solutions' total liability
-on any ground is limited to zero euros (€0).
+Given that the Program is supplied free of charge, the Owner's total liability on
+any ground is limited to zero euros (€0).
 
 Nothing in this licence excludes or limits liability that cannot lawfully be
 excluded or limited, in particular for wilful misconduct or for personal injury
@@ -304,7 +289,7 @@ caused by negligence.
 8. PRIVACY
 
 The Program runs locally. It creates no accounts, sends no telemetry and
-synchronises nothing with any AP Solutions server. It reaches the internet only
+synchronises nothing with any server of the Owner. It reaches the internet only
 if the person using it expressly enables a feature that requires it, and always
 towards the destinations declared in the Program's documentation.
 
@@ -318,9 +303,9 @@ Sections 3, 6, 7 and 11 survive termination.
 
 10. LICENCE CHANGES
 
-AP Solutions may release future versions of the Program under different terms.
-That does not alter the licence of the version you already hold, which is
-governed by the text that accompanied it.
+The Owner may release future versions of the Program under different terms. That
+does not alter the licence of the version you already hold, which is governed by
+the text that accompanied it.
 
 11. GOVERNING LAW AND JURISDICTION
 
@@ -330,9 +315,9 @@ protection rule confers jurisdiction elsewhere.
 
 12. ENTIRE AGREEMENT
 
-This document is the entire agreement between you and AP Solutions regarding the
+This document is the entire agreement between you and the Owner regarding the
 Program. If any clause is held void, the remainder stays in force.
 
 13. CONTACT
 
-AP Solutions — Santa Cruz de Tenerife, Spain.
+Carlos Armando Puche Martín, trading as AP Smart Code Solutions — Santa Cruz de Tenerife, Spain.

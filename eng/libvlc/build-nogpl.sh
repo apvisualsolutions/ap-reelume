@@ -1,5 +1,5 @@
 #!/bin/sh
-# SPDX-FileCopyrightText: 2026 AP Solutions
+# SPDX-FileCopyrightText: 2026 Carlos Armando Puche Martín
 # SPDX-License-Identifier: LicenseRef-APSolutions
 #
 # Builds LibVLC for Windows without GPL third-party libraries, the way VideoLAN builds it: inside
