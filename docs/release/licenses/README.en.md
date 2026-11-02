@@ -13,6 +13,7 @@ reproduced. Naming the component in a table is neither of those.
 
 | File | What it is | What it satisfies |
 |---|---|---|
+| `AOM-Patent-License-1.0.txt` | Text from AOMedia's official page, read on 2026-10-12 | The AV1 patent licence, royalty-free, requires travelling with the binary (§1.2.1.b): dav1d and libaom |
 | `Apache-2.0.txt` | Canonical text | SQLitePCLRaw (§4a) |
 | `BSD-3-Clause.txt` | Canonical text | ANGLE and Skia |
 | `GPL-2.0.txt` | Canonical text | No plugin since 2026-09-18; it is VLC's licence as a program, which `libvlc` displays for itself |
@@ -28,6 +29,8 @@ reproduced. Naming the component in a table is neither of those.
 | `NOTICE-SQLite.txt` | Verbatim copy from the package | SQLite (public domain) |
 | `NOTICE-SQLitePCLRaw.txt` | Assembled notice | SQLitePCLRaw |
 | `NOTICE-VideoLAN.txt` | Assembled notice | LibVLC and its plugins |
+| `Windows-SDK-License.rtf` | Microsoft's file behind `aka.ms/WinSDKLicenseURL`, as served, downloaded on 2026-10-16 (246,945 B, the size the server announces) | `Microsoft.Windows.SDK.NET.dll`, the Windows SDK projection, which is not MIT |
+| `DOTNET-THIRD-PARTY-NOTICES.TXT` | **Not in this folder**: `eng/copy-runtime-notice.ps1` copies it at packaging time from the .NET runtime pack that gets published | What the .NET runtime embeds and carries into the self-contained package |
 | `NOTICE-LibVLC-contribs.txt` | Verbatim texts from each library's own source archive | The 71 third-party libraries linked inside the LibVLC plugins: FFmpeg, FreeType, libass, dav1d and the rest |
 
 There is no catalogue licence text for the program itself: its own licence travels as `LICENSE` at the root of the package,

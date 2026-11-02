@@ -1,0 +1,225 @@
+diff --git a/modules/codec/Makefile.am b/modules/codec/Makefile.am
+index dd04391..15e0e6b 100644
+--- a/modules/codec/Makefile.am
++++ b/modules/codec/Makefile.am
+@@ -1,3 +1,6 @@
++# Modified by AP Solutions on 2026-10-24: the mft plugin also builds hevc_nal, because
++# it now decodes HEVC through Media Foundation.
++
+ codecdir = $(pluginsdir)/codec
+ codec_LTLIBRARIES =
+ 
+@@ -627,7 +630,8 @@ libdmo_plugin_la_LIBADD += $(LIBCOM) -luuid
+ codec_LTLIBRARIES += libdmo_plugin.la
+ endif
+ 
+-libmft_plugin_la_SOURCES = codec/mft.c packetizer/h264_nal.c packetizer/h264_nal.h
++libmft_plugin_la_SOURCES = codec/mft.c packetizer/h264_nal.c packetizer/h264_nal.h \
++	packetizer/hevc_nal.c packetizer/hevc_nal.h
+ if HAVE_WIN32
+ libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfuuid -lmfplat
+ codec_LTLIBRARIES += libmft_plugin.la
+diff --git a/modules/codec/mft.c b/modules/codec/mft.c
+index dc1bb92..9b250f8 100644
+--- a/modules/codec/mft.c
++++ b/modules/codec/mft.c
+@@ -5,6 +5,11 @@
+  *
+  * Author: Felix Abecassis <felix.abecassis@gmail.com>
+  *
++ * Modified by AP Solutions on 2026-10-24: H.264 sends the parameter sets a container
++ * carries out of band in front of the first packet, every output the decoder has ready is
++ * taken (and drained at the end of the stream) instead of one per packet, and HEVC is
++ * decoded the same way, so that Windows can decode the two without FFmpeg.
++ *
+  * This program is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU Lesser General Public License as published by
+  * the Free Software Foundation; either version 2.1 of the License, or
+@@ -51,6 +56,7 @@
+ #include <vlc_plugin.h>
+ #include <vlc_codec.h>
+ #include "../packetizer/h264_nal.h"
++#include "../packetizer/hevc_nal.h"
+ #define _VIDEOINFOHEADER_
+ #include <vlc_codecs.h>
+ 
+@@ -114,6 +120,13 @@ struct decoder_sys_t
+ 
+     /* H264 only. */
+     uint8_t nal_length_size;
++    /* The SPS and PPS a container carries out of band, in Annex B, sent once in front of the
++     * first packet: the Media Foundation decoder reads them from the stream and nowhere else. */
++    bool send_parameter_sets;
++
++    /* What ProcessOutputStream has done so far, counted so a caller can ask it again until it
++     * has nothing left: one output per input packet left frames inside the decoder. */
++    unsigned output_events;
+ };
+ 
+ static const int pi_channels_maps[9] =
+@@ -176,9 +189,20 @@ typedef struct
+  * We need this table since the FOURCC used for GUID is not the same
+  * as the FOURCC used by VLC, for instance h264 vs H264.
+  */
++static const GUID VLC_MFVideoFormat_HEVC =
++    { 0x43564548, 0x0000, 0x0010, { 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 } };
++
++/* H.264 and HEVC travel as NAL units: length-prefixed in MP4 and Matroska, with their parameter
++ * sets out of band, while the Media Foundation decoders want Annex B with the sets in the stream. */
++static bool IsNalCodec(const decoder_t *p_dec)
++{
++    return p_dec->fmt_in.i_codec == VLC_CODEC_H264 || p_dec->fmt_in.i_codec == VLC_CODEC_HEVC;
++}
++
+ static const pair_format_guid video_format_table[] =
+ {
+     { VLC_CODEC_H264, &MFVideoFormat_H264 },
++    { VLC_CODEC_HEVC, &VLC_MFVideoFormat_HEVC },
+     { VLC_CODEC_MJPG, &MFVideoFormat_MJPG },
+     { VLC_CODEC_WMV1, &MFVideoFormat_WMV1 },
+     { VLC_CODEC_WMV2, &MFVideoFormat_WMV2 },
+@@ -569,7 +593,11 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
+     HRESULT hr;
+     IMFSample *input_sample = NULL;
+ 
+-    if (AllocateInputSample(p_dec, stream_id, &input_sample, p_block->i_buffer))
++    /* The parameter sets go in front of the first packet, already in Annex B. */
++    size_t prefix = IsNalCodec(p_dec) && p_sys->send_parameter_sets
++                  ? p_dec->fmt_in.i_extra : 0;
++
++    if (AllocateInputSample(p_dec, stream_id, &input_sample, prefix + p_block->i_buffer))
+         goto error;
+ 
+     IMFMediaBuffer *input_media_buffer = NULL;
+@@ -582,19 +610,20 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
+     if (FAILED(hr))
+         goto error;
+ 
+-    memcpy(buffer_start, p_block->p_buffer, p_block->i_buffer);
++    memcpy(buffer_start, p_dec->fmt_in.p_extra, prefix);
++    memcpy(buffer_start + prefix, p_block->p_buffer, p_block->i_buffer);
+ 
+-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
++    if (IsNalCodec(p_dec))
+     {
+-        /* in-place NAL to annex B conversion. */
+-        h264_AVC_to_AnnexB(buffer_start, p_block->i_buffer, p_sys->nal_length_size);
++        /* in-place NAL to annex B conversion, of the packet only. */
++        h264_AVC_to_AnnexB(buffer_start + prefix, p_block->i_buffer, p_sys->nal_length_size);
+     }
+ 
+     hr = IMFMediaBuffer_Unlock(input_media_buffer);
+     if (FAILED(hr))
+         goto error;
+ 
+-    hr = IMFMediaBuffer_SetCurrentLength(input_media_buffer, p_block->i_buffer);
++    hr = IMFMediaBuffer_SetCurrentLength(input_media_buffer, prefix + p_block->i_buffer);
+     if (FAILED(hr))
+         goto error;
+ 
+@@ -610,6 +639,7 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
+     hr = IMFTransform_ProcessInput(p_sys->mft, stream_id, input_sample, 0);
+     if (FAILED(hr))
+         goto error;
++    p_sys->send_parameter_sets = false;
+ 
+     IMFMediaBuffer_Release(input_media_buffer);
+     IMFSample_Release(input_sample);
+@@ -754,6 +784,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
+         p_sys->output_sample = NULL;
+         if (AllocateOutputSample(p_dec, 0, &p_sys->output_sample))
+             goto error;
++        p_sys->output_events++;
+         return VLC_SUCCESS;
+     }
+     else if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT)
+@@ -767,6 +798,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
+         goto error;
+     }
+ 
++    p_sys->output_events++;
+     if (p_dec->fmt_in.i_cat == VIDEO_ES)
+         decoder_QueueVideo(p_dec, picture);
+     else
+@@ -783,12 +815,31 @@ error:
+     return VLC_EGENERIC;
+ }
+ 
++/* Takes every output the decoder has ready, not just one. */
++static int ProcessAllOutput(decoder_t *p_dec)
++{
++    decoder_sys_t *p_sys = p_dec->p_sys;
++    unsigned before;
++    do
++    {
++        before = p_sys->output_events;
++        if (ProcessOutputStream(p_dec, p_sys->output_stream_id))
++            return VLC_EGENERIC;
++    } while (p_sys->output_events != before);
++    return VLC_SUCCESS;
++}
++
+ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
+ {
+     decoder_sys_t *p_sys = p_dec->p_sys;
+ 
+-    if (!p_block) /* No Drain */
++    if (!p_block)
++    {
++        /* Drain: what the decoder still holds at the end of the stream is the last frames. */
++        if (SUCCEEDED(IMFTransform_ProcessMessage(p_sys->mft, MFT_MESSAGE_COMMAND_DRAIN, 0)))
++            ProcessAllOutput(p_dec);
+         return VLCDEC_SUCCESS;
++    }
+ 
+     if (p_block->i_flags & (BLOCK_FLAG_CORRUPTED))
+     {
+@@ -801,6 +852,8 @@ static int DecodeSync(decoder_t *p_dec, block_t *p_block)
+         goto error;
+     if (ProcessInputStream(p_dec, p_sys->input_stream_id, p_block))
+         goto error;
++    if (ProcessAllOutput(p_dec))
++        goto error;
+     block_Release(p_block);
+ 
+     return VLCDEC_SUCCESS;
+@@ -979,14 +1032,15 @@ static int InitializeMFT(decoder_t *p_dec)
+     if (FAILED(hr))
+         goto error;
+ 
+-    if (p_dec->fmt_in.i_codec == VLC_CODEC_H264)
++    if (IsNalCodec(p_dec))
+     {
+         /* It's not an error if the following call fails. */
+         IMFAttributes_SetUINT32(attributes, &CODECAPI_AVLowLatencyMode, true);
+ 
+         if (p_dec->fmt_in.i_extra)
+         {
+-            if (h264_isavcC((uint8_t*)p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
++            if (p_dec->fmt_in.i_codec == VLC_CODEC_H264
++                && h264_isavcC((uint8_t*)p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
+             {
+                 size_t i_buf;
+                 uint8_t *buf = h264_avcC_to_AnnexB_NAL(p_dec->fmt_in.p_extra,
+@@ -999,6 +1053,21 @@ static int InitializeMFT(decoder_t *p_dec)
+                     p_dec->fmt_in.i_extra = i_buf;
+                 }
+             }
++            else if (p_dec->fmt_in.i_codec == VLC_CODEC_HEVC
++                     && hevc_ishvcC((uint8_t*)p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra))
++            {
++                size_t i_buf;
++                uint8_t *buf = hevc_hvcC_to_AnnexB_NAL(p_dec->fmt_in.p_extra,
++                                                       p_dec->fmt_in.i_extra,
++                                                       &i_buf, &p_sys->nal_length_size);
++                if(buf)
++                {
++                    free(p_dec->fmt_in.p_extra);
++                    p_dec->fmt_in.p_extra = buf;
++                    p_dec->fmt_in.i_extra = i_buf;
++                }
++            }
++            p_sys->send_parameter_sets = true;
+         }
+     }
+     return VLC_SUCCESS;

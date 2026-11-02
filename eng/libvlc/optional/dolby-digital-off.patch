@@ -1,0 +1,16 @@
+diff --git a/contrib/src/ffmpeg/rules.mak b/contrib/src/ffmpeg/rules.mak
+index d874d44..baa802c 100644
+--- a/contrib/src/ffmpeg/rules.mak
++++ b/contrib/src/ffmpeg/rules.mak
+@@ -50,6 +50,11 @@ FFMPEGCONF = \
+ # licensed; VLC decodes them through Media Foundation (the mft plugin) instead.
+ FFMPEGCONF += --disable-decoder=h264,hevc,aac,aac_fixed,aac_latm --disable-encoder=aac
+ 
++# Modified by AP Solutions on 2026-10-30: Dolby Digital (AC-3) and Dolby Digital Plus (E-AC-3) are
++# left out as well. Applied only when the build is asked to (DOLBY_DIGITAL=off in build-nogpl.sh),
++# so that dropping them, should Dolby ask, is a switch and not a rebuild of this recipe by hand.
++FFMPEGCONF += --disable-decoder=ac3,ac3_fixed,eac3
++
+ ifdef USE_FFMPEG
+ FFMPEGCONF += \
+ 	--disable-swresample \

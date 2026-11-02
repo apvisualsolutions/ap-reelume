@@ -29,16 +29,40 @@
     Run it against VideoLAN's NuGet tree too (-LibVlc .../build/x64): that is the reference the
     rebuilt tree is compared with, and a row that fails there is a broken sample, not a finding.
 
+    With -PatentedThroughWindows it also measures that the rebuilt tree's FFmpeg has no H.264,
+    HEVC or AAC decoder, and those three are decoded by Windows through the mft plugin. So each of
+    the three is played twice. Through FFmpeg alone it must deliver nothing — a tree that still
+    carries the decoder fails here, which is the red the build has to be able to give — with MPEG-2
+    as the control that FFmpeg alone still plays. And through the whole tree it must deliver where
+    Windows has the decoder and nothing where it has not: a Windows Server runner has no Media
+    Foundation (it needs a restart to install) and HEVC needs Microsoft's extension, and a frame
+    there would mean something other than Windows decoded it.
+
 .PARAMETER LibVlc
     The folder holding libvlc.dll, libvlccore.dll and plugins/.
 
 .PARAMETER Samples
     Where to generate the samples (ffmpeg must be on the PATH). Reused if already there.
+
+    Every run also says whether the tree's FFmpeg carries the Dolby Digital decoders (AC-3 and
+    E-AC-3), measured by playing both samples through FFmpeg alone, because the engine build can
+    leave them out with a switch and the log of the build is the only record of which way
+    it went. -DolbyDigital turns that statement into an assertion.
+
+.PARAMETER PatentedThroughWindows
+    The tree is built with patches 0003 and 0004: assert who decodes H.264, HEVC and AAC.
+
+.PARAMETER DolbyDigital
+    What the build was asked for: on (FFmpeg must decode both) or off (FFmpeg must decode neither,
+    and nothing else in the tree may either, unless Windows itself has Dolby's decoder). Without it
+    the probe only reports what it found.
 #>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)] [string] $LibVlc,
-    [Parameter(Mandatory)] [string] $Samples
+    [Parameter(Mandatory)] [string] $Samples,
+    [switch] $PatentedThroughWindows,
+    [ValidateSet('on', 'off')] [string] $DolbyDigital
 )
 
 Set-StrictMode -Version Latest
@@ -78,12 +102,14 @@ foreach ($case in $cases) {
     }
 }
 # Black video with one subtitle cue covering the whole clip, so any bright pixel is subtitle ink.
+# MPEG-4 Part 2 rather than H.264, so that the subtitle is measured on a machine where Windows
+# cannot decode H.264 and the tree's FFmpeg no longer does.
 $subtitled = Join-Path $Samples 'subtitle.mkv'
 if (-not (Test-Path $subtitled)) {
     $srt = Join-Path $Samples 'subtitle.srt'
     Set-Content $srt "1`n00:00:00,000 --> 00:00:03,000`nSUBTITLE PROBE`n" -Encoding utf8NoBOM
     & ffmpeg -hide_banner -loglevel error -y -f lavfi -i 'color=c=black:size=640x360:rate=25:duration=3' -i $srt `
-        -c:v libx264 -pix_fmt yuv420p -c:s srt -disposition:s:0 default $subtitled
+        -c:v mpeg4 -q:v 2 -c:s srt -disposition:s:0 default $subtitled
     if ($LASTEXITCODE -ne 0) { throw 'ffmpeg could not produce the subtitle sample.' }
 }
 $fake = Join-Path $Samples 'fake.mp4'
@@ -151,11 +177,14 @@ public static class VlcProbe
 
     static byte[] Utf8(string s) => Encoding.UTF8.GetBytes(s + "\0");
 
+    // VLC's list of decoder modules to try; "any" is its own default.
+    public static string CodecList = "any";
+
     // Returns frames, audio samples and the most bright pixels seen in one frame.
     public static long[] Play(string path, bool subtitles, int seconds)
     {
         frames = 0; maxBright = 0; audioSamples = 0;
-        string[] args = { "--no-video-title-show", "--no-sub-autodetect-file", "--no-metadata-network-access", "--no-osd", subtitles ? "--spu" : "--no-spu" };
+        string[] args = { "--no-video-title-show", "--no-sub-autodetect-file", "--no-metadata-network-access", "--no-osd", subtitles ? "--spu" : "--no-spu", "--codec=" + CodecList };
         var handles = new GCHandle[args.Length];
         var argv = new IntPtr[args.Length];
         for (int i = 0; i < args.Length; i++) { handles[i] = GCHandle.Alloc(Utf8(args[i]), GCHandleType.Pinned); argv[i] = handles[i].AddrOfPinnedObject(); }
@@ -189,14 +218,74 @@ public static class VlcProbe
 [VlcProbe]::Load($LibVlc)
 
 $failures = [System.Collections.Generic.List[string]]::new()
+$notes = [System.Collections.Generic.List[string]]::new()
+
+# Whether this Windows can decode each of the three, asked of what installs the decoder rather
+# than of the decoder itself, so that the answer does not come from the code under test.
+$windowsDecodes = @{}
+if ($PatentedThroughWindows) {
+    $windowsDecodes = @{
+        h264 = Test-Path (Join-Path $env:SystemRoot 'System32\msmpeg2vdec.dll')
+        aac  = Test-Path (Join-Path $env:SystemRoot 'System32\msauddecmft.dll')
+        hevc = [bool](Get-AppxPackage -Name 'Microsoft.HEVCVideoExtension' -ErrorAction SilentlyContinue)
+    }
+}
+
+# Dolby Digital. Windows' own decoder is asked of the file that installs it, like the three
+# above; on this project's PC Windows 11 carries only DolbyDecMFT_redirect.dll, which is not it.
+$dolbyIds = @('ac3', 'eac3')
+$windowsDolby = Test-Path (Join-Path $env:SystemRoot 'System32\DolbyDecMFT.dll')
+
 $rows = foreach ($case in $cases) {
     # LibVLC writes its own errors straight to stderr; the marker says which sample they belong to.
     [Console]::Error.WriteLine("== decode-probe: $($case.Id)")
     $r = [VlcProbe]::Play($case.Path, $true, 10)
     $delivered = if ($case.Kind -eq 'video') { $r[0] } else { $r[1] }
-    if ($delivered -le 0) { $failures.Add("$($case.Id): delivered no $($case.Kind)") }
+    if ($DolbyDigital -eq 'off' -and $dolbyIds -contains $case.Id) {
+        # Left out of FFmpeg, so the whole tree may play it only through Windows' own decoder, and
+        # whether VLC's mft module asks Windows for Dolby at all is not assumed either way.
+        if ($delivered -le 0) { $notes.Add("$($case.Id): left out, and nothing in the tree decoded it") }
+        elseif ($windowsDolby) { $notes.Add("$($case.Id): left out of FFmpeg, and delivered $delivered on a Windows that has Dolby's decoder") }
+        else { $failures.Add("$($case.Id): left out, yet delivered $delivered without Dolby's decoder in Windows, so something in the tree still decodes it") }
+    }
+    elseif ($windowsDecodes.ContainsKey($case.Id) -and -not $windowsDecodes[$case.Id]) {
+        if ($delivered -gt 0) { $failures.Add("$($case.Id): delivered $delivered without Windows' decoder on this machine, so something else decodes it") }
+        else { $notes.Add("$($case.Id): Windows has no decoder for it here, and nothing else decoded it") }
+    }
+    elseif ($delivered -le 0) { $failures.Add("$($case.Id): delivered no $($case.Kind)") }
     [pscustomobject]@{ sample = $case.Id; kind = $case.Kind; frames = $r[0]; audioSamples = $r[1] }
 }
+
+if ($PatentedThroughWindows) {
+    # FFmpeg alone: nothing of the three, and MPEG-2 as the proof that FFmpeg alone still plays.
+    [VlcProbe]::CodecList = 'avcodec,none'
+    foreach ($case in $cases | Where-Object { $windowsDecodes.ContainsKey($_.Id) -or $_.Id -eq 'mpeg2' }) {
+        [Console]::Error.WriteLine("== decode-probe: $($case.Id) through FFmpeg alone")
+        $r = [VlcProbe]::Play($case.Path, $true, 10)
+        $delivered = if ($case.Kind -eq 'video') { $r[0] } else { $r[1] }
+        if ($case.Id -eq 'mpeg2') {
+            if ($delivered -le 0) { $failures.Add('mpeg2 through FFmpeg alone: delivered nothing, so FFmpeg alone is not being measured') }
+        }
+        elseif ($delivered -gt 0) { $failures.Add("$($case.Id) through FFmpeg alone: delivered $delivered, so the tree still carries FFmpeg's decoder") }
+        $notes.Add("$($case.Id) through FFmpeg alone: $delivered")
+    }
+    [VlcProbe]::CodecList = 'any'
+}
+
+# Dolby Digital through FFmpeg alone, on every run: the statement of which way the switch went.
+[VlcProbe]::CodecList = 'avcodec,none'
+$dolbyDelivered = foreach ($id in $dolbyIds) {
+    $case = $cases | Where-Object Id -eq $id
+    [Console]::Error.WriteLine("== decode-probe: $id through FFmpeg alone")
+    [VlcProbe]::Play($case.Path, $true, 10)[1]
+}
+[VlcProbe]::CodecList = 'any'
+$dolbyInside = @($dolbyDelivered | Where-Object { $_ -gt 0 }).Count
+$dolbyState = switch ($dolbyInside) { 0 { 'off' } $dolbyIds.Count { 'on' } default { 'mixed' } }
+$dolbyLine = "Dolby Digital (AC-3, E-AC-3) in this tree's FFmpeg: $dolbyState (ac3 $($dolbyDelivered[0]), eac3 $($dolbyDelivered[1]) samples)"
+if ($dolbyState -eq 'mixed') { $failures.Add("${dolbyLine}: one of the two decoders is in and the other out, which no switch setting builds") }
+elseif ($DolbyDigital -and $dolbyState -ne $DolbyDigital) { $failures.Add("$dolbyLine, but the build was asked for $DolbyDigital") }
+
 $f = [VlcProbe]::Play($fake, $true, 5)
 if ($f[0] -ne 0 -or $f[1] -ne 0) { $failures.Add("fake.mp4: delivered $($f[0]) frames and $($f[1]) samples from a text file — the counters are not measuring decoding") }
 $on = [VlcProbe]::Play($subtitled, $true, 10)
@@ -208,6 +297,8 @@ if ($on[2] -lt 200) { $failures.Add("subtitle: only $($on[2]) bright pixels with
 $rows | Format-Table -AutoSize | Out-String -Width 200
 "fake.mp4: frames $($f[0]), audio samples $($f[1])"
 "subtitle: bright pixels with $($on[2]), without $($off[2])"
+$dolbyLine
+foreach ($x in $notes) { $x }
 if ($failures.Count -gt 0) {
     'FAILED:'
     foreach ($x in $failures) { "  $x" }

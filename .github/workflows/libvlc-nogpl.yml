@@ -14,6 +14,16 @@ name: LibVLC without GPL
 
 on:
   workflow_dispatch:
+    inputs:
+      # The Dolby Digital switch, decided on 2026-10-30: Dolby Digital stays in unless a build is
+      # launched by hand with it off. A push builds with it on, because a push has no inputs.
+      dolby_digital:
+        description: Dolby Digital (AC-3, E-AC-3) decoders in the engine
+        type: choice
+        options:
+          - "on"
+          - "off"
+        default: "on"
   push:
     branches:
       - dev
@@ -47,10 +57,44 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # Measured on 2026-10-06 (run 37449793289): the runner starts with 5.8 GB free of 72,
+      # the build tree takes about 5 GB, and aarch64 finished with 623 MB to spare. The host's tool
+      # cache (Python, Go, Node, CodeQL…) is mounted here as /__t and nothing in this job uses it —
+      # checkout and the uploads run from the runner's own externals — so it goes, measured both sides.
+      - name: Free the host's tool cache
+        run: |
+          df -h "$GITHUB_WORKSPACE"
+          du -xsh /__t/* || true
+          rm -rf /__t/*
+          df -h "$GITHUB_WORKSPACE"
+
+      # The x86_64 build ran out of disk on 2026-10-05, 38 minutes in and in the middle of the
+      # contribs, with the same scripts that passed on 2026-09-27. Before freeing anything, measure:
+      # the free space every minute while it builds, and what the tree holds when it ends, pass or not.
+      # The switch's battery, here because this image is where the switch runs: seconds, before hours.
+      - name: Test the Dolby Digital switch
+        run: sh eng/libvlc/dolby-digital-switch.test.sh
+
       - name: Build
+        env:
+          DOLBY_DIGITAL: ${{ inputs.dolby_digital || 'on' }}
         run: |
           git config --global --add safe.directory '*'
-          sh eng/libvlc/build-nogpl.sh "${{ matrix.arch }}" "$GITHUB_WORKSPACE/out"
+          df -h / "$GITHUB_WORKSPACE"
+          ( while sleep 60; do echo "disk $(date -u +%H:%M) $(df -h --output=avail,pcent "$GITHUB_WORKSPACE" | tail -n 1)"; done ) &
+          sampler=$!
+          status=0
+          sh eng/libvlc/build-nogpl.sh "${{ matrix.arch }}" "$GITHUB_WORKSPACE/out" || status=$?
+          kill "$sampler"
+          exit "$status"
+
+      - name: Disk after the build
+        if: always()
+        run: |
+          df -h / "$GITHUB_WORKSPACE"
+          du -xsh "$GITHUB_WORKSPACE/out"/* || true
+          du -xh --max-depth=2 "$GITHUB_WORKSPACE/out/vlc-src" | sort -rh | head -n 20 || true
+          du -xh --max-depth=1 "$GITHUB_WORKSPACE"/out/vlc-src/contrib/contrib-* | sort -rh | head -n 25 || true
 
       # The verify job needs the tree the plugins were built from, to read their licences, and the
       # Makefile contrib/bootstrap generated, to see that GPL was off. Not the multi-gigabyte
@@ -171,8 +215,13 @@ jobs:
           $env:PATH = "C:\ProgramData\chocolatey\bin;$env:PATH"
           pwsh -NoProfile -File eng/libvlc/decode-probe.ps1 -LibVlc "ref/build/${{ matrix.nuget }}" -Samples samples
 
+      # And who decodes H.264, HEVC and AAC: never FFmpeg, and Windows where it can. The
+      # Server image's toolset does not install Media Foundation (and installing it needs a
+      # restart), so probably only the ARM64 runner, a Windows 11 client, sees Windows decode them;
+      # the probe asks each machine what it has before it asserts, and says what it found.
       - name: Decode through the rebuilt tree
         shell: pwsh
         run: |
           $env:PATH = "C:\ProgramData\chocolatey\bin;$env:PATH"
-          pwsh -NoProfile -File eng/libvlc/decode-probe.ps1 -LibVlc libvlc-nogpl -Samples samples
+          pwsh -NoProfile -File eng/libvlc/decode-probe.ps1 -LibVlc libvlc-nogpl -Samples samples -PatentedThroughWindows `
+            -DolbyDigital "${{ inputs.dolby_digital || 'on' }}"

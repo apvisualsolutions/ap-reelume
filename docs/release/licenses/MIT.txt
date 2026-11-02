@@ -28,7 +28,10 @@ Tom Deseyn
     Microsoft.Data.Sqlite, Microsoft.Data.Sqlite.Core, Microsoft.Extensions.DependencyInjection,
     Microsoft.Extensions.DependencyInjection.Abstractions, and the .NET 10 runtime and base class
     library this self-contained artifact carries — coreclr.dll, System.*.dll, mscorlib.dll and their
-    companions, plus Microsoft.Windows.SDK.NET.dll and WinRT.Runtime.dll.
+    companions, plus WinRT.Runtime.dll. Not Microsoft.Windows.SDK.NET.dll: its package,
+    Microsoft.Windows.SDK.NET.Ref, declares the Windows SDK licence terms
+    (https://aka.ms/WinSDKLicenseURL) rather than MIT, and they travel in Windows-SDK-License.rtf.
+    The runtime's own third-party notices travel in DOTNET-THIRD-PARTY-NOTICES.TXT.
 
 
 Licence text

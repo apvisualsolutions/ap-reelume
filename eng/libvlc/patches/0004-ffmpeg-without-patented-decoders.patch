@@ -1,0 +1,16 @@
+diff --git a/contrib/src/ffmpeg/rules.mak b/contrib/src/ffmpeg/rules.mak
+index 0fe31de..d874d44 100644
+--- a/contrib/src/ffmpeg/rules.mak
++++ b/contrib/src/ffmpeg/rules.mak
+@@ -45,6 +45,11 @@ FFMPEGCONF = \
+ 	--disable-avresample \
+ 	--enable-bsf=vp9_superframe
+ 
++# Modified by AP Solutions on 2026-10-24: FFmpeg is built without its H.264, HEVC and AAC
++# decoders and its AAC encoder, because those formats are under patents that are still
++# licensed; VLC decodes them through Media Foundation (the mft plugin) instead.
++FFMPEGCONF += --disable-decoder=h264,hevc,aac,aac_fixed,aac_latm --disable-encoder=aac
++
+ ifdef USE_FFMPEG
+ FFMPEGCONF += \
+ 	--disable-swresample \

@@ -12,7 +12,7 @@ running is in sbom/, in CycloneDX and SPDX formats.
 
 This product uses TMDB and the TMDB APIs but is not endorsed, certified, or
 otherwise approved by TMDB. The attribution is readable in the application,
-under Settings.
+under Settings › Credits.
 
 Video playback is done by LibVLC, from VideoLAN, under LGPL-2.1-or-later, in a
 build by AP Smart Code Solutions without GPL code: its GPL plugins and two GPL parts of its
@@ -27,7 +27,7 @@ está ejecutando está en sbom/, en formatos CycloneDX y SPDX.
 
 Este producto usa TMDB y las API de TMDB, pero no está avalado, certificado ni
 aprobado de ningún otro modo por TMDB. La atribución se lee en la aplicación, en
-Ajustes.
+Ajustes › Créditos.
 
 La reproducción de vídeo la hace LibVLC, de VideoLAN, bajo LGPL-2.1-or-later, en
 una compilación de AP Smart Code Solutions sin código GPL: se le quitaron los complementos

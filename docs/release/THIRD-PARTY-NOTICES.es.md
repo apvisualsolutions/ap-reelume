@@ -76,7 +76,7 @@ distribuye bajo **dos licencias mutuamente excluyentes** y hay que elegir una: l
 porque la otra vía es incompatible con una licencia propia — y el propio `LICENSE.TXT` de
 FreeType dice que la FTL «is suited to products which don't use the GNU General Public License».
 
-El precio de esa vía es su cláusula de publicidad, que pide literalmente «acknowledge somewhere in
+El precio de esa vía es su requisito de reconocimiento (§2 de la FTL; la cláusula de publicidad es la §3 y solo limita usar su nombre), que pide literalmente «acknowledge somewhere in
 your documentation that you have used the FreeType code». Eso es lo que hace el recuadro de arriba.
 
 **Y viaja por dos caminos, uno de ellos desde antes de esta decisión**: hoy llega dentro de los
@@ -89,9 +89,17 @@ de los subtítulos. El reconocimiento se escribe una vez y cubre los dos.
 
 El artefacto es autocontenido: lleva su propia copia del motor de ejecución de .NET 10 y de su
 biblioteca base (`coreclr.dll`, `System.*.dll`, `mscorlib.dll` y sus acompañantes), más la proyección
-del SDK de Windows (`Microsoft.Windows.SDK.NET.dll`, `WinRT.Runtime.dll`). Todo ello lo publica
-Microsoft bajo `MIT`. Nadie tiene que instalar un motor de ejecución para usar AP Reelume, y esa
+del SDK de Windows (`Microsoft.Windows.SDK.NET.dll`, `WinRT.Runtime.dll`). Microsoft publica el motor y
+`WinRT.Runtime.dll` bajo `MIT`; `Microsoft.Windows.SDK.NET.dll` no: su paquete declara los términos de licencia
+del SDK de Windows (https://aka.ms/WinSDKLicenseURL), medido en su `.nuspec` el 2026-10-12. Nadie tiene que instalar un motor de ejecución para usar AP Reelume, y esa
 comodidad es lo que mete varios cientos de archivos con licencia de Microsoft dentro del paquete.
+
+**Los dos textos viajan dentro del paquete desde el 2026-10-16.** Los avisos de terceros del propio
+motor de ejecución (lo que incorpora: zlib, los datos de Unicode y otros) van en
+`licenses/DOTNET-THIRD-PARTY-NOTICES.TXT`, copiados al empaquetar del paquete del motor que se publica,
+así que siempre son los de esa versión. Los términos del SDK de Windows, el fichero al que remite el
+enlace de arriba tal cual lo sirve Microsoft, van en
+[`licenses/Windows-SDK-License.rtf`](licenses/Windows-SDK-License.rtf).
 
 ### LibVLC, su núcleo y sus plugins
 
@@ -151,7 +159,7 @@ la aplicación no ofrece, un algoritmo de desentrelazado que no es el de por def
 de color que `libswscale` también hace; `libts` sin aribb24 sigue leyendo `.ts`.
 
 **Mientras esos plugins viajaran aquí, el artefacto no se podía distribuir, y eso es lo que cerró
-la compilación propia.** No pierde formatos: la biblioteca que descodifica es permisiva por defecto, y
+la compilación propia.** No pierde formatos: la biblioteca que descodifica, FFmpeg, va bajo la LGPL por defecto, que no alcanza al programa, y
 lo contagioso eran piezas opcionales que se activan al compilar —un filtro de posprocesado heredado y
 algunas optimizaciones—, **sin ningún decodificador entre ellas**. Medido en Windows x64 y ARM64
 reales: los catorce códecs prometidos decodifican con las mismas cifras que el paquete de VideoLAN,
@@ -225,14 +233,17 @@ se copia durante las pruebas.
 ## Lo que este documento no resuelve
 
 Este archivo dice qué declara cada componente y cómo encajan esas declaraciones entre sí. Lo escriben
-quienes ensamblaron el programa, no un abogado, y dos preguntas siguen abiertas hasta que un dictamen
-jurídico profesional las responda. **La primera se cerró por ingeniería el 2026-09-18**:
+quienes ensamblaron el programa, no un abogado. Dos preguntas quedaron para un dictamen jurídico
+profesional, y las dos se han cerrado después por ingeniería y no con él. **La primera se cerró el
+2026-09-18**:
 desde el 2026-09-13 era un hallazgo —los plugins GPL del paquete de VideoLAN no eran compatibles
 con la licencia propia y frenaban la publicación—, y desde el 2026-09-18 el motor se compila sin ellos.
 La `LGPL-3.0` de tres bibliotecas se leyó el mismo día: tanto esa licencia como la
 LGPL-2.1 piden que el programa se pueda modificar para uso propio y depurar con ingeniería inversa, y
-`LICENSE` lo permite desde entonces con una excepción expresa. La segunda sigue siendo
-pregunta: bajo qué apartado
-del §6 de la LGPL-2.1 queda amparada la forma en que LibVLC viaja aquí, ahora que la vía del §6(a)
-—publicar nuestro fuente bajo licencia libre— ya no está disponible. Ambas se nombran aquí para que
-nadie confunda este documento con el dictamen.
+`LICENSE` lo permite desde entonces con una excepción expresa. La segunda preguntaba bajo
+qué apartado del §6 de la LGPL-2.1 queda amparada la forma en que LibVLC viaja aquí, ahora que la vía
+del §6(a) —publicar nuestro fuente bajo licencia libre— ya no está disponible. Se responde haciendo lo
+que no admite interpretación: el fuente correspondiente se ofrece desde el mismo sitio que el
+ejecutable, que el §6(d) y el último párrafo del §3 cuentan como distribuirlo, y las bibliotecas viajan
+como archivos separados que cualquiera puede sustituir por su propia compilación sin tocar el
+programa. Ambas se nombran aquí para que nadie confunda este documento con un dictamen jurídico.

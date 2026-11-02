@@ -13,6 +13,7 @@ copyright. Nombrar el componente en una tabla no es ninguna de las dos cosas.
 
 | Archivo | Qué es | A qué obliga |
 |---|---|---|
+| `AOM-Patent-License-1.0.txt` | Texto de la página oficial de AOMedia, leído el 2026-10-12 | La licencia de patentes de AV1, gratuita, exige viajar con el binario (§1.2.1.b): dav1d y libaom |
 | `Apache-2.0.txt` | Texto canónico | SQLitePCLRaw (§4a) |
 | `BSD-3-Clause.txt` | Texto canónico | ANGLE y Skia |
 | `GPL-2.0.txt` | Texto canónico | Ningún plugin desde el 2026-09-18; es la licencia de VLC como programa, que `libvlc` muestra de sí mismo |
@@ -28,6 +29,8 @@ copyright. Nombrar el componente en una tabla no es ninguna de las dos cosas.
 | `NOTICE-SQLite.txt` | Copia literal del paquete | SQLite (dominio público) |
 | `NOTICE-SQLitePCLRaw.txt` | Aviso compuesto | SQLitePCLRaw |
 | `NOTICE-VideoLAN.txt` | Aviso compuesto | LibVLC y sus plugins |
+| `Windows-SDK-License.rtf` | El fichero de Microsoft al que remite `aka.ms/WinSDKLicenseURL`, tal cual, descargado el 2026-10-16 (246.945 B, el tamaño que anuncia el servidor) | `Microsoft.Windows.SDK.NET.dll`, la proyección del SDK de Windows, que no es MIT |
+| `DOTNET-THIRD-PARTY-NOTICES.TXT` | **No está en esta carpeta**: `eng/copy-runtime-notice.ps1` lo copia al empaquetar del paquete del motor de .NET que se publica | Lo que el motor de ejecución de .NET incorpora y viaja dentro del paquete autocontenido |
 | `NOTICE-LibVLC-contribs.txt` | Textos literales del archivo de fuentes de cada biblioteca | Las 71 bibliotecas de terceros enlazadas dentro de los plugins de LibVLC: FFmpeg, FreeType, libass, dav1d y las demás |
 
 No hay texto de una licencia de catálogo para el propio programa: su licencia del propio programa viaja como `LICENSE` en la raíz del paquete,

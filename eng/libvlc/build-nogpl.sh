@@ -62,6 +62,13 @@ for patch in "$HERE"/patches/*.patch; do
     fi
 done
 
+# Dolby Digital (AC-3 and E-AC-3) is decoded by default and left out with DOLBY_DIGITAL=off, the
+# decision of 2026-10-30: kept while Dolby has not answered, and removable by a
+# switch rather than by rewriting the FFmpeg recipe under pressure. The patch sits outside patches/
+# so the loop above never applies it, and after them because its context is patch 0004's block.
+# The switch lives in its own script so that it can be tested without cloning VLC.
+sh "$HERE/dolby-digital-switch.sh" "$SRC" "${DOLBY_DIGITAL:-on}"
+
 # Third-party libraries. --disable-gpl refuses every contrib whose recipe says REQUIRE_GPL;
 # x264 and x265 have to be deselected by name (the spike saw bootstrap list them as "manually
 # deselected"). --enable-ad-clauses brings freetype2 back under its FTL licence, the one chosen for
@@ -132,6 +139,12 @@ extras/package/win32/build.sh -r -i none -z -a "$ARCH" $ARCH_FLAGS -o "$OUT/inst
 STRIP="$ARCH-w64-mingw32-strip"
 command -v "$STRIP" >/dev/null 2>&1 || STRIP=llvm-strip
 find "$OUT/install" -name '*.dll' -exec "$STRIP" --strip-unneeded {} +
+
+# VLC 3.0.23's SSE2 conversion from I420 to UYVY writes out of bounds when the visible width is not
+# a multiple of eight, and took the whole application down on an 854-wide video. Without it VLC
+# picks the MMX one, which converts the same widths; the ARM64 tree never had an SSE2 variant.
+# LibVlc.targets withholds it as well, for a payload built before this line existed.
+find "$OUT/install" -name 'libi420_yuy2_sse2_plugin.dll' -print -delete
 
 # The HRTF data the headphone spatialiser reads; VideoLAN's package ships it next to the DLLs.
 cp -r "$SRC/share/hrtfs" "$OUT/install/hrtfs"

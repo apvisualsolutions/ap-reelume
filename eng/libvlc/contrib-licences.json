@@ -634,5 +634,84 @@
       "ships": "yes",
       "text": "aarch64/fluidlite-238997654efb20e736512847f3f5f6d618de9423.tar.xz:fluidlite-238997654efb20e736512847f3f5f6d618de9423/LICENSE"
     }
+  ],
+  "toolchain_comment": [
+    "What the compiler links into every binary. It comes from VideoLAN's build images, not from contrib/tarballs, so",
+    "check-contrib-licences.ps1 does not look for it there. Versions read on 2026-10-16 from each image's own build",
+    "history in the registry; what ships, from the published engine. None of it is copyleft over the",
+    "binary: the GCC runtime carries the GCC Runtime Library Exception and the LLVM runtimes the LLVM exception."
+  ],
+  "toolchain": [
+    {
+      "name": "mingw-w64 C runtime (crt, mingwex)",
+      "version": "v11.0.1 (x64) and git de62c283f3383bd825c98518cb0a42ba071d4ac2 (ARM64)",
+      "licence": "LicenseRef-MinGW-w64-runtime",
+      "image": "registry.videolan.org/vlc-debian-win64-3.0:20251208092116 and registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032",
+      "evidence": "«Mingw-w64 runtime failure» in all 316 x64 and 306 ARM64 DLLs. The file is the same at both versions (SHA-256 e9b2dc02451e…) and lists the notices of each part it covers",
+      "texts": [
+        "https://raw.githubusercontent.com/mingw-w64/mingw-w64/v11.0.1/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt"
+      ]
+    },
+    {
+      "name": "GCC runtime (libgcc, libstdc++), x64",
+      "version": "6.4.0",
+      "licence": "GPL-3.0-or-later WITH GCC-exception-3.1",
+      "image": "registry.videolan.org/vlc-debian-win64-3.0:20251208092116",
+      "evidence": "«GCC: (GNU) 6.4.0» in all 316 x64 DLLs and libstdc++ type information in 25 plugins",
+      "texts": [
+        "https://raw.githubusercontent.com/gcc-mirror/gcc/releases/gcc-6.4.0/COPYING.RUNTIME",
+        "https://raw.githubusercontent.com/gcc-mirror/gcc/releases/gcc-6.4.0/COPYING3"
+      ]
+    },
+    {
+      "name": "winpthreads, ARM64",
+      "version": "git de62c283f3383bd825c98518cb0a42ba071d4ac2",
+      "licence": "MIT AND BSD-3-Clause",
+      "image": "registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032",
+      "evidence": "pthread symbols in 15 ARM64 plugins; on x64 winpthreads comes from the contrib mingw-w64 v10.0.0 archive and has its own section",
+      "texts": [
+        "https://raw.githubusercontent.com/mingw-w64/mingw-w64/de62c283f3383bd825c98518cb0a42ba071d4ac2/mingw-w64-libraries/winpthreads/COPYING"
+      ]
+    },
+    {
+      "name": "libc++, ARM64",
+      "version": "LLVM 19.1.7",
+      "licence": "Apache-2.0 WITH LLVM-exception",
+      "image": "registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032",
+      "evidence": "the C++ plugins (SRT, the 22 with __gxx_personality_seh0) link the toolchain's C++ library",
+      "texts": [
+        "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-19.1.7/libcxx/LICENSE.TXT"
+      ]
+    },
+    {
+      "name": "libc++abi, ARM64",
+      "version": "LLVM 19.1.7",
+      "licence": "Apache-2.0 WITH LLVM-exception",
+      "image": "registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032",
+      "evidence": "«libc++abi» in 22 ARM64 plugins",
+      "texts": [
+        "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-19.1.7/libcxxabi/LICENSE.TXT"
+      ]
+    },
+    {
+      "name": "libunwind, ARM64",
+      "version": "LLVM 19.1.7",
+      "licence": "Apache-2.0 WITH LLVM-exception",
+      "image": "registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032",
+      "evidence": "«libunwind» in 25 ARM64 binaries",
+      "texts": [
+        "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-19.1.7/libunwind/LICENSE.TXT"
+      ]
+    },
+    {
+      "name": "compiler-rt builtins, ARM64",
+      "version": "LLVM 19.1.7",
+      "licence": "Apache-2.0 WITH LLVM-exception",
+      "image": "registry.videolan.org/vlc-debian-llvm-ucrt:20250903131032",
+      "evidence": "the image's toolchain is built with build-compiler-rt.sh and llvm-mingw links its builtins into every binary it produces",
+      "texts": [
+        "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-19.1.7/compiler-rt/LICENSE.TXT"
+      ]
+    }
   ]
 }

@@ -76,7 +76,7 @@ distributed under **two mutually exclusive licences** and one must be chosen: th
 because the other route is incompatible with a proprietary licence — and FreeType's own
 `LICENSE.TXT` says the FTL "is suited to products which don't use the GNU General Public License".
 
-The price of that route is its advertising clause, which asks literally to "acknowledge somewhere in
+The price of that route is its acknowledgement requirement (FTL §2; the advertising clause is §3 and only limits using its name), which asks literally to "acknowledge somewhere in
 your documentation that you have used the FreeType code". That is what the box above does.
 
 **And it arrives by two paths, one of them from before this decision**: today it comes inside Skia's
@@ -89,9 +89,16 @@ text. The acknowledgement is written once and covers both.
 
 The artifact is self-contained: it carries its own copy of the .NET 10 runtime and base class
 library (`coreclr.dll`, `System.*.dll`, `mscorlib.dll` and their companions), plus the Windows SDK
-projection (`Microsoft.Windows.SDK.NET.dll`, `WinRT.Runtime.dll`). All of it is published by
-Microsoft under `MIT`. Nobody has to install a runtime to run AP Reelume, and that convenience is
+projection (`Microsoft.Windows.SDK.NET.dll`, `WinRT.Runtime.dll`). Microsoft publishes the runtime and
+`WinRT.Runtime.dll` under `MIT`; not `Microsoft.Windows.SDK.NET.dll`: its package declares the Windows SDK
+licence terms (https://aka.ms/WinSDKLicenseURL), measured in its `.nuspec` on 2026-10-12. Nobody has to install a runtime to run AP Reelume, and that convenience is
 what puts several hundred Microsoft-licensed files inside the package.
+
+**Both texts travel inside the package since 2026-10-16.** The runtime's own third-party notices
+(what it embeds: zlib, the Unicode data and others) are in `licenses/DOTNET-THIRD-PARTY-NOTICES.TXT`,
+copied at packaging time from the runtime pack that gets published, so they are always that
+version's. The Windows SDK terms, the file the link above points to exactly as Microsoft serves it,
+are in [`licenses/Windows-SDK-License.rtf`](licenses/Windows-SDK-License.rtf).
 
 ### LibVLC, its core and its plugins
 
@@ -152,7 +159,7 @@ does not offer, a deinterlacing algorithm that is not the default and a colour c
 `libswscale` also does; `libts` without aribb24 still reads `.ts`.
 
 **While those plugins travelled here the artifact could not be distributed, and that is what the build
-of our own closed.** It costs no formats: the decoding library is permissive by default, and what was
+of our own closed.** It costs no formats: the decoding library, FFmpeg, is under the LGPL by default, which does not reach the program, and what was
 copyleft were optional pieces enabled at build time — a legacy post-processing filter and some
 optimisations — **with no decoder among them**. Measured on real Windows x64 and ARM64: the fourteen
 promised codecs decode with the same figures as VideoLAN's package, subtitles included
@@ -225,14 +232,17 @@ copied during the tests.
 ## What this document does not settle
 
 This file states what each component declares and how those declarations fit together. It is written
-by the people who assembled the software, not by a lawyer, and two questions stay open until a
-professional legal opinion answers them. **The first was closed by engineering on
+by the people who assembled the software, not by a lawyer. Two questions were left for a
+professional legal opinion, and both have since been closed by engineering rather than by one.
+**The first was closed on
 2026-09-18**: since 2026-09-13 it had been a finding — the GPL plugins in VideoLAN's package were not
 compatible with the program's own licence and blocked release — and since 2026-09-18 the engine is
 built without them. The `LGPL-3.0` of three libraries was read the same day: both that licence and the
 LGPL-2.1 ask that the program may be modified for one's own use and reverse engineered to debug that,
 and `LICENSE` has permitted it since then through an express exception. The
-second is still a question: which subsection of
-LGPL-2.1 §6 covers the way LibVLC travels here, now that the §6(a) route — publishing our source under
-a free licence — is no longer available. Both are named here so nobody mistakes this document for the
-opinion.
+second asked which subsection of LGPL-2.1 §6 covers the way LibVLC travels here, now that the §6(a)
+route — publishing our source under a free licence — is no longer available. It is answered by doing
+what needs no interpretation: the corresponding source is offered from the same place as the
+executable, which §6(d) and the last paragraph of §3 count as distributing it, and the libraries
+travel as separate files that anyone can replace with their own build without touching the program.
+Both are named here so nobody mistakes this document for a legal opinion.

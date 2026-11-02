@@ -1,11 +1,12 @@
 AP REELUME LICENCE 1.0 / LICENCIA DE AP REELUME 1.0
 
 SPDX-License-Identifier: LicenseRef-APSolutions
-Copyright (c) 2026 Carlos Armando Puche Martín, que opera como AP Smart Code Solutions.
+Copyright (c) 2026 Carlos Armando Puche Martín, que opera como AP Smart Code
+Solutions.
 Todos los derechos reservados. All rights reserved.
 
-El texto en español es el auténtico y el que prevalece. La traducción inglesa que
-sigue se ofrece por comodidad y no tiene valor interpretativo.
+El texto en español es el auténtico y el que prevalece. La traducción inglesa
+que sigue se ofrece por comodidad y no tiene valor interpretativo.
 
 The Spanish text below is the authentic and governing version. The English
 translation that follows it is provided for convenience only and has no
@@ -15,22 +16,26 @@ interpretive value.
 LICENCIA DE USO DE AP REELUME (versión auténtica)
 ===============================================================================
 
-AP Reelume (en adelante, «el Programa») es propiedad de Carlos Armando Puche Martín, que opera
-como AP Smart Code Solutions (en adelante, «el Titular»). Esta licencia describe
-lo que usted puede y no puede hacer con él. Al instalar, copiar o usar el
-Programa, usted acepta estas condiciones. Si no las acepta, no lo instale ni lo
-use.
+AP Reelume (en adelante, «el Programa») es propiedad de Carlos Armando Puche
+Martín, que opera como AP Smart Code Solutions (en adelante, «el Titular»). Esta
+licencia describe lo que usted puede y no puede hacer con él. Su texto completo
+viaja con el Programa, en el fichero LICENSE, y se publica junto a cada
+descarga. El Programa la muestra entera antes de su primer uso y solo se puede
+usar después de aceptarla con «Acepto»; si no está de acuerdo con ella, no la
+acepte y no use el Programa. Lo que la ley le permite
+hacer sin autorización del Titular no depende de esta licencia.
 
 1. LO QUE SE LE PERMITE
 
 El Titular le concede un derecho gratuito, mundial, no exclusivo, no
-transferible y revocable a:
+transferible y por tiempo indefinido a:
 
   1.1 Instalar y usar el Programa en cuantos dispositivos quiera, sin coste y
       sin límite de tiempo.
   1.2 Usarlo con cualquier finalidad, personal o profesional, incluida la
       actividad comercial de quien lo usa.
-  1.3 Hacer copias de seguridad del instalador para su propio uso.
+  1.3 Hacer las copias de seguridad del instalador y del Programa instalado que
+      necesite para usarlo.
   1.4 Consultar el código fuente de los componentes de terceros que el Programa
       incorpora, allí donde se publique, en los términos de sus propias
       licencias, y comprobar con las sumas de verificación firmadas que
@@ -38,6 +43,10 @@ transferible y revocable a:
       Titular publicó.
 
 No hay que pagar, ni registrarse, ni crear ninguna cuenta.
+
+El Titular solo puede dar por terminado este derecho en los casos de la cláusula
+9. Puede dejar de distribuir o de actualizar el Programa cuando quiera, y eso no
+le quita el derecho a seguir usando la copia que ya tiene.
 
 2. LO QUE NO SE LE PERMITE
 
@@ -50,8 +59,11 @@ usted no puede:
       entregarlo a terceros, ni gratis ni cobrando, ni entero ni en partes.
   2.3 Venderlo, alquilarlo, cederlo, prestarlo ni sublicenciarlo, ni ofrecerlo
       como servicio.
-  2.4 Descompilarlo, desensamblarlo ni aplicarle ingeniería inversa, salvo en la
-      medida en que la ley imperativa lo autorice.
+  2.4 Descompilarlo, desensamblarlo ni aplicarle ingeniería inversa, salvo lo
+      que esta licencia permite y lo que la ley no deja excluir por contrato:
+      observar, estudiar y verificar su funcionamiento (artículo 100.3 de la
+      Ley de Propiedad Intelectual) y descompilarlo para la interoperabilidad
+      en las condiciones de los apartados 5 y 6 de ese artículo.
   2.5 Retirar ni alterar los avisos de copyright, de licencia o de atribución,
       ni las marcas.
   2.6 Usar los nombres «AP Reelume» o «AP Smart Code Solutions», ni sus
@@ -61,29 +73,59 @@ Esta licencia no le concede ningún derecho sobre los nombres «AP Reelume» ni 
 Smart Code Solutions», ni sobre sus logotipos o signos distintivos, salvo el de
 mencionarlos para identificar el Programa con veracidad.
 
-Como excepción a 2.1, 2.4 y a la cláusula 3, puede modificar el Programa para
-su propio uso, con el fin de usarlo con una versión modificada de las
-bibliotecas que la cláusula 4 identifica bajo licencias LGPL, y aplicarle
-ingeniería inversa para depurar esas modificaciones. Esta excepción no le
-autoriza a redistribuir el Programa modificado.
+Como excepción a 2.1, 2.4 y a la cláusula 3, y porque lo exige la sección 6 de
+la GNU Lesser General Public License 2.1, se le permite modificar el Programa
+para su propio uso y aplicarle ingeniería inversa para depurar esas
+modificaciones. Esta excepción no le autoriza a distribuir el Programa
+modificado y no alcanza a los componentes de NVIDIA de la cláusula 4 bis.
 
 3. PROPIEDAD
 
 El Programa se licencia, no se vende. El Titular conserva la titularidad y todos
 los derechos de propiedad intelectual e industrial sobre él, incluidos los que
-esta licencia no menciona expresamente. Solo el Titular puede modificar el
-Programa y solo el Titular decide si se comercializa y en qué condiciones.
+esta licencia no menciona expresamente. Fuera de lo que esta licencia y la ley
+le permiten, solo el Titular puede modificar el Programa, y solo él decide si se
+comercializa y en qué condiciones.
 
 4. COMPONENTES DE TERCEROS
 
 El Programa incorpora componentes de terceros que se rigen por sus propias
-licencias, las cuales prevalecen sobre ésta en todo lo que se refiere a esos
-componentes. El inventario de esos componentes, la licencia de cada uno y el
-texto íntegro de cada licencia viajan dentro del paquete, en la carpeta
-«licenses/», y se relacionan en el fichero NOTICE.
+licencias, las cuales prevalecen sobre esta en todo lo que se refiere a esos
+componentes, salvo los de NVIDIA, que regula la cláusula 4 bis. El inventario de
+esos componentes, la licencia de cada uno y el texto íntegro de cada licencia
+viajan dentro del paquete, en la carpeta «licenses/», y se relacionan en el
+fichero NOTICE.
 
 Nada de esta licencia limita ni pretende limitar los derechos que esas licencias
 de terceros le concedan a usted sobre esos componentes.
+
+4 bis. COMPONENTES DE NVIDIA
+
+Algunas versiones del Programa incluyen componentes de NVIDIA Corporation para
+mejorar la imagen: el motor de superresolución y la pieza que lo conecta con el
+Programa. Son de NVIDIA y de sus proveedores, que conservan todos sus derechos.
+NVIDIA no le concede ninguna licencia: usted los usa solo a través de esta, y
+con estas condiciones:
+
+  a) Solo como parte del Programa, en un equipo con tarjeta gráfica de NVIDIA.
+  b) No puede extraerlos, copiarlos aparte, distribuirlos, modificarlos ni crear
+     obras derivadas de ellos.
+  c) No puede descompilarlos, desensamblarlos ni aplicarles ingeniería inversa,
+     salvo en lo que la ley imperativa permita. Tampoco puede retirar sus avisos
+     ni sortear sus limitaciones técnicas o de seguridad.
+  d) No se les aplica la excepción LGPL de la cláusula 2, ni ninguna condición
+     que los someta a una licencia de código abierto.
+  e) No puede usarlos en sistemas cuyo fallo pueda causar lesiones, muertes o
+     daños catastróficos, como la aviación, la navegación, el uso militar, la
+     medicina o el soporte vital.
+  f) Debe cumplir las normas de control de exportaciones y de sanciones de
+     Estados Unidos y las demás aplicables. Declara que no reside en un país o
+     región bajo embargo de Estados Unidos y que no tiene prohibido recibirlos.
+  g) En la máxima medida que la ley permita, NVIDIA no da ninguna garantía sobre
+     ellos ni responde ante usted. Su presencia no significa que NVIDIA
+     patrocine ni avale el Programa.
+  h) Si incumple esta cláusula, su derecho a usar los componentes de NVIDIA se
+     extingue de inmediato, sin el plazo de corrección de la cláusula 9.
 
 5. EL CÓDIGO FUENTE Y LAS APORTACIONES
 
@@ -91,16 +133,18 @@ El código fuente del Programa no se publica. Lo que el Titular publica en un
 repositorio público alojado por un tercero son los avisos de licencia, el código
 fuente de los componentes de terceros que sus licencias exigen y las versiones
 del Programa para descargar. Nada de eso le concede derechos sobre el Programa
-más allá de los de esta licencia, y lo previsto en la sección 2 sigue prohibido.
+más allá de los de esta licencia, y lo previsto en la cláusula 2 sigue
+prohibido.
 
 Si por cualquier vía llegara a conocer el código fuente del Programa, eso no le
 autoriza a copiarlo, reutilizarlo ni incorporarlo a ningún otro trabajo.
 
 El Titular no acepta aportaciones de código de terceros y rechazará las que
-reciba. Si alguna persona remite código, sugerencias o comentarios por cualquier
-vía, y el Titular decide incorporarlos, cede con ello al Titular el derecho a
-usarlos sin límite, sin contraprestación y sin obligación de atribución, y
-declara tener derecho a hacerlo.
+reciba. Las ideas que alguien le comunique no son objeto de derechos de autor, y
+el Titular puede usarlas libremente. Si quisiera incorporar algo que tenga
+autor, lo hará solo después de que este firme una cesión escrita que precise los
+derechos cedidos, las modalidades de explotación, la duración y el territorio.
+El autor conserva siempre el derecho a que se reconozca su autoría.
 
 6. SIN GARANTÍA
 
@@ -114,38 +158,49 @@ ni que los resultados que produzca —identificación de títulos, detección de
 segmentos, recomendaciones o mejoras de imagen— sean correctos. Son estimaciones
 hechas en el propio equipo.
 
-Quien usa el Programa es el único responsable de tener derecho a los archivos que
-reproduce con él. Nada de lo que el Programa deduzca sobre una biblioteca implica
-derecho alguno sobre su contenido.
+Quien usa el Programa es el único responsable de tener derecho a los archivos
+que reproduce con él. Nada de lo que el Programa deduzca sobre una biblioteca
+implica derecho alguno sobre su contenido.
 
-7. LÍMITE DE RESPONSABILIDAD
+Nada de esta cláusula limita las garantías que la ley imperativa le reconozca
+como consumidor, si alguna resulta aplicable.
 
-En la máxima medida que permita la ley aplicable, el Titular no responderá de
-daños indirectos, incidentales, especiales o consecuentes, ni del lucro cesante,
-la pérdida de datos o la interrupción de la actividad, derivados del uso o de la
-imposibilidad de uso del Programa, aunque se hubiera advertido de su posibilidad.
+7. RESPONSABILIDAD
 
-Dado que el Programa se entrega gratuitamente, la responsabilidad total del
-Titular por cualquier concepto queda limitada a cero euros (0 €).
-
-Nada de esta licencia excluye ni limita la responsabilidad que no pueda excluirse
-ni limitarse legalmente, en particular por dolo o por daños personales causados
-por negligencia.
+  7.1 El Titular responde siempre, sin límite, de los daños causados por dolo o
+      culpa grave, de la muerte y las lesiones personales, de la responsabilidad
+      por productos defectuosos y de cualquier otra que la ley no permita
+      excluir ni limitar. Si usted es consumidor, esta cláusula no limita
+      ninguno de los derechos que la ley le reconoce.
+  7.2 Si usa el Programa en su actividad empresarial o profesional, y fuera de
+      los casos de 7.1, el Titular no responde de los daños causados por
+      negligencia leve, incluidos el lucro cesante, la pérdida de datos y la
+      interrupción de la actividad.
+  7.3 El Programa trabaja sobre archivos que usted ya tiene. Mantenga copias de
+      seguridad de su biblioteca y de sus datos. Si sufre una pérdida que esas
+      copias habrían evitado, eso se tendrá en cuenta para reducir o excluir la
+      indemnización, en la medida en que la ley lo permite.
 
 8. PRIVACIDAD
 
 El Programa funciona en local. No crea cuentas, no envía telemetría y no
-sincroniza nada con ningún servidor del Titular. Solo sale a internet si quien lo
-usa activa expresamente una función que lo requiera, y siempre hacia los
+sincroniza nada con ningún servidor del Titular. Solo sale a internet si quien
+lo usa activa expresamente una función que lo requiera, y siempre hacia los
 destinos declarados en la documentación del Programa.
 
 9. VIGENCIA Y TERMINACIÓN
 
-Esta licencia está en vigor mientras usted la cumpla. Se extingue
-automáticamente, sin previo aviso, si incumple cualquiera de sus condiciones. Al
-extinguirse, debe dejar de usar el Programa y eliminar todas sus copias.
+Usted puede terminar esta licencia cuando quiera, desinstalando el Programa. El
+Titular solo puede terminarla si usted incumple de forma grave las cláusulas 2,
+4 bis o 5, por ejemplo redistribuyendo o vendiendo el Programa, distribuyéndolo
+modificado o retirando sus avisos. Antes, si puede identificarle, le avisará
+indicándole el incumplimiento. Si en quince días naturales lo corrige y no lo
+repite, la licencia sigue vigente; si no, o si no admite corrección, se
+extingue. Al extinguirse, debe dejar de usar el Programa y eliminar sus copias.
+Esto no impide al Titular ejercer las acciones que la ley le da por la
+infracción.
 
-Las secciones 3, 6, 7 y 11 siguen vigentes tras la extinción.
+Las cláusulas 3, 4 bis, 6, 7 y 11 siguen vigentes tras la extinción.
 
 10. CAMBIOS DE LICENCIA
 
@@ -155,46 +210,56 @@ rige por el texto que la acompañaba.
 
 11. LEY APLICABLE Y JURISDICCIÓN
 
-Esta licencia se rige por la legislación española. Para cualquier controversia,
-las partes se someten a los juzgados y tribunales de Santa Cruz de Tenerife
-(España), salvo que una norma imperativa de protección de los consumidores
-atribuya la competencia a otro fuero.
+Esta licencia se rige por la legislación española, sin perjuicio de las normas
+imperativas que protegen al consumidor. Las controversias se resolverán ante los
+juzgados y tribunales que correspondan según la ley.
 
 12. INTEGRIDAD DEL ACUERDO
 
 Este documento constituye el acuerdo completo entre usted y el Titular respecto
-del Programa. Si alguna cláusula se declarase nula, las demás seguirán en vigor.
+del Programa. Si alguna cláusula fuera nula o no quedara incorporada, se tendrá
+por no puesta, el resto seguirá en vigor y la parte afectada se integrará
+conforme a la ley.
 
 13. CONTACTO
 
-Carlos Armando Puche Martín, que opera como AP Smart Code Solutions — Santa Cruz de Tenerife,
-España.
+Carlos Armando Puche Martín, que opera como AP Smart Code Solutions —
+Santa Cruz de Tenerife, España.
 
 ===============================================================================
 AP REELUME LICENCE (English translation, for convenience only)
 ===============================================================================
 
-AP Reelume (the "Program") is owned by Carlos Armando Puche Martín, trading as AP Smart Code
-Solutions (the "Owner"). This licence describes what you may and may not do with
-it. By installing, copying or using the Program you accept these terms. If you
-do not accept them, do not install or use it.
+AP Reelume (the "Program") is owned by Carlos Armando Puche Martín, trading as
+AP Smart Code Solutions (the "Owner"). This licence describes what you may and
+may not do with it. Its full text travels with the Program, in the LICENSE file,
+and is published next to each download. The Program shows it in full before it
+is first used, and can only be used after it is accepted with «I accept»; if you
+do not agree with it, do not accept it and do not use the Program. What the law
+allows you to do without the Owner's authorisation does not
+depend on this licence.
 
 1. WHAT YOU MAY DO
 
 The Owner grants you a free of charge, worldwide, non-exclusive,
-non-transferable and revocable right to:
+non-transferable right, for an indefinite term, to:
 
   1.1 Install and use the Program on as many devices as you wish, at no cost and
       with no time limit.
   1.2 Use it for any purpose, personal or professional, including the commercial
       activity of the person using it.
-  1.3 Make backup copies of the installer for your own use.
+  1.3 Make the backup copies of the installer and of the installed Program that
+      you need in order to use it.
   1.4 Read the source code of the third-party components the Program
       incorporates, wherever it is published, under the terms of their own
       licences, and check with the signed checksums that accompany each release
       that the program you download is the one the Owner published.
 
 There is nothing to pay, no registration and no account.
+
+The Owner may end this right only as set out in clause 9. The Owner may stop
+distributing or updating the Program at any time, and that does not take away
+your right to keep using the copy you already have.
 
 2. WHAT YOU MAY NOT DO
 
@@ -203,42 +268,75 @@ you may not:
 
   2.1 Modify the Program, its source code or its binaries, or create derivative
       works of it.
-  2.2 Redistribute it: publish, share, host, package or hand it to third parties,
-      whether free of charge or for a fee, in whole or in part.
+  2.2 Redistribute it: publish, share, host, package or hand it to third
+      parties, whether free of charge or for a fee, in whole or in part.
   2.3 Sell, rent, assign, lend or sublicense it, or offer it as a service.
-  2.4 Decompile, disassemble or reverse engineer it, except to the extent
-      mandatory law allows.
+  2.4 Decompile, disassemble or reverse engineer it, except as this licence
+      allows and as the law does not let a contract exclude: observing, studying
+      and testing how it works (article 100.3 of the Spanish Intellectual
+      Property Act) and decompiling it for interoperability under the
+      conditions of paragraphs 5 and 6 of that article.
   2.5 Remove or alter copyright, licence or attribution notices, or the marks.
-  2.6 Use the names "AP Reelume" or "AP Smart Code Solutions", or their logos, to
-      identify or promote any other product or service.
+  2.6 Use the names "AP Reelume" or "AP Smart Code Solutions", or their logos,
+      to identify or promote any other product or service.
 
 This licence grants you no right over the names "AP Reelume" or "AP Smart Code
 Solutions", nor over their logos or distinctive signs, other than to mention
 them in order to identify the Program truthfully.
 
-As an exception to 2.1, 2.4 and clause 3, you may modify the Program for your
-own use, in order to use it with a modified version of the libraries that
-clause 4 identifies as under LGPL licences, and reverse engineer it to debug
-those modifications. This exception does not entitle you to redistribute the
-modified Program.
+As an exception to 2.1, 2.4 and clause 3, and because section 6 of the GNU
+Lesser General Public License 2.1 requires it, you are permitted to modify the
+Program for your own use and to reverse engineer it for debugging such
+modifications. This exception does not entitle you to distribute the modified
+Program and does not extend to the NVIDIA components in clause 4 bis.
 
 3. OWNERSHIP
 
 The Program is licensed, not sold. The Owner retains ownership and all
 intellectual property rights in it, including those this licence does not
-expressly mention. Only the Owner may modify the Program, and only the Owner
-decides whether it is commercialised and on what terms.
+expressly mention. Beyond what this licence and the law allow you, only the
+Owner may modify the Program, and only the Owner decides whether it is
+commercialised and on what terms.
 
 4. THIRD-PARTY COMPONENTS
 
 The Program incorporates third-party components governed by their own licences,
-which prevail over this one in everything concerning those components. The
-inventory of those components, the licence of each and the full text of each
-licence travel inside the package, in the `licenses/` folder, and are listed in
-the NOTICE file.
+which prevail over this one in everything concerning those components, except
+NVIDIA's, governed by clause 4 bis. The inventory of those components, the
+licence of each and the full text of each licence travel inside the package, in
+the `licenses/` folder, and are listed in the NOTICE file.
 
 Nothing in this licence limits, or is intended to limit, the rights those
 third-party licences grant you over those components.
+
+4 bis. NVIDIA COMPONENTS
+
+Some versions of the Program include NVIDIA Corporation components that enhance
+the picture: the super-resolution engine and the part that connects it to the
+Program. They belong to NVIDIA and its suppliers, who keep all their rights.
+NVIDIA grants you no licence: you use them only through this one, and on these
+terms:
+
+  a) Only as part of the Program, on a computer with an NVIDIA graphics card.
+  b) You may not extract them, copy them separately, distribute them, modify
+     them or create derivative works of them.
+  c) You may not decompile, disassemble or reverse engineer them, except to the
+     extent mandatory law allows. Nor may you remove their notices or bypass
+     their technical or security limits.
+  d) The LGPL exception in clause 2 does not apply to them, nor does any term
+     that would subject them to an open-source licence.
+  e) You may not use them in systems whose failure could cause injury, death or
+     catastrophic loss, such as aviation, navigation, military use, medicine or
+     life support.
+  f) You must comply with United States export-control and sanctions rules and
+     any others that apply. You declare that you do not reside in a country or
+     region under United States embargo and that you are not barred from
+     receiving them.
+  g) To the maximum extent the law allows, NVIDIA gives no warranty on them and
+     has no liability to you. Their presence does not mean that NVIDIA sponsors
+     or endorses the Program.
+  h) If you breach this clause, your right to use the NVIDIA components ends
+     immediately, without the cure period in clause 9.
 
 5. THE SOURCE CODE AND CONTRIBUTIONS
 
@@ -246,22 +344,24 @@ The Program's source code is not published. What the Owner publishes in a public
 repository hosted by a third party is the licence notices, the source code of
 the third-party components their licences require, and the releases of the
 Program for download. None of that grants you any right over the Program beyond
-those of this licence, and everything set out in section 2 remains prohibited.
+those of this licence, and everything set out in clause 2 remains prohibited.
 
 Should you come to know the Program's source code by any means, that does not
 entitle you to copy it, reuse it or incorporate it into any other work.
 
 The Owner does not accept third-party code contributions and will reject those
-received. If any person submits code, suggestions or comments by any means and
-the Owner decides to incorporate them, that person thereby grants the Owner the
-right to use them without limit, without consideration and without any
-attribution obligation, and represents that they are entitled to do so.
+received. Ideas someone communicates are not subject to copyright, and the Owner
+may use them freely. Should the Owner wish to incorporate anything that has an
+author, it will do so only after that author signs a written assignment stating
+the rights assigned, the forms of exploitation, the duration and the territory.
+The author always keeps the right to be recognised as such.
 
 6. NO WARRANTY
 
-The Program is provided "as is" and "as available", without warranty of any kind,
-express or implied, including without limitation warranties of merchantability,
-fitness for a particular purpose, accuracy and non-infringement.
+The Program is provided "as is" and "as available", without warranty of any
+kind, express or implied, including without limitation warranties of
+merchantability, fitness for a particular purpose, accuracy and
+non-infringement.
 
 The Owner does not warrant that the Program will operate uninterrupted or
 error-free, nor that the results it produces —title identification, segment
@@ -272,19 +372,24 @@ Whoever uses the Program is solely responsible for holding the rights to the
 files they play with it. Nothing the Program infers about a library implies any
 right over its content.
 
-7. LIMITATION OF LIABILITY
+Nothing in this clause limits any guarantee that mandatory law gives you as a
+consumer, where one applies.
 
-To the maximum extent permitted by applicable law, the Owner shall not be liable
-for indirect, incidental, special or consequential damages, nor for lost profits,
-loss of data or business interruption, arising from the use or inability to use
-the Program, even if advised of the possibility.
+7. LIABILITY
 
-Given that the Program is supplied free of charge, the Owner's total liability on
-any ground is limited to zero euros (€0).
-
-Nothing in this licence excludes or limits liability that cannot lawfully be
-excluded or limited, in particular for wilful misconduct or for personal injury
-caused by negligence.
+  7.1 The Owner is always liable, without limit, for damage caused by wilful
+      misconduct or gross negligence, for death and personal injury, for
+      defective-product liability, and for any other liability that the law
+      does not allow to be excluded or limited. If you are a consumer, this
+      clause limits none of your statutory rights.
+  7.2 If you use the Program in your business or profession, and outside the
+      cases in 7.1, the Owner is not liable for damage caused by slight
+      negligence, including lost profits, loss of data and business
+      interruption.
+  7.3 The Program works on files you already hold. Keep backups of your library
+      and your data. If you suffer a loss that those backups would have
+      prevented, that will be taken into account to reduce or exclude
+      compensation, to the extent the law allows.
 
 8. PRIVACY
 
@@ -295,11 +400,17 @@ towards the destinations declared in the Program's documentation.
 
 9. TERM AND TERMINATION
 
-This licence is in force for as long as you comply with it. It terminates
-automatically, without notice, if you breach any of its terms. On termination you
-must stop using the Program and delete all copies of it.
+You may end this licence at any time by uninstalling the Program. The Owner may
+end it only if you seriously breach clause 2, 4 bis or 5, for example by
+redistributing or selling the Program, distributing it modified or removing its
+notices.
+Beforehand, if the Owner can identify you, you will be notified of the breach.
+If within fifteen calendar days you remedy it and do not repeat it, the licence
+continues; otherwise, or if it cannot be remedied, it terminates. On termination
+you must stop using the Program and delete your copies. This does not prevent
+the Owner from taking the legal action available for the infringement.
 
-Sections 3, 6, 7 and 11 survive termination.
+Clauses 3, 4 bis, 6, 7 and 11 survive termination.
 
 10. LICENCE CHANGES
 
@@ -309,15 +420,18 @@ the text that accompanied it.
 
 11. GOVERNING LAW AND JURISDICTION
 
-This licence is governed by Spanish law. For any dispute, the parties submit to
-the courts of Santa Cruz de Tenerife, Spain, unless a mandatory consumer
-protection rule confers jurisdiction elsewhere.
+This licence is governed by Spanish law, without prejudice to mandatory
+consumer-protection rules. Disputes shall be resolved by the courts that have
+jurisdiction under the law.
 
 12. ENTIRE AGREEMENT
 
 This document is the entire agreement between you and the Owner regarding the
-Program. If any clause is held void, the remainder stays in force.
+Program. If any clause is void or not incorporated, it shall be deemed not
+written, the remainder stays in force, and the affected part shall be completed
+in accordance with the law.
 
 13. CONTACT
 
-Carlos Armando Puche Martín, trading as AP Smart Code Solutions — Santa Cruz de Tenerife, Spain.
+Carlos Armando Puche Martín, trading as AP Smart Code Solutions —
+Santa Cruz de Tenerife, Spain.

@@ -4,7 +4,10 @@ This tree is VLC media player's library (libvlc.dll, libvlccore.dll, plugins/ an
 Copyright (C) the VideoLAN team and its contributors, built from VLC 3.0.23 with the patches and
 scripts published beside it. It is modified: the build leaves out every module and third-party
 library whose licence is the GPL, among them the two teletext decoders (zvbi and telx), so teletext
-subtitles are not decoded.
+subtitles are not decoded. FFmpeg is also built without its H.264, HEVC and AAC decoders and its AAC
+encoder: those three formats are decoded by Windows through Media Foundation (the mft plugin, which
+the patches change so that it decodes H.264 from MP4 and Matroska and decodes HEVC), and HEVC needs
+Microsoft's HEVC Video Extensions on the computer.
 
 Licences
   LibVLC and its plugins           LGPL-2.1-or-later          licenses/LGPL-2.1.txt
